@@ -139,6 +139,7 @@ public class PubsubJsonClient extends PubsubClient {
     PublishRequest request = new PublishRequest().setMessages(pubsubMessages);
     PublishResponse response =
         pubsub.projects().topics().publish(topic.getPath(), request).execute();
+    System.out.println("[PubsubIO]\t\twriting message '" + outgoingMessages.get(0).message().getData().toStringUtf8() + "' to '" + topic.getPath() + "' topic");
     return response.getMessageIds().size();
   }
 

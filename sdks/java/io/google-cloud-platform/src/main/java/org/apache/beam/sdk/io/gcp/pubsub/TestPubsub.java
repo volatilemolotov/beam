@@ -22,6 +22,9 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 
 import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
+import com.google.api.gax.grpc.GrpcTransportChannel;
+import com.google.api.gax.rpc.FixedTransportChannelProvider;
+import com.google.api.gax.rpc.TransportChannelProvider;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Publisher;
@@ -40,8 +43,12 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
+
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubClient.SubscriptionPath;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubClient.TopicPath;
+import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.testing.TestPipelineOptions;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions;
@@ -77,25 +84,38 @@ public class TestPubsub implements TestRule {
 
   private final TestPubsubOptions pipelineOptions;
   private final String pubsubEndpoint;
+  private final boolean isLocalhost;
 
   private @Nullable TopicAdminClient topicAdmin = null;
   private @Nullable SubscriptionAdminClient subscriptionAdmin = null;
   private @Nullable TopicPath eventsTopicPath = null;
   private @Nullable SubscriptionPath subscriptionPath = null;
+  private @Nullable ManagedChannel channel = null;
+  private @Nullable TransportChannelProvider channelProvider = null;
 
   /**
-   * Creates an instance of this rule.
+   * Creates an instance of this rule using options provided by {@link TestPipeline#testingPipelineOptions()}.
    *
    * <p>Loads GCP configuration from {@link TestPipelineOptions}.
    */
   public static TestPubsub create() {
     TestPubsubOptions options = TestPipeline.testingPipelineOptions().as(TestPubsubOptions.class);
-    return new TestPubsub(options);
+    return fromOptions(options);
+  }
+
+  /**
+   * Creates an instance of this rule using provided options.
+   *
+   * <p>Loads GCP configuration from {@link TestPipelineOptions}</p>
+   */
+  public static TestPubsub fromOptions(PipelineOptions options) {
+    return new TestPubsub(options.as(TestPubsubOptions.class));
   }
 
   private TestPubsub(TestPubsubOptions pipelineOptions) {
     this.pipelineOptions = pipelineOptions;
     this.pubsubEndpoint = PubsubOptions.targetForRootUrl(this.pipelineOptions.getPubsubRootUrl());
+    this.isLocalhost = this.pubsubEndpoint.startsWith("localhost");
   }
 
   @Override
@@ -124,16 +144,24 @@ public class TestPubsub implements TestRule {
   }
 
   private void initializePubsub(Description description) throws IOException {
+    if (isLocalhost) {
+      channel = ManagedChannelBuilder.forTarget(pubsubEndpoint).usePlaintext().build();
+    } else {
+      channel = ManagedChannelBuilder.forTarget(pubsubEndpoint).useTransportSecurity().build();
+    }
+    channelProvider = FixedTransportChannelProvider.create(GrpcTransportChannel.create(channel));
     topicAdmin =
         TopicAdminClient.create(
             TopicAdminSettings.newBuilder()
                 .setCredentialsProvider(pipelineOptions::getGcpCredential)
+                .setTransportChannelProvider(channelProvider)
                 .setEndpoint(pubsubEndpoint)
                 .build());
     subscriptionAdmin =
         SubscriptionAdminClient.create(
             SubscriptionAdminSettings.newBuilder()
                 .setCredentialsProvider(pipelineOptions::getGcpCredential)
+                .setTransportChannelProvider(channelProvider)
                 .setEndpoint(pubsubEndpoint)
                 .build());
     TopicPath eventsTopicPathTmp =
@@ -161,7 +189,7 @@ public class TestPubsub implements TestRule {
   }
 
   private void tearDown() throws IOException {
-    if (subscriptionAdmin == null || topicAdmin == null) {
+    if (subscriptionAdmin == null || topicAdmin == null || channel == null) {
       return;
     }
 
@@ -179,9 +207,12 @@ public class TestPubsub implements TestRule {
     } finally {
       subscriptionAdmin.close();
       topicAdmin.close();
+      channel.shutdown();
 
       subscriptionAdmin = null;
       topicAdmin = null;
+      channelProvider = null;
+      channel = null;
 
       eventsTopicPath = null;
       subscriptionPath = null;
@@ -233,6 +264,7 @@ public class TestPubsub implements TestRule {
     Preconditions.checkNotNull(topicAdmin);
     // Exclude subscriptionPath, the subscription that we created
     return Streams.stream(topicAdmin.listTopicSubscriptions(topicPath.getPath()).iterateAll())
+        .peek(el -> System.out.println("[Test pubsub]" + el))
         .filter((path) -> !path.equals(subscriptionPath.getPath()))
         .collect(Collectors.toList());
   }
@@ -287,6 +319,7 @@ public class TestPubsub implements TestRule {
 
     MessageReceiver receiver =
         (com.google.pubsub.v1.PubsubMessage message, AckReplyConsumer replyConsumer) -> {
+          System.out.println("[Test pubsub]\treceived message " + message.getData().toStringUtf8());
           if (receivedMessages.offer(message)) {
             replyConsumer.ack();
           } else {
@@ -294,12 +327,19 @@ public class TestPubsub implements TestRule {
           }
         };
 
+    System.out.println("[Test pubsub]\tcreating subscriber with path: " + subscriptionPath.getPath());
     Subscriber subscriber =
         Subscriber.newBuilder(subscriptionPath.getPath(), receiver)
             .setCredentialsProvider(pipelineOptions::getGcpCredential)
             .setEndpoint(pubsubEndpoint)
             .build();
+    System.out.println("[Test pubsub]\tchecking subscriptions for topic: " + topicPath().getPath());
+    Streams.stream(topicAdmin.listTopicSubscriptions(topicPath().getPath()).iterateAll())
+      .map(e -> "[Test pubsub]\t'" + e + "'")
+      .forEach(System.out::println);
+    System.out.println("[Test pubsub]\tsubscriptions done, starting poll...");
     subscriber.startAsync();
+
 
     DateTime startTime = new DateTime();
     int timeoutSeconds = timeoutDuration.toStandardSeconds().getSeconds();

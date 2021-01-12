@@ -24,6 +24,14 @@ plugins {
   id 'com.github.johnrengelman.shadow'
 }
 
+test {
+  testLogging {
+    outputs.upToDateWhen {false}
+//    showStandardStreams = true
+    events 'standard_out'
+  }
+}
+
 applyJavaNature(
   exportJavadoc: false,
   automaticModuleName: 'org.apache.beam.examples',

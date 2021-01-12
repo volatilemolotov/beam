@@ -18,26 +18,25 @@
 package org.apache.beam.examples.complete.kafkatopubsub;
 
 import static org.apache.beam.examples.complete.kafkatopubsub.transforms.FormatTransform.readFromKafka;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 
 import com.google.auth.Credentials;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.Supplier;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import org.apache.beam.examples.complete.kafkatopubsub.utils.RunKafkaContainer;
 import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.extensions.gcp.auth.NoopCredentialFactory;
 import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
-import org.apache.beam.sdk.io.gcp.pubsub.PubsubClient;
-import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
-import org.apache.beam.sdk.io.gcp.pubsub.PubsubJsonClient;
-import org.apache.beam.sdk.io.gcp.pubsub.PubsubOptions;
-import org.apache.beam.sdk.io.gcp.pubsub.TestPubsubSignal;
+import org.apache.beam.sdk.io.gcp.pubsub.*;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
@@ -53,6 +52,7 @@ public class KafkaToPubsubE2ETest {
 
   @Rule public final transient TestPipeline pipeline = TestPipeline.fromOptions(OPTIONS);
   @Rule public transient TestPubsubSignal signal = TestPubsubSignal.fromOptions(OPTIONS);
+  @Rule public transient TestPubsub testPubsub = TestPubsub.fromOptions(OPTIONS);
 
   private static final String PUBSUB_EMULATOR_IMAGE =
       "gcr.io/google.com/cloudsdktool/cloud-sdk:316.0.0-emulators";
@@ -69,18 +69,32 @@ public class KafkaToPubsubE2ETest {
     OPTIONS.as(GcpOptions.class).setGcpCredential(credentials);
     OPTIONS.as(GcpOptions.class).setProject(PROJECT_ID);
     setupPubsubContainer(OPTIONS.as(PubsubOptions.class));
-    createPubsubTopicForTest(OPTIONS.as(PubsubOptions.class));
+//    createPubsubTopicForTest(OPTIONS.as(PubsubOptions.class));
   }
 
+  private static class LogIt extends DoFn<String, String> {
+    @ProcessElement
+    public void processElement(ProcessContext context) {
+      System.out.println("[TEST]\t\tElement is: " + context.element());
+      context.output(context.element());
+    }
+  }
+
+
   @Test
-  public void testKafkaToPubsubE2E() throws IOException {
+  public void testKafkaToPubsubE2E() throws IOException, InterruptedException {
+    System.out.println("[TEST]\t\ttest started...");
+//    System.out.println("test started, waiting for subscription to create...");
+//    testPubsub.assertSubscriptionEventuallyCreated(PROJECT_ID, Duration.standardSeconds(10));
+//    System.out.println("subscription is created");
     pipeline.getOptions().as(DirectOptions.class).setBlockOnRun(false);
 
     RunKafkaContainer rkc = new RunKafkaContainer(PUBSUB_MESSAGE);
     String bootstrapServer = rkc.getBootstrapServer();
     String[] kafkaTopicsList = new String[] {rkc.getTopicName()};
 
-    String pubsubTopicPath = TOPIC_PATH.getPath();
+    String pubsubTopicPath = testPubsub.topicPath().getPath();
+    System.out.println(String.format("[TEST]\t\twill be writing to '%s' topic", pubsubTopicPath));
 
     Map<String, Object> kafkaConfig = new HashMap<>();
     Map<String, String> sslConfig = new HashMap<>();
@@ -90,29 +104,35 @@ public class KafkaToPubsubE2ETest {
             "readFromKafka",
             readFromKafka(bootstrapServer, Arrays.asList(kafkaTopicsList), kafkaConfig, sslConfig));
 
-    PCollection<String> readFromPubsub =
         readStrings
             .apply(Values.create())
-            .apply("writeToPubSub", PubsubIO.writeStrings().to(pubsubTopicPath))
-            .getPipeline()
-            .apply("readFromPubsub", PubsubIO.readStrings().fromTopic(pubsubTopicPath));
+            .apply(ParDo.of(new LogIt()))
+            .apply("writeToPubSub", PubsubIO.writeStrings().to(pubsubTopicPath));
 
-    readFromPubsub.apply(
-        "waitForTestMessage",
-        signal.signalSuccessWhen(
-            readFromPubsub.getCoder(),
-            input -> {
-              if (input == null) {
-                return false;
-              }
-              return input.stream().anyMatch(message -> Objects.equals(message, PUBSUB_MESSAGE));
-            }));
 
-    Supplier<Void> start = signal.waitForStart(Duration.standardSeconds(10));
-    pipeline.apply(signal.signalStart());
+//    readFromPubsub.apply(
+//        "waitForTestMessage",
+//        signal.signalSuccessWhen(
+//            readFromPubsub.getCoder(),
+//            input -> {
+//              if (input == null) {
+//                return false;
+//              }
+//              return input.stream().anyMatch(message -> Objects.equals(message, PUBSUB_MESSAGE));
+//            }));
+
+//    Supplier<Void> start = signal.waitForStart(Duration.standardSeconds(10));
+//    pipeline.apply(signal.signalStart());
     PipelineResult job = pipeline.run();
-    start.get();
-    signal.waitForSuccess(Duration.standardMinutes(2));
+    System.out.println("[TEST]\t\tPipeline started");
+//    start.get();
+    System.out.println("[TEST]\t\twaiting for message for 1 minutes");
+//    testPubsub.assertThatTopicEventuallyReceives(hasProperty("payload", equalTo(PUBSUB_MESSAGE.getBytes(StandardCharsets.US_ASCII)))).waitForUpTo(Duration.standardSeconds(20));
+    List<PubsubMessage> pubsubMessages = testPubsub.waitForNMessages(1, Duration.standardMinutes(1));
+    pubsubMessages.forEach(System.out::println);
+    System.out.println("[TEST]\t\twaited 1 minutes for message");
+    assertThat(pubsubMessages, hasSize(1));
+//    signal.waitForSuccess(Duration.standardMinutes(2));
     try {
       job.cancel();
     } catch (IOException | UnsupportedOperationException e) {

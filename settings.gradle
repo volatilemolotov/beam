@@ -210,14 +210,14 @@ include ":vendor:bytebuddy-1_10_8"
 include ":vendor:calcite-1_20_0"
 include ":vendor:guava-26_0-jre"
 include ":vendor:sdks-java-extensions-protobuf"
-include ":website"
+//include ":website"
 include ":runners:google-cloud-dataflow-java:worker:legacy-worker"
 include ":runners:google-cloud-dataflow-java:worker"
 include ":runners:google-cloud-dataflow-java:worker:windmill"
 // no dots allowed for project paths
-include "beam-test-infra-metrics"
-project(":beam-test-infra-metrics").dir = file(".test-infra/metrics")
-include "beam-test-tools"
-project(":beam-test-tools").dir = file(".test-infra/tools")
-include "beam-test-jenkins"
-project(":beam-test-jenkins").dir = file(".test-infra/jenkins")
+//include "beam-test-infra-metrics"
+//project(":beam-test-infra-metrics").dir = file(".test-infra/metrics")
+//include "beam-test-tools"
+//project(":beam-test-tools").dir = file(".test-infra/tools")
+//include "beam-test-jenkins"
+//project(":beam-test-jenkins").dir = file(".test-infra/jenkins")

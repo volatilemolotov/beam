@@ -54,15 +54,17 @@ public class RunKafkaContainer {
         () -> {
           try {
             producer.send(new ProducerRecord<>(topicName, "testcontainers", pubsubMessage)).get();
-            System.out.println("Producer sent");
+            System.out.println("[Kafka]\t\tProducer sent");
           } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException("Something went wrong in kafka producer", e);
           }
         };
     // Without saving `.schedule(...)` result to variable checkframework will fail
     @SuppressWarnings("unused")
-    ScheduledFuture<?> schedule =
-        Executors.newSingleThreadScheduledExecutor().schedule(kafkaProducer, 10, TimeUnit.SECONDS);
+    ScheduledFuture<?> schedule1 =
+        Executors.newSingleThreadScheduledExecutor().schedule(kafkaProducer, 5, TimeUnit.SECONDS);
+    ScheduledFuture<?> schedule2 =
+            Executors.newSingleThreadScheduledExecutor().schedule(kafkaProducer, 15, TimeUnit.SECONDS);
   }
 
   public String getTopicName() {
