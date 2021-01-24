@@ -119,8 +119,10 @@ To execute this pipeline, specify the parameters:
             - Ns (for seconds, example: 5s),
             - Nm (for minutes, example: 12m),
             - Nh (for hours, example: 2h).
-        - Google Cloud BigQuery
-            - **bigQueryTableName**: Cloud BigQuery table name to write into
+    - Google Cloud BigQuery
+        - **bigQueryTableName**: Cloud BigQuery table name to write into
+        - **tempLocation**: Folder in a Google Cloud Storage bucket, which is needed for
+          BigQuery to handle data writing
     - Cloud BigTable
         - **bigTableProjectId**: Id of the project where the Cloud BigTable instance to write into
           is located
@@ -142,14 +144,14 @@ The template allows for the user to supply the following optional parameter:
 in the following format:
 
 ```bash
---dataSchemaGcsPath="path-to-data-schema-in-json-format"
---inputGcsFilePattern="path-patternt-to-input-data"
---outputGcsDirectory="path-to-output-directory"
+--dataSchemaPath="path-to-data-schema-in-json-format"
+--inputFilePattern="path-pattern-to-input-data"
+--outputDirectory="path-to-output-directory"
 # example to usage csv
---inputGcsFileFormat="CSV"
---outputGcsFileFormat="CSV"
+--inputFileFormat="CSV"
+--outputFileFormat="CSV"
 --csvContainsHeaders="true"
---nonTokenizedDeadLetterGcsPath="path-to-errors-rows-writing"
+--nonTokenizedDeadLetterPath="path-to-errors-rows-writing"
 --batchSize=batch-size-number
 --rpcUri=http://host:port/tokenize
 ```
