@@ -22,15 +22,18 @@ import static org.apache.beam.examples.complete.datatokenization.utils.SchemasUt
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import org.apache.beam.examples.complete.datatokenization.options.DataTokenizationOptions;
 import org.apache.beam.examples.complete.datatokenization.transforms.DataProtectors.RowToTokenizedRow;
 import org.apache.beam.examples.complete.datatokenization.transforms.io.BigQueryIO;
 import org.apache.beam.examples.complete.datatokenization.transforms.io.BigTableIO;
 import org.apache.beam.examples.complete.datatokenization.transforms.io.FileSystemIO;
+import org.apache.beam.examples.complete.datatokenization.transforms.io.FileSystemIO.FORMAT;
 import org.apache.beam.examples.complete.datatokenization.utils.ErrorConverters;
 import org.apache.beam.examples.complete.datatokenization.utils.FailsafeElement;
 import org.apache.beam.examples.complete.datatokenization.utils.FailsafeElementCoder;
+import org.apache.beam.examples.complete.datatokenization.utils.JsonToBeamRow;
 import org.apache.beam.examples.complete.datatokenization.utils.RowToCsv;
 import org.apache.beam.examples.complete.datatokenization.utils.SchemasUtils;
 import org.apache.beam.sdk.Pipeline;
@@ -45,7 +48,6 @@ import org.apache.beam.sdk.io.FileSystems;
 import org.apache.beam.sdk.io.gcp.bigquery.WriteResult;
 import org.apache.beam.sdk.io.gcp.pubsub.PubsubIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.JsonToRow;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.windowing.FixedWindows;
 import org.apache.beam.sdk.transforms.windowing.Window;
@@ -59,9 +61,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link DataTokenization} pipeline reads data from one of the supported sources,
- * tokenizes data with external API calls to some tokenization server, and writes data
- * into one of the supported sinks.
+ * The {@link DataTokenization} pipeline reads data from one of the supported sources, tokenizes
+ * data with external API calls to some tokenization server, and writes data into one of the
+ * supported sinks.
  * <br>
  * <p><b>Pipeline Requirements</b>
  * <ul>
@@ -175,23 +177,35 @@ import org.slf4j.LoggerFactory;
  */
 public class DataTokenization {
 
-  /** Logger for class. */
+  /**
+   * Logger for class.
+   */
   private static final Logger LOG = LoggerFactory.getLogger(DataTokenization.class);
 
-  /** String/String Coder for FailsafeElement. */
-  private static final FailsafeElementCoder<String, String> FAILSAFE_ELEMENT_CODER =
+  /**
+   * String/String Coder for FailsafeElement.
+   */
+  public static final FailsafeElementCoder<String, String> FAILSAFE_ELEMENT_CODER =
       FailsafeElementCoder.of(
           NullableCoder.of(StringUtf8Coder.of()), NullableCoder.of(StringUtf8Coder.of()));
 
-  /** The default suffix for error tables if dead letter table is not specified. */
+  /**
+   * The default suffix for error tables if dead letter table is not specified.
+   */
   private static final String DEFAULT_DEADLETTER_TABLE_SUFFIX = "_error_records";
 
-  /** The tag for the main output for the UDF. */
-  private static final TupleTag<Row> TOKENIZATION_OUT = new TupleTag<Row>() {};
+  /**
+   * The tag for the main output for the UDF.
+   */
+  private static final TupleTag<Row> TOKENIZATION_OUT = new TupleTag<Row>() {
+  };
 
-  /** The tag for the dead-letter output of the udf. */
+  /**
+   * The tag for the dead-letter output of the udf.
+   */
   static final TupleTag<FailsafeElement<Row, Row>> TOKENIZATION_DEADLETTER_OUT =
-      new TupleTag<FailsafeElement<Row, Row>>() {};
+      new TupleTag<FailsafeElement<Row, Row>>() {
+      };
 
   /**
    * Main entry point for pipeline execution.
@@ -241,66 +255,49 @@ public class DataTokenization {
 
     coderRegistry.registerCoderForType(coder.getEncodedTypeDescriptor(), coder);
 
-    PCollection<String> jsons;
+    PCollection<? extends Serializable> records;
     if (options.getInputFilePattern() != null) {
-      jsons = new FileSystemIO(options).read(pipeline, schema.getJsonBeamSchema());
+      records = new FileSystemIO(options).read(pipeline, schema);
     } else if (options.getPubsubTopic() != null) {
-      jsons =
-          pipeline.apply(
-              "ReadMessagesFromPubsub", PubsubIO.readStrings().fromTopic(options.getPubsubTopic()));
+      records = pipeline
+          .apply("ReadMessagesFromPubsub",
+              PubsubIO.readStrings().fromTopic(options.getPubsubTopic()));
       if (options.getOutputDirectory() != null) {
-        jsons =
-            jsons.apply(Window.into(FixedWindows.of(parseDuration(options.getWindowDuration()))));
+        records = records
+            .apply(Window.into(FixedWindows.of(parseDuration(options.getWindowDuration()))));
       }
     } else {
-      throw new IllegalStateException(
-          "No source is provided, please configure File System or Pub/Sub");
+      throw new IllegalStateException("No source is provided, please configure GCS or Pub/Sub");
     }
 
-    JsonToRow.ParseResult rows =
-        jsons.apply(
-            "JsonToRow",
-            JsonToRow.withExceptionReporting(schema.getBeamSchema()).withExtendedErrorInfo());
-
-    if (options.getNonTokenizedDeadLetterPath() != null) {
-      /*
-       * Write Row conversion errors to filesystem specified path
-       */
-      rows.getFailedToParseLines()
-          .apply(
-              "ToFailsafeElement",
-              MapElements.into(FAILSAFE_ELEMENT_CODER.getEncodedTypeDescriptor())
-                  .via(
-                      (Row errRow) ->
-                          FailsafeElement.of(errRow.getString("line"), errRow.getString("line"))
-                              .setErrorMessage(errRow.getString("err"))))
-          .apply(
-              "WriteCsvConversionErrorsToFS",
-              ErrorConverters.WriteStringMessageErrorsAsCsv.newBuilder()
-                  .setCsvDelimiter(options.getCsvDelimiter())
-                  .setErrorWritePath(options.getNonTokenizedDeadLetterPath())
-                  .build());
+    /*
+    Get collection of Rows
+    */
+    PCollection<Row> rows;
+    if (options.getInputFilePattern() != null
+        && options.getInputFileFormat() == FORMAT.AVRO) {
+      rows = (PCollection<Row>) records;
+    } else {
+      rows = ((PCollection<String>) records).apply(new JsonToBeamRow(options, schema));
     }
     /*
     Tokenize data using remote API call
      */
-    PCollectionTuple tokenizedRows =
-        rows.getResults()
-            .setRowSchema(schema.getBeamSchema())
-            .apply(
-                MapElements.into(
-                        TypeDescriptors.kvs(TypeDescriptors.integers(), TypeDescriptors.rows()))
-                    .via((Row row) -> KV.of(0, row)))
-            .setCoder(KvCoder.of(VarIntCoder.of(), RowCoder.of(schema.getBeamSchema())))
-            .apply(
-                "DsgTokenization",
-                RowToTokenizedRow.newBuilder()
-                    .setBatchSize(options.getBatchSize())
-                    .setRpcURI(options.getRpcUri())
-                    .setSchema(schema.getBeamSchema())
-                    .setSuccessTag(TOKENIZATION_OUT)
-                    .setFailureTag(TOKENIZATION_DEADLETTER_OUT)
-                    .build());
+    PCollectionTuple tokenizedRows = rows
+        .apply(
+            MapElements.into(
+                TypeDescriptors.kvs(TypeDescriptors.integers(), TypeDescriptors.rows()))
+                .via((Row row) -> KV.of(0, row)))
+        .setCoder(KvCoder.of(VarIntCoder.of(), RowCoder.of(schema.getBeamSchema())))
+        .apply(
+            "DsgTokenization",
+            RowToTokenizedRow.newBuilder()
+                .setBatchSize(options.getBatchSize())
+                .setRpcURI(options.getRpcUri())
+                .setSchema(schema.getBeamSchema())
+                .setSuccessTag(TOKENIZATION_OUT)
+                .setFailureTag(TOKENIZATION_DEADLETTER_OUT)
+                .build());
 
     String csvDelimiter = options.getCsvDelimiter();
     if (options.getNonTokenizedDeadLetterPath() != null) {

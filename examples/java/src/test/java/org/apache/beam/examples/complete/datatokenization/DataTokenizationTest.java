@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.startsWith;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,21 +107,21 @@ public class DataTokenizationTest {
 
   @Test
   public void testFileSystemIOReadCSV() throws IOException {
-    PCollection<String> jsons = fileSystemIORead(CSV_FILE_PATH, FORMAT.CSV);
+    PCollection<String> jsons = (PCollection<String>) fileSystemIORead(CSV_FILE_PATH, FORMAT.CSV);
     assertField(jsons);
     testPipeline.run();
   }
 
   @Test
   public void testFileSystemIOReadJSON() throws IOException {
-    PCollection<String> jsons = fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
+    PCollection<String> jsons = (PCollection<String>) fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
     assertField(jsons);
     testPipeline.run();
   }
 
   @Test
   public void testJsonToRow() throws IOException {
-    PCollection<String> jsons = fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
+    PCollection<String> jsons = (PCollection<String>) fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
     SchemasUtils testSchemaUtils = new SchemasUtils(SCHEMA_FILE_PATH, StandardCharsets.UTF_8);
     JsonToRow.ParseResult rows =
         jsons.apply(
@@ -144,7 +145,7 @@ public class DataTokenizationTest {
     testPipeline.run();
   }
 
-  private PCollection<String> fileSystemIORead(
+  private PCollection<? extends Serializable> fileSystemIORead(
       String inputGcsFilePattern, FORMAT inputGcsFileFormat) throws IOException {
     DataTokenizationOptions options =
         PipelineOptionsFactory.create().as(DataTokenizationOptions.class);
@@ -173,7 +174,7 @@ public class DataTokenizationTest {
             RowCoder.of(testSchemaUtils.getBeamSchema()));
     coderRegistry.registerCoderForType(coder.getEncodedTypeDescriptor(), coder);
 
-    return new FileSystemIO(options).read(testPipeline, testSchemaUtils.getJsonBeamSchema());
+    return new FileSystemIO(options).read(testPipeline, testSchemaUtils);
   }
 
   private void assertField(PCollection<String> jsons) {

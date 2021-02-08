@@ -17,20 +17,27 @@
  */
 package org.apache.beam.examples.complete.datatokenization.transforms.io;
 
+import java.io.Serializable;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.examples.complete.datatokenization.options.DataTokenizationOptions;
 import org.apache.beam.examples.complete.datatokenization.utils.CsvConverters;
 import org.apache.beam.examples.complete.datatokenization.utils.ErrorConverters;
 import org.apache.beam.examples.complete.datatokenization.utils.FailsafeElement;
 import org.apache.beam.examples.complete.datatokenization.utils.FailsafeElementCoder;
 import org.apache.beam.examples.complete.datatokenization.utils.RowToCsv;
+import org.apache.beam.examples.complete.datatokenization.utils.SchemasUtils;
 import org.apache.beam.sdk.Pipeline;
+import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
+import org.apache.beam.sdk.coders.RowCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.AvroIO;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.schemas.Schema;
+import org.apache.beam.sdk.schemas.utils.AvroUtils;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ToJson;
 import org.apache.beam.sdk.values.PCollection;
@@ -39,6 +46,7 @@ import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.PDone;
 import org.apache.beam.sdk.values.Row;
 import org.apache.beam.sdk.values.TupleTag;
+import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +78,13 @@ public class FileSystemIO {
       FailsafeElementCoder.of(
           NullableCoder.of(StringUtf8Coder.of()), NullableCoder.of(StringUtf8Coder.of()));
 
-  /** Supported format to read from GCS. */
+  /**
+   * Supported format to read from GCS.
+   */
   public enum FORMAT {
     JSON,
-    CSV
+    CSV,
+    AVRO
   }
 
   /**
@@ -145,7 +156,7 @@ public class FileSystemIO {
     this.options = options;
   }
 
-  public PCollection<String> read(Pipeline pipeline, String schema) {
+  public PCollection<? extends Serializable> read(Pipeline pipeline, SchemasUtils schema) {
     if (options.getInputFileFormat() == FORMAT.JSON) {
       return pipeline.apply("ReadJsonFromFiles", TextIO.read().from(options.getInputFilePattern()));
     } else if (options.getInputFileFormat() == FORMAT.CSV) {
@@ -171,7 +182,7 @@ public class FileSystemIO {
                   "LineToJson",
                   CsvConverters.LineToFailsafeJson.newBuilder()
                       .setDelimiter(options.getCsvDelimiter())
-                      .setJsonSchema(schema)
+                      .setJsonSchema(schema.getJsonBeamSchema())
                       .setHeaderTag(CSV_HEADERS)
                       .setLineTag(CSV_LINES)
                       .setUdfOutputTag(PROCESSING_OUT)
@@ -200,6 +211,16 @@ public class FileSystemIO {
           .apply(
               "GetJson",
               MapElements.into(TypeDescriptors.strings()).via(FailsafeElement::getPayload));
+    } else if (options.getInputFileFormat() == FORMAT.AVRO) {
+      org.apache.avro.Schema avroSchema = AvroUtils.toAvroSchema(schema.getBeamSchema());
+      PCollection<GenericRecord> genericRecords = pipeline.apply(
+          "ReadAvroFiles",
+          AvroIO.readGenericRecords(avroSchema).from(options.getInputFilePattern()));
+      return genericRecords
+          .apply(
+              "GenericRecordToRow", MapElements.into(TypeDescriptor.of(Row.class))
+                  .via(AvroUtils.getGenericRecordToRowFunction(schema.getBeamSchema())))
+          .setCoder(RowCoder.of(schema.getBeamSchema()));
     } else {
       throw new IllegalStateException(
           "No valid format for input data is provided. Please, choose JSON or CSV.");
@@ -239,7 +260,16 @@ public class FileSystemIO {
                 .to(options.getOutputDirectory())
                 .withHeader(header));
       }
-
+    } else if (options.getOutputFileFormat() == FORMAT.AVRO) {
+      org.apache.avro.Schema avroSchema = AvroUtils.toAvroSchema(schema);
+      return input
+          .apply(
+              "RowToGenericRecord", MapElements.into(TypeDescriptor.of(GenericRecord.class))
+                  .via(AvroUtils.getRowToGenericRecordFunction(avroSchema)))
+          .setCoder(AvroCoder.of(GenericRecord.class, avroSchema))
+          .apply("WriteToAvro", AvroIO.writeGenericRecords(avroSchema)
+              .to(options.getOutputDirectory())
+              .withSuffix(".avro"));
     } else {
       throw new IllegalStateException(
           "No valid format for output data is provided. Please, choose JSON or CSV.");
