@@ -191,13 +191,11 @@ public class DataTokenization {
   private static final String DEFAULT_DEADLETTER_TABLE_SUFFIX = "_error_records";
 
   /** The tag for the main output for the UDF. */
-  private static final TupleTag<Row> TOKENIZATION_OUT = new TupleTag<Row>() {
-  };
+  private static final TupleTag<Row> TOKENIZATION_OUT = new TupleTag<Row>() {};
 
   /** The tag for the dead-letter output of the udf. */
   static final TupleTag<FailsafeElement<Row, Row>> TOKENIZATION_DEADLETTER_OUT =
-      new TupleTag<FailsafeElement<Row, Row>>() {
-      };
+      new TupleTag<FailsafeElement<Row, Row>>() {};
 
   /**
    * Main entry point for pipeline execution.
