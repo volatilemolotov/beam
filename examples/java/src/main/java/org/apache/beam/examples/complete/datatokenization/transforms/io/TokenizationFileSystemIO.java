@@ -65,9 +65,7 @@ public class TokenizationFileSystemIO {
   static final TupleTag<FailsafeElement<String, String>> PROCESSING_OUT =
       new TupleTag<FailsafeElement<String, String>>() {};
 
-  /**
-   * Supported format to read from GCS.
-   */
+  /** Supported format to read from GCS. */
   public enum FORMAT {
     JSON,
     CSV,
