@@ -24,7 +24,6 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,6 +72,9 @@ public class DataTokenizationTest {
   private static final String JSON_FILE_PATH =
       Resources.getResource(RESOURCES_DIR + "testInput.txt").getPath();
 
+  private static final String AVRO_FILE_PATH =
+      Resources.getResource(RESOURCES_DIR + "testInput.avro").getPath();
+
   private static final String SCHEMA_FILE_PATH =
       Resources.getResource(RESOURCES_DIR + "schema.txt").getPath();
 
@@ -108,22 +110,28 @@ public class DataTokenizationTest {
 
   @Test
   public void testFileSystemIOReadCSV() throws IOException {
-    PCollection<Row> jsons = (PCollection<String>) fileSystemIORead(CSV_FILE_PATH, FORMAT.CSV);
+    PCollection<Row> jsons = fileSystemIORead(CSV_FILE_PATH, FORMAT.CSV);
     assertRows(jsons);
     testPipeline.run();
   }
 
   @Test
   public void testFileSystemIOReadJSON() throws IOException {
-    PCollection<Row> jsons = (PCollection<String>) fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
+    PCollection<Row> jsons = fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
     assertRows(jsons);
     testPipeline.run();
   }
 
   @Test
+  public void testFileSystemIOReadAVRO() throws IOException {
+    PCollection<Row> rows = fileSystemIORead(AVRO_FILE_PATH, FORMAT.AVRO);
+    assertRows(rows);
+    testPipeline.run();
+  }
+
+  @Test
   public void testJsonToRow() throws IOException {
-    PCollection<Row> rows = (PCollection<String>) fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
-    SchemasUtils testSchemaUtils = new SchemasUtils(SCHEMA_FILE_PATH, StandardCharsets.UTF_8);
+    PCollection<Row> rows = fileSystemIORead(JSON_FILE_PATH, FORMAT.JSON);
 
     PAssert.that(rows)
         .satisfies(

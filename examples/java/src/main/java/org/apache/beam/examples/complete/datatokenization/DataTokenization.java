@@ -31,11 +31,9 @@ import org.apache.beam.examples.complete.datatokenization.transforms.Serializabl
 import org.apache.beam.examples.complete.datatokenization.transforms.io.TokenizationBigQueryIO;
 import org.apache.beam.examples.complete.datatokenization.transforms.io.TokenizationBigTableIO;
 import org.apache.beam.examples.complete.datatokenization.transforms.io.TokenizationFileSystemIO;
-import org.apache.beam.examples.complete.datatokenization.transforms.io.FileSystemIO.FORMAT;
 import org.apache.beam.examples.complete.datatokenization.utils.ErrorConverters;
 import org.apache.beam.examples.complete.datatokenization.utils.FailsafeElement;
 import org.apache.beam.examples.complete.datatokenization.utils.FailsafeElementCoder;
-import org.apache.beam.examples.complete.datatokenization.utils.JsonToBeamRow;
 import org.apache.beam.examples.complete.datatokenization.utils.RowToCsv;
 import org.apache.beam.examples.complete.datatokenization.utils.SchemasUtils;
 import org.apache.beam.sdk.Pipeline;
