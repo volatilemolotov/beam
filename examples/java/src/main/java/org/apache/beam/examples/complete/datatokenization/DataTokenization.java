@@ -22,7 +22,6 @@ import static org.apache.beam.examples.complete.datatokenization.utils.SchemasUt
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import org.apache.beam.examples.complete.datatokenization.options.DataTokenizationOptions;
 import org.apache.beam.examples.complete.datatokenization.transforms.DataProtectors.RowToTokenizedRow;
@@ -261,7 +260,8 @@ public class DataTokenization {
         rows = rows.apply(Window.into(FixedWindows.of(parseDuration(options.getWindowDuration()))));
       }
     } else {
-      throw new IllegalStateException("No source is provided, please configure GCS or Pub/Sub");
+      throw new IllegalStateException(
+          "No source is provided, please configure FS, GCS or Pub/Sub");
     }
 
     /*

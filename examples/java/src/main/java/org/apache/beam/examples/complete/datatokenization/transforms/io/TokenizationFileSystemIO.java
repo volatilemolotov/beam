@@ -17,7 +17,6 @@
  */
 package org.apache.beam.examples.complete.datatokenization.transforms.io;
 
-import java.io.Serializable;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.examples.complete.datatokenization.options.DataTokenizationOptions;
 import org.apache.beam.examples.complete.datatokenization.transforms.JsonToBeamRow;
@@ -159,13 +158,12 @@ public class TokenizationFileSystemIO {
 
   private PCollection<Row> readAvro(Pipeline pipeline, SchemasUtils schema) {
     org.apache.avro.Schema avroSchema = AvroUtils.toAvroSchema(schema.getBeamSchema());
-    PCollection<GenericRecord> genericRecords = pipeline.apply(
-        "ReadAvroFiles",
-        AvroIO.readGenericRecords(avroSchema).from(options.getInputFilePattern()));
-    return genericRecords
-        .apply(
-            "GenericRecordToRow", MapElements.into(TypeDescriptor.of(Row.class))
-                .via(AvroUtils.getGenericRecordToRowFunction(schema.getBeamSchema())))
+    return pipeline
+        .apply("ReadAvroFiles",
+            AvroIO.readGenericRecords(avroSchema).from(options.getInputFilePattern()))
+        .apply("GenericRecordToRow",
+            MapElements.into(TypeDescriptor.of(Row.class))
+            .via(AvroUtils.getGenericRecordToRowFunction(schema.getBeamSchema())))
         .setCoder(RowCoder.of(schema.getBeamSchema()));
   }
 
