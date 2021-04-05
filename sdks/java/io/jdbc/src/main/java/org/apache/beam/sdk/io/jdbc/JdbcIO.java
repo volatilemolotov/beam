@@ -29,7 +29,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,6 +51,7 @@ import org.apache.beam.sdk.schemas.SchemaRegistry;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Filter;
+import org.apache.beam.sdk.transforms.GroupByKey;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Reshuffle;
@@ -62,6 +65,7 @@ import org.apache.beam.sdk.util.BackOff;
 import org.apache.beam.sdk.util.BackOffUtils;
 import org.apache.beam.sdk.util.FluentBackoff;
 import org.apache.beam.sdk.util.Sleeper;
+import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionView;
@@ -207,8 +211,8 @@ import org.slf4j.LoggerFactory;
  */
 @Experimental(Kind.SOURCE_SINK)
 @SuppressWarnings({
-  "rawtypes", // TODO(https://issues.apache.org/jira/browse/BEAM-10556)
-  "nullness" // TODO(https://issues.apache.org/jira/browse/BEAM-10402)
+    "rawtypes", // TODO(https://issues.apache.org/jira/browse/BEAM-10556)
+    "nullness" // TODO(https://issues.apache.org/jira/browse/BEAM-10402)
 })
 public class JdbcIO {
 
@@ -247,6 +251,16 @@ public class JdbcIO {
     return new AutoValue_JdbcIO_ReadAll.Builder<ParameterT, OutputT>()
         .setFetchSize(DEFAULT_FETCH_SIZE)
         .setOutputParallelization(true)
+        .build();
+  }
+
+
+  /**
+   * Read from a JDBC data source.
+   */
+  public static <T> ReadWithPartitions<T> readWithPartitions() {
+    return new AutoValue_JdbcIO_ReadWithPartitions.Builder()
+        .setOutputParallelization(false)
         .build();
   }
 
@@ -689,7 +703,7 @@ public class JdbcIO {
           (getDataSourceProviderFn() != null),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
 
-      return input
+      PCollection<T> result = input
           .apply(Create.of((Void) null))
           .apply(
               JdbcIO.<Void, T>readAll()
@@ -705,6 +719,7 @@ public class JdbcIO {
                           getStatementPreparator().setParameters(preparedStatement);
                         }
                       }));
+      return result;
     }
 
     @Override
@@ -866,8 +881,176 @@ public class JdbcIO {
     }
   }
 
-  /** A {@link DoFn} executing the SQL query to read from the database. */
+  /**
+   * Implementation of {@link #readWithPartitions}.
+   */
+  @AutoValue
+  public abstract static class ReadWithPartitions<T> extends PTransform<PBegin, PCollection<T>> {
+
+    abstract @Nullable SerializableFunction<Void, DataSource> getDataSourceProviderFn();
+
+    abstract @Nullable RowMapper<T> getRowMapper();
+
+    abstract @Nullable Coder<T> getCoder();
+
+    abstract boolean getOutputParallelization();
+
+    abstract int getLowerBound();
+
+    abstract int getUpperBound();
+
+    abstract int getNumPartitions();
+
+    abstract String getPartitionColumn();
+
+    abstract String getTableName();
+
+    abstract Builder<T> toBuilder();
+
+    @AutoValue.Builder
+    abstract static class Builder<T> {
+
+      abstract Builder<T> setDataSourceProviderFn(
+          SerializableFunction<Void, DataSource> dataSourceProviderFn);
+
+      abstract Builder<T> setRowMapper(RowMapper<T> rowMapper);
+
+      abstract Builder<T> setCoder(Coder<T> coder);
+
+      abstract Builder<T> setOutputParallelization(boolean outputParallelization);
+
+      abstract Builder<T> setLowerBound(int lowerBound);
+
+      abstract Builder<T> setUpperBound(int upperBound);
+
+      abstract Builder<T> setNumPartitions(int numPartitions);
+
+      abstract Builder<T> setPartitionColumn(String partitionColumn);
+
+      abstract Builder<T> setTableName(String tableName);
+
+      abstract ReadWithPartitions<T> build();
+    }
+
+    public ReadWithPartitions<T> withDataSourceConfiguration(final DataSourceConfiguration config) {
+      return withDataSourceProviderFn(new DataSourceProviderFromDataSourceConfiguration(config));
+    }
+
+    public ReadWithPartitions<T> withDataSourceProviderFn(
+        SerializableFunction<Void, DataSource> dataSourceProviderFn) {
+      return toBuilder().setDataSourceProviderFn(dataSourceProviderFn).build();
+    }
+
+    public ReadWithPartitions<T> withRowMapper(RowMapper<T> rowMapper) {
+      checkArgument(rowMapper != null, "rowMapper can not be null");
+      return toBuilder().setRowMapper(rowMapper).build();
+    }
+
+    public ReadWithPartitions<T> withCoder(Coder<T> coder) {
+      checkArgument(coder != null, "coder can not be null");
+      return toBuilder().setCoder(coder).build();
+    }
+
+
+    /**
+     * Whether to reshuffle the resulting PCollection so results are distributed to all workers. The
+     * default is to parallelize and should only be changed if this is known to be unnecessary.
+     */
+    public ReadWithPartitions<T> withOutputParallelization(boolean outputParallelization) {
+      return toBuilder().setOutputParallelization(outputParallelization).build();
+    }
+
+    public ReadWithPartitions<T> withLowerBound(int lowerBound) {
+      return toBuilder().setLowerBound(lowerBound).build();
+    }
+
+    public ReadWithPartitions<T> withUpperBound(int upperBound) {
+      return toBuilder().setUpperBound(upperBound).build();
+    }
+
+    public ReadWithPartitions<T> withNumPartitions(int numPartitions) {
+      return toBuilder().setNumPartitions(numPartitions).build();
+    }
+
+    public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
+      return toBuilder().setPartitionColumn(partitionColumn).build();
+    }
+
+    public ReadWithPartitions<T> withTableName(String tableName) {
+      return toBuilder().setTableName(tableName).build();
+    }
+
+    @Override
+    public PCollection<T> expand(PBegin input) {
+      checkArgument(getRowMapper() != null, "withRowMapper() is required");
+      checkArgument(getCoder() != null, "withCoder() is required");
+      checkArgument(
+          (getDataSourceProviderFn() != null),
+          "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
+
+      int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
+      PCollection<List<Integer>> params = input.apply(Create.of(Collections.singletonList(
+          Arrays.asList(getLowerBound(), getUpperBound(), getNumPartitions()))));
+      PCollection<KV<String, Iterable<Integer>>> ranges =
+          params
+              .apply("Distribute", ParDo.of(new DoFn<List<Integer>, KV<String, Integer>>() {
+                @ProcessElement
+                public void processElement(ProcessContext c) {
+                  List<Integer> params = c.element();
+                  Integer lowerBound = params.get(0);
+                  Integer upperBound = params.get(2);
+                  Integer numPartitions = params.get(2);
+                  for (int i = lowerBound; i < upperBound - stride; i += stride) {
+                    String range = String.format("%s,%s", i, i + stride);
+                    KV<String, Integer> kvRange = KV.of(range, 1);
+                    c.output(kvRange);
+                  }
+                  if (upperBound - lowerBound > stride * numPartitions) {
+                    int indexFrom = numPartitions * stride;
+                    int indexTo = numPartitions * stride + (upperBound - lowerBound) % stride;
+                    String range = String.format("%s,%s", indexFrom, indexTo);
+                    KV<String, Integer> kvRange = KV.of(range, 1);
+                    c.output(kvRange);
+                  }
+                }
+              }))
+              .apply("Group partitions", GroupByKey.create());
+
+      PCollection<T> result = ranges.apply(String.format("Read ALL %s", getTableName()),
+          JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
+              .withDataSourceProviderFn(getDataSourceProviderFn())
+              .withFetchSize(stride)
+              .withQuery(String
+                  .format("select * from %1$s where %2$s >= ? and %2$s < ?", getTableName(),
+                      getPartitionColumn()))
+              .withCoder(getCoder())
+              .withRowMapper(getRowMapper())
+              .withParameterSetter(
+                  (PreparedStatementSetter<KV<String, Iterable<Integer>>>) (element, preparedStatement) -> {
+                    String[] range = element.getKey().split(",", -1);
+                    preparedStatement.setInt(1, Integer.parseInt(range[0]));
+                    preparedStatement.setInt(2, Integer.parseInt(range[1]));
+                  })
+              .withOutputParallelization(false));
+      return result;
+    }
+
+    @Override
+    public void populateDisplayData(DisplayData.Builder builder) {
+      super.populateDisplayData(builder);
+      builder.add(DisplayData.item("rowMapper", getRowMapper().getClass().getName()));
+      builder.add(DisplayData.item("coder", getCoder().getClass().getName()));
+      if (getDataSourceProviderFn() instanceof HasDisplayData) {
+        ((HasDisplayData) getDataSourceProviderFn()).populateDisplayData(builder);
+      }
+    }
+  }
+
+  /**
+   * A {@link DoFn} executing the SQL query to read from the database.
+   */
   private static class ReadFn<ParameterT, OutputT> extends DoFn<ParameterT, OutputT> {
+
     private final SerializableFunction<Void, DataSource> dataSourceProviderFn;
     private final ValueProvider<String> query;
     private final PreparedStatementSetter<ParameterT> parameterSetter;
@@ -1153,7 +1336,7 @@ public class JdbcIO {
                             .findFirst();
                     return (optionalSchemaField.isPresent())
                         ? SchemaUtil.FieldWithIndex.of(
-                            tableField, schema.getFields().indexOf(optionalSchemaField.get()))
+                        tableField, schema.getFields().indexOf(optionalSchemaField.get()))
                         : null;
                   })
               .filter(Objects::nonNull)
@@ -1495,12 +1678,12 @@ public class JdbcIO {
           input.apply(
               "Identity",
               ParDo.of(
-                      new DoFn<T, T>() {
-                        @ProcessElement
-                        public void process(ProcessContext c) {
-                          c.output(c.element());
-                        }
-                      })
+                  new DoFn<T, T>() {
+                    @ProcessElement
+                    public void process(ProcessContext c) {
+                      c.output(c.element());
+                    }
+                  })
                   .withSideInputs(empty));
       return materialized.apply(Reshuffle.viaRandomKey());
     }

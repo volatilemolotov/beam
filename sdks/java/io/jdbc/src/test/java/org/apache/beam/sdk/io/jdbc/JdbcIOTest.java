@@ -69,6 +69,8 @@ import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.transforms.Wait;
 import org.apache.beam.sdk.util.SerializableUtils;
@@ -222,6 +224,45 @@ public class JdbcIOTest implements Serializable {
 
     Iterable<TestRow> expectedValues = TestRow.getExpectedValues(0, EXPECTED_ROW_COUNT);
     PAssert.that(rows).containsInAnyOrder(expectedValues);
+
+    pipeline.run();
+  }
+
+  @Test
+  public void testReadWithPartitions() {
+    PCollection<TestRow> rows =
+        pipeline.apply(
+            JdbcIO.<TestRow>readWithPartitions()
+                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+                .withCoder(SerializableCoder.of(TestRow.class))
+                .withTableName(READ_TABLE_NAME)
+                .withNumPartitions(10)
+                .withLowerBound(0)
+                .withUpperBound(99)
+                .withPartitionColumn("id")
+                .withOutputParallelization(false)
+        );
+
+//    PCollection<TestRow> rows =
+//        pipeline.apply(
+//            JdbcIO.<TestRow>read()
+//                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+//                .withQuery(String.format("select * from %s", READ_TABLE_NAME))
+//                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+//                .withCoder(SerializableCoder.of(TestRow.class)));
+
+    System.out.println("!!!!!! ");
+
+    rows
+        .apply("printIt", ParDo.of(new DoFn<TestRow, TestRow>() {
+          @ProcessElement
+          public void processElement(ProcessContext context) {
+            System.out.println(context.element());
+            context.output(context.element());
+          }
+        }))
+        .setCoder(SerializableCoder.of(TestRow.class));
 
     pipeline.run();
   }
