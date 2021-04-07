@@ -30,10 +30,16 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.beam.sdk.metrics.Counter;
+import org.apache.beam.sdk.metrics.Metrics;
 import org.apache.beam.sdk.schemas.Schema;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.Row;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Provides utility functions for working with {@link JdbcIO}. */
 @SuppressWarnings({
@@ -251,5 +257,28 @@ class JdbcUtil {
     calendar.setTimeInMillis(dateTime.getMillis());
 
     return calendar;
+  }
+
+  static class PartitioningFn extends DoFn<List<Integer>, KV<String, Integer>> {
+    @ProcessElement
+    public void processElement(ProcessContext c) {
+      List<Integer> params = c.element();
+      Integer lowerBound = params.get(0);
+      Integer upperBound = params.get(1);
+      Integer numPartitions = params.get(2);
+      int stride = (upperBound - lowerBound) / numPartitions + 1;
+      for (int i = lowerBound; i < upperBound - stride; i += stride) {
+        String range = String.format("%s,%s", i, i + stride);
+        KV<String, Integer> kvRange = KV.of(range, 1);
+        c.output(kvRange);
+      }
+      if (upperBound - lowerBound > stride * (numPartitions - 1)) {
+        int indexFrom = (numPartitions - 1) * stride;
+        int indexTo = upperBound + 1;
+        String range = String.format("%s,%s", indexFrom, indexTo);
+        KV<String, Integer> kvRange = KV.of(range, 1);
+        c.output(kvRange);
+      }
+    }
   }
 }

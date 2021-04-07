@@ -244,14 +244,6 @@ public class JdbcIOTest implements Serializable {
                 .withOutputParallelization(false)
         );
 
-//    PCollection<TestRow> rows =
-//        pipeline.apply(
-//            JdbcIO.<TestRow>read()
-//                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
-//                .withQuery(String.format("select * from %s", READ_TABLE_NAME))
-//                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
-//                .withCoder(SerializableCoder.of(TestRow.class)));
-
     System.out.println("!!!!!! ");
 
     rows

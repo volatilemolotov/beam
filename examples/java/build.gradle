@@ -53,6 +53,7 @@ configurations.sparkRunnerPreCommit {
 }
 
 dependencies {
+  compile('mysql:mysql-connector-java:8.0.15')
   compile enforcedPlatform(library.java.google_cloud_platform_libraries_bom)
   compile library.java.vendored_guava_26_0_jre
   compile library.java.kafka_clients
@@ -61,6 +62,9 @@ dependencies {
   compile project(":sdks:java:io:google-cloud-platform")
   compile project(":sdks:java:io:kafka")
   compile project(":sdks:java:extensions:ml")
+  compile project(":runners:google-cloud-dataflow-java")
+  compile project(":sdks:java:io:jdbc")
+//  compile project(path: ":runners:direct-java", configuration: "shadow")
   compile library.java.avro
   compile library.java.bigdataoss_util
   compile library.java.google_api_client
@@ -149,3 +153,9 @@ task preCommit() {
   }
 }
 
+//task execute (type:JavaExec) {
+//  main = System.getProperty("mainClass")
+//  classpath = sourceSets.main.runtimeClasspath
+//  systemProperties System.getProperties()
+//  args System.getProperty("exec.args", "").split()
+//}

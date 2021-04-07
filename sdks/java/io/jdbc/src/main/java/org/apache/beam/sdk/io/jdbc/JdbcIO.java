@@ -17,6 +17,7 @@
  */
 package org.apache.beam.sdk.io.jdbc;
 
+import static java.lang.Integer.MAX_VALUE;
 import static org.apache.beam.sdk.io.jdbc.SchemaUtil.checkNullabilityForFields;
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
@@ -44,6 +45,8 @@ import org.apache.beam.sdk.annotations.Experimental;
 import org.apache.beam.sdk.annotations.Experimental.Kind;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.RowCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.jdbc.JdbcUtil.PartitioningFn;
 import org.apache.beam.sdk.options.ValueProvider;
 import org.apache.beam.sdk.schemas.NoSuchSchemaException;
 import org.apache.beam.sdk.schemas.Schema;
@@ -259,8 +262,11 @@ public class JdbcIO {
    * Read from a JDBC data source.
    */
   public static <T> ReadWithPartitions<T> readWithPartitions() {
-    return new AutoValue_JdbcIO_ReadWithPartitions.Builder()
+    return new AutoValue_JdbcIO_ReadWithPartitions.Builder<T>()
         .setOutputParallelization(false)
+        .setLowerBound(-1)
+        .setUpperBound(MAX_VALUE)
+        .setNumPartitions(0)
         .build();
   }
 
@@ -901,9 +907,9 @@ public class JdbcIO {
 
     abstract int getNumPartitions();
 
-    abstract String getPartitionColumn();
+    abstract @Nullable String getPartitionColumn();
 
-    abstract String getTableName();
+    abstract @Nullable String getTableName();
 
     abstract Builder<T> toBuilder();
 
@@ -951,11 +957,6 @@ public class JdbcIO {
       return toBuilder().setCoder(coder).build();
     }
 
-
-    /**
-     * Whether to reshuffle the resulting PCollection so results are distributed to all workers. The
-     * default is to parallelize and should only be changed if this is known to be unnecessary.
-     */
     public ReadWithPartitions<T> withOutputParallelization(boolean outputParallelization) {
       return toBuilder().setOutputParallelization(outputParallelization).build();
     }
@@ -973,10 +974,12 @@ public class JdbcIO {
     }
 
     public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
+      checkArgument(partitionColumn != null, "partitionColumn can not be null");
       return toBuilder().setPartitionColumn(partitionColumn).build();
     }
 
     public ReadWithPartitions<T> withTableName(String tableName) {
+      checkArgument(tableName != null, "tableName can not be null");
       return toBuilder().setTableName(tableName).build();
     }
 
@@ -987,36 +990,22 @@ public class JdbcIO {
       checkArgument(
           (getDataSourceProviderFn() != null),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
+      checkArgument(getTableName() != null, "withTableName() is required");
+      checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
+      checkArgument(getLowerBound() > -1, "withLowerBound() is required");
+      checkArgument(getUpperBound() != MAX_VALUE, "withUpperBound() is required");
+      checkArgument(getNumPartitions() > 0, "withNumPartitions() is required");
+
 
       int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
       PCollection<List<Integer>> params = input.apply(Create.of(Collections.singletonList(
           Arrays.asList(getLowerBound(), getUpperBound(), getNumPartitions()))));
       PCollection<KV<String, Iterable<Integer>>> ranges =
           params
-              .apply("Distribute", ParDo.of(new DoFn<List<Integer>, KV<String, Integer>>() {
-                @ProcessElement
-                public void processElement(ProcessContext c) {
-                  List<Integer> params = c.element();
-                  Integer lowerBound = params.get(0);
-                  Integer upperBound = params.get(2);
-                  Integer numPartitions = params.get(2);
-                  for (int i = lowerBound; i < upperBound - stride; i += stride) {
-                    String range = String.format("%s,%s", i, i + stride);
-                    KV<String, Integer> kvRange = KV.of(range, 1);
-                    c.output(kvRange);
-                  }
-                  if (upperBound - lowerBound > stride * numPartitions) {
-                    int indexFrom = numPartitions * stride;
-                    int indexTo = numPartitions * stride + (upperBound - lowerBound) % stride;
-                    String range = String.format("%s,%s", indexFrom, indexTo);
-                    KV<String, Integer> kvRange = KV.of(range, 1);
-                    c.output(kvRange);
-                  }
-                }
-              }))
+              .apply("Partitioning", ParDo.of(new PartitioningFn()))
               .apply("Group partitions", GroupByKey.create());
 
-      PCollection<T> result = ranges.apply(String.format("Read ALL %s", getTableName()),
+      PCollection<T> result = ranges.apply(String.format("Read ranges %s", getTableName()),
           JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
               .withDataSourceProviderFn(getDataSourceProviderFn())
               .withFetchSize(stride)
