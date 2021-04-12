@@ -241,19 +241,18 @@ public class JdbcIOTest implements Serializable {
                 .withLowerBound(0)
                 .withUpperBound(99)
                 .withPartitionColumn("id")
-                .withOutputParallelization(false)
-        );
+                .withOutputParallelization(false));
 
-    System.out.println("!!!!!! ");
-
-    rows
-        .apply("printIt", ParDo.of(new DoFn<TestRow, TestRow>() {
-          @ProcessElement
-          public void processElement(ProcessContext context) {
-            System.out.println(context.element());
-            context.output(context.element());
-          }
-        }))
+    rows.apply(
+            "printIt",
+            ParDo.of(
+                new DoFn<TestRow, TestRow>() {
+                  @ProcessElement
+                  public void processElement(ProcessContext context) {
+                    System.out.println(context.element());
+                    context.output(context.element());
+                  }
+                }))
         .setCoder(SerializableCoder.of(TestRow.class));
 
     pipeline.run();

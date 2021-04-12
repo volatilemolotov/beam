@@ -45,7 +45,6 @@ import org.apache.beam.sdk.annotations.Experimental;
 import org.apache.beam.sdk.annotations.Experimental.Kind;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.RowCoder;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.jdbc.JdbcUtil.PartitioningFn;
 import org.apache.beam.sdk.options.ValueProvider;
 import org.apache.beam.sdk.schemas.NoSuchSchemaException;
@@ -214,8 +213,8 @@ import org.slf4j.LoggerFactory;
  */
 @Experimental(Kind.SOURCE_SINK)
 @SuppressWarnings({
-    "rawtypes", // TODO(https://issues.apache.org/jira/browse/BEAM-10556)
-    "nullness" // TODO(https://issues.apache.org/jira/browse/BEAM-10402)
+  "rawtypes", // TODO(https://issues.apache.org/jira/browse/BEAM-10556)
+  "nullness" // TODO(https://issues.apache.org/jira/browse/BEAM-10402)
 })
 public class JdbcIO {
 
@@ -257,10 +256,7 @@ public class JdbcIO {
         .build();
   }
 
-
-  /**
-   * Read from a JDBC data source.
-   */
+  /** Read from a JDBC data source. */
   public static <T> ReadWithPartitions<T> readWithPartitions() {
     return new AutoValue_JdbcIO_ReadWithPartitions.Builder<T>()
         .setOutputParallelization(false)
@@ -709,22 +705,23 @@ public class JdbcIO {
           (getDataSourceProviderFn() != null),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
 
-      PCollection<T> result = input
-          .apply(Create.of((Void) null))
-          .apply(
-              JdbcIO.<Void, T>readAll()
-                  .withDataSourceProviderFn(getDataSourceProviderFn())
-                  .withQuery(getQuery())
-                  .withCoder(getCoder())
-                  .withRowMapper(getRowMapper())
-                  .withFetchSize(getFetchSize())
-                  .withOutputParallelization(getOutputParallelization())
-                  .withParameterSetter(
-                      (element, preparedStatement) -> {
-                        if (getStatementPreparator() != null) {
-                          getStatementPreparator().setParameters(preparedStatement);
-                        }
-                      }));
+      PCollection<T> result =
+          input
+              .apply(Create.of((Void) null))
+              .apply(
+                  JdbcIO.<Void, T>readAll()
+                      .withDataSourceProviderFn(getDataSourceProviderFn())
+                      .withQuery(getQuery())
+                      .withCoder(getCoder())
+                      .withRowMapper(getRowMapper())
+                      .withFetchSize(getFetchSize())
+                      .withOutputParallelization(getOutputParallelization())
+                      .withParameterSetter(
+                          (element, preparedStatement) -> {
+                            if (getStatementPreparator() != null) {
+                              getStatementPreparator().setParameters(preparedStatement);
+                            }
+                          }));
       return result;
     }
 
@@ -887,9 +884,7 @@ public class JdbcIO {
     }
   }
 
-  /**
-   * Implementation of {@link #readWithPartitions}.
-   */
+  /** Implementation of {@link #readWithPartitions}. */
   @AutoValue
   public abstract static class ReadWithPartitions<T> extends PTransform<PBegin, PCollection<T>> {
 
@@ -996,31 +991,37 @@ public class JdbcIO {
       checkArgument(getUpperBound() != MAX_VALUE, "withUpperBound() is required");
       checkArgument(getNumPartitions() > 0, "withNumPartitions() is required");
 
-
       int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
-      PCollection<List<Integer>> params = input.apply(Create.of(Collections.singletonList(
-          Arrays.asList(getLowerBound(), getUpperBound(), getNumPartitions()))));
+      PCollection<List<Integer>> params =
+          input.apply(
+              Create.of(
+                  Collections.singletonList(
+                      Arrays.asList(getLowerBound(), getUpperBound(), getNumPartitions()))));
       PCollection<KV<String, Iterable<Integer>>> ranges =
           params
               .apply("Partitioning", ParDo.of(new PartitioningFn()))
               .apply("Group partitions", GroupByKey.create());
 
-      PCollection<T> result = ranges.apply(String.format("Read ranges %s", getTableName()),
-          JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
-              .withDataSourceProviderFn(getDataSourceProviderFn())
-              .withFetchSize(stride)
-              .withQuery(String
-                  .format("select * from %1$s where %2$s >= ? and %2$s < ?", getTableName(),
-                      getPartitionColumn()))
-              .withCoder(getCoder())
-              .withRowMapper(getRowMapper())
-              .withParameterSetter(
-                  (PreparedStatementSetter<KV<String, Iterable<Integer>>>) (element, preparedStatement) -> {
-                    String[] range = element.getKey().split(",", -1);
-                    preparedStatement.setInt(1, Integer.parseInt(range[0]));
-                    preparedStatement.setInt(2, Integer.parseInt(range[1]));
-                  })
-              .withOutputParallelization(false));
+      PCollection<T> result =
+          ranges.apply(
+              String.format("Read ranges %s", getTableName()),
+              JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
+                  .withDataSourceProviderFn(getDataSourceProviderFn())
+                  .withFetchSize(stride)
+                  .withQuery(
+                      String.format(
+                          "select * from %1$s where %2$s >= ? and %2$s < ?",
+                          getTableName(), getPartitionColumn()))
+                  .withCoder(getCoder())
+                  .withRowMapper(getRowMapper())
+                  .withParameterSetter(
+                      (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
+                          (element, preparedStatement) -> {
+                            String[] range = element.getKey().split(",", -1);
+                            preparedStatement.setInt(1, Integer.parseInt(range[0]));
+                            preparedStatement.setInt(2, Integer.parseInt(range[1]));
+                          })
+                  .withOutputParallelization(false));
       return result;
     }
 
@@ -1035,9 +1036,7 @@ public class JdbcIO {
     }
   }
 
-  /**
-   * A {@link DoFn} executing the SQL query to read from the database.
-   */
+  /** A {@link DoFn} executing the SQL query to read from the database. */
   private static class ReadFn<ParameterT, OutputT> extends DoFn<ParameterT, OutputT> {
 
     private final SerializableFunction<Void, DataSource> dataSourceProviderFn;
@@ -1325,7 +1324,7 @@ public class JdbcIO {
                             .findFirst();
                     return (optionalSchemaField.isPresent())
                         ? SchemaUtil.FieldWithIndex.of(
-                        tableField, schema.getFields().indexOf(optionalSchemaField.get()))
+                            tableField, schema.getFields().indexOf(optionalSchemaField.get()))
                         : null;
                   })
               .filter(Objects::nonNull)
@@ -1667,12 +1666,12 @@ public class JdbcIO {
           input.apply(
               "Identity",
               ParDo.of(
-                  new DoFn<T, T>() {
-                    @ProcessElement
-                    public void process(ProcessContext c) {
-                      c.output(c.element());
-                    }
-                  })
+                      new DoFn<T, T>() {
+                        @ProcessElement
+                        public void process(ProcessContext c) {
+                          c.output(c.element());
+                        }
+                      })
                   .withSideInputs(empty));
       return materialized.apply(Reshuffle.viaRandomKey());
     }
