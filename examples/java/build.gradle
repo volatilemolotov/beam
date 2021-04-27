@@ -25,9 +25,9 @@ plugins {
 }
 
 applyJavaNature(
-  enableStrictDependencies: true,
-  exportJavadoc: false,
-  automaticModuleName: 'org.apache.beam.examples',
+        enableStrictDependencies: true,
+        exportJavadoc: false,
+        automaticModuleName: 'org.apache.beam.examples',
 )
 provideIntegrationTestingDependencies()
 enableJavaPerformanceTesting()
@@ -53,6 +53,9 @@ configurations.sparkRunnerPreCommit {
 }
 
 dependencies {
+  implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.0-alpha1'
+  implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.3.0-alpha5'
+
   compile enforcedPlatform(library.java.google_cloud_platform_libraries_bom)
   compile library.java.vendored_guava_26_0_jre
   compile library.java.kafka_clients
@@ -60,6 +63,7 @@ dependencies {
   compile project(":sdks:java:extensions:google-cloud-platform-core")
   compile project(":sdks:java:io:google-cloud-platform")
   compile project(":sdks:java:io:kafka")
+  compile project(":sdks:java:io:redis")
   compile project(":sdks:java:extensions:ml")
   compile library.java.avro
   compile library.java.bigdataoss_util
@@ -72,9 +76,15 @@ dependencies {
   compile library.java.google_code_gson
   compile library.java.google_http_client
   compile library.java.google_oauth_client
+  compile library.java.jackson_databind
   compile library.java.joda_time
+  compile library.java.protobuf_java
+  compile library.java.proto_google_cloud_bigtable_v2
   compile library.java.proto_google_cloud_datastore_v1
   compile library.java.slf4j_api
+  provided library.java.commons_io
+  provided library.java.commons_csv
+  runtime project(path: ":runners:direct-java", configuration: "shadow")
   compile library.java.vendored_grpc_1_26_0
   compile library.java.vendored_guava_26_0_jre
   compile "com.google.api.grpc:proto-google-cloud-language-v1:1.81.4"
@@ -83,6 +93,7 @@ dependencies {
     // "spotbugs-annotations:3.1.12" used in Beam. Not required.
     exclude group: "org.apache.zookeeper", module: "zookeeper"
   }
+  compile "org.apache.commons:commons-lang3:3.9"
   compile "org.apache.httpcomponents:httpclient:4.5.13"
   compile "org.apache.httpcomponents:httpcore:4.4.13"
   testCompile project(path: ":runners:direct-java", configuration: "shadow")
@@ -117,9 +128,9 @@ dependencies {
  * of integration tests for WordCount and WindowedWordCount.
  */
 def preCommitRunnerClass = [
-  directRunner: "org.apache.beam.runners.direct.DirectRunner",
-  flinkRunner: "org.apache.beam.runners.flink.TestFlinkRunner",
-  sparkRunner: "org.apache.beam.runners.spark.TestSparkRunner",
+        directRunner: "org.apache.beam.runners.direct.DirectRunner",
+        flinkRunner: "org.apache.beam.runners.flink.TestFlinkRunner",
+        sparkRunner: "org.apache.beam.runners.spark.TestSparkRunner",
 ]
 def gcpProject = project.findProperty('gcpProject') ?: 'apache-beam-testing'
 def gcsTempRoot = project.findProperty('gcsTempRoot') ?: 'gs://temp-storage-for-end-to-end-tests/'
@@ -127,9 +138,9 @@ def gcsTempRoot = project.findProperty('gcsTempRoot') ?: 'gs://temp-storage-for-
 for (String runner : preCommitRunners) {
   tasks.create(name: runner + "PreCommit", type: Test) {
     def preCommitBeamTestPipelineOptions = [
-       "--project=${gcpProject}",
-       "--tempRoot=${gcsTempRoot}",
-       "--runner=" + preCommitRunnerClass[runner],
+            "--project=${gcpProject}",
+            "--tempRoot=${gcsTempRoot}",
+            "--runner=" + preCommitRunnerClass[runner],
     ]
     classpath = configurations."${runner}PreCommit"
     include "**/WordCountIT.class"
@@ -147,5 +158,12 @@ task preCommit() {
   for (String runner : preCommitRunners) {
     dependsOn runner + "PreCommit"
   }
+}
+
+task execute (type:JavaExec) {
+  main = System.getProperty("mainClass")
+  classpath = sourceSets.main.runtimeClasspath
+  systemProperties System.getProperties()
+  args System.getProperty("exec.args", "").split()
 }
 
