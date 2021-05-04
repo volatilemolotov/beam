@@ -87,8 +87,7 @@ dependencies {
   compile "org.apache.httpcomponents:httpcore:4.4.13"
   compile "org.apache.beam:beam-runners-direct-java:2.28.0"
 
-  //todo library aiplatform:
-  compile 'com.google.cloud:google-cloud-aiplatform:0.4.1'
+  compile "com.google.cloud:google-cloud-aiplatform:0.4.1"
 
   testCompile project(path: ":runners:direct-java", configuration: "shadow")
   testCompile project(":sdks:java:io:google-cloud-platform")
