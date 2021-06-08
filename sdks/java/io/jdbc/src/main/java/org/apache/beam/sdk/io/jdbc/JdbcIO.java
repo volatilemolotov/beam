@@ -29,14 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -257,13 +250,15 @@ public class JdbcIO {
         .build();
   }
 
-  /** Read from a JDBC data source. */
+  /**
+   * Like {@link #readAll}, but executes multiple instances of the query on the same table using ranges.
+   * @param <T> Type of the data to be read.
+   */
   public static <T> ReadWithPartitions<T> readWithPartitions() {
     return new AutoValue_JdbcIO_ReadWithPartitions.Builder<T>()
-        .setOutputParallelization(false)
-        .setLowerBound(-1)
-        .setUpperBound(MAX_VALUE)
-        .setNumPartitions(0)
+        .setLowerBound(DEFAULT_LOWER_BOUND)
+        .setUpperBound(DEFAULT_UPPER_BOUND)
+        .setNumPartitions(DEFAULT_NUM_PARTITIONS)
         .build();
   }
 
@@ -272,6 +267,10 @@ public class JdbcIO {
   // Default values used from fluent backoff.
   private static final Duration DEFAULT_INITIAL_BACKOFF = Duration.standardSeconds(1);
   private static final Duration DEFAULT_MAX_CUMULATIVE_BACKOFF = Duration.standardDays(1000);
+  // Default values used for partitioning a table
+  private static final int DEFAULT_LOWER_BOUND = 0;
+  private static final int DEFAULT_UPPER_BOUND = MAX_VALUE;
+  private static final int DEFAULT_NUM_PARTITIONS = 200;
 
   /**
    * Write data to a JDBC datasource.
@@ -899,8 +898,6 @@ public class JdbcIO {
 
     abstract @Nullable Coder<T> getCoder();
 
-    abstract boolean getOutputParallelization();
-
     abstract int getLowerBound();
 
     abstract int getUpperBound();
@@ -922,8 +919,6 @@ public class JdbcIO {
       abstract Builder<T> setRowMapper(RowMapper<T> rowMapper);
 
       abstract Builder<T> setCoder(Coder<T> coder);
-
-      abstract Builder<T> setOutputParallelization(boolean outputParallelization);
 
       abstract Builder<T> setLowerBound(int lowerBound);
 
@@ -957,10 +952,6 @@ public class JdbcIO {
       return toBuilder().setCoder(coder).build();
     }
 
-    public ReadWithPartitions<T> withOutputParallelization(boolean outputParallelization) {
-      return toBuilder().setOutputParallelization(outputParallelization).build();
-    }
-
     public ReadWithPartitions<T> withLowerBound(int lowerBound) {
       return toBuilder().setLowerBound(lowerBound).build();
     }
@@ -992,9 +983,12 @@ public class JdbcIO {
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
       checkArgument(getTableName() != null, "withTableName() is required");
       checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
-      checkArgument(getLowerBound() > -1, "withLowerBound() is required");
-      checkArgument(getUpperBound() != MAX_VALUE, "withUpperBound() is required");
-      checkArgument(getNumPartitions() > 0, "withNumPartitions() is required");
+
+      if( getUpperBound() == MAX_VALUE) {
+        withUpperBound(
+            JdbcUtil.getUpperBound(
+                input, getTableName(), getDataSourceProviderFn(), getPartitionColumn()));
+      }
 
       int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
       PCollection<List<Integer>> params =

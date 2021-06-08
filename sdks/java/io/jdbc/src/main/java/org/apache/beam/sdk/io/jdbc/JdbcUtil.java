@@ -23,19 +23,21 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.KV;
+import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.Row;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
+
+import javax.sql.DataSource;
 
 /** Provides utility functions for working with {@link JdbcIO}. */
 @SuppressWarnings({
@@ -255,6 +257,7 @@ class JdbcUtil {
     return calendar;
   }
 
+  /**Create partitions фat the table. **/
   static class PartitioningFn extends DoFn<List<Integer>, KV<String, Integer>> {
     @ProcessElement
     public void processElement(ProcessContext c) {
@@ -276,5 +279,32 @@ class JdbcUtil {
         c.output(kvRange);
       }
     }
+  }
+
+  /** Select maximal value from a table. **/
+  static Integer getUpperBound(PBegin input, String tableName, SerializableFunction<Void,
+          DataSource> providerFunctionFn, String partitionColumn)
+  {
+    final Integer[] upperBound = {0};
+    input
+        .apply(
+            String.format("Read max value of %s from: %s", partitionColumn, tableName),
+            JdbcIO.<String>read()
+                .withDataSourceProviderFn(providerFunctionFn)
+                .withQuery(
+                    String.format("select max(%1$s) from %2$s", partitionColumn, tableName))
+                .withRowMapper((JdbcIO.RowMapper<String>) resultSet -> resultSet.getString(1))
+                .withOutputParallelization(false)
+                .withCoder(StringUtf8Coder.of()))
+        .apply(
+            ParDo.of(
+                new DoFn<String, String>() {
+                  @ProcessElement
+                  public void processElement(ProcessContext context) {
+                    upperBound[0] =  Integer.valueOf(Objects.requireNonNull(context.element()));
+                    context.output(context.element());
+                  }
+                }));
+    return upperBound[0];
   }
 }

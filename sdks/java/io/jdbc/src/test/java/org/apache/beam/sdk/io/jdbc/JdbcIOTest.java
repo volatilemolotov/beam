@@ -230,36 +230,6 @@ public class JdbcIOTest implements Serializable {
   }
 
   @Test
-  public void testReadWithPartitions() {
-    PCollection<TestRow> rows =
-        pipeline.apply(
-            JdbcIO.<TestRow>readWithPartitions()
-                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
-                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
-                .withCoder(SerializableCoder.of(TestRow.class))
-                .withTableName(READ_TABLE_NAME)
-                .withNumPartitions(10)
-                .withLowerBound(0)
-                .withUpperBound(99)
-                .withPartitionColumn("id")
-                .withOutputParallelization(false));
-
-    rows.apply(
-            "printIt",
-            ParDo.of(
-                new DoFn<TestRow, TestRow>() {
-                  @ProcessElement
-                  public void processElement(ProcessContext context) {
-                    System.out.println(context.element());
-                    context.output(context.element());
-                  }
-                }))
-        .setCoder(SerializableCoder.of(TestRow.class));
-
-    pipeline.run();
-  }
-
-  @Test
   public void testReadWithSingleStringParameter() {
     PCollection<TestRow> rows =
         pipeline.apply(
@@ -364,6 +334,35 @@ public class JdbcIOTest implements Serializable {
         .containsInAnyOrder(
             ImmutableList.of(Row.withSchema(expectedSchema).addValues("Testval1", 1).build()));
 
+    pipeline.run();
+  }
+
+  @Test
+  public void testReadWithPartitions() {
+    PCollection<TestRow> rows =
+        pipeline.apply(
+            JdbcIO.<TestRow>readWithPartitions()
+                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+                .withCoder(SerializableCoder.of(TestRow.class))
+                .withTableName(READ_TABLE_NAME)
+                .withNumPartitions(10)
+                .withLowerBound(0)
+                .withPartitionColumn("id"));
+
+    PAssert.thatSingleton(rows.apply("Count All", Count.globally())).isEqualTo(1000L);
+
+    rows.apply(
+            "printIt",
+            ParDo.of(
+                new DoFn<TestRow, TestRow>() {
+                  @ProcessElement
+                  public void processElement(ProcessContext context) {
+                    System.out.println(context.element());
+                    context.output(context.element());
+                  }
+                }))
+        .setCoder(SerializableCoder.of(TestRow.class));
     pipeline.run();
   }
 
