@@ -717,24 +717,22 @@ public class JdbcIO {
           (getDataSourceProviderFn() != null),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
 
-      PCollection<T> result =
-          input
-              .apply(Create.of((Void) null))
-              .apply(
-                  JdbcIO.<Void, T>readAll()
-                      .withDataSourceProviderFn(getDataSourceProviderFn())
-                      .withQuery(getQuery())
-                      .withCoder(getCoder())
-                      .withRowMapper(getRowMapper())
-                      .withFetchSize(getFetchSize())
-                      .withOutputParallelization(getOutputParallelization())
-                      .withParameterSetter(
-                          (element, preparedStatement) -> {
-                            if (getStatementPreparator() != null) {
-                              getStatementPreparator().setParameters(preparedStatement);
-                            }
-                          }));
-      return result;
+      return input
+          .apply(Create.of((Void) null))
+          .apply(
+              JdbcIO.<Void, T>readAll()
+                  .withDataSourceProviderFn(getDataSourceProviderFn())
+                  .withQuery(getQuery())
+                  .withCoder(getCoder())
+                  .withRowMapper(getRowMapper())
+                  .withFetchSize(getFetchSize())
+                  .withOutputParallelization(getOutputParallelization())
+                  .withParameterSetter(
+                      (element, preparedStatement) -> {
+                        if (getStatementPreparator() != null) {
+                          getStatementPreparator().setParameters(preparedStatement);
+                        }
+                      }));
     }
 
     @Override
