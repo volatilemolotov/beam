@@ -914,6 +914,8 @@ public class JdbcIO {
 
     abstract @Nullable String getTableName();
 
+    abstract @Nullable String getQuery();
+
     abstract Builder<T> toBuilder();
 
     @AutoValue.Builder
@@ -935,6 +937,8 @@ public class JdbcIO {
       abstract Builder<T> setPartitionColumn(String partitionColumn);
 
       abstract Builder<T> setTableName(String tableName);
+
+      abstract Builder<T> setQuery(String query);
 
       abstract ReadWithPartitions<T> build();
     }
@@ -980,6 +984,11 @@ public class JdbcIO {
       return toBuilder().setTableName(tableName).build();
     }
 
+    public ReadWithPartitions<T> withQuery(String query) {
+      checkArgument(query != null, "query can not be null");
+      return toBuilder().setQuery(String.format("(%s)", query)).build();
+    }
+
     @Override
     public PCollection<T> expand(PBegin input) {
       checkArgument(getRowMapper() != null, "withRowMapper() is required");
@@ -987,14 +996,14 @@ public class JdbcIO {
       checkArgument(
           (getDataSourceProviderFn() != null),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
-      checkArgument(getTableName() != null, "withTableName() is required");
       checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
+      checkArgument(getTableName() != null || getQuery() != null,
+          "only one of withQuery() or withTableName() can be used");
 
-      if( getUpperBound() == MAX_VALUE) {
-        withUpperBound(
-            JdbcUtil.getUpperBound(
-                input, getTableName(), getDataSourceProviderFn(), getPartitionColumn()));
+      if (getUpperBound() == MAX_VALUE || getLowerBound() == 0) {
+        refineBounds(input);
       }
+      String fromClause = getQuery() == null ? getTableName() : getQuery();
 
       int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
       PCollection<List<Integer>> params =
@@ -1007,29 +1016,37 @@ public class JdbcIO {
               .apply("Partitioning", ParDo.of(new PartitioningFn()))
               .apply("Group partitions", GroupByKey.create());
 
-      PCollection<T> result =
-          ranges.apply(
-              String.format("Read ranges %s", getTableName()),
-              JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
-                  .withDataSourceProviderFn(getDataSourceProviderFn())
-                  .withFetchSize(stride)
-                  .withQuery(
-                      String.format(
-                          "select * from %1$s where %2$s >= ? and %2$s < ?",
-                          getTableName(), getPartitionColumn()))
-                  .withCoder(getCoder())
-                  .withRowMapper(getRowMapper())
-                  .withParameterSetter(
-                      (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
-                          (element, preparedStatement) -> {
-                            String[] range = element.getKey().split(",", -1);
-                            preparedStatement.setInt(1, Integer.parseInt(range[0]));
-                            preparedStatement.setInt(2, Integer.parseInt(range[1]));
-                          })
-                  .withOutputParallelization(false));
-      return result;
+      return ranges.apply(
+          String.format("Read ranges"),
+          JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
+              .withDataSourceProviderFn(getDataSourceProviderFn())
+              .withFetchSize(stride)
+              .withQuery(
+                  String.format(
+                      "select * from %1$s where %2$s >= ? and %2$s < ?",
+                      fromClause, getPartitionColumn()))
+              .withCoder(getCoder())
+              .withRowMapper(getRowMapper())
+              .withParameterSetter(
+                  (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
+                      (element, preparedStatement) -> {
+                        String[] range = element.getKey().split(",", -1);
+                        preparedStatement.setInt(1, Integer.parseInt(range[0]));
+                        preparedStatement.setInt(2, Integer.parseInt(range[1]));
+                      })
+              .withOutputParallelization(false));
     }
 
+    private void refineBounds(PBegin input) {
+      Integer[] bounds = JdbcUtil.getBounds(input, getTableName(), getDataSourceProviderFn(),
+          getPartitionColumn(), getQuery());
+      if (getLowerBound() == 0) {
+        withLowerBound(bounds[0]);
+      }
+      if (getUpperBound() == MAX_VALUE) {
+        withUpperBound(bounds[1]);
+      }
+    }
 
 
     @Override

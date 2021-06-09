@@ -23,9 +23,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import javax.sql.DataSource;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.schemas.Schema;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -34,10 +41,9 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.Row;
+import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Splitter;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
-
-import javax.sql.DataSource;
 
 /** Provides utility functions for working with {@link JdbcIO}. */
 @SuppressWarnings({
@@ -281,19 +287,26 @@ class JdbcUtil {
     }
   }
 
-  /** Select maximal value from a table. **/
-  static Integer getUpperBound(PBegin input, String tableName, SerializableFunction<Void,
-          DataSource> providerFunctionFn, String partitionColumn)
-  {
-    final Integer[] upperBound = {0};
+  /**
+   * Select maximal value from a table.
+   *
+   * @return
+   */
+  static Integer[] getBounds(PBegin input, String tableName, SerializableFunction<Void,
+      DataSource> providerFunctionFn, String partitionColumn, String query) {
+    final Integer[] bounds = {0, 0};
+    String fromClause = query == null ? tableName : query;
+    System.out.println("!!! from clause " + fromClause);
     input
         .apply(
-            String.format("Read max value of %s from: %s", partitionColumn, tableName),
+            String.format("Read min and max value by %s", partitionColumn),
             JdbcIO.<String>read()
                 .withDataSourceProviderFn(providerFunctionFn)
                 .withQuery(
-                    String.format("select max(%1$s) from %2$s", partitionColumn, tableName))
-                .withRowMapper((JdbcIO.RowMapper<String>) resultSet -> resultSet.getString(1))
+                    String.format("select min(%1$s), max(%1$s) from %2$s", partitionColumn,
+                        fromClause))
+                .withRowMapper((JdbcIO.RowMapper<String>) resultSet -> String
+                    .join(",", Arrays.asList(resultSet.getString(1), resultSet.getString(2))))
                 .withOutputParallelization(false)
                 .withCoder(StringUtf8Coder.of()))
         .apply(
@@ -301,10 +314,13 @@ class JdbcUtil {
                 new DoFn<String, String>() {
                   @ProcessElement
                   public void processElement(ProcessContext context) {
-                    upperBound[0] =  Integer.valueOf(Objects.requireNonNull(context.element()));
+                    System.out.println(context.element());
+                    List<String> elements = Splitter.on(',').splitToList(context.element());
+                    bounds[0] = Integer.parseInt(Objects.requireNonNull(elements.get(0)));
+                    bounds[1] = Integer.parseInt(Objects.requireNonNull(elements.get(1)));
                     context.output(context.element());
                   }
                 }));
-    return upperBound[0];
+    return bounds;
   }
 }
