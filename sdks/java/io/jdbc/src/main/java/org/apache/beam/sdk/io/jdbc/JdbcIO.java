@@ -1014,6 +1014,7 @@ public class JdbcIO {
      * evenly. When the input is less than 1, the number is set to 1.
      */
     public ReadWithPartitions<T> withNumPartitions(int numPartitions) {
+      numPartitions = numPartitions < 1 ? 1 : numPartitions;
       return toBuilder().setNumPartitions(numPartitions).build();
     }
 
@@ -1050,10 +1051,15 @@ public class JdbcIO {
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
       checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
       checkArgument(getTable() != null, "withTable() is required");
+      checkArgument(getLowerBound() <= getUpperBound(),
+          "The lower bound of partitioning column is larger than the upper bound");
+      checkArgument(getUpperBound() - getLowerBound() >= getNumPartitions(),
+          "The specified number of partitions is less than the difference between upper bound and lower bound.");
 
       if (getUpperBound() == MAX_VALUE || getLowerBound() == 0) {
         refineBounds(input);
       }
+
       int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
       PCollection<List<Integer>> params =
           input.apply(
