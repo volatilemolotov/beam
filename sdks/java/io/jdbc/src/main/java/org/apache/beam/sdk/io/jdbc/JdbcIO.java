@@ -180,6 +180,52 @@ import org.slf4j.LoggerFactory;
  * );
  * }</code></pre>
  *
+ * <p> 3. To read all data from a table in parallel with partitioning can be done with {@link ReadWithPartitions}:
+ * <pre>{@code
+ * pipeline.apply(JdbcIO.<KV<Integer, String>>readWithPartitions()
+ *  .withDataSourceConfiguration(JdbcIO.DataSourceConfiguration.create(
+ *         "com.mysql.jdbc.Driver", "jdbc:mysql://hostname:3306/mydb")
+ *       .withUsername("username")
+ *       .withPassword("password"))
+ *  .withTable("Person")
+ *  .withPartitionColumn("id")
+ *  .withLowerBound(0)
+ *  .withUpperBound(1000)
+ *  .withNumPartitions(5)
+ *  .withCoder(KvCoder.of(BigEndianIntegerCoder.of(), StringUtf8Coder.of()))
+ *  .withRowMapper(new JdbcIO.RowMapper<KV<Integer, String>>() {
+ *    public KV<Integer, String> mapRow(ResultSet resultSet) throws Exception {
+ *      return KV.of(resultSet.getInt(1), resultSet.getString(2));
+ *    }
+ *  })
+ * );
+ * }</pre>
+ *
+ * <p>Instead of a full table you could also use a subquery in parentheses.
+ * The subquery can be specified using Table option instead and partition columns
+ * can be qualified using the subquery alias provided as part of Table.
+ *
+ * <pre>{@code
+ * pipeline.apply(JdbcIO.<KV<Integer, String>>readWithPartitions()
+ *  .withDataSourceConfiguration(JdbcIO.DataSourceConfiguration.create(
+ *         "com.mysql.jdbc.Driver", "jdbc:mysql://hostname:3306/mydb")
+ *       .withUsername("username")
+ *       .withPassword("password"))
+ *  .withTable("(select id, name from Person) as subq")
+ *  .withPartitionColumn("id")
+ *  .withLowerBound(0)
+ *  .withUpperBound(1000)
+ *  .withNumPartitions(5)
+ *  .withCoder(KvCoder.of(BigEndianIntegerCoder.of(), StringUtf8Coder.of()))
+ *  .withRowMapper(new JdbcIO.RowMapper<KV<Integer, String>>() {
+ *    public KV<Integer, String> mapRow(ResultSet resultSet) throws Exception {
+ *      return KV.of(resultSet.getInt(1), resultSet.getString(2));
+ *    }
+ *  })
+ * );
+ * }</pre>
+ *
+ *
  * <h3>Writing to JDBC datasource</h3>
  *
  * <p>JDBC sink supports writing records into a database. It writes a {@link PCollection} to the
@@ -259,7 +305,9 @@ public class JdbcIO {
   }
 
   /**
-   * Like {@link #readAll}, but executes multiple instances of the query on the same table using ranges.
+   * Like {@link #readAll}, but executes multiple instances of the query on the same table
+   * (subquery) using ranges.
+   *
    * @param <T> Type of the data to be read.
    */
   public static <T> ReadWithPartitions<T> readWithPartitions() {
@@ -894,7 +942,9 @@ public class JdbcIO {
     }
   }
 
-  /** Implementation of {@link #readWithPartitions}. */
+  /**
+   * Implementation of {@link #readWithPartitions}.
+   */
   @AutoValue
   public abstract static class ReadWithPartitions<T> extends PTransform<PBegin, PCollection<T>> {
 
@@ -904,17 +954,15 @@ public class JdbcIO {
 
     abstract @Nullable Coder<T> getCoder();
 
-    abstract int getLowerBound();
-
-    abstract int getUpperBound();
-
     abstract int getNumPartitions();
 
     abstract @Nullable String getPartitionColumn();
 
-    abstract @Nullable String getTableName();
+    abstract int getLowerBound();
 
-    abstract @Nullable String getQuery();
+    abstract int getUpperBound();
+
+    abstract @Nullable String getTable();
 
     abstract Builder<T> toBuilder();
 
@@ -928,17 +976,15 @@ public class JdbcIO {
 
       abstract Builder<T> setCoder(Coder<T> coder);
 
-      abstract Builder<T> setLowerBound(int lowerBound);
-
-      abstract Builder<T> setUpperBound(int upperBound);
-
       abstract Builder<T> setNumPartitions(int numPartitions);
 
       abstract Builder<T> setPartitionColumn(String partitionColumn);
 
-      abstract Builder<T> setTableName(String tableName);
+      abstract Builder<T> setLowerBound(int lowerBound);
 
-      abstract Builder<T> setQuery(String query);
+      abstract Builder<T> setUpperBound(int upperBound);
+
+      abstract Builder<T> setTable(String tableName);
 
       abstract ReadWithPartitions<T> build();
     }
@@ -962,6 +1008,23 @@ public class JdbcIO {
       return toBuilder().setCoder(coder).build();
     }
 
+    /**
+     * The number of partitions. This, along with withLowerBound and withUpperBound, form partitions
+     * strides for generated WHERE clause expressions used to split the column withPartitionColumn
+     * evenly. When the input is less than 1, the number is set to 1.
+     */
+    public ReadWithPartitions<T> withNumPartitions(int numPartitions) {
+      return toBuilder().setNumPartitions(numPartitions).build();
+    }
+
+    /**
+     * The name of a column of numeric type that will be used for partitioning
+     */
+    public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
+      checkArgument(partitionColumn != null, "partitionColumn can not be null");
+      return toBuilder().setPartitionColumn(partitionColumn).build();
+    }
+
     public ReadWithPartitions<T> withLowerBound(int lowerBound) {
       return toBuilder().setLowerBound(lowerBound).build();
     }
@@ -970,23 +1033,12 @@ public class JdbcIO {
       return toBuilder().setUpperBound(upperBound).build();
     }
 
-    public ReadWithPartitions<T> withNumPartitions(int numPartitions) {
-      return toBuilder().setNumPartitions(numPartitions).build();
-    }
-
-    public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
-      checkArgument(partitionColumn != null, "partitionColumn can not be null");
-      return toBuilder().setPartitionColumn(partitionColumn).build();
-    }
-
-    public ReadWithPartitions<T> withTableName(String tableName) {
-      checkArgument(tableName != null, "tableName can not be null");
-      return toBuilder().setTableName(tableName).build();
-    }
-
-    public ReadWithPartitions<T> withQuery(String query) {
-      checkArgument(query != null, "query can not be null");
-      return toBuilder().setQuery(String.format("(%s)", query)).build();
+    /**
+     * Name of the table in the external database. Can be used to pass a user-defined subqery.
+     */
+    public ReadWithPartitions<T> withTable(String tableName) {
+      checkArgument(tableName != null, "table can not be null");
+      return toBuilder().setTable(tableName).build();
     }
 
     @Override
@@ -997,14 +1049,11 @@ public class JdbcIO {
           (getDataSourceProviderFn() != null),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
       checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
-      checkArgument(getTableName() != null || getQuery() != null,
-          "only one of withQuery() or withTableName() can be used");
+      checkArgument(getTable() != null, "withTable() is required");
 
       if (getUpperBound() == MAX_VALUE || getLowerBound() == 0) {
         refineBounds(input);
       }
-      String fromClause = getQuery() == null ? getTableName() : getQuery();
-
       int stride = (getUpperBound() - getLowerBound()) / getNumPartitions();
       PCollection<List<Integer>> params =
           input.apply(
@@ -1021,10 +1070,9 @@ public class JdbcIO {
           JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
               .withDataSourceProviderFn(getDataSourceProviderFn())
               .withFetchSize(stride)
-              .withQuery(
-                  String.format(
-                      "select * from %1$s where %2$s >= ? and %2$s < ?",
-                      fromClause, getPartitionColumn()))
+              .withQuery(String
+                  .format("select * from %1$s where %2$s >= ? and %2$s < ?", getTable(),
+                      getPartitionColumn()))
               .withCoder(getCoder())
               .withRowMapper(getRowMapper())
               .withParameterSetter(
@@ -1038,8 +1086,8 @@ public class JdbcIO {
     }
 
     private void refineBounds(PBegin input) {
-      Integer[] bounds = JdbcUtil.getBounds(input, getTableName(), getDataSourceProviderFn(),
-          getPartitionColumn(), getQuery());
+      Integer[] bounds = JdbcUtil.getBounds(input, getTable(), getDataSourceProviderFn(),
+          getPartitionColumn());
       if (getLowerBound() == 0) {
         withLowerBound(bounds[0]);
       }

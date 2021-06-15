@@ -345,10 +345,12 @@ public class JdbcIOTest implements Serializable {
                 .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
                 .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
                 .withCoder(SerializableCoder.of(TestRow.class))
-                .withTableName(READ_TABLE_NAME)
+//                .withTableName(READ_TABLE_NAME)
+                .withTable(String.format("(select * from %s) as subq", READ_TABLE_NAME))
                 .withNumPartitions(10)
+                .withPartitionColumn("id")
                 .withLowerBound(0)
-                .withPartitionColumn("id"));
+                .withUpperBound(1000));
 
     PAssert.thatSingleton(rows.apply("Count All", Count.globally())).isEqualTo(1000L);
 

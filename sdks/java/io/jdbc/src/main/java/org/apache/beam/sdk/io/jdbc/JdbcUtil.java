@@ -292,11 +292,9 @@ class JdbcUtil {
    *
    * @return
    */
-  static Integer[] getBounds(PBegin input, String tableName, SerializableFunction<Void,
-      DataSource> providerFunctionFn, String partitionColumn, String query) {
+  static Integer[] getBounds(PBegin input, String table, SerializableFunction<Void,
+      DataSource> providerFunctionFn, String partitionColumn) {
     final Integer[] bounds = {0, 0};
-    String fromClause = query == null ? tableName : query;
-    System.out.println("!!! from clause " + fromClause);
     input
         .apply(
             String.format("Read min and max value by %s", partitionColumn),
@@ -304,7 +302,7 @@ class JdbcUtil {
                 .withDataSourceProviderFn(providerFunctionFn)
                 .withQuery(
                     String.format("select min(%1$s), max(%1$s) from %2$s", partitionColumn,
-                        fromClause))
+                        table))
                 .withRowMapper((JdbcIO.RowMapper<String>) resultSet -> String
                     .join(",", Arrays.asList(resultSet.getString(1), resultSet.getString(2))))
                 .withOutputParallelization(false)
