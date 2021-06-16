@@ -312,7 +312,6 @@ class JdbcUtil {
                 new DoFn<String, String>() {
                   @ProcessElement
                   public void processElement(ProcessContext context) {
-                    System.out.println(context.element());
                     List<String> elements = Splitter.on(',').splitToList(context.element());
                     bounds[0] = Integer.parseInt(Objects.requireNonNull(elements.get(0)));
                     bounds[1] = Integer.parseInt(Objects.requireNonNull(elements.get(1)));

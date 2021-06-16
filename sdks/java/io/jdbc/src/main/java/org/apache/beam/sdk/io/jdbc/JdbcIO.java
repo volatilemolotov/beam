@@ -1051,10 +1051,10 @@ public class JdbcIO {
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
       checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
       checkArgument(getTable() != null, "withTable() is required");
-      checkArgument(getLowerBound() <= getUpperBound(),
-          "The lower bound of partitioning column is larger than the upper bound");
+      checkArgument(getLowerBound() < getUpperBound(),
+          "The lower bound of partitioning column is larger or equal than the upper bound");
       checkArgument(getUpperBound() - getLowerBound() >= getNumPartitions(),
-          "The specified number of partitions is less than the difference between upper bound and lower bound.");
+          "The specified number of partitions is more than the difference between upper bound and lower bound");
 
       if (getUpperBound() == MAX_VALUE || getLowerBound() == 0) {
         refineBounds(input);

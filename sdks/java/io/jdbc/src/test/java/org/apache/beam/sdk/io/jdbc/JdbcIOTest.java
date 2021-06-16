@@ -70,8 +70,6 @@ import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.transforms.Wait;
 import org.apache.beam.sdk.util.SerializableUtils;
@@ -345,26 +343,65 @@ public class JdbcIOTest implements Serializable {
                 .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
                 .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
                 .withCoder(SerializableCoder.of(TestRow.class))
-//                .withTableName(READ_TABLE_NAME)
                 .withTable(String.format("(select * from %s) as subq", READ_TABLE_NAME))
                 .withNumPartitions(10)
                 .withPartitionColumn("id")
                 .withLowerBound(0)
                 .withUpperBound(1000));
-
     PAssert.thatSingleton(rows.apply("Count All", Count.globally())).isEqualTo(1000L);
+    pipeline.run();
+  }
 
-    rows.apply(
-            "printIt",
-            ParDo.of(
-                new DoFn<TestRow, TestRow>() {
-                  @ProcessElement
-                  public void processElement(ProcessContext context) {
-                    System.out.println(context.element());
-                    context.output(context.element());
-                  }
-                }))
-        .setCoder(SerializableCoder.of(TestRow.class));
+  @Test
+  public void testIfNumPartitionsIsZero() {
+    PCollection<TestRow> rows =
+        pipeline.apply(
+            JdbcIO.<TestRow>readWithPartitions()
+                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+                .withCoder(SerializableCoder.of(TestRow.class))
+                .withTable(READ_TABLE_NAME)
+                .withNumPartitions(0)
+                .withPartitionColumn("id")
+                .withLowerBound(0)
+                .withUpperBound(1000));
+    PAssert.thatSingleton(rows.apply("Count All", Count.globally())).isEqualTo(1000L);
+    pipeline.run();
+  }
+
+  @Test
+  public void testNumPartitionsMoreThanTotalRows() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage(
+        "The specified number of partitions is more than the difference between upper bound and lower bound");
+    pipeline.apply(
+        JdbcIO.<TestRow>readWithPartitions()
+            .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+            .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+            .withCoder(SerializableCoder.of(TestRow.class))
+            .withTable(READ_TABLE_NAME)
+            .withNumPartitions(200)
+            .withPartitionColumn("id")
+            .withLowerBound(0)
+            .withUpperBound(100));
+    pipeline.run();
+  }
+
+  @Test
+  public void testLowerBoundIsMoreThanUpperBound() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage(
+        "The lower bound of partitioning column is larger or equal than the upper bound");
+    pipeline.apply(
+        JdbcIO.<TestRow>readWithPartitions()
+            .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+            .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+            .withCoder(SerializableCoder.of(TestRow.class))
+            .withTable(READ_TABLE_NAME)
+            .withNumPartitions(5)
+            .withPartitionColumn("id")
+            .withLowerBound(100)
+            .withUpperBound(100));
     pipeline.run();
   }
 
