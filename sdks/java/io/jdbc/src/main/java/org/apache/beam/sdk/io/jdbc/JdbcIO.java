@@ -20,6 +20,7 @@ package org.apache.beam.sdk.io.jdbc;
 import static java.lang.Integer.MAX_VALUE;
 import static org.apache.beam.sdk.io.jdbc.SchemaUtil.checkNullabilityForFields;
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.auto.value.AutoValue;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -999,12 +1000,12 @@ public class JdbcIO {
     }
 
     public ReadWithPartitions<T> withRowMapper(RowMapper<T> rowMapper) {
-      checkArgument(rowMapper != null, "rowMapper can not be null");
+      checkNotNull(rowMapper, "rowMapper can not be null");
       return toBuilder().setRowMapper(rowMapper).build();
     }
 
     public ReadWithPartitions<T> withCoder(Coder<T> coder) {
-      checkArgument(coder != null, "coder can not be null");
+      checkNotNull(coder, "coder can not be null");
       return toBuilder().setCoder(coder).build();
     }
 
@@ -1014,7 +1015,7 @@ public class JdbcIO {
      * evenly. When the input is less than 1, the number is set to 1.
      */
     public ReadWithPartitions<T> withNumPartitions(int numPartitions) {
-      numPartitions = numPartitions < 1 ? 1 : numPartitions;
+      checkArgument(numPartitions > 0, "numPartitions can not be less than 1");
       return toBuilder().setNumPartitions(numPartitions).build();
     }
 
@@ -1022,7 +1023,7 @@ public class JdbcIO {
      * The name of a column of numeric type that will be used for partitioning
      */
     public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
-      checkArgument(partitionColumn != null, "partitionColumn can not be null");
+      checkNotNull(partitionColumn, "partitionColumn can not be null");
       return toBuilder().setPartitionColumn(partitionColumn).build();
     }
 
@@ -1038,19 +1039,18 @@ public class JdbcIO {
      * Name of the table in the external database. Can be used to pass a user-defined subqery.
      */
     public ReadWithPartitions<T> withTable(String tableName) {
-      checkArgument(tableName != null, "table can not be null");
+      checkNotNull(tableName, "table can not be null");
       return toBuilder().setTable(tableName).build();
     }
 
     @Override
     public PCollection<T> expand(PBegin input) {
-      checkArgument(getRowMapper() != null, "withRowMapper() is required");
-      checkArgument(getCoder() != null, "withCoder() is required");
-      checkArgument(
-          (getDataSourceProviderFn() != null),
+      checkNotNull(getRowMapper(), "withRowMapper() is required");
+      checkNotNull(getCoder(), "withCoder() is required");
+      checkNotNull(getDataSourceProviderFn(),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
-      checkArgument(getPartitionColumn() != null, "withPartitionColumn() is required");
-      checkArgument(getTable() != null, "withTable() is required");
+      checkNotNull(getPartitionColumn(), "withPartitionColumn() is required");
+      checkNotNull(getTable(), "withTable() is required");
       checkArgument(getLowerBound() < getUpperBound(),
           "The lower bound of partitioning column is larger or equal than the upper bound");
       checkArgument(getUpperBound() - getLowerBound() >= getNumPartitions(),
@@ -1071,24 +1071,22 @@ public class JdbcIO {
               .apply("Partitioning", ParDo.of(new PartitioningFn()))
               .apply("Group partitions", GroupByKey.create());
 
-      return ranges.apply(
-          String.format("Read ranges"),
-          JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
-              .withDataSourceProviderFn(getDataSourceProviderFn())
-              .withFetchSize(stride)
-              .withQuery(String
-                  .format("select * from %1$s where %2$s >= ? and %2$s < ?", getTable(),
-                      getPartitionColumn()))
-              .withCoder(getCoder())
-              .withRowMapper(getRowMapper())
-              .withParameterSetter(
-                  (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
-                      (element, preparedStatement) -> {
-                        String[] range = element.getKey().split(",", -1);
-                        preparedStatement.setInt(1, Integer.parseInt(range[0]));
-                        preparedStatement.setInt(2, Integer.parseInt(range[1]));
-                      })
-              .withOutputParallelization(false));
+      return ranges.apply("Read ranges", JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
+          .withDataSourceProviderFn(getDataSourceProviderFn())
+          .withFetchSize(stride)
+          .withQuery(String
+              .format("select * from %1$s where %2$s >= ? and %2$s < ?", getTable(),
+                  getPartitionColumn()))
+          .withCoder(getCoder())
+          .withRowMapper(getRowMapper())
+          .withParameterSetter(
+              (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
+                  (element, preparedStatement) -> {
+                    String[] range = element.getKey().split(",", -1);
+                    preparedStatement.setInt(1, Integer.parseInt(range[0]));
+                    preparedStatement.setInt(2, Integer.parseInt(range[1]));
+                  })
+          .withOutputParallelization(false));
     }
 
     private void refineBounds(PBegin input) {

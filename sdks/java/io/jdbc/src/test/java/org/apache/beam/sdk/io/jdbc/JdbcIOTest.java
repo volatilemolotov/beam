@@ -343,6 +343,23 @@ public class JdbcIOTest implements Serializable {
                 .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
                 .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
                 .withCoder(SerializableCoder.of(TestRow.class))
+                .withTable(READ_TABLE_NAME)
+                .withNumPartitions(1)
+                .withPartitionColumn("id")
+                .withLowerBound(0)
+                .withUpperBound(1000));
+    PAssert.thatSingleton(rows.apply("Count All", Count.globally())).isEqualTo(1000L);
+    pipeline.run();
+  }
+
+  @Test
+  public void testReadWithPartitionsBySubqery() {
+    PCollection<TestRow> rows =
+        pipeline.apply(
+            JdbcIO.<TestRow>readWithPartitions()
+                .withDataSourceConfiguration(DATA_SOURCE_CONFIGURATION)
+                .withRowMapper(new JdbcTestHelper.CreateTestRowOfNameAndId())
+                .withCoder(SerializableCoder.of(TestRow.class))
                 .withTable(String.format("(select * from %s) as subq", READ_TABLE_NAME))
                 .withNumPartitions(10)
                 .withPartitionColumn("id")
@@ -354,6 +371,8 @@ public class JdbcIOTest implements Serializable {
 
   @Test
   public void testIfNumPartitionsIsZero() {
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("numPartitions can not be less than 1");
     PCollection<TestRow> rows =
         pipeline.apply(
             JdbcIO.<TestRow>readWithPartitions()
@@ -365,7 +384,6 @@ public class JdbcIOTest implements Serializable {
                 .withPartitionColumn("id")
                 .withLowerBound(0)
                 .withUpperBound(1000));
-    PAssert.thatSingleton(rows.apply("Count All", Count.globally())).isEqualTo(1000L);
     pipeline.run();
   }
 

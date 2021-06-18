@@ -263,7 +263,9 @@ class JdbcUtil {
     return calendar;
   }
 
-  /**Create partitions фat the table. **/
+  /**
+   * Create partitions on a table.
+   **/
   static class PartitioningFn extends DoFn<List<Integer>, KV<String, Integer>> {
     @ProcessElement
     public void processElement(ProcessContext c) {
@@ -288,9 +290,8 @@ class JdbcUtil {
   }
 
   /**
-   * Select maximal value from a table.
-   *
-   * @return
+   * Select maximal and minimal value from a table by partitioning column.
+   * @return pair of integers corresponds to the upper and lower bounds.
    */
   static Integer[] getBounds(PBegin input, String table, SerializableFunction<Void,
       DataSource> providerFunctionFn, String partitionColumn) {
