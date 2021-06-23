@@ -181,7 +181,9 @@ import org.slf4j.LoggerFactory;
  * );
  * }</code></pre>
  *
- * <p> 3. To read all data from a table in parallel with partitioning can be done with {@link ReadWithPartitions}:
+ * <p>3. To read all data from a table in parallel with partitioning can be done with {@link
+ * ReadWithPartitions}:
+ *
  * <pre>{@code
  * pipeline.apply(JdbcIO.<KV<Integer, String>>readWithPartitions()
  *  .withDataSourceConfiguration(JdbcIO.DataSourceConfiguration.create(
@@ -202,9 +204,9 @@ import org.slf4j.LoggerFactory;
  * );
  * }</pre>
  *
- * <p>Instead of a full table you could also use a subquery in parentheses.
- * The subquery can be specified using Table option instead and partition columns
- * can be qualified using the subquery alias provided as part of Table.
+ * <p>Instead of a full table you could also use a subquery in parentheses. The subquery can be
+ * specified using Table option instead and partition columns can be qualified using the subquery
+ * alias provided as part of Table.
  *
  * <pre>{@code
  * pipeline.apply(JdbcIO.<KV<Integer, String>>readWithPartitions()
@@ -225,7 +227,6 @@ import org.slf4j.LoggerFactory;
  *  })
  * );
  * }</pre>
- *
  *
  * <h3>Writing to JDBC datasource</h3>
  *
@@ -943,9 +944,7 @@ public class JdbcIO {
     }
   }
 
-  /**
-   * Implementation of {@link #readWithPartitions}.
-   */
+  /** Implementation of {@link #readWithPartitions}. */
   @AutoValue
   public abstract static class ReadWithPartitions<T> extends PTransform<PBegin, PCollection<T>> {
 
@@ -1019,9 +1018,7 @@ public class JdbcIO {
       return toBuilder().setNumPartitions(numPartitions).build();
     }
 
-    /**
-     * The name of a column of numeric type that will be used for partitioning
-     */
+    /** The name of a column of numeric type that will be used for partitioning */
     public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
       checkNotNull(partitionColumn, "partitionColumn can not be null");
       return toBuilder().setPartitionColumn(partitionColumn).build();
@@ -1035,9 +1032,7 @@ public class JdbcIO {
       return toBuilder().setUpperBound(upperBound).build();
     }
 
-    /**
-     * Name of the table in the external database. Can be used to pass a user-defined subqery.
-     */
+    /** Name of the table in the external database. Can be used to pass a user-defined subqery. */
     public ReadWithPartitions<T> withTable(String tableName) {
       checkNotNull(tableName, "table can not be null");
       return toBuilder().setTable(tableName).build();
@@ -1047,13 +1042,16 @@ public class JdbcIO {
     public PCollection<T> expand(PBegin input) {
       checkNotNull(getRowMapper(), "withRowMapper() is required");
       checkNotNull(getCoder(), "withCoder() is required");
-      checkNotNull(getDataSourceProviderFn(),
+      checkNotNull(
+          getDataSourceProviderFn(),
           "withDataSourceConfiguration() or withDataSourceProviderFn() is required");
       checkNotNull(getPartitionColumn(), "withPartitionColumn() is required");
       checkNotNull(getTable(), "withTable() is required");
-      checkArgument(getLowerBound() < getUpperBound(),
+      checkArgument(
+          getLowerBound() < getUpperBound(),
           "The lower bound of partitioning column is larger or equal than the upper bound");
-      checkArgument(getUpperBound() - getLowerBound() >= getNumPartitions(),
+      checkArgument(
+          getUpperBound() - getLowerBound() >= getNumPartitions(),
           "The specified number of partitions is more than the difference between upper bound and lower bound");
 
       if (getUpperBound() == MAX_VALUE || getLowerBound() == 0) {
@@ -1071,27 +1069,30 @@ public class JdbcIO {
               .apply("Partitioning", ParDo.of(new PartitioningFn()))
               .apply("Group partitions", GroupByKey.create());
 
-      return ranges.apply("Read ranges", JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
-          .withDataSourceProviderFn(getDataSourceProviderFn())
-          .withFetchSize(stride)
-          .withQuery(String
-              .format("select * from %1$s where %2$s >= ? and %2$s < ?", getTable(),
-                  getPartitionColumn()))
-          .withCoder(getCoder())
-          .withRowMapper(getRowMapper())
-          .withParameterSetter(
-              (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
-                  (element, preparedStatement) -> {
-                    String[] range = element.getKey().split(",", -1);
-                    preparedStatement.setInt(1, Integer.parseInt(range[0]));
-                    preparedStatement.setInt(2, Integer.parseInt(range[1]));
-                  })
-          .withOutputParallelization(false));
+      return ranges.apply(
+          "Read ranges",
+          JdbcIO.<KV<String, Iterable<Integer>>, T>readAll()
+              .withDataSourceProviderFn(getDataSourceProviderFn())
+              .withFetchSize(stride)
+              .withQuery(
+                  String.format(
+                      "select * from %1$s where %2$s >= ? and %2$s < ?",
+                      getTable(), getPartitionColumn()))
+              .withCoder(getCoder())
+              .withRowMapper(getRowMapper())
+              .withParameterSetter(
+                  (PreparedStatementSetter<KV<String, Iterable<Integer>>>)
+                      (element, preparedStatement) -> {
+                        String[] range = element.getKey().split(",", -1);
+                        preparedStatement.setInt(1, Integer.parseInt(range[0]));
+                        preparedStatement.setInt(2, Integer.parseInt(range[1]));
+                      })
+              .withOutputParallelization(false));
     }
 
     private void refineBounds(PBegin input) {
-      Integer[] bounds = JdbcUtil.getBounds(input, getTable(), getDataSourceProviderFn(),
-          getPartitionColumn());
+      Integer[] bounds =
+          JdbcUtil.getBounds(input, getTable(), getDataSourceProviderFn(), getPartitionColumn());
       if (getLowerBound() == 0) {
         withLowerBound(bounds[0]);
       }
@@ -1099,7 +1100,6 @@ public class JdbcIO {
         withUpperBound(bounds[1]);
       }
     }
-
 
     @Override
     public void populateDisplayData(DisplayData.Builder builder) {

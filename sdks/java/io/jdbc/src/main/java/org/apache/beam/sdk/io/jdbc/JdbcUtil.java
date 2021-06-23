@@ -263,9 +263,7 @@ class JdbcUtil {
     return calendar;
   }
 
-  /**
-   * Create partitions on a table.
-   **/
+  /** Create partitions on a table. */
   static class PartitioningFn extends DoFn<List<Integer>, KV<String, Integer>> {
     @ProcessElement
     public void processElement(ProcessContext c) {
@@ -291,10 +289,14 @@ class JdbcUtil {
 
   /**
    * Select maximal and minimal value from a table by partitioning column.
+   *
    * @return pair of integers corresponds to the upper and lower bounds.
    */
-  static Integer[] getBounds(PBegin input, String table, SerializableFunction<Void,
-      DataSource> providerFunctionFn, String partitionColumn) {
+  static Integer[] getBounds(
+      PBegin input,
+      String table,
+      SerializableFunction<Void, DataSource> providerFunctionFn,
+      String partitionColumn) {
     final Integer[] bounds = {0, 0};
     input
         .apply(
@@ -302,10 +304,12 @@ class JdbcUtil {
             JdbcIO.<String>read()
                 .withDataSourceProviderFn(providerFunctionFn)
                 .withQuery(
-                    String.format("select min(%1$s), max(%1$s) from %2$s", partitionColumn,
-                        table))
-                .withRowMapper((JdbcIO.RowMapper<String>) resultSet -> String
-                    .join(",", Arrays.asList(resultSet.getString(1), resultSet.getString(2))))
+                    String.format("select min(%1$s), max(%1$s) from %2$s", partitionColumn, table))
+                .withRowMapper(
+                    (JdbcIO.RowMapper<String>)
+                        resultSet ->
+                            String.join(
+                                ",", Arrays.asList(resultSet.getString(1), resultSet.getString(2))))
                 .withOutputParallelization(false)
                 .withCoder(StringUtf8Coder.of()))
         .apply(
