@@ -1018,7 +1018,7 @@ public class JdbcIO {
       return toBuilder().setNumPartitions(numPartitions).build();
     }
 
-    /** The name of a column of numeric type that will be used for partitioning */
+    /** The name of a column of numeric type that will be used for partitioning. */
     public ReadWithPartitions<T> withPartitionColumn(String partitionColumn) {
       checkNotNull(partitionColumn, "partitionColumn can not be null");
       return toBuilder().setPartitionColumn(partitionColumn).build();
