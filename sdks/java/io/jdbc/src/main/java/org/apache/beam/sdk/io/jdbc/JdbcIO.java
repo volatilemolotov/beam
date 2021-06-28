@@ -1106,6 +1106,11 @@ public class JdbcIO {
       super.populateDisplayData(builder);
       builder.add(DisplayData.item("rowMapper", getRowMapper().getClass().getName()));
       builder.add(DisplayData.item("coder", getCoder().getClass().getName()));
+      builder.add(DisplayData.item("partitionColumn", getPartitionColumn()));
+      builder.add(DisplayData.item("table", getTable()));
+      builder.add(DisplayData.item("numPartitions", getNumPartitions()));
+      builder.add(DisplayData.item("lowerBound", getLowerBound()));
+      builder.add(DisplayData.item("upperBound", getUpperBound()));
       if (getDataSourceProviderFn() instanceof HasDisplayData) {
         ((HasDisplayData) getDataSourceProviderFn()).populateDisplayData(builder);
       }

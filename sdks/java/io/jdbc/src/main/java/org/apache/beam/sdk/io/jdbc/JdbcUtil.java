@@ -271,6 +271,11 @@ class JdbcUtil {
       Integer lowerBound = params.get(0);
       Integer upperBound = params.get(1);
       Integer numPartitions = params.get(2);
+      if (lowerBound > upperBound) {
+        throw new RuntimeException(
+            String.format(
+                "Lower bound [%s] is higher than upper bound [%s]", lowerBound, upperBound));
+      }
       int stride = (upperBound - lowerBound) / numPartitions + 1;
       for (int i = lowerBound; i < upperBound - stride; i += stride) {
         String range = String.format("%s,%s", i, i + stride);
