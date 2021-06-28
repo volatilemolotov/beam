@@ -27,12 +27,14 @@ description = "Apache Beam :: SDKs :: Java :: IO :: JDBC"
 ext.summary = "IO to read and write on JDBC datasource."
 
 dependencies {
+  implementation 'org.projectlombok:lombok:1.18.18'
   compile library.java.vendored_guava_26_0_jre
   compile project(path: ":sdks:java:core", configuration: "shadow")
   compile "org.apache.commons:commons-dbcp2:2.8.0"
   compile library.java.joda_time
   compile "org.apache.commons:commons-pool2:2.8.1"
   compile library.java.slf4j_api
+  compile project(":runners:google-cloud-dataflow-java")
   testCompile "org.apache.derby:derby:10.14.2.0"
   testCompile "org.apache.derby:derbyclient:10.14.2.0"
   testCompile "org.apache.derby:derbynet:10.14.2.0"
