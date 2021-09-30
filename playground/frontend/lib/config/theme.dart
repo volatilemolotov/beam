@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/constants/colors.dart';
+import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:provider/provider.dart';
 
@@ -34,42 +35,82 @@ class ThemeProvider extends ChangeNotifier {
   }
 }
 
-final kLightTheme = ThemeData(
-  brightness: Brightness.light,
-  primaryColor: kLightPrimary,
-  backgroundColor: kLightPrimaryBackground,
-  appBarTheme: const AppBarTheme(
-    color: kLightSecondaryBackground,
-    elevation: 1,
-    centerTitle: false,
-  ),
-  textButtonTheme: TextButtonThemeData(
+TextTheme createTextTheme(Color textColor) {
+  return const TextTheme(
+    headline1: TextStyle(),
+    headline2: TextStyle(),
+    headline3: TextStyle(),
+    headline4: TextStyle(),
+    headline5: TextStyle(),
+    headline6: TextStyle(),
+    subtitle1: TextStyle(),
+    subtitle2: TextStyle(),
+    bodyText1: TextStyle(),
+    bodyText2: TextStyle(),
+    caption: TextStyle(),
+    overline: TextStyle(),
+    button: TextStyle(fontWeight: kBoldWeight),
+  ).apply(
+    bodyColor: textColor,
+    displayColor: textColor,
+  );
+}
+
+TextButtonThemeData createTextButtonTheme(Color textColor) {
+  return TextButtonThemeData(
     style: TextButton.styleFrom(
-      primary: kLightText,
+      primary: textColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(kBorderRadius)),
       ),
     ),
-  ),
+  );
+}
+
+ElevatedButtonThemeData createElevatedButtonTheme(Color primaryColor) {
+  return ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(primary: primaryColor),
+  );
+}
+
+PopupMenuThemeData createPopupMenuTheme() {
+  return const PopupMenuThemeData(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(
+        Radius.circular(kBorderRadius),
+      ),
+    ),
+  );
+}
+
+AppBarTheme createAppBarTheme(Color backgroundColor) {
+  return AppBarTheme(
+    color: backgroundColor,
+    elevation: 1,
+    centerTitle: false,
+  );
+}
+
+final kLightTheme = ThemeData(
+  brightness: Brightness.light,
+  primaryColor: kLightPrimary,
+  backgroundColor: kLightPrimaryBackground,
+  appBarTheme: createAppBarTheme(kLightSecondaryBackground),
+  textTheme: createTextTheme(kLightText),
+  popupMenuTheme: createPopupMenuTheme(),
+  textButtonTheme: createTextButtonTheme(kLightText),
+  elevatedButtonTheme: createElevatedButtonTheme(kLightPrimary),
 );
 
 final kDarkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: kDarkPrimary,
   backgroundColor: kDarkGrey,
-  appBarTheme: const AppBarTheme(
-    color: kDarkSecondaryBackground,
-    elevation: 1,
-    centerTitle: false,
-  ),
-  textButtonTheme: TextButtonThemeData(
-    style: TextButton.styleFrom(
-      primary: kDarkText,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(kBorderRadius)),
-      ),
-    ),
-  ),
+  appBarTheme: createAppBarTheme(kDarkSecondaryBackground),
+  textTheme: createTextTheme(kDarkText),
+  popupMenuTheme: createPopupMenuTheme(),
+  textButtonTheme: createTextButtonTheme(kDarkText),
+  elevatedButtonTheme: createElevatedButtonTheme(kDarkPrimary),
 );
 
 class ThemeColors {
@@ -83,4 +124,6 @@ class ThemeColors {
   ThemeColors(this.isDark);
 
   Color get greyColor => isDark ? kDarkGrey : kLightGrey;
+
+  Color get grey1Color => isDark ? kDarkGrey1 : kLightGrey1;
 }

@@ -16,22 +16,31 @@
  * limitations under the License.
  */
 
-// spacings
-const double kZeroSpace = 0.0;
-const double kSmSpace = 4.0;
-const double kMdSpace = 8.0;
-const double kLgSpace = 16.0;
+import 'package:flutter/material.dart';
+import 'package:playground/config/theme.dart';
+import 'package:playground/constants/sizes.dart';
 
-// sizes
-const kHeaderButtonHeight = 46.0;
-const kRunButtonWidth = 150.0;
-const kRunButtonHeight = 40.0;
+class HeaderIconButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String label;
+  final IconData icon;
 
-// border radius
-const double kBorderRadius = 8.0;
+  const HeaderIconButton({
+    Key? key,
+    required this.onPressed,
+    required this.label,
+    required this.icon,
+  }) : super(key: key);
 
-// elevation
-const int kElevation = 1;
-
-// icon sizes
-const double kIconSizeMd = 24.0;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: kHeaderButtonHeight,
+      child: TextButton.icon(
+        icon: Icon(icon, color: ThemeColors.of(context).grey1Color),
+        label: Text(label),
+        onPressed: onPressed,
+      ),
+    );
+  }
+}

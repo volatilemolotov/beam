@@ -16,22 +16,22 @@
  * limitations under the License.
  */
 
-// spacings
-const double kZeroSpace = 0.0;
-const double kSmSpace = 4.0;
-const double kMdSpace = 8.0;
-const double kLgSpace = 16.0;
+import 'package:flutter/material.dart';
+import 'package:playground/modules/actions/components/header_icon_button.dart';
 
-// sizes
-const kHeaderButtonHeight = 46.0;
-const kRunButtonWidth = 150.0;
-const kRunButtonHeight = 40.0;
+const kResetButtonText = "Reset";
 
-// border radius
-const double kBorderRadius = 8.0;
+class ResetAction extends StatelessWidget {
+  final VoidCallback reset;
 
-// elevation
-const int kElevation = 1;
+  const ResetAction({Key? key, required this.reset}) : super(key: key);
 
-// icon sizes
-const double kIconSizeMd = 24.0;
+  @override
+  Widget build(BuildContext context) {
+    return HeaderIconButton(
+      icon: Icons.refresh_outlined,
+      label: kResetButtonText,
+      onPressed: reset,
+    );
+  }
+}
