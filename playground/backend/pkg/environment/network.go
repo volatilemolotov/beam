@@ -13,12 +13,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+package environment
 
-go 1.16
+import "fmt"
 
+// ServerEnvs contains all environment variables that need to run server.
+type ServerEnvs struct {
+	ip   string
+	port int
+}
 
-require (
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
-)
+// NewServerEnvs constructor for ServerEnvs
+func NewServerEnvs(ip string, port int) *ServerEnvs {
+	return &ServerEnvs{ip: ip, port: port}
+}
+
+// GetAddress returns concatenated ip and port through ':'
+func (serverEnvs ServerEnvs) GetAddress() string {
+	return fmt.Sprintf("%s:%d", serverEnvs.ip, serverEnvs.port)
+}

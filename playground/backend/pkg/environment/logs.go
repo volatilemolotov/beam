@@ -13,12 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+package environment
 
-go 1.16
+import "io"
 
+// LogWriters contains writes for logger. Writers should implement io.Writer interface.
+type LogWriters struct {
+	InfoWriter    io.Writer
+	WarningWriter io.Writer
+	ErrorWriter   io.Writer
+}
 
-require (
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
-)
+// NewLogWriters is a constructor for LogWriters
+func NewLogWriters(infoWriter io.Writer, warningWriter io.Writer, errorWriter io.Writer) *LogWriters {
+	return &LogWriters{InfoWriter: infoWriter, WarningWriter: warningWriter, ErrorWriter: errorWriter}
+}
