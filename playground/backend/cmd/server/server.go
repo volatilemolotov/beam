@@ -16,9 +16,71 @@
 package main
 
 import (
+	pb "beam.apache.org/playground/backend/pkg/api"
+	"beam.apache.org/playground/backend/pkg/environment"
 	"beam.apache.org/playground/backend/pkg/executors"
+	"beam.apache.org/playground/backend/pkg/fs_tool"
+	"fmt"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 )
 
+// runServer is starting http server wrapped on grpc
+func runServer() error {
+	envService := environment.NewService(nil)
+	executor, err := getExecutor(envService.BeamSdkEnvs)
+	if err != nil {
+		return err
+	}
+	grpcServer := grpc.NewServer()
+	controller := newPlaygroundController(executor)
+	pb.RegisterPlaygroundServiceServer(grpcServer, controller)
+
+	setupLogger(envService.LogWriters)
+	handler := Wrap(grpcServer, getGrpcWebOptions())
+	errChan := make(chan error)
+
+	go listenHttp(errChan, envService.ServerEnvs, handler)
+	err = <-errChan
+	return err
+}
+
+// getGrpcWebOptions returns grpcweb options needed to configure wrapper
+func getGrpcWebOptions() []grpcweb.Option {
+	return []grpcweb.Option{
+		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
+		grpcweb.WithAllowNonRootResource(true),
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			return true
+		}),
+	}
+
+}
+
+// setupLogger is configuring grpc logger using LoggerV2
+func setupLogger(writers environment.LogWriters) {
+	grpclog.SetLoggerV2(grpclog.NewLoggerV2(
+		writers.InfoWriter,
+		writers.WarningWriter,
+		writers.ErrorWriter))
+}
+
+// getExecutor is a factory for executors. Returns executor based on environment.BeamEnvs
+func getExecutor(sdk environment.BeamEnvs) (executors.Executor, error) {
+	switch sdk.ApacheBeamSdk {
+	case pb.Sdk_SDK_JAVA:
+		return executors.NewJavaExecutor(&fs_tool.JavaFileSystemService{}), nil
+	default:
+		return nil, fmt.Errorf("%s isn't supported now", sdk)
+
+	}
+
+}
+
 func main() {
-	_ = executors.GoExecutor{}
+	err := runServer()
+	if err != nil {
+		panic(err)
+	}
 }
