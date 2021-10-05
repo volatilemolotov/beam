@@ -16,24 +16,32 @@
  * limitations under the License.
  */
 
-// spacings
-const double kZeroSpace = 0.0;
-const double kSmSpace = 4.0;
-const double kMdSpace = 8.0;
-const double kLgSpace = 16.0;
+import 'package:flutter/material.dart';
+import 'package:playground/constants/sizes.dart';
+import 'package:playground/modules/output/components/output_header/output_placements.dart';
 
-// sizes
-const kHeaderButtonHeight = 46.0;
-const kRunButtonWidth = 150.0;
-const kRunButtonHeight = 40.0;
-const kIconButtonSplashRadius = 24.0;
-const kFooterHeight = 32.0;
+import 'output_tabs.dart';
 
-// border radius
-const double kBorderRadius = 8.0;
+class OutputHeader extends StatelessWidget {
+  const OutputHeader({Key? key}) : super(key: key);
 
-// elevation
-const int kElevation = 1;
-
-// icon sizes
-const double kIconSizeMd = 24.0;
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kLgSpace,
+          vertical: kZeroSpace,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            OutputTabs(),
+            OutputPlacements(),
+          ],
+        ),
+      ),
+    );
+  }
+}

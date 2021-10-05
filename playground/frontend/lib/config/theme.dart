@@ -23,7 +23,7 @@ import 'package:playground/constants/sizes.dart';
 import 'package:provider/provider.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  ThemeMode themeMode = ThemeMode.light;
+  ThemeMode themeMode = ThemeMode.dark;
 
   bool get isDarkMode {
     return themeMode == ThemeMode.dark;
@@ -91,6 +91,16 @@ AppBarTheme createAppBarTheme(Color backgroundColor) {
   );
 }
 
+TabBarTheme createTabBarTheme(Color textColor, Color indicatorColor) {
+  return TabBarTheme(
+    unselectedLabelColor: textColor,
+    labelColor: textColor,
+    indicator: UnderlineTabIndicator(
+      borderSide: BorderSide(width: 2.0, color: indicatorColor),
+    ),
+  );
+}
+
 final kLightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: kLightPrimary,
@@ -100,17 +110,19 @@ final kLightTheme = ThemeData(
   popupMenuTheme: createPopupMenuTheme(),
   textButtonTheme: createTextButtonTheme(kLightText),
   elevatedButtonTheme: createElevatedButtonTheme(kLightPrimary),
+  tabBarTheme: createTabBarTheme(kLightText, kLightPrimary),
 );
 
 final kDarkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: kDarkPrimary,
-  backgroundColor: kDarkGrey,
+  backgroundColor: kDarkPrimaryBackground,
   appBarTheme: createAppBarTheme(kDarkSecondaryBackground),
   textTheme: createTextTheme(kDarkText),
   popupMenuTheme: createPopupMenuTheme(),
   textButtonTheme: createTextButtonTheme(kDarkText),
   elevatedButtonTheme: createElevatedButtonTheme(kDarkPrimary),
+  tabBarTheme: createTabBarTheme(kDarkText, kDarkPrimary),
 );
 
 class ThemeColors {
@@ -126,4 +138,7 @@ class ThemeColors {
   Color get greyColor => isDark ? kDarkGrey : kLightGrey;
 
   Color get grey1Color => isDark ? kDarkGrey1 : kLightGrey1;
+
+  Color get secondaryBackground =>
+      isDark ? kDarkSecondaryBackground : kLightSecondaryBackground;
 }
