@@ -15,7 +15,7 @@
 
 package environment
 
-import pb "beam.apache.org/playground/backend/pkg/api"
+import pb "beam.apache.org/playground/backend/internal/api"
 
 // BeamEnvs contains all environments related of ApacheBeam. These will use to run pipelines
 type BeamEnvs struct {

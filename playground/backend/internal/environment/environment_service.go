@@ -16,7 +16,7 @@
 package environment
 
 import (
-	pb "beam.apache.org/playground/backend/pkg/api"
+	pb "beam.apache.org/playground/backend/internal/api"
 	"google.golang.org/grpc/grpclog"
 	"os"
 	"strconv"
