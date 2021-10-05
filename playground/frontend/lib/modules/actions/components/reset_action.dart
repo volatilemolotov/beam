@@ -17,6 +17,8 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:playground/config/theme.dart';
 import 'package:playground/modules/actions/components/header_icon_button.dart';
 
 const kResetButtonText = "Reset";
@@ -29,7 +31,10 @@ class ResetAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HeaderIconButton(
-      icon: Icons.refresh_outlined,
+      icon: SvgPicture.asset(
+        "reset.svg",
+        color: ThemeColors.of(context).grey1Color,
+      ),
       label: kResetButtonText,
       onPressed: reset,
     );

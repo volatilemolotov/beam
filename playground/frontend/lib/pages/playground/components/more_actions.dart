@@ -17,6 +17,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:html' as html;
 
 import 'package:playground/config/theme.dart';
@@ -61,19 +62,19 @@ class MoreActions extends StatelessWidget {
           color: ThemeColors.of(context).grey1Color,
         ),
         itemBuilder: (BuildContext context) => <PopupMenuEntry<HeaderAction>>[
-          const PopupMenuItem<HeaderAction>(
+          PopupMenuItem<HeaderAction>(
             padding: EdgeInsets.zero,
             value: HeaderAction.shortcuts,
             child: ListTile(
-              leading: Icon(Icons.shortcut_outlined),
-              title: Text(kShortcutsText),
+              leading: SvgPicture.asset("shortcuts.svg"),
+              title: const Text(kShortcutsText),
             ),
           ),
           PopupMenuItem<HeaderAction>(
             padding: EdgeInsets.zero,
             value: HeaderAction.beamPlaygroundGithub,
             child: ListTile(
-              leading: const Icon(Icons.link_outlined),
+              leading: SvgPicture.asset("github.svg"),
               title: const Text(kBeamPlaygroundGithubText),
               onTap: () => html.window.open(
                 kBeamPlaygroundGithubLink,
@@ -85,7 +86,7 @@ class MoreActions extends StatelessWidget {
             padding: EdgeInsets.zero,
             value: HeaderAction.apacheBeamGithub,
             child: ListTile(
-              leading: const Icon(Icons.link_outlined),
+              leading: SvgPicture.asset("github.svg"),
               title: const Text(kApacheBeamGithubText),
               onTap: () => html.window.open(
                 kApacheBeamGithubLink,
@@ -97,7 +98,7 @@ class MoreActions extends StatelessWidget {
             padding: EdgeInsets.zero,
             value: HeaderAction.scioGithub,
             child: ListTile(
-              leading: const Icon(Icons.link_outlined),
+              leading: SvgPicture.asset("github.svg"),
               title: const Text(kScioGithubText),
               onTap: () => html.window.open(
                 kScioGithubLink,
@@ -110,7 +111,7 @@ class MoreActions extends StatelessWidget {
             padding: EdgeInsets.zero,
             value: HeaderAction.beamWebsite,
             child: ListTile(
-              leading: const Icon(Icons.link_outlined),
+              leading: const Image(image: AssetImage('beam.png')),
               title: const Text(kBeamWebsiteText),
               onTap: () => html.window.open(
                 kBeamWebsiteLink,

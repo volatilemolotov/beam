@@ -18,6 +18,7 @@
 
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
+import 'package:playground/config/theme.dart';
 import 'package:playground/modules/actions/components/header_icon_button.dart';
 
 const kNewExampleButtonText = "New Example";
@@ -28,7 +29,10 @@ class NewExampleAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HeaderIconButton(
-      icon: Icons.add_circle_outline,
+      icon: Icon(
+        Icons.add_circle_outline,
+        color: ThemeColors.of(context).grey1Color,
+      ),
       label: kNewExampleButtonText,
       onPressed: () => html.window.open("/", '_blank'),
     );

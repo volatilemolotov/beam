@@ -17,13 +17,12 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/config/theme.dart';
 import 'package:playground/constants/sizes.dart';
 
 class HeaderIconButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String label;
-  final IconData icon;
+  final Widget icon;
 
   const HeaderIconButton({
     Key? key,
@@ -37,7 +36,7 @@ class HeaderIconButton extends StatelessWidget {
     return SizedBox(
       height: kHeaderButtonHeight,
       child: TextButton.icon(
-        icon: Icon(icon, color: ThemeColors.of(context).grey1Color),
+        icon: icon,
         label: Text(label),
         onPressed: onPressed,
       ),
