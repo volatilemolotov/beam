@@ -13,14 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+// Package executors
+package executors
 
-go 1.16
+// GoExecutor for Go code
+type GoExecutor struct{}
 
-require (
-	github.com/google/uuid v1.3.0
-	github.com/improbable-eng/grpc-web v0.14.1
-	github.com/rs/cors v1.7.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
-)
+func (goExec GoExecutor) Validate(fileName string) (bool, error) {
+	return true, nil
+}
+
+func (goExec GoExecutor) Compile(fileName string) error {
+	return nil
+}
+
+func (goExec GoExecutor) Run(runName string) (string, error) {
+	return "", nil
+}

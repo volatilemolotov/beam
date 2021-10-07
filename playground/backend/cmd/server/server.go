@@ -16,9 +16,38 @@
 package main
 
 import (
-	"beam.apache.org/playground/backend/internal/executors"
+	pb "beam.apache.org/playground/backend/pkg/api"
+	"beam.apache.org/playground/backend/pkg/environment"
+	"beam.apache.org/playground/backend/pkg/executors"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/grpclog"
 )
 
+func runServer() error {
+	grpcServer := grpc.NewServer()
+	// TODO need to implement selecting executor based on os env var
+	controller := playgroundController{executor: executors.JavaExecutor{}}
+	pb.RegisterPlaygroundServiceServer(grpcServer, &controller)
+	envService := environment.NewService(nil)
+	grpclog.SetLoggerV2(grpclog.NewLoggerV2(
+		envService.LogWriters.InfoWriter,
+		envService.LogWriters.WarningWriter,
+		envService.LogWriters.ErrorWriter))
+	handler := Wrap(grpcServer)
+	errChan := make(chan error)
+
+	go listenHttp(errChan, envService.ServerEnvs, handler)
+	for {
+		select {
+		case err := <-errChan:
+			return err
+		}
+	}
+}
+
 func main() {
-	_ = executors.GoExecutor{}
+	err := runServer()
+	if err != nil {
+		panic(err)
+	}
 }

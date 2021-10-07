@@ -13,14 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+package environment
 
-go 1.16
+import "io"
 
-require (
-	github.com/google/uuid v1.3.0
-	github.com/improbable-eng/grpc-web v0.14.1
-	github.com/rs/cors v1.7.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
-)
+type LogWriters struct {
+	InfoWriter    io.Writer
+	WarningWriter io.Writer
+	ErrorWriter   io.Writer
+}
+
+func NewLogWriters(infoWriter io.Writer, warningWriter io.Writer, errorWriter io.Writer) *LogWriters {
+	return &LogWriters{InfoWriter: infoWriter, WarningWriter: warningWriter, ErrorWriter: errorWriter}
+}

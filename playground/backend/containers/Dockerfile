@@ -1,25 +1,9 @@
-###############################################################################
-#  Licensed to the Apache Software Foundation (ASF) under one
-#  or more contributor license agreements.  See the NOTICE file
-#  distributed with this work for additional information
-#  regarding copyright ownership.  The ASF licenses this file
-#  to you under the Apache License, Version 2.0 (the
-#  "License"); you may not use this file except in compliance
-#  with the License.  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-# limitations under the License.
-###############################################################################
-
 FROM apache/beam_java8_sdk
 ENV GRADLE_VERSION=6.9.1
 ENV GO_VERSION=1.17.1
 ENV BEAM_VERSION=2.32.0
+#FROM openjdk:8
+#COPY --from=builder /opt /opt
 
 #Install Gradle
 RUN cd /tmp &&\
@@ -49,7 +33,7 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26 &&\
 RUN apt-get update && apt-get install -y protobuf-compiler
 
 #Prepare Application
-COPY src /go/src/playground
+COPY playground /go/src/playground
 
 #Build Application
 RUN cd /go/src/playground && \
@@ -57,8 +41,7 @@ RUN cd /go/src/playground && \
     protoc --go_out=backend/pkg/api --go_opt=paths=source_relative --go-grpc_out=backend/pkg/api --go-grpc_opt=paths=source_relative --proto_path=playground/v1 playground/v1/playground.proto
 RUN cd /go/src/playground/backend &&\
     go mod download &&\
-    go mod tidy
+    go mod tidy 
 
 WORKDIR $GOPATH/src/playground/backend/cmd/server
 ENTRYPOINT ["go", "run", "."]
-

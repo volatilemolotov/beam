@@ -12,15 +12,36 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+package main
 
-module beam.apache.org/playground/backend
-
-go 1.16
-
-require (
-	github.com/google/uuid v1.3.0
-	github.com/improbable-eng/grpc-web v0.14.1
-	github.com/rs/cors v1.7.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+import (
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/rs/cors"
+	"google.golang.org/grpc"
+	"net/http"
 )
+
+// Wrap a grpc.Server as an http.Handler
+func Wrap(svc *grpc.Server) http.Handler {
+	options := []grpcweb.Option{
+		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
+		grpcweb.WithAllowNonRootResource(true),
+		grpcweb.WithOriginFunc(func(origin string) bool {
+			return true
+		}),
+	}
+	wrappedServer := grpcweb.WrapServer(svc, options...)
+	cors.AllowAll().Handler(&wrapper{
+		svc: wrappedServer,
+	})
+	return wrappedServer
+}
+
+type wrapper struct {
+	svc *grpcweb.WrappedGrpcServer
+}
+
+func (wrap *wrapper) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+	wrap.svc.ServeHTTP(resp, req)
+
+}

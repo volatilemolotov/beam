@@ -13,14 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+package fs_tool
 
-go 1.16
-
-require (
-	github.com/google/uuid v1.3.0
-	github.com/improbable-eng/grpc-web v0.14.1
-	github.com/rs/cors v1.7.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+import (
+	pb "beam.apache.org/playground/backend/pkg/api"
+	"beam.apache.org/playground/backend/pkg/fs_tool"
+	"testing"
 )
+
+func TestNewFileSystemServiceWithAvailableSdk(t *testing.T) {
+	sdk := pb.Sdk_SDK_JAVA
+	_, err := fs_tool.NewFileSystemService(sdk)
+	if err != nil {
+		t.Errorf("Unexpexted error: %s should be available", sdk.String())
+	}
+}
+
+func TestNewFileSystemServiceWithUnAvailableSdk(t *testing.T) {
+	sdk := pb.Sdk_SDK_SCIO
+	_, err := fs_tool.NewFileSystemService(sdk)
+	if err == nil {
+		t.Errorf("Expexted error. %s should be unavailable", sdk.String())
+	}
+}
