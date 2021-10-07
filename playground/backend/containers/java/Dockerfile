@@ -20,6 +20,8 @@ FROM apache/beam_java8_sdk
 ENV GRADLE_VERSION=6.9.1
 ENV GO_VERSION=1.17.1
 ENV BEAM_VERSION=2.32.0
+#FROM openjdk:8
+#COPY --from=builder /opt /opt
 
 #Install Gradle
 RUN cd /tmp &&\
@@ -49,7 +51,7 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.26 &&\
 RUN apt-get update && apt-get install -y protobuf-compiler
 
 #Prepare Application
-COPY src /go/src/playground
+COPY playground /go/src/playground
 
 #Build Application
 RUN cd /go/src/playground && \
@@ -61,4 +63,3 @@ RUN cd /go/src/playground/backend &&\
 
 WORKDIR $GOPATH/src/playground/backend/cmd/server
 ENTRYPOINT ["go", "run", "."]
-
