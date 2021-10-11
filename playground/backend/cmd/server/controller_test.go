@@ -64,15 +64,24 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 	defer conn.Close()
 	client := pb.NewPlaygroundServiceClient(conn)
 	code := pb.RunCodeRequest{
-		Code: "test",
+		Code: "class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World!\");\n    }\n}",
 		Sdk:  pb.Sdk_SDK_JAVA,
 	}
 	pipelineMeta, err := client.RunCode(ctx, &code)
 	if err != nil {
 		t.Fatalf("runCode failed: %v", err)
 	}
-	log.Printf("Response: %+v", pipelineMeta)
-	time.Sleep(time.Minute * 5)
+	log.Printf("Response RUN_CODE: %+v", pipelineMeta)
+	time.Sleep(time.Minute)
+
+	request := pb.CheckStatusRequest{
+		PipelineUuid: pipelineMeta.PipelineUuid,
+	}
+	status, err := client.CheckStatus(ctx, &request)
+	if err != nil {
+		t.Fatalf("runCode failed: %v", err)
+	}
+	log.Printf("Response CHECK_STATUS: %+v", status)
 }
 
 func TestPlaygroundController_CheckStatus(t *testing.T) {
