@@ -61,6 +61,10 @@ func NewLifeCycle(sdk pb.Sdk, pipelineId uuid.UUID) (*LifeCycle, error) {
 
 // CreateFolders creates all folders which will be used for code execution.
 func (l *LifeCycle) CreateFolders() error {
+	err := os.Chdir("../..")
+	if err != nil {
+		return err
+	}
 	for _, folder := range l.folderGlobs {
 		err := os.MkdirAll(folder, fs.ModePerm)
 		if err != nil {
