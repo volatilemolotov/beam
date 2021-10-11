@@ -13,19 +13,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Interface for all executors (Java/Python/Go/SCIO)
+// Package executors
 package executors
 
-type executor interface {
-	// Validate validates executable file.
-	// Return result of validation (true/false) and error if it occurs
-	Validate(filePath string) (bool, error)
+import (
+	"beam.apache.org/playground/backend/internal/validators"
+	"os/exec"
+)
 
-	// Compile compiles executable file.
-	// Return error if it occurs
-	Compile(filePath string) error
+// Executor interface for all executors (Java/Python/Go/SCIO)
+type Executor struct {
+	relativeFilePath string
+	absoulteFilePath string
+	dirPath          string
+	executableDir    string
+	validators       []validators.Validator
+	compileCommand   string
+	compileArgs      []string
+	runCommand       string
+	runArgs          []string
+}
 
-	// Run runs executable file.
-	// Return logs and error if it occurs
-	Run(filePath string) (string, error)
+// Validate checks that the file exists and that extension of the file matches the SDK.
+// Return function that apply any validators
+func (ex *Executor) Validate() func() error {
+	return func() error {
+		for _, validator := range ex.validators {
+			err := validator.Validator(validator.Args...)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+}
+
+// Compile compiles the code and creates executable file.
+// Return error if it occurs
+func (ex *Executor) Compile() *exec.Cmd {
+	cmd := exec.Command(ex.compileCommand, ex.compileArgs...)
+	cmd.Dir = ex.dirPath
+	return cmd
+}
+
+// Run runs the executable file.
+// Return logs and error if it occurs
+func (ex *Executor) Run(name string) *exec.Cmd {
+	args := append(ex.runArgs, name)
+	cmd := exec.Command(ex.runCommand, args...)
+	cmd.Dir = ex.dirPath
+	return cmd
 }

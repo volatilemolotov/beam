@@ -13,19 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Executor for Java
-package executors
+package validators
 
-type JavaExecutor struct{}
-
-func (javaExec JavaExecutor) Validate(filePath string) (bool, error) {
-	return true, nil
-}
-
-func (javaExec JavaExecutor) Compile(filePath string) error {
-	return nil
-}
-
-func (javaExec JavaExecutor) Run(filePath string) (string, error) {
-	return "", nil
+type Validator struct {
+	Validator func(args ...interface{}) error
+	Args      []interface{}
 }

@@ -13,14 +13,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+// Package executors
+package executors
 
-go 1.16
-
-require (
-	github.com/google/uuid v1.3.0
-	github.com/improbable-eng/grpc-web v0.14.1
-	github.com/rs/cors v1.8.0
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
+import (
+	"beam.apache.org/playground/backend/internal/environment"
+	"beam.apache.org/playground/backend/internal/validators"
 )
+
+// ConfigureSDK creates an executor with Go specifics
+func ConfigureSDK(exec *Executor, envs environment.BeamEnvs, workingDir string, validatorsFuncs *[]validators.Validator) {
+	if validatorsFuncs == nil {
+		v := make([]validators.Validator, 0)
+		validatorsFuncs = &v
+	}
+
+	exec.validators = *validatorsFuncs
+	exec.dirPath = workingDir
+	exec.compileCommand = envs.CompileCommand
+	exec.runCommand = envs.RunCommand
+	exec.compileArgs = envs.CompileArgs
+	exec.runArgs = envs.RunArgs
+
+}

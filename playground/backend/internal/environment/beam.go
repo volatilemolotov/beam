@@ -13,19 +13,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Executor for Go
-package executors
+package environment
 
-type GoExecutor struct{}
+import pb "beam.apache.org/playground/backend/internal/api"
 
-func (goExec GoExecutor) Validate(filePath string) (bool, error) {
-	return true, nil
+// BeamEnvs contains all environments related of ApacheBeam. These will use to run pipelines
+type BeamEnvs struct {
+	ApacheBeamSdk  pb.Sdk
+	RunCommand     string
+	CompileCommand string
+	CompileArgs    []string
+	RunArgs        []string
 }
 
-func (goExec GoExecutor) Compile(filePath string) error {
-	return nil
+// NewBeamEnvs is a BeamEnvs constructor
+func NewBeamEnvs(apacheBeamSdk pb.Sdk) *BeamEnvs {
+	return &BeamEnvs{ApacheBeamSdk: apacheBeamSdk}
 }
 
-func (goExec GoExecutor) Run(filePath string) (string, error) {
-	return "", nil
+func (envs *BeamEnvs) readConfig(configPath string) {
+	//TODO read config from file
 }
