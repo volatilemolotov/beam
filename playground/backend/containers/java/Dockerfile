@@ -55,9 +55,6 @@ COPY src /go/src/playground/backend
 COPY playground /go/src/playground/playground
 RUN ls /go/src/playground/backend
 #Build Application
-RUN cd /go/src/playground && \
-    mkdir backend/pkg/api && \
-    protoc --go_out=backend/pkg/api --go_opt=paths=source_relative --go-grpc_out=backend/pkg/api --go-grpc_opt=paths=source_relative --proto_path=playground/v1 playground/v1/playground.proto
 RUN cd /go/src/playground/backend &&\
     go mod download &&\
     go mod tidy
