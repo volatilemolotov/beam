@@ -16,7 +16,11 @@ package main
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api"
+	"beam.apache.org/playground/backend/internal/errors"
+	"beam.apache.org/playground/backend/internal/executors"
+	"beam.apache.org/playground/backend/internal/fs_tool"
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 )
 
@@ -24,11 +28,97 @@ type playgroundController struct {
 	pb.UnimplementedPlaygroundServiceServer
 }
 
+var (
+	results = make(map[string]string)
+)
+
 //RunCode is running code from requests using a particular SDK
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
-	// TODO implement this method
-	pipelineInfo := pb.RunCodeResponse{PipelineUuid: uuid.NewString()}
+	pipeLineId := uuid.New()
 
+	// create file system service
+	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipeLineId)
+	if err != nil {
+		// log(err)
+		return nil, errors.InternalError("Run code", "Error during creating file system service: "+err.Error())
+	}
+	// create folders
+	err = lc.CreateFolders()
+	if err != nil {
+		// log(err)
+		return nil, errors.InternalError("Run code", "Error during preparing folders: "+err.Error())
+	}
+	// create file with code
+	fileName, err := lc.CreateExecutableFile(info.Code)
+	if err != nil {
+		// log(err)
+		return nil, errors.InternalError("Run code", "Error during creating file with code: "+err.Error())
+	}
+
+	// create executor
+	exec, err := executors.NewExecutor(info.Sdk, lc)
+	if err != nil {
+		// log(err)
+		return nil, errors.InternalError("Run code", "Error during creating executor: "+err.Error())
+	}
+	// validate
+	err = exec.Validate()
+	if err != nil {
+		// log(err)
+		return nil, errors.InternalError("Run code", "Error during validate file: "+err.Error())
+	}
+
+	go func(lc *fs_tool.LifeCycle, exec *executors.Executor, fileName string) {
+		err := exec.Compile()
+		if err != nil {
+			// error during compilation
+			// log(err)
+
+			// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
+			key := fmt.Sprintf("%s:%s", pipeLineId, "StatusTag")
+			results[key] = pb.Status_STATUS_ERROR.String()
+
+			// set to cache pipeLineId: cache.Tag_CompileOutputTag: err.Error()
+			key = fmt.Sprintf("%s:%s", pipeLineId, "CompileOutputTag")
+			results[key] = err.Error()
+		} else {
+			// compilation success
+			// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_EXECUTING
+			key := fmt.Sprintf("%s:%s", pipeLineId, "StatusTag")
+			results[key] = pb.Status_STATUS_EXECUTING.String()
+
+			output, err := exec.Run(fileName)
+			if err != nil {
+				// error during run code
+				// log(err)
+				// set to cache pipeLineId: cache.Tag_RunOutputTag: err.Error()
+				key := fmt.Sprintf("%s:%s", pipeLineId, "RunOutputTag")
+				results[key] = err.Error()
+			} else {
+				// run code success
+				// set to cache pipeLineId: cache.Tag_RunOutputTag: output
+				key := fmt.Sprintf("%s:%s", pipeLineId, "RunOutputTag")
+				results[key] = output
+			}
+			// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_FINISHED
+			key = fmt.Sprintf("%s:%s", pipeLineId, "StatusTag")
+			results[key] = pb.Status_STATUS_FINISHED.String()
+		}
+		err = lc.DeleteCompiledFile()
+		if err != nil {
+			// log(err)
+		}
+		err = lc.DeleteExecutableFile()
+		if err != nil {
+			// log(err)
+		}
+		err = lc.DeleteFolders()
+		if err != nil {
+			// log(err)
+		}
+	}(lc, exec, fileName)
+
+	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipeLineId.String()}
 	return &pipelineInfo, nil
 }
 

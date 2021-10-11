@@ -23,6 +23,7 @@ import (
 	"log"
 	"net"
 	"testing"
+	"time"
 )
 
 const bufSize = 1024 * 1024
@@ -71,6 +72,7 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 		t.Fatalf("runCode failed: %v", err)
 	}
 	log.Printf("Response: %+v", pipelineMeta)
+	time.Sleep(time.Minute * 5)
 }
 
 func TestPlaygroundController_CheckStatus(t *testing.T) {
