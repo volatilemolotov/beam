@@ -17,6 +17,9 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/constants/sizes.dart';
+import 'package:playground/pages/playground/states/playground_state.dart';
+import 'package:provider/provider.dart';
 
 class OutputArea extends StatelessWidget {
   const OutputArea({Key? key}) : super(key: key);
@@ -25,12 +28,19 @@ class OutputArea extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).backgroundColor,
-      child: const TabBarView(
-        children: <Widget>[
-          Center(child: Text("Output")),
-          Center(child: Text("Log")),
-          Center(child: Text("Graph")),
-        ],
+      child: Consumer<PlaygroundState>(
+        builder: (context, state, child) {
+          return TabBarView(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(kLgSpace),
+                child: Text(state.result?.output ?? "Output"),
+              ),
+              Center(child: Text("Log")),
+              Center(child: Text("Graph")),
+            ],
+          );
+        },
       ),
     );
   }

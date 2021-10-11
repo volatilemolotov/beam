@@ -17,13 +17,31 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/sdk/models/sdk.dart';
+import 'package:playground/constants/sizes.dart';
 
-class PlaygroundState with ChangeNotifier {
-  SDK sdk = SDK.java;
+const kRunText = "Run";
 
-  setSdk(SDK sdk) {
-    this.sdk = sdk;
-    notifyListeners();
+class RunButton extends StatelessWidget {
+  final bool isRunning;
+  final VoidCallback runCode;
+
+  const RunButton({Key? key, required this.isRunning, required this.runCode})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      icon: isRunning
+          ? SizedBox(
+              width: kIconSizeSm,
+              height: kIconSizeSm,
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            )
+          : const Icon(Icons.play_arrow),
+      label: const Text(kRunText),
+      onPressed: !isRunning ? runCode : null,
+    );
   }
 }

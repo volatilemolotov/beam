@@ -17,6 +17,9 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/modules/editor/repository/code_repository/code_repository.dart';
+import 'package:playground/modules/editor/repository/code_repository/run_code_request.dart';
+import 'package:playground/modules/editor/repository/code_repository/run_code_result.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
@@ -24,6 +27,7 @@ class PlaygroundState with ChangeNotifier {
   SDK _sdk;
   ExampleModel? _selectedExample;
   String _source = "";
+  RunCodeResult? result;
 
   PlaygroundState([this._sdk = SDK.java, this._selectedExample]);
 
@@ -32,6 +36,8 @@ class PlaygroundState with ChangeNotifier {
   SDK get sdk => _sdk;
 
   String get source => _source;
+
+  bool get isCodeRunning => result?.status == RunCodeStatus.running;
 
   setExample(ExampleModel example) {
     _selectedExample = example;
@@ -54,8 +60,20 @@ class PlaygroundState with ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  String toString() {
-    return 'PlaygroundState{_sdk: $_sdk, _selectedExample: $_selectedExample}';
+  resetError() {
+    if (result == null) {
+      return;
+    }
+    result = RunCodeResult(status: result!.status, output: result!.output);
+    notifyListeners();
+  }
+
+  void runCode() {
+    CodeRepository()
+        .runCode(RunCodeRequestWrapper(code: source, sdk: sdk))
+        .listen((event) {
+      result = event;
+      notifyListeners();
+    });
   }
 }
