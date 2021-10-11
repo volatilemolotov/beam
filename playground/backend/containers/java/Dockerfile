@@ -18,10 +18,9 @@
 
 FROM apache/beam_java8_sdk
 ENV GRADLE_VERSION=6.9.1
-ENV GO_VERSION=1.17.1
+ENV GO_VERSION=1.16.1
 ENV BEAM_VERSION=2.32.0
-#FROM openjdk:8
-#COPY --from=builder /opt /opt
+ENV SERVER_IP=0.0.0.0
 
 #Install Gradle
 RUN cd /tmp &&\
