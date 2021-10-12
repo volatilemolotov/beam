@@ -39,28 +39,28 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 	// create file system service
 	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipeLineId)
 	if err != nil {
-		grpclog.Error("RunCode: NewLifeCycle:" + err.Error())
+		grpclog.Error("RunCode: NewLifeCycle: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file system service: "+err.Error())
 	}
 
 	// create folders
 	err = lc.CreateFolders()
 	if err != nil {
-		grpclog.Error("RunCode: CreateFolders:" + err.Error())
+		grpclog.Error("RunCode: CreateFolders: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during preparing folders: "+err.Error())
 	}
 
 	// create file with code
 	_, err = lc.CreateExecutableFile(info.Code)
 	if err != nil {
-		grpclog.Error("RunCode: CreateExecutableFile:" + err.Error())
+		grpclog.Error("RunCode: CreateExecutableFile: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file with code: "+err.Error())
 	}
 
 	// create executor
 	exec, err := executors.NewExecutor(info.Sdk, lc)
 	if err != nil {
-		grpclog.Error("RunCode: NewExecutor:" + err.Error())
+		grpclog.Error("RunCode: NewExecutor: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating executor: "+err.Error())
 	}
 
@@ -101,7 +101,7 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 	err := exec.Validate()
 	if err != nil {
 		// error during validation
-		grpclog.Error("RunCode: Validate" + err.Error())
+		grpclog.Error("RunCode: Validate: " + err.Error())
 
 		// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
 		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
@@ -111,7 +111,7 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 	err = exec.Compile()
 	if err != nil {
 		// error during compilation
-		grpclog.Error("RunCode: Compile" + err.Error())
+		grpclog.Error("RunCode: Compile: " + err.Error())
 
 		// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
 		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
@@ -122,14 +122,22 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		results[key] = err.Error()
 	} else {
 		// compilation success
+
+		fileName, err := lc.GetExecutableName()
+		if err != nil {
+			grpclog.Error("RunCode: get compiled file name: " + err.Error())
+			key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
+			results[key] = pb.Status_STATUS_ERROR
+		}
+
 		// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_EXECUTING
 		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 		results[key] = pb.Status_STATUS_EXECUTING
 
-		output, err := exec.Run("HelloWorld")
+		output, err := exec.Run(fileName)
 		if err != nil {
 			// error during run code
-			grpclog.Error("RunCode: Run" + err.Error())
+			grpclog.Error("RunCode: Run: " + err.Error())
 
 			// set to cache pipeLineId: cache.Tag_RunOutputTag: err.Error()
 			key := fmt.Sprintf("%s:%s", pipelineId, "RunOutputTag")
@@ -151,14 +159,14 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 	}
 	err = lc.DeleteCompiledFile()
 	if err != nil {
-		grpclog.Error("RunCode: DeleteCompiledFile" + err.Error())
+		grpclog.Error("RunCode: DeleteCompiledFile: " + err.Error())
 	}
 	err = lc.DeleteExecutableFile()
 	if err != nil {
-		grpclog.Error("RunCode: DeleteExecutableFile" + err.Error())
+		grpclog.Error("RunCode: DeleteExecutableFile: " + err.Error())
 	}
 	err = lc.DeleteFolders()
 	if err != nil {
-		grpclog.Error("RunCode: DeleteFolders" + err.Error())
+		grpclog.Error("RunCode: DeleteFolders: " + err.Error())
 	}
 }
