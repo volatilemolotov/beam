@@ -34,10 +34,10 @@ var results = make(map[string]interface{})
 
 //RunCode is running code from requests using a particular SDK
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
-	pipeLineId := uuid.New()
+	pipelineId := uuid.New()
 
 	// create file system service
-	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipeLineId)
+	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipelineId)
 	if err != nil {
 		grpclog.Error("RunCode: NewLifeCycle: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file system service: "+err.Error())
@@ -64,9 +64,11 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		return nil, errors.InternalError("Run code", "Error during creating executor: "+err.Error())
 	}
 
-	go runCode(lc, exec, pipeLineId)
+	key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
+	results[key] = pb.Status_STATUS_EXECUTING
+	go runCode(lc, exec, pipelineId)
 
-	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipeLineId.String()}
+	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipelineId.String()}
 	return &pipelineInfo, nil
 }
 
@@ -113,7 +115,7 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		// error during validation
 		grpclog.Error("RunCode: Validate: " + err.Error())
 
-		// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
+		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
 		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 		results[key] = pb.Status_STATUS_ERROR
 	}
@@ -123,11 +125,11 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		// error during compilation
 		grpclog.Error("RunCode: Compile: " + err.Error())
 
-		// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
+		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
 		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 		results[key] = pb.Status_STATUS_ERROR
 
-		// set to cache pipeLineId: cache.Tag_CompileOutputTag: err.Error()
+		// set to cache pipelineId: cache.Tag_CompileOutputTag: err.Error()
 		key = fmt.Sprintf("%s:%s", pipelineId, "CompileOutputTag")
 		results[key] = err.Error()
 	} else {
@@ -140,7 +142,7 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 			results[key] = pb.Status_STATUS_ERROR
 		}
 
-		// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_EXECUTING
+		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_EXECUTING
 		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 		results[key] = pb.Status_STATUS_EXECUTING
 
@@ -149,20 +151,20 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 			// error during run code
 			grpclog.Error("RunCode: Run: " + err.Error())
 
-			// set to cache pipeLineId: cache.Tag_RunOutputTag: err.Error()
+			// set to cache pipelineId: cache.Tag_RunOutputTag: err.Error()
 			key := fmt.Sprintf("%s:%s", pipelineId, "RunOutputTag")
 			results[key] = err.Error()
 
-			// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
+			// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
 			key = fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 			results[key] = pb.Status_STATUS_ERROR
 		} else {
 			// run code success
-			// set to cache pipeLineId: cache.Tag_RunOutputTag: output
+			// set to cache pipelineId: cache.Tag_RunOutputTag: output
 			key := fmt.Sprintf("%s:%s", pipelineId, "RunOutputTag")
 			results[key] = output
 
-			// set to cache pipeLineId: cache.Tag_StatusTag: pb.Status_STATUS_FINISHED
+			// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_FINISHED
 			key = fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 			results[key] = pb.Status_STATUS_FINISHED
 		}
