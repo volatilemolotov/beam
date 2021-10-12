@@ -435,3 +435,55 @@ func TestLifeCycle_GetAbsoluteExecutableFilePath(t *testing.T) {
 		})
 	}
 }
+
+func TestLifeCycle_GetExecutableName(t *testing.T) {
+	pipelineId := uuid.New()
+	baseFileFolder := fmt.Sprintf("%s_%s", javaBaseFileFolder, pipelineId)
+	binFileFolder := baseFileFolder + "/bin"
+
+	type fields struct {
+		folderGlobs []string
+		Folder      Folder
+		Extension   Extension
+		pipelineId  uuid.UUID
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "GetExecutableName",
+			fields: fields{
+				Folder: Folder{
+					BaseFolder:     baseFileFolder,
+					CompiledFolder: binFileFolder,
+				},
+				pipelineId:  pipelineId,
+				folderGlobs: []string{baseFileFolder, binFileFolder},
+			},
+			want: pipelineId.String(),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			l := &LifeCycle{
+				folderGlobs: tt.fields.folderGlobs,
+				Folder:      tt.fields.Folder,
+				Extension:   tt.fields.Extension,
+				pipelineId:  tt.fields.pipelineId,
+			}
+			if err := l.CreateFolders(); err != nil {
+				t.Errorf("CreateFolders() error = %v", err)
+			}
+			_, err := os.Create(binFileFolder + "/" + pipelineId.String() + ".class")
+			if err != nil {
+				t.Errorf("Unable to write file: %v", err)
+			}
+			got, err := l.GetExecutableName()
+			if got != tt.want {
+				t.Errorf("GetExecutableName() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
