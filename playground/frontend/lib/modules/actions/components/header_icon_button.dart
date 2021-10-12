@@ -18,29 +18,27 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
 
-class OutputArea extends StatelessWidget {
-  const OutputArea({Key? key}) : super(key: key);
+class HeaderIconButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final String label;
+  final Widget icon;
+
+  const HeaderIconButton({
+    Key? key,
+    required this.onPressed,
+    required this.label,
+    required this.icon,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      child: Consumer<PlaygroundState>(
-        builder: (context, state, child) {
-          return TabBarView(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(kLgSpace),
-                child: Text(state.result?.output ?? "Output"),
-              ),
-              Center(child: Text("Log")),
-              Center(child: Text("Graph")),
-            ],
-          );
-        },
+    return SizedBox(
+      height: kHeaderButtonHeight,
+      child: TextButton.icon(
+        icon: icon,
+        label: Text(label),
+        onPressed: onPressed,
       ),
     );
   }

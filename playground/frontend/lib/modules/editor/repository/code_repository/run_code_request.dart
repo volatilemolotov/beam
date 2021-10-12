@@ -16,25 +16,31 @@
  * limitations under the License.
  */
 
-// spacings
-const double kZeroSpace = 0.0;
-const double kSmSpace = 4.0;
-const double kMdSpace = 8.0;
-const double kLgSpace = 16.0;
+import 'package:playground/generated/playground.pb.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-// sizes
-const kHeaderButtonHeight = 46.0;
-const kRunButtonWidth = 150.0;
-const kRunButtonHeight = 40.0;
-const kIconButtonSplashRadius = 24.0;
-const kFooterHeight = 32.0;
+class RunCodeRequestWrapper {
+  final String code;
+  final SDK sdk;
 
-// border radius
-const double kBorderRadius = 8.0;
+  RunCodeRequestWrapper({required this.code, required this.sdk});
 
-// elevation
-const int kElevation = 1;
+  RunCodeRequest toGrpcRequest() {
+    return RunCodeRequest()
+      ..code = code
+      ..sdk = _grpcSdk;
+  }
 
-// icon sizes
-const double kIconSizeSm = 16.0;
-const double kIconSizeMd = 24.0;
+  Sdk get _grpcSdk {
+    switch (sdk) {
+      case SDK.java:
+        return Sdk.SDK_JAVA;
+      case SDK.go:
+        return Sdk.SDK_GO;
+      case SDK.python:
+        return Sdk.SDK_PYTHON;
+      case SDK.scio:
+        return Sdk.SDK_SCIO;
+    }
+  }
+}

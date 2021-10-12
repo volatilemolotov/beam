@@ -16,25 +16,21 @@
  * limitations under the License.
  */
 
-// spacings
-const double kZeroSpace = 0.0;
-const double kSmSpace = 4.0;
-const double kMdSpace = 8.0;
-const double kLgSpace = 16.0;
+enum OutputPlacement {
+  bottom,
+  left,
+  right,
+}
 
-// sizes
-const kHeaderButtonHeight = 46.0;
-const kRunButtonWidth = 150.0;
-const kRunButtonHeight = 40.0;
-const kIconButtonSplashRadius = 24.0;
-const kFooterHeight = 32.0;
-
-// border radius
-const double kBorderRadius = 8.0;
-
-// elevation
-const int kElevation = 1;
-
-// icon sizes
-const double kIconSizeSm = 16.0;
-const double kIconSizeMd = 24.0;
+extension OutputPlacementToIcon on OutputPlacement {
+  String get icon {
+    switch (this) {
+      case OutputPlacement.bottom:
+        return "output_bottom.svg";
+      case OutputPlacement.right:
+        return "output_right.svg";
+      case OutputPlacement.left:
+        return "output_left.svg";
+    }
+  }
+}

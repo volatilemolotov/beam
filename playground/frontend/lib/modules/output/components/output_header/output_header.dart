@@ -18,29 +18,29 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
+import 'package:playground/modules/output/components/output_header/output_placements.dart';
 
-class OutputArea extends StatelessWidget {
-  const OutputArea({Key? key}) : super(key: key);
+import 'output_tabs.dart';
+
+class OutputHeader extends StatelessWidget {
+  const OutputHeader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      child: Consumer<PlaygroundState>(
-        builder: (context, state, child) {
-          return TabBarView(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(kLgSpace),
-                child: Text(state.result?.output ?? "Output"),
-              ),
-              Center(child: Text("Log")),
-              Center(child: Text("Graph")),
-            ],
-          );
-        },
+    return SizedBox(
+      height: 50,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: kLgSpace,
+          vertical: kZeroSpace,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: const [
+            OutputTabs(),
+            OutputPlacements(),
+          ],
+        ),
       ),
     );
   }

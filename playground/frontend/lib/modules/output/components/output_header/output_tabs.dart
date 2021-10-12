@@ -17,30 +17,20 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/constants/sizes.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
 
-class OutputArea extends StatelessWidget {
-  const OutputArea({Key? key}) : super(key: key);
+class OutputTabs extends StatelessWidget {
+  const OutputTabs({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      child: Consumer<PlaygroundState>(
-        builder: (context, state, child) {
-          return TabBarView(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(kLgSpace),
-                child: Text(state.result?.output ?? "Output"),
-              ),
-              Center(child: Text("Log")),
-              Center(child: Text("Graph")),
-            ],
-          );
-        },
+    return const SizedBox(
+      width: 300,
+      child: TabBar(
+        tabs: <Widget>[
+          Tab(text: 'Output'),
+          Tab(text: 'Log'),
+          Tab(text: 'Graph'),
+        ],
       ),
     );
   }

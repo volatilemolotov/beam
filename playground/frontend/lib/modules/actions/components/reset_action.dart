@@ -17,31 +17,26 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/constants/sizes.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:playground/config/theme.dart';
+import 'package:playground/modules/actions/components/header_icon_button.dart';
 
-class OutputArea extends StatelessWidget {
-  const OutputArea({Key? key}) : super(key: key);
+const kResetButtonText = "Reset";
+
+class ResetAction extends StatelessWidget {
+  final VoidCallback reset;
+
+  const ResetAction({Key? key, required this.reset}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Theme.of(context).backgroundColor,
-      child: Consumer<PlaygroundState>(
-        builder: (context, state, child) {
-          return TabBarView(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(kLgSpace),
-                child: Text(state.result?.output ?? "Output"),
-              ),
-              Center(child: Text("Log")),
-              Center(child: Text("Graph")),
-            ],
-          );
-        },
+    return HeaderIconButton(
+      icon: SvgPicture.asset(
+        "reset.svg",
+        color: ThemeColors.of(context).grey1Color,
       ),
+      label: kResetButtonText,
+      onPressed: reset,
     );
   }
 }
