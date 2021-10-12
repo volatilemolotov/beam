@@ -91,17 +91,37 @@ func (controller *playgroundController) CheckStatus(ctx context.Context, info *p
 
 //GetRunOutput is returning output of execution for specific pipeline by PipelineUuid
 func (controller *playgroundController) GetRunOutput(ctx context.Context, info *pb.GetRunOutputRequest) (*pb.GetRunOutputResponse, error) {
-	// TODO implement this method
-	pipelineResult := pb.GetRunOutputResponse{Output: "Test Pipeline Result"}
+	pipelineId := info.PipelineUuid
+	key := fmt.Sprintf("%s:%s", pipelineId, "RunOutputTag")
+	runOutputInterface, exists := results[key]
+	if !exists {
+		grpclog.Error("GetRunOutput: get run output for pipelineId which doesn't exist: " + pipelineId)
+		return nil, errors.NotFoundError("GetRunOutput", "there is no run output for pipelineId: "+pipelineId)
+	}
+	runOutput, converted := runOutputInterface.(string)
+	if !converted {
+		return nil, errors.InternalError("GetRunOutput", "run output can't be converted to string")
+	}
+	pipelineResult := pb.GetRunOutputResponse{Output: runOutput}
 
 	return &pipelineResult, nil
 }
 
 //GetCompileOutput is returning output of compilation for specific pipeline by PipelineUuid
 func (controller *playgroundController) GetCompileOutput(ctx context.Context, info *pb.GetCompileOutputRequest) (*pb.GetCompileOutputResponse, error) {
-	// TODO implement this method
-	compileOutput := pb.GetCompileOutputResponse{Output: "test compile output"}
-	return &compileOutput, nil
+	pipelineId := info.PipelineUuid
+	key := fmt.Sprintf("%s:%s", pipelineId, "CompileOutputTag")
+	compileOutputInterface, exists := results[key]
+	if !exists {
+		grpclog.Error("GetCompileOutput: get compile output for pipelineId which doesn't exist: " + pipelineId)
+		return nil, errors.NotFoundError("GetCompileOutput", "there is no compile output for pipelineId: "+pipelineId)
+	}
+	compileOutput, converted := compileOutputInterface.(string)
+	if !converted {
+		return nil, errors.InternalError("GetCompileOutput", "compile output can't be converted to string")
+	}
+	return &pb.GetCompileOutputResponse{Output: compileOutput}, nil
+
 }
 
 // runCode validates, compiles and runs code by pipelineId.
