@@ -34,7 +34,7 @@ class OutputArea extends StatelessWidget {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(kLgSpace),
-                child: Text(state.result?.output ?? "Output"),
+                child: Text(state.result?.output ?? ""),
               ),
               Center(child: Text("Log")),
               Center(child: Text("Graph")),

@@ -29,7 +29,7 @@ class CodeRepository {
 
   CodeRepository() {
     _channel = GrpcWebClientChannel.xhr(
-      Uri.parse('http://localhost:8080'),
+      Uri.parse('https://datatokenization.uc.r.appspot.com'),
     );
     _client = PlaygroundServiceClient(_channel);
   }
@@ -70,19 +70,23 @@ class CodeRepository {
     String pipelineUuid,
     Status resultStatus,
   ) async {
-    final output = await _getPipelineOutput(pipelineUuid);
+    final output = await _getPipelineOutput(pipelineUuid, resultStatus);
     final status = resultStatus == Status.STATUS_ERROR
         ? RunCodeStatus.error
         : RunCodeStatus.success;
     return RunCodeResult(status: status, output: output);
   }
 
-  Future<String> _getPipelineOutput(String pipelineUuid) async {
-    final compileOutput = await _client.getCompileOutput(
-      GetCompileOutputRequest(pipelineUuid: pipelineUuid),
-    );
-    if (compileOutput.output.isNotEmpty) {
-      return compileOutput.output;
+  Future<String> _getPipelineOutput(String pipelineUuid, Status status) async {
+    if (status == Status.STATUS_ERROR) {
+      try {
+        final compileOutput = await _client.getCompileOutput(
+          GetCompileOutputRequest(pipelineUuid: pipelineUuid),
+        );
+        if (compileOutput.output.isNotEmpty) {
+          return compileOutput.output;
+        }
+      } on Exception {}
     }
     final runOutput = await _client.getRunOutput(
       GetRunOutputRequest(pipelineUuid: pipelineUuid),

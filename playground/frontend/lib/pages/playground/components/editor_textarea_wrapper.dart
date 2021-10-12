@@ -17,11 +17,8 @@
  */
 
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-=======
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/editor/components/run_button.dart';
->>>>>>> origin/BEAM-13022-playground-run-code
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 import 'package:provider/provider.dart';
@@ -34,16 +31,6 @@ class CodeTextAreaWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<PlaygroundState>(builder: (context, state, child) {
-<<<<<<< HEAD
-      return EditorTextArea(
-        key: ValueKey(EditorKeyObject(state.sdk, state.selectedExample)),
-        example: state.selectedExample,
-        sdk: state.sdk,
-        onSourceChange: state.setSource,
-      );
-    });
-  }
-=======
       if (state.result?.errorMessage?.isNotEmpty ?? false) {
         WidgetsBinding.instance?.addPostFrameCallback((_) {
           _handleError(context, state);
@@ -80,7 +67,6 @@ class CodeTextAreaWrapper extends StatelessWidget {
     );
     state.resetError();
   }
->>>>>>> origin/BEAM-13022-playground-run-code
 }
 
 class EditorKeyObject {

@@ -23,7 +23,7 @@ import 'package:playground/constants/sizes.dart';
 import 'package:provider/provider.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  ThemeMode themeMode = ThemeMode.dark;
+  ThemeMode themeMode = ThemeMode.light;
 
   bool get isDarkMode {
     return themeMode == ThemeMode.dark;
