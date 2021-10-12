@@ -82,6 +82,24 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 		t.Fatalf("runCode failed: %v", err)
 	}
 	log.Printf("Response CHECK_STATUS: %+v", status)
+
+	requestCompileOutput := pb.GetCompileOutputRequest{
+		PipelineUuid: pipelineMeta.PipelineUuid,
+	}
+	compileOutput, err := client.GetCompileOutput(ctx, &requestCompileOutput)
+	if err == nil {
+		t.Fatalf("getCompileOutput failed: %+v", compileOutput)
+	}
+	log.Printf("Error: %+v", err)
+
+	requestRunOutput := pb.GetRunOutputRequest{
+		PipelineUuid: pipelineMeta.PipelineUuid,
+	}
+	statusRunOutput, err := client.GetRunOutput(ctx, &requestRunOutput)
+	if err != nil {
+		t.Fatalf("getRunOutput failed: %v", err)
+	}
+	log.Printf("Response GET_RUN_OUTPUT: %+v", statusRunOutput)
 }
 
 func TestPlaygroundController_CheckStatus(t *testing.T) {
