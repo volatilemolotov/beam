@@ -16,25 +16,30 @@ package main
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api"
+	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/grpclog"
+	"os"
+	"time"
 )
 
 type playgroundController struct {
 	pb.UnimplementedPlaygroundServiceServer
 }
 
-// TODO change to using cache
-var results = make(map[string]interface{})
+var cacheService = cache.NewCache(os.Getenv("cache"))
 
 //RunCode is running code from requests using a particular SDK
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
 	pipelineId := uuid.New()
+	expTime, err := time.ParseDuration(os.Getenv("expiration"))
+	if err != nil {
+		expTime = time.Hour
+	}
 
 	// create file system service
 	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipelineId)
@@ -64,8 +69,17 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		return nil, errors.InternalError("Run code", "Error during creating executor: "+err.Error())
 	}
 
-	key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-	results[key] = pb.Status_STATUS_EXECUTING
+	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXECUTING)
+	if err != nil {
+		grpclog.Error("RunCode: cache.SetValue: " + err.Error())
+		return nil, errors.InternalError("Run code", "Error during set value to cache: "+err.Error())
+	}
+	err = cacheService.SetExpTime(pipelineId, expTime)
+	if err != nil {
+		grpclog.Error("RunCode: cache.SetExpTime: " + err.Error())
+		return nil, errors.InternalError("Run code", "Error during set expiration to cache: "+err.Error())
+	}
+
 	go runCode(lc, exec, pipelineId)
 
 	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipelineId.String()}
@@ -105,9 +119,12 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		// error during validation
 		grpclog.Error("RunCode: Validate: " + err.Error())
 
-		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
-		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-		results[key] = pb.Status_STATUS_ERROR
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+		if err != nil {
+			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			return
+		}
 	}
 
 	err = exec.Compile()
@@ -115,51 +132,71 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		// error during compilation
 		grpclog.Error("RunCode: Compile: " + err.Error())
 
-		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
-		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-		results[key] = pb.Status_STATUS_ERROR
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+		if err != nil {
+			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			return
+		}
 
-		// set to cache pipelineId: cache.Tag_CompileOutputTag: err.Error()
-		key = fmt.Sprintf("%s:%s", pipelineId, "CompileOutputTag")
-		results[key] = err.Error()
+		// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
+		err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
+		if err != nil {
+			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			return
+		}
 	} else {
 		// compilation success
-		// set to cache pipelineId: cache.Tag_CompileOutputTag: err.Error()
-		key := fmt.Sprintf("%s:%s", pipelineId, "CompileOutputTag")
-		results[key] = ""
+		// set to cache pipelineId: cache.SubKey_CompileOutput: ""
+		err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
+		if err != nil {
+			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			return
+		}
 
 		fileName, err := lc.GetExecutableName()
 		if err != nil {
 			grpclog.Error("RunCode: get compiled file name: " + err.Error())
-			key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-			results[key] = pb.Status_STATUS_ERROR
+			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+			if err != nil {
+				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				return
+			}
 		}
-
-		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_EXECUTING
-		key = fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-		results[key] = pb.Status_STATUS_EXECUTING
 
 		output, err := exec.Run(fileName)
 		if err != nil {
 			// error during run code
 			grpclog.Error("RunCode: Run: " + err.Error())
 
-			// set to cache pipelineId: cache.Tag_RunOutputTag: err.Error()
-			key := fmt.Sprintf("%s:%s", pipelineId, "RunOutputTag")
-			results[key] = err.Error()
+			// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
+			err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, err.Error())
+			if err != nil {
+				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				return
+			}
 
-			// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_ERROR
-			key = fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-			results[key] = pb.Status_STATUS_ERROR
+			// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+			if err != nil {
+				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				return
+			}
 		} else {
 			// run code success
-			// set to cache pipelineId: cache.Tag_RunOutputTag: output
-			key := fmt.Sprintf("%s:%s", pipelineId, "RunOutputTag")
-			results[key] = output
+			// set to cache pipelineId: cache.SubKey_RunOutput: output
+			err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, output)
+			if err != nil {
+				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				return
+			}
 
-			// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_FINISHED
-			key = fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
-			results[key] = pb.Status_STATUS_FINISHED
+			// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
+			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
+			if err != nil {
+				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				return
+			}
 		}
 	}
 	err = lc.DeleteCompiledFile()
