@@ -16,34 +16,28 @@
 package fs_tool
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 )
 
 const (
 	javaBaseFileFolder          = parentBaseFileFolder + "/executable_files"
-	javaSrcFileFolder           = javaBaseFileFolder + "/src"
-	javaBinFileFolder           = javaBaseFileFolder + "/bin"
 	javaExecutableFileExtension = "java"
 	javaCompiledFileExtension   = "class"
 )
 
-var (
-	// folders that should be created for java SDK
-	javaGlobs = []string{
-		javaBaseFileFolder,
-		javaSrcFileFolder,
-		javaBinFileFolder,
-	}
-)
-
 // newJavaLifeCycle creates LifeCycle with java SDK environment.
 func newJavaLifeCycle(pipelineId uuid.UUID) *LifeCycle {
+	baseFileFolder := fmt.Sprintf("%s_%s", javaBaseFileFolder, pipelineId)
+	srcFileFolder := baseFileFolder + "/src"
+	binFileFolder := baseFileFolder + "/bin"
+
 	return &LifeCycle{
-		folderGlobs: javaGlobs,
+		folderGlobs: []string{baseFileFolder, srcFileFolder, binFileFolder},
 		Folder: Folder{
-			BaseFolder:       javaBaseFileFolder,
-			ExecutableFolder: javaSrcFileFolder,
-			CompiledFolder:   javaBinFileFolder,
+			BaseFolder:       baseFileFolder,
+			ExecutableFolder: srcFileFolder,
+			CompiledFolder:   binFileFolder,
 		},
 		Extension: Extension{
 			ExecutableExtension: javaExecutableFileExtension,
