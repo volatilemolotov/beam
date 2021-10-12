@@ -124,6 +124,9 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		results[key] = err.Error()
 	} else {
 		// compilation success
+		// set to cache pipelineId: cache.Tag_CompileOutputTag: err.Error()
+		key := fmt.Sprintf("%s:%s", pipelineId, "CompileOutputTag")
+		results[key] = ""
 
 		fileName, err := lc.GetExecutableName()
 		if err != nil {
@@ -133,7 +136,7 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		}
 
 		// set to cache pipelineId: cache.Tag_StatusTag: pb.Status_STATUS_EXECUTING
-		key := fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
+		key = fmt.Sprintf("%s:%s", pipelineId, "StatusTag")
 		results[key] = pb.Status_STATUS_EXECUTING
 
 		output, err := exec.Run(fileName)
