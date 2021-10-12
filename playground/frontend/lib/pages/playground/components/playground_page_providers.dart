@@ -46,7 +46,9 @@ class PlaygroundPageProviders extends StatelessWidget {
             }
             if (exampleState.examples?.isNotEmpty ?? false) {
               return PlaygroundState(
-                  playground.sdk, exampleState.examples!.first);
+                playground.sdk,
+                exampleState.examples!.first,
+              );
             }
             return playground;
           },

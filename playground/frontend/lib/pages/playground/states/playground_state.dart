@@ -29,7 +29,9 @@ class PlaygroundState with ChangeNotifier {
   String _source = "";
   RunCodeResult? result;
 
-  PlaygroundState([this._sdk = SDK.java, this._selectedExample]);
+  PlaygroundState([this._sdk = SDK.java, this._selectedExample]) {
+    _source = _selectedExample?.sources[_sdk] ?? "";
+  }
 
   ExampleModel? get selectedExample => _selectedExample;
 
