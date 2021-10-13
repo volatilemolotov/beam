@@ -17,11 +17,11 @@
 package executors
 
 // NewGoExecutor creates an executor with Go specifics
-func NewGoExecutor(fs *fs_tool.LifeCycle, javaValidators *[]validatorWithArgs) *Executor {
-	return nil
-}
+//func NewGoExecutor(fs *fs_tool.LifeCycle, javaValidators *[]validatorWithArgs) *Executor {
+//	return nil
+//}
 
 // GetGoValidators return validators methods that needed for Go file
-func GetGoValidators() *[]validatorWithArgs {
-	return nil
-}
+//func GetGoValidators() *[]validatorWithArgs {
+//	return nil
+//}

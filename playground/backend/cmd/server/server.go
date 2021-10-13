@@ -18,7 +18,10 @@ package main
 import (
 	pb "beam.apache.org/playground/backend/internal/api"
 	"beam.apache.org/playground/backend/internal/environment"
+	"beam.apache.org/playground/backend/internal/executors"
+	"bytes"
 	"context"
+	"fmt"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
@@ -65,8 +68,14 @@ func getGrpcWebOptions() []grpcweb.Option {
 }
 
 func main() {
-	err := runServer()
-	if err != nil {
-		panic(err)
-	}
+	//err := runServer()
+	//if err != nil {
+	//	panic(err)
+	//}
+	var buf bytes.Buffer
+	executors.ListBuckets(&buf, "datatokenization")
+	fmt.Println(buf.String())
+	buf.Reset()
+	executors.ListFiles(&buf, "datatokenization.appspot.com")
+	fmt.Println(buf.String())
 }
