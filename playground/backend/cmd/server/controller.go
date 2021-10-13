@@ -114,10 +114,11 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 // After success code running saves output to cache.
 func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID) {
 	// validate
+	grpclog.Info("runCode: Validate ...")
 	err := exec.Validate()
 	if err != nil {
 		// error during validation
-		grpclog.Error("RunCode: Validate: " + err.Error())
+		grpclog.Error("runCode: Validate: " + err.Error())
 
 		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
@@ -126,11 +127,13 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 			return
 		}
 	}
+	grpclog.Info("runCode: Validate finish")
 
+	grpclog.Info("runCode: Compile ...")
 	err = exec.Compile()
 	if err != nil {
 		// error during compilation
-		grpclog.Error("RunCode: Compile: " + err.Error())
+		grpclog.Error("runCode: Compile: " + err.Error())
 
 		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
@@ -147,6 +150,8 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 		}
 	} else {
 		// compilation success
+		grpclog.Info("runCode: Compile finish")
+
 		// set to cache pipelineId: cache.SubKey_CompileOutput: ""
 		err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
 		if err != nil {
@@ -154,16 +159,19 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 			return
 		}
 
+		grpclog.Info("runCode: get executable file name ...")
 		fileName, err := lc.GetExecutableName()
 		if err != nil {
-			grpclog.Error("RunCode: get compiled file name: " + err.Error())
+			grpclog.Error("runCode: get executable file name: " + err.Error())
 			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 			if err != nil {
 				grpclog.Error("runCode: cache.SetValue: " + err.Error())
 				return
 			}
 		}
+		grpclog.Infof("runCode: executable file name: %s", fileName)
 
+		grpclog.Info("runCode: Run ...")
 		output, err := exec.Run(fileName)
 		if err != nil {
 			// error during run code
@@ -184,6 +192,8 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 			}
 		} else {
 			// run code success
+			grpclog.Info("runCode: Run finish")
+
 			// set to cache pipelineId: cache.SubKey_RunOutput: output
 			err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, output)
 			if err != nil {
@@ -199,14 +209,17 @@ func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UU
 			}
 		}
 	}
+	grpclog.Info("runCode: DeleteCompiledFile ...")
 	err = lc.DeleteCompiledFile()
 	if err != nil {
 		grpclog.Error("RunCode: DeleteCompiledFile: " + err.Error())
 	}
+	grpclog.Info("runCode: DeleteExecutableFile ...")
 	err = lc.DeleteExecutableFile()
 	if err != nil {
 		grpclog.Error("RunCode: DeleteExecutableFile: " + err.Error())
 	}
+	grpclog.Info("runCode: DeleteFolders ...")
 	err = lc.DeleteFolders()
 	if err != nil {
 		grpclog.Error("RunCode: DeleteFolders: " + err.Error())
