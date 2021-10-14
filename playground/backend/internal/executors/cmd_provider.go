@@ -17,25 +17,23 @@
 package executors
 
 import (
+	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/validators"
 	"os/exec"
 )
 
-// Executor struct for all executors (Java/Python/Go/SCIO)
-type Executor struct {
-	relativeFilePath string
-	absoulteFilePath string
-	dirPath          string
-	executableDir    string
-	validators       []validators.Validator
-	compileCommand   string
-	compileArgs      []string
-	runCommand       string
-	runArgs          []string
+// CmdProvider struct for all executors (Java/Python/Go/SCIO)
+type CmdProvider struct {
+	dirPath        string
+	validators     []validators.Validator
+	compileCommand string
+	compileArgs    []string
+	runCommand     string
+	runArgs        []string
 }
 
-// Validate return the function that apply all validators of executor
-func (ex *Executor) Validate() func() error {
+// Validators return the function that apply all validators of executor
+func (ex *CmdProvider) Validators() func() error {
 	return func() error {
 		for _, validator := range ex.validators {
 			err := validator.Validator(validator.Args...)
@@ -50,7 +48,7 @@ func (ex *Executor) Validate() func() error {
 
 // Compile prepares the Cmd for code compilation
 // Returns Cmd instance
-func (ex *Executor) Compile() *exec.Cmd {
+func (ex *CmdProvider) Compile() *exec.Cmd {
 	cmd := exec.Command(ex.compileCommand, ex.compileArgs...)
 	cmd.Dir = ex.dirPath
 	return cmd
@@ -58,9 +56,26 @@ func (ex *Executor) Compile() *exec.Cmd {
 
 // Run prepares the Cmd for execution of the code
 // Returns Cmd instance
-func (ex *Executor) Run(name string) *exec.Cmd {
+func (ex *CmdProvider) Run(name string) *exec.Cmd {
 	args := append(ex.runArgs, name)
 	cmd := exec.Command(ex.runCommand, args...)
 	cmd.Dir = ex.dirPath
 	return cmd
+}
+
+// NewCmdProvider fills up an executor with Cmd arguments
+func NewCmdProvider(envs environment.BeamEnvs, workingDir string, filePath string, validatorsFuncs *[]validators.Validator) *CmdProvider {
+	provider := CmdProvider{}
+	if validatorsFuncs == nil {
+		v := make([]validators.Validator, 0)
+		validatorsFuncs = &v
+	}
+	compileArgs := append(envs.CmdConfig.CompileArgs, filePath)
+	provider.validators = *validatorsFuncs
+	provider.dirPath = workingDir
+	provider.compileCommand = envs.CmdConfig.CompileCmd
+	provider.runCommand = envs.CmdConfig.RunCmd
+	provider.compileArgs = compileArgs
+	provider.runArgs = envs.CmdConfig.RunArgs
+	return &provider
 }

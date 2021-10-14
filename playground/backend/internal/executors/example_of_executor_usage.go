@@ -24,7 +24,6 @@ import (
 )
 
 func ExampleOfExecutorUsage() {
-	exec := Executor{}
 	cycle, err := fs_tool.NewLifeCycle(pb.Sdk_SDK_JAVA, uuid.New())
 	cycle.CreateFolders()
 	cycle.CreateExecutableFile("exampleOfExecutorUsage")
@@ -32,9 +31,9 @@ func ExampleOfExecutorUsage() {
 		return
 	}
 	env := environment.NewEnvironment()
-	ConfigureSDK(&exec, env.BeamSdkEnvs, cycle.Folder.BaseFolder, validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath()))
+	exec := NewCmdProvider(env.BeamSdkEnvs, cycle.Folder.BaseFolder, "", validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath()))
 
-	applyValidators := exec.Validate()
+	applyValidators := exec.Validators()
 	go func() {
 		err := applyValidators()
 		if err != nil {

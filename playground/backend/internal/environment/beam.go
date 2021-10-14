@@ -63,13 +63,9 @@ func readConfig(apacheBeamSdk pb.Sdk) *CmdConfig {
 }
 
 func getCmdConfig(apacheBeamSdk pb.Sdk) CmdConfig {
-	path, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-	CmdConfigPath := path + "/playground/backend/internal/environment/configs/" + apacheBeamSdk.String() + ".json"
+	CmdConfigPath := getEnv("CONFIG_FOLDER", "./") + apacheBeamSdk.String() + ".json"
 	cmdConfig := CmdConfig{}
-	err = gonfig.GetConf(CmdConfigPath, &cmdConfig)
+	err := gonfig.GetConf(CmdConfigPath, &cmdConfig)
 	if err != nil {
 		panic(err)
 	}
