@@ -13,20 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-module beam.apache.org/playground/backend
+package validators
 
-go 1.16
-
-require (
-	github.com/google/uuid v1.3.0
-	github.com/kr/pretty v0.1.0 // indirect
-	github.com/tkanos/gonfig v0.0.0-20210106201359-53e13348de2f
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4 // indirect
-	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
-	golang.org/x/text v0.3.5 // indirect
-	google.golang.org/genproto v0.0.0-20210126160654-44e461bb6506 // indirect
-	google.golang.org/grpc v1.41.0
-	google.golang.org/protobuf v1.27.1
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/yaml.v2 v2.3.0 // indirect
+import (
+	"beam.apache.org/playground/backend/internal/fs_tool"
 )
+
+const (
+	javaExtension = ".java"
+)
+
+// GetJavaValidators return validators methods that should be applied to Java code
+func GetJavaValidators(filePath string) *[]Validator {
+	validatorArgs := make([]interface{}, 2)
+	validatorArgs[0] = filePath
+	validatorArgs[1] = javaExtension
+	pathCheckerValidator := Validator{
+		Validator: fs_tool.CheckPathIsValid,
+		Args:      validatorArgs,
+	}
+	validators := []Validator{pathCheckerValidator}
+	return &validators
+}
