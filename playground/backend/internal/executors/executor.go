@@ -21,7 +21,7 @@ import (
 	"os/exec"
 )
 
-// Executor interface for all executors (Java/Python/Go/SCIO)
+// Executor struct for all executors (Java/Python/Go/SCIO)
 type Executor struct {
 	relativeFilePath string
 	absoulteFilePath string
@@ -34,8 +34,7 @@ type Executor struct {
 	runArgs          []string
 }
 
-// Validate checks that the file exists and that extension of the file matches the SDK.
-// Return function that apply any validators
+// Validate return the function that apply all validators of executor
 func (ex *Executor) Validate() func() error {
 	return func() error {
 		for _, validator := range ex.validators {
@@ -49,16 +48,16 @@ func (ex *Executor) Validate() func() error {
 	}
 }
 
-// Compile compiles the code and creates executable file.
-// Return error if it occurs
+// Compile prepares the Cmd for code compilation
+// Returns Cmd instance
 func (ex *Executor) Compile() *exec.Cmd {
 	cmd := exec.Command(ex.compileCommand, ex.compileArgs...)
 	cmd.Dir = ex.dirPath
 	return cmd
 }
 
-// Run runs the executable file.
-// Return logs and error if it occurs
+// Run prepares the Cmd for execution of the code
+// Returns Cmd instance
 func (ex *Executor) Run(name string) *exec.Cmd {
 	args := append(ex.runArgs, name)
 	cmd := exec.Command(ex.runCommand, args...)

@@ -57,9 +57,9 @@ func Test_getSdkEnvsFromOsEnvs(t *testing.T) {
 		want      BeamEnvs
 		envsToSet map[string]string
 	}{
-		{name: "default sdk envs", want: BeamEnvs{defaultSdk}},
-		{name: "right sdk key in os envs", want: BeamEnvs{pb.Sdk_SDK_JAVA}, envsToSet: map[string]string{"BEAM_SDK": "SDK_JAVA"}},
-		{name: "wrong sdk key in os envs", want: BeamEnvs{defaultSdk}, envsToSet: map[string]string{"BEAM_SDK": "SDK_J"}},
+		{name: "default sdk envs", want: BeamEnvs{defaultSdk, nil}},
+		{name: "right sdk key in os envs", want: BeamEnvs{pb.Sdk_SDK_JAVA, nil}, envsToSet: map[string]string{"BEAM_SDK": "SDK_JAVA"}},
+		{name: "wrong sdk key in os envs", want: BeamEnvs{defaultSdk, nil}, envsToSet: map[string]string{"BEAM_SDK": "SDK_J"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

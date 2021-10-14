@@ -21,18 +21,17 @@ import (
 	"beam.apache.org/playground/backend/internal/validators"
 )
 
-// ConfigureSDK creates an executor with Go specifics
+// ConfigureSDK fills up an executor with Cmd arguments
 func ConfigureSDK(exec *Executor, envs environment.BeamEnvs, workingDir string, validatorsFuncs *[]validators.Validator) {
 	if validatorsFuncs == nil {
 		v := make([]validators.Validator, 0)
 		validatorsFuncs = &v
 	}
-
 	exec.validators = *validatorsFuncs
 	exec.dirPath = workingDir
-	exec.compileCommand = envs.CompileCommand
-	exec.runCommand = envs.RunCommand
-	exec.compileArgs = envs.CompileArgs
-	exec.runArgs = envs.RunArgs
+	exec.compileCommand = envs.CmdConfig.CompileCmd
+	exec.runCommand = envs.CmdConfig.RunCmd
+	exec.compileArgs = envs.CmdConfig.CompileArgs
+	exec.runArgs = envs.CmdConfig.RunArgs
 
 }

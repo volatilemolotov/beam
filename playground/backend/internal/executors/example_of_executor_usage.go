@@ -23,7 +23,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func exampleOfExecutorUsage() {
+func ExampleOfExecutorUsage() {
 	exec := Executor{}
 	cycle, err := fs_tool.NewLifeCycle(pb.Sdk_SDK_JAVA, uuid.New())
 	cycle.CreateFolders()

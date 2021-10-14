@@ -23,9 +23,9 @@ const (
 	javaExtension = ".java"
 )
 
-// GetJavaValidators return validators methods that needed for Java file
+// GetJavaValidators return validators methods that should be applied to Java code
 func GetJavaValidators(filePath string) *[]Validator {
-	validatorArgs := make([]interface{}, 1)
+	validatorArgs := make([]interface{}, 2)
 	validatorArgs[0] = filePath
 	validatorArgs[1] = javaExtension
 	pathCheckerValidator := Validator{
