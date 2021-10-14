@@ -13,19 +13,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Executor for Java
-package executors
+package validators
 
-type JavaExecutor struct{}
+import (
+	"beam.apache.org/playground/backend/internal/fs_tool"
+)
 
-func (javaExec JavaExecutor) Validate(filePath string) (bool, error) {
-	return true, nil
-}
+const (
+	javaExtension = ".java"
+)
 
-func (javaExec JavaExecutor) Compile(filePath string) error {
-	return nil
-}
-
-func (javaExec JavaExecutor) Run(filePath string) (string, error) {
-	return "", nil
+// GetJavaValidators return validators methods that should be applied to Java code
+func GetJavaValidators(filePath string) *[]Validator {
+	validatorArgs := make([]interface{}, 2)
+	validatorArgs[0] = filePath
+	validatorArgs[1] = javaExtension
+	pathCheckerValidator := Validator{
+		Validator: fs_tool.CheckPathIsValid,
+		Args:      validatorArgs,
+	}
+	validators := []Validator{pathCheckerValidator}
+	return &validators
 }

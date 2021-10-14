@@ -13,19 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Executor for Go
-package executors
+package validators
 
-type GoExecutor struct{}
-
-func (goExec GoExecutor) Validate(filePath string) (bool, error) {
-	return true, nil
-}
-
-func (goExec GoExecutor) Compile(filePath string) error {
-	return nil
-}
-
-func (goExec GoExecutor) Run(filePath string) (string, error) {
-	return "", nil
+type Validator struct {
+	Validator func(args ...interface{}) error
+	Args      []interface{}
 }
