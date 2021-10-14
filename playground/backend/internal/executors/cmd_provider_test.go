@@ -143,91 +143,72 @@ func TestCmdProvider_Compile(t *testing.T) {
 				runCommand:     tt.fields.runCommand,
 				runArgs:        tt.fields.runArgs,
 			}
-			if got := ex.Compile(); !reflect.DeepEqual(got, tt.want) {
+			if got := ex.Compile(); !reflect.DeepEqual(got.String(), tt.want.String()) {
 				t.Errorf("Compile() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-//func TestCmdProvider_Run(t *testing.T) {
-//	type fields struct {
-//		relativeFilePath string
-//		absoulteFilePath string
-//		dirPath          string
-//		executableDir    string
-//		validators       []validators.Validator
-//		compileCommand   string
-//		compileArgs      []string
-//		runCommand       string
-//		runArgs          []string
-//	}
-//	type args struct {
-//		name string
-//	}
-//	tests := []struct {
-//		name   string
-//		fields fields
-//		args   args
-//		want   *exec.Cmd
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			ex := &CmdProvider{
-//				relativeFilePath: tt.fields.relativeFilePath,
-//				absoulteFilePath: tt.fields.absoulteFilePath,
-//				dirPath:          tt.fields.dirPath,
-//				executableDir:    tt.fields.executableDir,
-//				validators:       tt.fields.validators,
-//				compileCommand:   tt.fields.compileCommand,
-//				compileArgs:      tt.fields.compileArgs,
-//				runCommand:       tt.fields.runCommand,
-//				runArgs:          tt.fields.runArgs,
-//			}
-//			if got := ex.Run(tt.args.name); !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("Run() = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
-//
-//func TestCmdProvider_Validators(t *testing.T) {
-//	type fields struct {
-//		relativeFilePath string
-//		absoulteFilePath string
-//		dirPath          string
-//		executableDir    string
-//		validators       []validators.Validator
-//		compileCommand   string
-//		compileArgs      []string
-//		runCommand       string
-//		runArgs          []string
-//	}
-//	tests := []struct {
-//		name   string
-//		fields fields
-//		want   func() error
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			ex := &CmdProvider{
-//				relativeFilePath: tt.fields.relativeFilePath,
-//				absoulteFilePath: tt.fields.absoulteFilePath,
-//				dirPath:          tt.fields.dirPath,
-//				executableDir:    tt.fields.executableDir,
-//				validators:       tt.fields.validators,
-//				compileCommand:   tt.fields.compileCommand,
-//				compileArgs:      tt.fields.compileArgs,
-//				runCommand:       tt.fields.runCommand,
-//				runArgs:          tt.fields.runArgs,
-//			}
-//			if got := ex.Validators(); !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("Validators() = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
+func TestCmdProvider_Run(t *testing.T) {
+	type fields struct {
+		dirPath        string
+		validators     []validators.Validator
+		compileCommand string
+		compileArgs    []string
+		runCommand     string
+		runArgs        []string
+	}
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *exec.Cmd
+	}{
+		{
+			name: "TestRun",
+			fields: fields{
+				dirPath:        "./",
+				validators:     nil,
+				compileCommand: "",
+				compileArgs:    nil,
+				runCommand:     "java",
+				runArgs:        []string{"-cp", "bin:/opt/apache/beam/jars/beam-sdks-java-harness.jar:/opt/apache/beam/jars/beam-runners-direct.jar:/opt/apache/beam/jars/slf4j-jdk14.jar"},
+			},
+			want: &exec.Cmd{
+				Path:         "/usr/bin/java",
+				Args:         []string{"java", "-cp", "bin:/opt/apache/beam/jars/beam-sdks-java-harness.jar:/opt/apache/beam/jars/beam-runners-direct.jar:/opt/apache/beam/jars/slf4j-jdk14.jar", "HelloWorld"},
+				Env:          nil,
+				Dir:          "",
+				Stdin:        nil,
+				Stdout:       nil,
+				Stderr:       nil,
+				ExtraFiles:   nil,
+				SysProcAttr:  nil,
+				Process:      nil,
+				ProcessState: nil,
+			},
+			args: args{
+				"HelloWorld",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ex := &CmdProvider{
+				dirPath:        tt.fields.dirPath,
+				validators:     tt.fields.validators,
+				compileCommand: tt.fields.compileCommand,
+				compileArgs:    tt.fields.compileArgs,
+				runCommand:     tt.fields.runCommand,
+				runArgs:        tt.fields.runArgs,
+			}
+			if got := ex.Run(tt.args.name); !reflect.DeepEqual(got.String(), tt.want.String()) {
+				t.Errorf("Run() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
