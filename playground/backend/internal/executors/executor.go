@@ -23,6 +23,11 @@ import (
 	"os/exec"
 )
 
+type RunResult struct {
+	Err    error
+	Output string
+}
+
 type validatorWithArgs struct {
 	validator func(filePath string, args ...interface{}) error
 	args      []interface{}
@@ -43,19 +48,22 @@ type Executor struct {
 
 // Validate checks that the file exists and that extension of the file matches the SDK.
 // Return result of validation (true/false) and error if it occurs
-func (ex *Executor) Validate() error {
+func (ex *Executor) Validate() <-chan error {
+	errChan := make(chan error)
 	for _, validator := range ex.validators {
 		err := validator.validator(ex.absoulteFilePath, validator.args...)
 		if err != nil {
-			return err
+			errChan <- err
+			return errChan
 		}
 	}
-	return nil
+	return errChan
 }
 
 // Compile compiles the code and creates executable file.
 // Return error if it occurs
-func (ex *Executor) Compile() error {
+func (ex *Executor) Compile() <-chan error {
+	errChan := make(chan error)
 	args := append(ex.compileArgs, ex.relativeFilePath)
 	cmd := exec.Command(ex.compileName, args...)
 	cmd.Dir = ex.dirPath
@@ -63,19 +71,24 @@ func (ex *Executor) Compile() error {
 	fmt.Println(s)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return &CompileError{string(out)}
+		errChan <- &CompileError{string(out)}
 	}
-	return nil
+	return errChan
 }
 
 // Run runs the executable file.
 // Return logs and error if it occurs
-func (ex *Executor) Run(name string) (string, error) {
+func (ex *Executor) Run(name string) <-chan RunResult {
+	channel := make(chan RunResult)
+	result := RunResult{}
 	args := append(ex.runArgs, name)
 	cmd := exec.Command(ex.runName, args...)
 	cmd.Dir = ex.dirPath
 	out, err := cmd.Output()
-	return string(out), err
+	result.Output = string(out)
+	result.Err = err
+	channel <- result
+	return channel
 }
 
 // NewExecutor executes the compilation, running and validation of code

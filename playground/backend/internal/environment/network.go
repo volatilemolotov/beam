@@ -15,20 +15,35 @@
 
 package environment
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // ServerEnvs contains all environment variables that need to run server.
 type ServerEnvs struct {
-	ip   string
-	port int
+	ip              string
+	port            int
+	cacheExpiration time.Duration
+	runCodeTimeout  time.Duration
 }
 
 // NewServerEnvs constructor for ServerEnvs
-func NewServerEnvs(ip string, port int) *ServerEnvs {
-	return &ServerEnvs{ip: ip, port: port}
+func NewServerEnvs(ip string, port int, cacheExpiration, runCodeTimeout time.Duration) *ServerEnvs {
+	return &ServerEnvs{ip: ip, port: port, cacheExpiration: cacheExpiration, runCodeTimeout: runCodeTimeout}
 }
 
 // Address returns concatenated ip and port through ':'
 func (serverEnvs ServerEnvs) Address() string {
 	return fmt.Sprintf("%s:%d", serverEnvs.ip, serverEnvs.port)
+}
+
+// GetCacheExpiration returns expiration time for cache key
+func (serverEnvs *ServerEnvs) GetCacheExpiration() time.Duration {
+	return serverEnvs.cacheExpiration
+}
+
+// GetRunCodeTimeout returns timeout for run code method
+func (serverEnvs *ServerEnvs) GetRunCodeTimeout() time.Duration {
+	return serverEnvs.runCodeTimeout
 }

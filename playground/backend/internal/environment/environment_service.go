@@ -20,15 +20,20 @@ import (
 	"google.golang.org/grpc/grpclog"
 	"os"
 	"strconv"
+	"time"
 )
 
 const (
-	serverIpKey   = "SERVER_IP"
-	serverPortKey = "SERVER_PORT"
-	beamSdkKey    = "BEAM_SDK"
-	defaultIp     = "localhost"
-	defaultPort   = 8080
-	defaultSdk    = pb.Sdk_SDK_JAVA
+	serverIpKey            = "SERVER_IP"
+	serverPortKey          = "SERVER_PORT"
+	beamSdkKey             = "BEAM_SDK"
+	cacheExpirationKey     = "CACHE_EXPIRATION"
+	runCodeTimeoutKey      = "RUN_CODE_TIMEOUT"
+	defaultIp              = "localhost"
+	defaultPort            = 8080
+	defaultSdk             = pb.Sdk_SDK_JAVA
+	defaultCacheExpiration = time.Minute * 30
+	defaultRunCodeTimeout  = time.Minute * 10
 )
 
 // Environment operates with environment structures: ServerEnvs, LogWriters, BeamEnvs
@@ -54,6 +59,9 @@ func NewEnvironment() *Environment {
 func getServerEnvsFromOsEnvs() *ServerEnvs {
 	ip := defaultIp
 	port := defaultPort
+	cacheExpiration := defaultCacheExpiration
+	runCodeTimeout := defaultRunCodeTimeout
+
 	if value, present := os.LookupEnv(serverIpKey); present {
 		ip = value
 	}
@@ -66,7 +74,22 @@ func getServerEnvsFromOsEnvs() *ServerEnvs {
 		}
 	}
 
-	return NewServerEnvs(ip, port)
+	if value, present := os.LookupEnv(cacheExpirationKey); present {
+		if converted, err := time.ParseDuration(value); err == nil {
+			cacheExpiration = converted
+		} else {
+			grpclog.Errorf("couldn't convert provided cache expiration. Using default %s\n", defaultCacheExpiration)
+		}
+	}
+	if value, present := os.LookupEnv(runCodeTimeoutKey); present {
+		if converted, err := time.ParseDuration(value); err == nil {
+			runCodeTimeout = converted
+		} else {
+			grpclog.Errorf("couldn't convert provided request timeout. Using default %s\n", defaultRunCodeTimeout)
+		}
+	}
+
+	return NewServerEnvs(ip, port, cacheExpiration, runCodeTimeout)
 }
 
 // getServerEnvsFromOsEnvs lookups in os environment variables and takes value for Apache Beam SDK. If not exists - using default
