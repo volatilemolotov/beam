@@ -26,7 +26,7 @@ const (
 //func TestMain(m *testing.M) {
 //	lc = setup()
 //	defer teardown(lc)
-//	m.Run()
+//	m.Runner()
 //}
 //
 //func setup() *fs_tool.LifeCycle {
@@ -84,7 +84,7 @@ const (
 //		},
 //	}
 //	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
+//		t.Runner(tt.name, func(t *testing.T) {
 //			if got := NewCmdProvider(tt.args.envs, tt.args.workingDir, filePath, tt.args.validatorsFuncs); !reflect.DeepEqual(got, tt.want) {
 //				t.Errorf("NewCmdProvider() = %v, want %v", got, tt.want)
 //			}
@@ -136,7 +136,7 @@ func TestExecutor_Compile(t *testing.T) {
 				validators:  tt.fields.validators,
 			}
 			if got := ex.Compile(); !reflect.DeepEqual(got.String(), tt.want.String()) {
-				t.Errorf("Compile() = %v, want %v", got, tt.want)
+				t.Errorf("Compiler() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -188,7 +188,7 @@ func TestExecutor_Run(t *testing.T) {
 				validators:  tt.fields.validators,
 			}
 			if got := ex.Run(); !reflect.DeepEqual(got.String(), tt.want.String()) {
-				t.Errorf("Run() = %v, want %v", got, tt.want)
+				t.Errorf("Runner() = %v, want %v", got, tt.want)
 			}
 		})
 	}

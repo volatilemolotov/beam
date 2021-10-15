@@ -32,18 +32,18 @@ func NewExecutorBuilder() *ExecutorBuilder {
 	return &ExecutorBuilder{}
 }
 
-// Compile - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
-func (b *ExecutorBuilder) Compile() *CompileBuilder {
+// Compiler - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
+func (b *ExecutorBuilder) Compiler() *CompileBuilder {
 	return &CompileBuilder{*b}
 }
 
-// Run - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
-func (b *ExecutorBuilder) Run() *RunBuilder {
+// Runner - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
+func (b *ExecutorBuilder) Runner() *RunBuilder {
 	return &RunBuilder{*b}
 }
 
-// Validate - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
-func (b *ExecutorBuilder) Validate() *ValidatorBuilder {
+// Validator - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
+func (b *ExecutorBuilder) Validator() *ValidatorBuilder {
 	return &ValidatorBuilder{*b}
 }
 
@@ -148,17 +148,17 @@ func BaseExecutorBuilder(envs environment.BeamEnvs, workingDir string, filePath 
 		validatorsFuncs = &v
 	}
 	builder := NewExecutorBuilder().
-		Compile().
+		Compiler().
 		withCommand(envs.CmdConfig.CompileCmd).
 		withArgs(envs.CmdConfig.CompileArgs).
 		withFileName(filePath).
 		withWorkingDir(workingDir).
-		Run().
+		Runner().
 		withCommand(envs.CmdConfig.RunCmd).
 		withArgs(envs.CmdConfig.RunArgs).
 		withClassName("HelloWorld").
 		withWorkingDir(workingDir).
-		Validate().
+		Validator().
 		withSdkValidators(validatorsFuncs).
 		Return()
 	return builder
