@@ -147,7 +147,7 @@ func BaseExecutorBuilder(envs environment.BeamEnvs, workingDir string, filePath 
 		v := make([]validators.Validator, 0)
 		validatorsFuncs = &v
 	}
-	e := NewExecutorBuilder().
+	builder := NewExecutorBuilder().
 		Compile().
 		withCommand(envs.CmdConfig.CompileCmd).
 		withArgs(envs.CmdConfig.CompileArgs).
@@ -161,5 +161,5 @@ func BaseExecutorBuilder(envs environment.BeamEnvs, workingDir string, filePath 
 		Validate().
 		withSdkValidators(validatorsFuncs).
 		Return()
-	return e
+	return builder
 }
