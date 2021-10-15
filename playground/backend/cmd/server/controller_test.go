@@ -54,6 +54,7 @@ func teardown(server *grpc.Server) {
 func bufDialer(context.Context, string) (net.Conn, error) {
 	return lis.Dial()
 }
+
 func TestPlaygroundController_RunCode(t *testing.T) {
 	ctx := context.Background()
 	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
@@ -63,7 +64,7 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 	defer conn.Close()
 	client := pb.NewPlaygroundServiceClient(conn)
 	code := pb.RunCodeRequest{
-		Code: "test",
+		Code: "class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World!\");\n    }\n}",
 		Sdk:  pb.Sdk_SDK_JAVA,
 	}
 	pipelineMeta, err := client.RunCode(ctx, &code)

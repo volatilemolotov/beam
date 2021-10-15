@@ -22,6 +22,7 @@ import (
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/grpclog"
 	"os"
@@ -84,7 +85,7 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		return nil, errors.InternalError("Run code", "Error during set expiration to cache: "+err.Error())
 	}
 
-	go runCode(ctx, lc, exec, pipelineId, timeout)
+	go runCode(context.TODO(), lc, exec, pipelineId, timeout)
 
 	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipelineId.String()}
 	return &pipelineInfo, nil
@@ -117,41 +118,52 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 // In case of compilation failed saves logs to cache.
 // After success code running saves output to cache.
 func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID, timeout time.Duration) {
+	channel := make(chan interface{}, 1)
+
 	ctxWithTimeout, cancelByTimeoutFunc := context.WithTimeout(ctx, timeout)
 	defer func(lc *fs_tool.LifeCycle) {
 		cleanUp(lc)
 		cancelByTimeoutFunc()
+		close(channel)
 	}(lc)
 
 	// validate
 	grpclog.Info("parallelRunCode: Validate ...")
+	fmt.Println("parallelRunCode: Validate ...")
+	//for {
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
 		return
-	case err := <-exec.Validate():
+	case channel <- exec.Validate():
+		err := <-channel
 		if err != nil {
 			// error during validation
-			processErrDuringValidate(err, pipelineId)
+			processErrDuringValidate(err.(error), pipelineId)
 			return
 		}
 	}
+	//}
 	grpclog.Info("parallelRunCode: Validate finish")
+	fmt.Println("parallelRunCode: Validate finish")
 
 	// compile
 	grpclog.Info("parallelRunCode: Compile ...")
+	fmt.Println("parallelRunCode: Compile ...")
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
 		return
-	case err := <-exec.Compile():
+	case channel <- exec.Compile():
+		err := <-channel
 		if err != nil {
 			// error during compilation
-			processErrDuringCompile(err, pipelineId)
+			processErrDuringCompile(err.(error), pipelineId)
 			return
 		}
 	}
 	grpclog.Info("parallelRunCode: Compile finish")
+	fmt.Println("parallelRunCode: Compile finish")
 
 	// set empty value to pipelineId: cache.SubKey_CompileOutput
 	err := cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
@@ -162,6 +174,7 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 
 	// get executable file name
 	grpclog.Info("parallelRunCode: get executable file name ...")
+	fmt.Println("parallelRunCode: get executable file name ...")
 	fileName, err := lc.GetExecutableName()
 	if err != nil {
 		// error during get executable file name
@@ -169,17 +182,20 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 		return
 	}
 	grpclog.Infof("parallelRunCode: executable file name: %s", fileName)
+	fmt.Printf("parallelRunCode: executable file name: %s\n", fileName)
 
 	// run
 	output := ""
 	grpclog.Info("parallelRunCode: Run ...")
+	fmt.Println("parallelRunCode: Run ...")
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
 		return
-	case result := <-exec.Run(fileName):
-		output = result.Output
-		err := result.Err
+	case channel <- exec.Run(fileName):
+		runResult := <-channel
+		err := runResult.(*executors.RunResult).Err
+		output = runResult.(*executors.RunResult).Output
 		if err != nil {
 			// error during run code
 			processErrDuringRun(err, pipelineId)
@@ -187,7 +203,11 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 		}
 	}
 	grpclog.Info("parallelRunCode: Run finish")
+	fmt.Println("parallelRunCode: Run finish")
 	processSuccessRun(pipelineId, output)
+	fmt.Println(cacheService.GetValue(pipelineId, cache.SubKey_Status))
+	fmt.Println(cacheService.GetValue(pipelineId, cache.SubKey_CompileOutput))
+	fmt.Println(cacheService.GetValue(pipelineId, cache.Subkey_RunOutput))
 }
 
 // finishByContext is used in case of runCode method finished by timeout
@@ -203,13 +223,18 @@ func finishByContext(pipelineId uuid.UUID) {
 
 // cleanUp removes all prepared folders for received LifeCycle
 func cleanUp(lc *fs_tool.LifeCycle) {
+	grpclog.Info("parallelRunCode complete")
+	fmt.Println("parallelRunCode complete")
+
 	grpclog.Info("parallelRunCode: DeleteFolders ...")
+	fmt.Println("parallelRunCode: DeleteFolders ...")
 	err := lc.DeleteFolders()
 	if err != nil {
 		grpclog.Error("parallelRunCode: DeleteFolders: " + err.Error())
+		fmt.Println("parallelRunCode: DeleteFolders: " + err.Error())
 	}
-
-	grpclog.Info("parallelRunCode complete")
+	grpclog.Info("parallelRunCode: DeleteFolders complete")
+	fmt.Println("parallelRunCode: DeleteFolders complete")
 }
 
 // processErrDuringValidate processes error received during Validate step
@@ -226,17 +251,20 @@ func processErrDuringValidate(err error, pipelineId uuid.UUID) {
 // processErrDuringCompile processes error received during Compile step
 func processErrDuringCompile(err error, pipelineId uuid.UUID) {
 	grpclog.Error("parallelRunCode: Compile: " + err.Error())
+	fmt.Println("parallelRunCode: Compile: " + err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
 		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		fmt.Println("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 
 	// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
 	err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
 	if err != nil {
 		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		fmt.Println("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
