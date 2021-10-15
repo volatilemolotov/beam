@@ -35,8 +35,11 @@ func ExampleOfExecutorUsage() {
 	os.Setenv("CONFIG_FOLDER", "playground/backend/internal/environment/configs/")
 	env := environment.NewEnvironment()
 
-	e := BaseExecutorBuilder(env.BeamSdkEnvs, cycle.Folder.BaseFolder, file, validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath()))
-	exec := e.Build() //or add smth to base builder
+	exec := NewExecutorBuilder().
+		WithCompiler().withCommand(env.BeamSdkEnvs.CmdConfig.CompileCmd).withArgs(env.BeamSdkEnvs.CmdConfig.CompileArgs).withFileName(file).withWorkingDir("").
+		WithRunner().withCommand(env.BeamSdkEnvs.CmdConfig.RunCmd).withArgs(env.BeamSdkEnvs.CmdConfig.RunArgs).withClassName("HelloWorld").withWorkingDir("").
+		WithValidator().withSdkValidators(validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath())).
+		Build()
 
 	applyValidators := exec.Validate()
 	go func() {

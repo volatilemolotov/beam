@@ -1,7 +1,6 @@
 package executors
 
 import (
-	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/validators"
 )
 
@@ -32,18 +31,18 @@ func NewExecutorBuilder() *ExecutorBuilder {
 	return &ExecutorBuilder{}
 }
 
-// Compiler - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
-func (b *ExecutorBuilder) Compiler() *CompileBuilder {
+// WithCompiler - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
+func (b *ExecutorBuilder) WithCompiler() *CompileBuilder {
 	return &CompileBuilder{*b}
 }
 
-// Runner - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
-func (b *ExecutorBuilder) Runner() *RunBuilder {
+// WithRunner - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
+func (b *ExecutorBuilder) WithRunner() *RunBuilder {
 	return &RunBuilder{*b}
 }
 
-// Validator - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
-func (b *ExecutorBuilder) Validator() *ValidatorBuilder {
+// WithValidator - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
+func (b *ExecutorBuilder) WithValidator() *ValidatorBuilder {
 	return &ValidatorBuilder{*b}
 }
 
@@ -134,32 +133,4 @@ func (b *ExecutorBuilder) Build() Executor {
 		a(&executor)
 	}
 	return executor
-}
-
-//Return the executor builder
-func (b *ExecutorBuilder) Return() *ExecutorBuilder {
-	return b
-}
-
-// BaseExecutorBuilder fills up an executor with base parameters
-func BaseExecutorBuilder(envs environment.BeamEnvs, workingDir string, filePath string, validatorsFuncs *[]validators.Validator) *ExecutorBuilder {
-	if validatorsFuncs == nil {
-		v := make([]validators.Validator, 0)
-		validatorsFuncs = &v
-	}
-	builder := NewExecutorBuilder().
-		Compiler().
-		withCommand(envs.CmdConfig.CompileCmd).
-		withArgs(envs.CmdConfig.CompileArgs).
-		withFileName(filePath).
-		withWorkingDir(workingDir).
-		Runner().
-		withCommand(envs.CmdConfig.RunCmd).
-		withArgs(envs.CmdConfig.RunArgs).
-		withClassName("HelloWorld").
-		withWorkingDir(workingDir).
-		Validator().
-		withSdkValidators(validatorsFuncs).
-		Return()
-	return builder
 }

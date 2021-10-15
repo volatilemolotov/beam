@@ -26,7 +26,7 @@ const (
 //func TestMain(m *testing.M) {
 //	lc = setup()
 //	defer teardown(lc)
-//	m.Runner()
+//	m.WithRunner()
 //}
 //
 //func setup() *fs_tool.LifeCycle {
@@ -58,7 +58,7 @@ const (
 //		envs            environment.BeamEnvs
 //		workingDir      string
 //		filePath        string
-//		validatorsFuncs *[]validators.Validator
+//		validatorsFuncs *[]validators.WithValidator
 //	}
 //	tests := []struct {
 //		name string
@@ -84,13 +84,35 @@ const (
 //		},
 //	}
 //	for _, tt := range tests {
-//		t.Runner(tt.name, func(t *testing.T) {
+//		t.WithRunner(tt.name, func(t *testing.T) {
 //			if got := NewCmdProvider(tt.args.envs, tt.args.workingDir, filePath, tt.args.validatorsFuncs); !reflect.DeepEqual(got, tt.want) {
 //				t.Errorf("NewCmdProvider() = %v, want %v", got, tt.want)
 //			}
 //		})
 //	}
 //}
+
+// BaseExecutorBuilder fills up an executor with base parameters
+func BaseExecutorBuilder(envs environment.BeamEnvs, workingDir string, filePath string, validatorsFuncs *[]validators.Validator) *ExecutorBuilder {
+	if validatorsFuncs == nil {
+		v := make([]validators.Validator, 0)
+		validatorsFuncs = &v
+	}
+	builder := NewExecutorBuilder().
+		WithCompiler().
+		withCommand(envs.CmdConfig.CompileCmd).
+		withArgs(envs.CmdConfig.CompileArgs).
+		withFileName(filePath).
+		withWorkingDir(workingDir).
+		WithRunner().
+		withCommand(envs.CmdConfig.RunCmd).
+		withArgs(envs.CmdConfig.RunArgs).
+		withClassName("HelloWorld").
+		withWorkingDir(workingDir).
+		WithValidator().
+		withSdkValidators(validatorsFuncs).ExecutorBuilder
+	return &builder
+}
 
 func TestExecutor_Compile(t *testing.T) {
 	type fields struct {
@@ -136,7 +158,7 @@ func TestExecutor_Compile(t *testing.T) {
 				validators:  tt.fields.validators,
 			}
 			if got := ex.Compile(); !reflect.DeepEqual(got.String(), tt.want.String()) {
-				t.Errorf("Compiler() = %v, want %v", got, tt.want)
+				t.Errorf("WithCompiler() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -188,7 +210,7 @@ func TestExecutor_Run(t *testing.T) {
 				validators:  tt.fields.validators,
 			}
 			if got := ex.Run(); !reflect.DeepEqual(got.String(), tt.want.String()) {
-				t.Errorf("Runner() = %v, want %v", got, tt.want)
+				t.Errorf("WithRunner() = %v, want %v", got, tt.want)
 			}
 		})
 	}
