@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 	"log"
 	"net"
+	"os"
 	"testing"
 )
 
@@ -56,22 +57,65 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 }
 
 func TestPlaygroundController_RunCode(t *testing.T) {
-	ctx := context.Background()
-	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
-	if err != nil {
-		t.Fatalf("Failed to dial bufnet: %v", err)
+	type args struct {
+		ctx     context.Context
+		request *pb.RunCodeRequest
 	}
-	defer conn.Close()
-	client := pb.NewPlaygroundServiceClient(conn)
-	code := pb.RunCodeRequest{
-		Code: "class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World!\");\n    }\n}",
-		Sdk:  pb.Sdk_SDK_JAVA,
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "RunCode with incorrect sdk",
+			args: args{
+				ctx: context.Background(),
+				request: &pb.RunCodeRequest{
+					Code: "MOCK_CODE",
+					Sdk:  pb.Sdk_SDK_UNSPECIFIED,
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "RunCode with correct sdk",
+			args: args{
+				ctx: context.Background(),
+				request: &pb.RunCodeRequest{
+					Code: "MOCK_CODE",
+					Sdk:  pb.Sdk_SDK_JAVA,
+				},
+			},
+			wantErr: false,
+		},
 	}
-	pipelineMeta, err := client.RunCode(ctx, &code)
-	if err != nil {
-		t.Fatalf("runCode failed: %v", err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			conn, err := grpc.DialContext(tt.args.ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
+			if err != nil {
+				t.Fatalf("Failed to dial bufnet: %v", err)
+			}
+			defer conn.Close()
+			client := pb.NewPlaygroundServiceClient(conn)
+			response, err := client.RunCode(tt.args.ctx, tt.args.request)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PlaygroundController_RunCode() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err == nil {
+				if response == nil {
+					t.Errorf("PlaygroundController_RunCode() response shoudn't be nil")
+				} else {
+					if response.PipelineUuid == "" {
+						t.Errorf("PlaygroundController_RunCode() response.pipeLineId shoudn't be nil")
+					} else {
+						path := "internal/executable_files_" + response.PipelineUuid
+						//absPath, _ := filepath.Abs(path)
+						os.RemoveAll(path)
+					}
+				}
+			}
+		})
 	}
-	log.Printf("Response: %+v", pipelineMeta)
 }
 
 func TestPlaygroundController_CheckStatus(t *testing.T) {

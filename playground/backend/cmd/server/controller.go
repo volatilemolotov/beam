@@ -22,7 +22,6 @@ import (
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/grpclog"
 	"os"
@@ -129,7 +128,6 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 
 	// validate
 	grpclog.Info("parallelRunCode: Validate ...")
-	fmt.Println("parallelRunCode: Validate ...")
 	//for {
 	select {
 	case <-ctxWithTimeout.Done():
@@ -145,11 +143,9 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 	}
 	//}
 	grpclog.Info("parallelRunCode: Validate finish")
-	fmt.Println("parallelRunCode: Validate finish")
 
 	// compile
 	grpclog.Info("parallelRunCode: Compile ...")
-	fmt.Println("parallelRunCode: Compile ...")
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
@@ -163,7 +159,6 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 		}
 	}
 	grpclog.Info("parallelRunCode: Compile finish")
-	fmt.Println("parallelRunCode: Compile finish")
 
 	// set empty value to pipelineId: cache.SubKey_CompileOutput
 	err := cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
@@ -174,7 +169,6 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 
 	// get executable file name
 	grpclog.Info("parallelRunCode: get executable file name ...")
-	fmt.Println("parallelRunCode: get executable file name ...")
 	fileName, err := lc.GetExecutableName()
 	if err != nil {
 		// error during get executable file name
@@ -182,12 +176,10 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 		return
 	}
 	grpclog.Infof("parallelRunCode: executable file name: %s", fileName)
-	fmt.Printf("parallelRunCode: executable file name: %s\n", fileName)
 
 	// run
 	output := ""
 	grpclog.Info("parallelRunCode: Run ...")
-	fmt.Println("parallelRunCode: Run ...")
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
@@ -203,11 +195,7 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 		}
 	}
 	grpclog.Info("parallelRunCode: Run finish")
-	fmt.Println("parallelRunCode: Run finish")
 	processSuccessRun(pipelineId, output)
-	fmt.Println(cacheService.GetValue(pipelineId, cache.SubKey_Status))
-	fmt.Println(cacheService.GetValue(pipelineId, cache.SubKey_CompileOutput))
-	fmt.Println(cacheService.GetValue(pipelineId, cache.Subkey_RunOutput))
 }
 
 // finishByContext is used in case of runCode method finished by timeout
@@ -224,17 +212,13 @@ func finishByContext(pipelineId uuid.UUID) {
 // cleanUp removes all prepared folders for received LifeCycle
 func cleanUp(lc *fs_tool.LifeCycle) {
 	grpclog.Info("parallelRunCode complete")
-	fmt.Println("parallelRunCode complete")
 
 	grpclog.Info("parallelRunCode: DeleteFolders ...")
-	fmt.Println("parallelRunCode: DeleteFolders ...")
 	err := lc.DeleteFolders()
 	if err != nil {
 		grpclog.Error("parallelRunCode: DeleteFolders: " + err.Error())
-		fmt.Println("parallelRunCode: DeleteFolders: " + err.Error())
 	}
 	grpclog.Info("parallelRunCode: DeleteFolders complete")
-	fmt.Println("parallelRunCode: DeleteFolders complete")
 }
 
 // processErrDuringValidate processes error received during Validate step
@@ -251,20 +235,17 @@ func processErrDuringValidate(err error, pipelineId uuid.UUID) {
 // processErrDuringCompile processes error received during Compile step
 func processErrDuringCompile(err error, pipelineId uuid.UUID) {
 	grpclog.Error("parallelRunCode: Compile: " + err.Error())
-	fmt.Println("parallelRunCode: Compile: " + err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
 		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
-		fmt.Println("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 
 	// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
 	err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
 	if err != nil {
 		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
-		fmt.Println("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
