@@ -35,6 +35,10 @@ var cacheService = cache.NewCache(os.Getenv("cache"))
 
 //RunCode is running code from requests using a particular SDK
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
+	defer func() {
+		grpclog.Info("RunCode complete")
+	}()
+
 	pipelineId := uuid.New()
 	expTime, err := time.ParseDuration(os.Getenv("expiration"))
 	if err != nil {
@@ -80,7 +84,7 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		return nil, errors.InternalError("Run code", "Error during set expiration to cache: "+err.Error())
 	}
 
-	go runCode(lc, exec, pipelineId)
+	go parallelRunCode(ctx, lc, exec, pipelineId)
 
 	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipelineId.String()}
 	return &pipelineInfo, nil
@@ -108,120 +112,172 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 	return &compileOutput, nil
 }
 
-// runCode validates, compiles and runs code by pipelineId.
+// parallelRunCode validates, compiles and runs code by pipelineId.
 // During each operation updates status of execution and saves it into cache.
 // In case of compilation failed saves logs to cache.
 // After success code running saves output to cache.
-func runCode(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID) {
-	// validate
-	grpclog.Info("runCode: Validate ...")
-	err := exec.Validate()
-	if err != nil {
-		// error during validation
-		grpclog.Error("runCode: Validate: " + err.Error())
-
-		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+func parallelRunCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID) {
+	ctxWithTimeout, cancelByTimeoutFunc := context.WithTimeout(ctx, timeout)
+	defer func(lc *fs_tool.LifeCycle) {
+		grpclog.Info("parallelRunCode: DeleteFolders ...")
+		err := lc.DeleteFolders()
 		if err != nil {
-			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			grpclog.Error("parallelRunCode: DeleteFolders: " + err.Error())
+		}
+
+		// set to cache pipelineId: cache.SubKey_Status: Status_STATUS_EXPIRED
+		err := cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXPIRED)
+		if err != nil {
+			grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
 			return
 		}
+
+		grpclog.Info("parallelRunCode complete")
+
+		cancelByTimeoutFunc()
+	}(lc)
+
+	// set to cache pipelineId: cache.SubKey_Canceled: false
+	err := cacheService.SetValue(pipelineId, cache.SubKey_Canceled, false)
+	if err != nil {
+		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		return
 	}
-	grpclog.Info("runCode: Validate finish")
 
-	grpclog.Info("runCode: Compile ...")
-	err = exec.Compile()
-	if err != nil {
-		// error during compilation
-		grpclog.Error("runCode: Compile: " + err.Error())
-
-		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	finish := make(chan bool)
+	cancel := make(chan bool)
+	go func(lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID, finish chan bool) {
+		// validate
+		grpclog.Info("parallelRunCode: Validate ...")
+		err := exec.Validate()
 		if err != nil {
-			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			// error during validation
+			grpclog.Error("parallelRunCode: Validate: " + err.Error())
+
+			// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+			if err != nil {
+				grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+				return
+			}
 			return
 		}
+		grpclog.Info("parallelRunCode: Validate finish")
 
-		// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
-		err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
+		grpclog.Info("parallelRunCode: Compile ...")
+		err = exec.Compile()
 		if err != nil {
-			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			// error during compilation
+			grpclog.Error("parallelRunCode: Compile: " + err.Error())
+
+			// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+			if err != nil {
+				grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+				return
+			}
+
+			// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
+			err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
+			if err != nil {
+				grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+				return
+			}
 			return
 		}
-	} else {
 		// compilation success
-		grpclog.Info("runCode: Compile finish")
+		grpclog.Info("parallelRunCode: Compile finish")
 
 		// set to cache pipelineId: cache.SubKey_CompileOutput: ""
 		err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
 		if err != nil {
-			grpclog.Error("runCode: cache.SetValue: " + err.Error())
+			grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
 			return
 		}
 
-		grpclog.Info("runCode: get executable file name ...")
+		grpclog.Info("parallelRunCode: get executable file name ...")
 		fileName, err := lc.GetExecutableName()
 		if err != nil {
-			grpclog.Error("runCode: get executable file name: " + err.Error())
+			grpclog.Error("parallelRunCode: get executable file name: " + err.Error())
 			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 			if err != nil {
-				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
 				return
 			}
 		}
-		grpclog.Infof("runCode: executable file name: %s", fileName)
+		grpclog.Infof("parallelRunCode: executable file name: %s", fileName)
 
-		grpclog.Info("runCode: Run ...")
+		grpclog.Info("parallelRunCode: Run ...")
 		output, err := exec.Run(fileName)
 		if err != nil {
 			// error during run code
-			grpclog.Error("RunCode: Run: " + err.Error())
+			grpclog.Error("parallelRunCode: Run: " + err.Error())
 
 			// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
 			err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, err.Error())
 			if err != nil {
-				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
 				return
 			}
 
 			// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 			if err != nil {
-				grpclog.Error("runCode: cache.SetValue: " + err.Error())
+				grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
 				return
 			}
-		} else {
-			// run code success
-			grpclog.Info("runCode: Run finish")
-
-			// set to cache pipelineId: cache.SubKey_RunOutput: output
-			err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, output)
-			if err != nil {
-				grpclog.Error("runCode: cache.SetValue: " + err.Error())
-				return
-			}
-
-			// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
-			err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
-			if err != nil {
-				grpclog.Error("runCode: cache.SetValue: " + err.Error())
-				return
-			}
+			return
 		}
+		// run code success
+		grpclog.Info("parallelRunCode: Run finish")
+
+		// set to cache pipelineId: cache.SubKey_RunOutput: output
+		err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, output)
+		if err != nil {
+			grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+			return
+		}
+
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
+		err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
+		if err != nil {
+			grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+			return
+		}
+
+		// if channel was closed then no need to set any value
+		if _, ok := <-finish; !ok {
+			return
+		}
+		finish <- true
+	}(lc, exec, pipelineId, finish)
+	go func(cancel chan bool) {
+		for {
+			canceled, err := cacheService.GetValue(pipelineId, cache.SubKey_Canceled)
+			if err != nil {
+				grpclog.Error("parallelRunCode: cache.GetValue: " + err.Error())
+				return
+			}
+			// if channel was closed then need to stop goroutine
+			if _, ok := <-cancel; !ok {
+				return
+			}
+			if canceled.(bool) {
+				cancel <- true
+				return
+			}
+			time.Sleep(time.Second)
+		}
+	}(cancel)
+
+	select {
+	case <-ctxWithTimeout.Done():
+		grpclog.Info("parallelRunCode finish because of ctxWithTimeout.Done")
+	case <-cancel:
+		grpclog.Info("parallelRunCode finish because of Cancel operation")
+	case <-finish:
+		grpclog.Info("parallelRunCode finish")
 	}
-	grpclog.Info("runCode: DeleteCompiledFile ...")
-	err = lc.DeleteCompiledFile()
-	if err != nil {
-		grpclog.Error("RunCode: DeleteCompiledFile: " + err.Error())
-	}
-	grpclog.Info("runCode: DeleteExecutableFile ...")
-	err = lc.DeleteExecutableFile()
-	if err != nil {
-		grpclog.Error("RunCode: DeleteExecutableFile: " + err.Error())
-	}
-	grpclog.Info("runCode: DeleteFolders ...")
-	err = lc.DeleteFolders()
-	if err != nil {
-		grpclog.Error("RunCode: DeleteFolders: " + err.Error())
-	}
+	close(finish)
+	close(cancel)
 }
