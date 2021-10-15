@@ -21,19 +21,24 @@ import (
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/validators"
 	"github.com/google/uuid"
+	"os"
 )
 
 func ExampleOfExecutorUsage() {
 	cycle, err := fs_tool.NewLifeCycle(pb.Sdk_SDK_JAVA, uuid.New())
 	cycle.CreateFolders()
-	cycle.CreateExecutableFile("exampleOfExecutorUsage")
+	file, _ := cycle.CreateExecutableFile("exampleOfExecutorUsage")
 	if err != nil {
 		return
 	}
-	env := environment.NewEnvironment()
-	exec := NewCmdProvider(env.BeamSdkEnvs, cycle.Folder.BaseFolder, "", validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath()))
 
-	applyValidators := exec.Validators()
+	os.Setenv("CONFIG_FOLDER", "playground/backend/internal/environment/configs/")
+	env := environment.NewEnvironment()
+
+	e := BaseExecutorBuilder(env.BeamSdkEnvs, cycle.Folder.BaseFolder, file, validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath()))
+	exec := e.Build() //or add smth to base builder
+
+	applyValidators := exec.Validate()
 	go func() {
 		err := applyValidators()
 		if err != nil {
@@ -49,7 +54,7 @@ func ExampleOfExecutorUsage() {
 		}
 	}()
 
-	runCmd := exec.Run("HelloWorld")
+	runCmd := exec.Run()
 
 	go func() {
 		_, err := runCmd.Output()
