@@ -48,19 +48,18 @@ type Executor struct {
 
 // Validate checks that the file exists and that extension of the file matches the SDK.
 // Return result of validation (true/false) and error if it occurs
-func (ex *Executor) Validate() error {
+func (ex *Executor) Validate(channel chan interface{}) {
 	for _, validator := range ex.validators {
 		err := validator.validator(ex.absoulteFilePath, validator.args...)
 		if err != nil {
-			return err
+			channel <- err
 		}
 	}
-	return nil
 }
 
 // Compile compiles the code and creates executable file.
 // Return error if it occurs
-func (ex *Executor) Compile() error {
+func (ex *Executor) Compile(channel chan interface{}) {
 	args := append(ex.compileArgs, ex.relativeFilePath)
 	cmd := exec.Command(ex.compileName, args...)
 	cmd.Dir = ex.dirPath
@@ -68,19 +67,18 @@ func (ex *Executor) Compile() error {
 	fmt.Println(s)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return &CompileError{string(out)}
+		channel <- &CompileError{string(out)}
 	}
-	return nil
 }
 
 // Run runs the executable file.
 // Return logs and error if it occurs
-func (ex *Executor) Run(name string) *RunResult {
+func (ex *Executor) Run(channel chan interface{}, name string) {
 	args := append(ex.runArgs, name)
 	cmd := exec.Command(ex.runName, args...)
 	cmd.Dir = ex.dirPath
 	out, err := cmd.Output()
-	return &RunResult{err, string(out)}
+	channel <- &RunResult{err, string(out)}
 }
 
 // NewExecutor executes the compilation, running and validation of code

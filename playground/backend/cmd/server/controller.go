@@ -24,6 +24,7 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/grpclog"
+	"log"
 	"os"
 	"time"
 )
@@ -37,7 +38,7 @@ var cacheService = cache.NewCache(os.Getenv("cache"))
 //RunCode is running code from requests using a particular SDK
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
 	defer func() {
-		grpclog.Info("RunCode complete")
+		log.Println("RunCode complete")
 	}()
 
 	pipelineId := uuid.New()
@@ -121,44 +122,42 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 
 	ctxWithTimeout, cancelByTimeoutFunc := context.WithTimeout(ctx, timeout)
 	defer func(lc *fs_tool.LifeCycle) {
-		cleanUp(lc)
 		cancelByTimeoutFunc()
 		close(channel)
+		cleanUp(lc)
 	}(lc)
 
 	// validate
-	grpclog.Info("parallelRunCode: Validate ...")
-	//for {
+	log.Println("parallelRunCode: Validate ...")
+	go exec.Validate(channel)
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
 		return
-	case channel <- exec.Validate():
-		err := <-channel
+	case err := <-channel:
 		if err != nil {
 			// error during validation
 			processErrDuringValidate(err.(error), pipelineId)
 			return
 		}
 	}
-	//}
-	grpclog.Info("parallelRunCode: Validate finish")
+	log.Println("parallelRunCode: Validate finish")
 
 	// compile
-	grpclog.Info("parallelRunCode: Compile ...")
+	log.Println("parallelRunCode: Compile ...")
+	go exec.Compile(channel)
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
 		return
-	case channel <- exec.Compile():
-		err := <-channel
+	case err := <-channel:
 		if err != nil {
 			// error during compilation
 			processErrDuringCompile(err.(error), pipelineId)
 			return
 		}
 	}
-	grpclog.Info("parallelRunCode: Compile finish")
+	log.Println("parallelRunCode: Compile finish")
 
 	// set empty value to pipelineId: cache.SubKey_CompileOutput
 	err := cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
@@ -168,24 +167,24 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 	}
 
 	// get executable file name
-	grpclog.Info("parallelRunCode: get executable file name ...")
+	log.Println("parallelRunCode: get executable file name ...")
 	fileName, err := lc.GetExecutableName()
 	if err != nil {
 		// error during get executable file name
 		processErrDuringGetExecutableName(err, pipelineId)
 		return
 	}
-	grpclog.Infof("parallelRunCode: executable file name: %s", fileName)
+	log.Printf("parallelRunCode: executable file name: %s\n", fileName)
 
 	// run
 	output := ""
-	grpclog.Info("parallelRunCode: Run ...")
+	log.Println("parallelRunCode: Run ...")
+	go exec.Run(channel, fileName)
 	select {
 	case <-ctxWithTimeout.Done():
 		finishByContext(pipelineId)
 		return
-	case channel <- exec.Run(fileName):
-		runResult := <-channel
+	case runResult := <-channel:
 		err := runResult.(*executors.RunResult).Err
 		output = runResult.(*executors.RunResult).Output
 		if err != nil {
@@ -194,13 +193,13 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 			return
 		}
 	}
-	grpclog.Info("parallelRunCode: Run finish")
+	log.Println("parallelRunCode: Run finish")
 	processSuccessRun(pipelineId, output)
 }
 
 // finishByContext is used in case of runCode method finished by timeout
 func finishByContext(pipelineId uuid.UUID) {
-	grpclog.Info("parallelRunCode finish because of ctxWithTimeout.Done")
+	log.Println("parallelRunCode finish because of ctxWithTimeout.Done")
 
 	// set to cache pipelineId: cache.SubKey_Status: Status_STATUS_TIMEOUT
 	err := cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
@@ -211,14 +210,14 @@ func finishByContext(pipelineId uuid.UUID) {
 
 // cleanUp removes all prepared folders for received LifeCycle
 func cleanUp(lc *fs_tool.LifeCycle) {
-	grpclog.Info("parallelRunCode complete")
+	log.Println("parallelRunCode complete")
 
-	grpclog.Info("parallelRunCode: DeleteFolders ...")
+	log.Println("parallelRunCode: DeleteFolders ...")
 	err := lc.DeleteFolders()
 	if err != nil {
 		grpclog.Error("parallelRunCode: DeleteFolders: " + err.Error())
 	}
-	grpclog.Info("parallelRunCode: DeleteFolders complete")
+	log.Println("parallelRunCode: DeleteFolders complete")
 }
 
 // processErrDuringValidate processes error received during Validate step
