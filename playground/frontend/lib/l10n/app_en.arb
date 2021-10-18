@@ -1,0 +1,70 @@
+{
+  "lightMode": "Light Mode",
+  "@lightMode": {
+    "description": "Title for theme switch"
+  },
+  "darkMode": "Dark Mode",
+  "@darkMode": {
+    "description": "Title for theme switch"
+  },
+  "newExample": "New Example",
+  "@newExample": {
+    "description": "Title for new example button"
+  },
+  "reset": "Reset",
+  "@reset": {
+    "description": "Title for reset button"
+  },
+  "run": "Run",
+  "@run": {
+    "description": "Title for run button"
+  },
+  "log": "Log",
+  "@log": {
+    "description": "Title for log section"
+  },
+  "graph": "Graph",
+  "@graph": {
+    "description": "Title for graph section"
+  },
+  "output": "Output",
+  "@output": {
+    "description": "Title for output section"
+  },
+  "shortcuts": "Shortcuts",
+  "@shortcuts": {
+    "description": "Title for shortcuts menu item"
+  },
+  "beamPlaygroundOnGithub": "Beam Playground on Github",
+  "@beamPlaygroundOnGithub": {
+    "description": "Title for Beam Playground on Github menu item"
+  },
+  "apacheBeamOnGithub": "Apache Beam on Github",
+  "@apacheBeamOnGithub": {
+    "description": "Title for Apache Beam on Github menu item"
+  },
+  "scioOnGithub": "SCIO on Github",
+  "@scioOnGithub": {
+    "description": "Title for SCIO on Github menu item"
+  },
+  "toApacheBeamWebsite": "To Apache Beam Website",
+  "@toApacheBeamWebsite": {
+    "description": "Title for To Apache Beam Website menu item"
+  },
+  "aboutApacheBeam": "About Apache Beam",
+  "@aboutApacheBeam": {
+    "description": "Title for About Apache Beam menu item"
+  },
+  "sendFeedback": "Send feedback",
+  "@sendFeedback": {
+    "description": "Title of the send feedback button"
+  },
+  "privacyPolicy": "Privacy Policy",
+  "@privacyPolicy": {
+    "description": "Title for privacy policy button"
+  },
+  "copyright": "© The Apache Software Foundation",
+  "@copyright": {
+    "description": "Copyright text for the footer"
+  }
+}

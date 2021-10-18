@@ -17,14 +17,11 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/pages/playground/components/playground_feedback.dart';
-
-const kPrivacyPolicyText = 'Privacy Policy';
-const kReportIssueText = 'Report issue in Jira';
-const kCopyright = '© The Apache Software Foundation';
 
 class PlaygroundPageFooter extends StatelessWidget {
   const PlaygroundPageFooter({Key? key}) : super(key: key);
@@ -57,10 +54,11 @@ class PlaygroundPageFooter extends StatelessWidget {
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
               ),
               // ignore: avoid_print
-              onPressed: () => print(kPrivacyPolicyText),
-              child: const Text(kPrivacyPolicyText),
+              onPressed: () =>
+                  print(AppLocalizations.of(context)!.privacyPolicy),
+              child: Text(AppLocalizations.of(context)!.privacyPolicy),
             ),
-            const Text(kCopyright),
+            Text(AppLocalizations.of(context)!.copyright),
           ],
         ),
       ),
