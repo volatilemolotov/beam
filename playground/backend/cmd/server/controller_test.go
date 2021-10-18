@@ -16,14 +16,21 @@ package main
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api"
+	"beam.apache.org/playground/backend/internal/cache"
+	"beam.apache.org/playground/backend/internal/environment"
+	"beam.apache.org/playground/backend/internal/executors"
+	"beam.apache.org/playground/backend/internal/fs_tool"
 	"context"
+	"fmt"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
 	"log"
 	"net"
 	"os"
+	"reflect"
 	"testing"
+	"time"
 )
 
 const bufSize = 1024 * 1024
@@ -39,7 +46,10 @@ func TestMain(m *testing.M) {
 func setup() *grpc.Server {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
-	pb.RegisterPlaygroundServiceServer(s, &playgroundController{})
+	pb.RegisterPlaygroundServiceServer(s, &playgroundController{
+		env:          environment.NewEnvironment(),
+		cacheService: cache.NewCache(""),
+	})
 	go func() {
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("Server exited with error: %v", err)
@@ -109,7 +119,6 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 						t.Errorf("PlaygroundController_RunCode() response.pipeLineId shoudn't be nil")
 					} else {
 						path := "internal/executable_files_" + response.PipelineUuid
-						//absPath, _ := filepath.Abs(path)
 						os.RemoveAll(path)
 					}
 				}
@@ -170,4 +179,122 @@ func TestPlaygroundController_GetRunOutput(t *testing.T) {
 		t.Fatalf("runCode failed: %v", err)
 	}
 	log.Printf("Response: %+v", runOutput)
+}
+
+func Test_processCode(t *testing.T) {
+	type args struct {
+		ctx     context.Context
+		timeout time.Duration
+	}
+	tests := []struct {
+		name              string
+		createExecFile    bool
+		code              string
+		expectedStatus    pb.Status
+		expectedRunOutput interface {
+		}
+		expectedCompileOutput interface {
+		}
+		args args
+	}{
+		{
+			name:                  "small pipeline execution timeout",
+			createExecFile:        false,
+			code:                  "",
+			expectedStatus:        pb.Status_STATUS_ERROR,
+			expectedCompileOutput: nil,
+			expectedRunOutput:     nil,
+			args: args{
+				ctx:     context.Background(),
+				timeout: 0,
+			},
+		},
+		{
+			name:                  "validation failed",
+			createExecFile:        false,
+			code:                  "",
+			expectedStatus:        pb.Status_STATUS_ERROR,
+			expectedCompileOutput: nil,
+			expectedRunOutput:     nil,
+			args: args{
+				ctx:     context.Background(),
+				timeout: time.Second * 100,
+			},
+		},
+		{
+			name:                  "compilation failed",
+			createExecFile:        true,
+			code:                  "MOCK_CODE",
+			expectedStatus:        pb.Status_STATUS_ERROR,
+			expectedCompileOutput: "Compilation error: src/%s.java:1: error: reached end of file while parsing\nMOCK_CODE\n^\n1 error\n",
+			expectedRunOutput:     nil,
+			args: args{
+				ctx:     context.Background(),
+				timeout: time.Second * 100,
+			},
+		},
+		{
+			name:                  "run failed",
+			createExecFile:        true,
+			code:                  "class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(1/0);\n    }\n}",
+			expectedStatus:        pb.Status_STATUS_ERROR,
+			expectedCompileOutput: "",
+			expectedRunOutput:     "exit status 1",
+			args: args{
+				ctx:     context.Background(),
+				timeout: time.Second * 100,
+			},
+		},
+		{
+			name:                  "all success",
+			createExecFile:        true,
+			code:                  "class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello world!\");\n    }\n}",
+			expectedStatus:        pb.Status_STATUS_FINISHED,
+			expectedCompileOutput: "",
+			expectedRunOutput:     "Hello world!\n",
+			args: args{
+				ctx:     context.Background(),
+				timeout: time.Second * 100,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pipelineId := uuid.New()
+			lc, _ := fs_tool.NewLifeCycle(pb.Sdk_SDK_JAVA, pipelineId)
+			err := lc.CreateFolders()
+			if err != nil {
+				t.Fatalf("error during prepare folders: %s", err.Error())
+			}
+			exec, _ := executors.NewExecutor(pb.Sdk_SDK_JAVA, lc)
+
+			if tt.createExecFile {
+				_, _ = lc.CreateExecutableFile(tt.code)
+			}
+
+			cacheService := cache.NewCache("")
+			processCode(tt.args.ctx, cacheService, lc, exec, pipelineId, tt.args.timeout)
+
+			status, _ := cacheService.GetValue(pipelineId, cache.SubKey_Status)
+			if !reflect.DeepEqual(status, tt.expectedStatus) {
+				t.Errorf("processCode() set status: %s, but expectes: %s", status, tt.expectedStatus)
+			}
+
+			compileOutput, _ := cacheService.GetValue(pipelineId, cache.SubKey_CompileOutput)
+			if compileOutput == nil || compileOutput.(string) == "" {
+				if !reflect.DeepEqual(compileOutput, tt.expectedCompileOutput) {
+					t.Errorf("processCode() set compileOutput: %s, but expectes: %s", compileOutput, tt.expectedCompileOutput)
+				}
+			} else {
+				if !reflect.DeepEqual(compileOutput, fmt.Sprintf(tt.expectedCompileOutput.(string), pipelineId)) {
+					t.Errorf("processCode() set compileOutput: %s, but expectes: %s", compileOutput, tt.expectedCompileOutput)
+				}
+			}
+
+			runOutput, _ := cacheService.GetValue(pipelineId, cache.Subkey_RunOutput)
+			if !reflect.DeepEqual(runOutput, tt.expectedRunOutput) {
+				t.Errorf("processCode() set runOutput: %s, but expectes: %s", runOutput, tt.expectedRunOutput)
+			}
+		})
+	}
 }

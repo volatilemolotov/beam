@@ -24,67 +24,64 @@ import (
 	"context"
 	"github.com/google/uuid"
 	"log"
-	"os"
 	"time"
 )
 
 type playgroundController struct {
+	env          *environment.Environment
+	cacheService cache.Cache
+
 	pb.UnimplementedPlaygroundServiceServer
 }
 
-var cacheService = cache.NewCache(os.Getenv("cache"))
-
 //RunCode is running code from requests using a particular SDK
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
+	pipelineId := uuid.New()
+
 	defer func() {
-		log.Println("RunCode complete")
+		log.Printf("RunCode() is completed for pipeline with id: %s\n", pipelineId)
 	}()
 
-	pipelineId := uuid.New()
-	env := environment.NewEnvironment()
-	expTime := env.ServerEnvs.GetCacheExpiration()
-	timeout := env.ServerEnvs.GetRunCodeTimeout()
+	expTime := controller.env.GetCacheExpirationTime()
+	timeout := controller.env.ServerEnvs.GetPipelineExecuteTimeout()
 
 	// create file system service
 	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipelineId)
 	if err != nil {
-		log.Printf("RunCode: NewLifeCycle: " + err.Error())
+		log.Printf("%s: RunCode(): NewLifeCycle(): %s\n", pipelineId, err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file system service: "+err.Error())
 	}
 
 	// create folders
 	err = lc.CreateFolders()
 	if err != nil {
-		log.Printf("RunCode: CreateFolders: " + err.Error())
-		return nil, errors.InternalError("Run code", "Error during preparing folders: "+err.Error())
+		log.Printf("%s: RunCode(): CreateFolders(): %s\n", pipelineId, err.Error())
+		return nil, errors.InternalError("Run code()", "Error during preparing folders: "+err.Error())
 	}
 
 	// create file with code
 	_, err = lc.CreateExecutableFile(info.Code)
 	if err != nil {
-		log.Printf("RunCode: CreateExecutableFile: " + err.Error())
-		return nil, errors.InternalError("Run code", "Error during creating file with code: "+err.Error())
+		log.Printf("%s: RunCode(): CreateExecutableFile(): %s\n", pipelineId, err.Error())
+		return nil, errors.InternalError("Run code()", "Error during creating file with code: "+err.Error())
 	}
 
 	// create executor
 	exec, err := executors.NewExecutor(info.Sdk, lc)
 	if err != nil {
-		log.Printf("RunCode: NewExecutor: " + err.Error())
-		return nil, errors.InternalError("Run code", "Error during creating executor: "+err.Error())
+		log.Printf("%s: RunCode(): NewExecutor(): %s\n", pipelineId, err.Error())
+		return nil, errors.InternalError("Run code()", "Error during creating executor: "+err.Error())
 	}
 
-	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXECUTING)
+	setToCache(controller.cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXECUTING)
+
+	err = controller.cacheService.SetExpTime(pipelineId, expTime)
 	if err != nil {
-		log.Printf("RunCode: cache.SetValue: " + err.Error())
-		return nil, errors.InternalError("Run code", "Error during set value to cache: "+err.Error())
-	}
-	err = cacheService.SetExpTime(pipelineId, expTime)
-	if err != nil {
-		log.Printf("RunCode: cache.SetExpTime: " + err.Error())
-		return nil, errors.InternalError("Run code", "Error during set expiration to cache: "+err.Error())
+		log.Printf("%s: RunCode(): cache.SetExpTime(): %s\n", pipelineId, err.Error())
+		return nil, errors.InternalError("Run code()", "Error during set expiration to cache: "+err.Error())
 	}
 
-	go runCode(context.TODO(), lc, exec, pipelineId, timeout)
+	go processCode(context.TODO(), controller.cacheService, lc, exec, pipelineId, timeout)
 
 	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipelineId.String()}
 	return &pipelineInfo, nil
@@ -112,182 +109,156 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 	return &compileOutput, nil
 }
 
-// runCode validates, compiles and runs code by pipelineId.
+// processCode validates, compiles and runs code by pipelineId.
 // During each operation updates status of execution and saves it into cache.
-// In case of compilation failed saves logs to cache.
+// In case of some step is failed saves output logs to cache.
 // After success code running saves output to cache.
-func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID, timeout time.Duration) {
+// At the end of this method deletes all created folders
+func processCode(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycle, exec *executors.Executor, pipelineId uuid.UUID, timeout time.Duration) {
 	channel := make(chan interface{}, 1)
 
 	ctxWithTimeout, cancelByTimeoutFunc := context.WithTimeout(ctx, timeout)
 	defer func(lc *fs_tool.LifeCycle) {
 		cancelByTimeoutFunc()
-		close(channel)
-		cleanUp(lc)
+		cleanUp(pipelineId, lc)
 	}(lc)
 
 	// validate
-	log.Println("parallelRunCode: Validate ...")
+	log.Printf("%s: Validate() ...\n", pipelineId)
 	go exec.Validate(channel)
 	select {
 	case <-ctxWithTimeout.Done():
-		finishByContext(pipelineId)
+		finishByContext(pipelineId, cacheService)
 		return
 	case err := <-channel:
 		if err != nil {
 			// error during validation
-			processErrDuringValidate(err.(error), pipelineId)
+			processErrDuringValidate(err.(error), pipelineId, cacheService)
 			return
 		}
 	}
-	log.Println("parallelRunCode: Validate finish")
+	log.Printf("%s: Validate() finish\n", pipelineId)
 
 	// compile
-	log.Println("parallelRunCode: Compile ...")
+	log.Printf("%s: Compile() ...\n", pipelineId)
 	go exec.Compile(channel)
 	select {
 	case <-ctxWithTimeout.Done():
-		finishByContext(pipelineId)
+		finishByContext(pipelineId, cacheService)
 		return
 	case err := <-channel:
 		if err != nil {
 			// error during compilation
-			processErrDuringCompile(err.(error), pipelineId)
+			processErrDuringCompile(err.(error), pipelineId, cacheService)
 			return
 		}
 	}
-	log.Println("parallelRunCode: Compile finish")
+	log.Printf("%s: Compile() finish\n", pipelineId)
 
 	// set empty value to pipelineId: cache.SubKey_CompileOutput
-	err := cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-		return
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_CompileOutput, "")
 
 	// get executable file name
-	log.Println("parallelRunCode: get executable file name ...")
+	log.Printf("%s: get executable file name ...\n", pipelineId)
 	fileName, err := lc.GetExecutableName()
 	if err != nil {
 		// error during get executable file name
-		processErrDuringGetExecutableName(err, pipelineId)
+		processErrDuringGetExecutableName(err, pipelineId, cacheService)
 		return
 	}
-	log.Printf("parallelRunCode: executable file name: %s\n", fileName)
+	log.Printf("%s: executable file name: %s\n", pipelineId, fileName)
 
 	// run
 	output := ""
-	log.Println("parallelRunCode: Run ...")
+	log.Printf("%s: Run() ...\n", pipelineId)
 	go exec.Run(channel, fileName)
 	select {
 	case <-ctxWithTimeout.Done():
-		finishByContext(pipelineId)
+		finishByContext(pipelineId, cacheService)
 		return
 	case runResult := <-channel:
 		err := runResult.(*executors.RunResult).Err
 		output = runResult.(*executors.RunResult).Output
 		if err != nil {
 			// error during run code
-			processErrDuringRun(err, pipelineId)
+			processErrDuringRun(err, pipelineId, cacheService)
 			return
 		}
 	}
-	log.Println("parallelRunCode: Run finish")
-	processSuccessRun(pipelineId, output)
+	log.Printf("%s: Run() finish\n", pipelineId)
+	processSuccessRun(pipelineId, output, cacheService)
 }
 
 // finishByContext is used in case of runCode method finished by timeout
-func finishByContext(pipelineId uuid.UUID) {
-	log.Println("parallelRunCode finish because of ctxWithTimeout.Done")
+func finishByContext(pipelineId uuid.UUID, cacheService cache.Cache) {
+	log.Printf("%s: processCode finish because of ctxWithTimeout.Done\n", pipelineId)
 
 	// set to cache pipelineId: cache.SubKey_Status: Status_STATUS_TIMEOUT
-	err := cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // cleanUp removes all prepared folders for received LifeCycle
-func cleanUp(lc *fs_tool.LifeCycle) {
-	log.Println("parallelRunCode complete")
-
-	log.Println("parallelRunCode: DeleteFolders ...")
+func cleanUp(pipelineId uuid.UUID, lc *fs_tool.LifeCycle) {
+	log.Printf("%s: DeleteFolders() ...\n", pipelineId)
 	err := lc.DeleteFolders()
 	if err != nil {
-		log.Printf("parallelRunCode: DeleteFolders: " + err.Error())
+		log.Printf("%s: DeleteFolders(): %s\n", pipelineId, err.Error())
 	}
-	log.Println("parallelRunCode: DeleteFolders complete")
+	log.Printf("%s: DeleteFolders() complete\n", pipelineId)
+	log.Printf("%s: complete\n", pipelineId)
 }
 
 // processErrDuringValidate processes error received during Validate step
-func processErrDuringValidate(err error, pipelineId uuid.UUID) {
-	log.Printf("parallelRunCode: Validate: " + err.Error())
+func processErrDuringValidate(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+	log.Printf("%s: Validate: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processErrDuringCompile processes error received during Compile step
-func processErrDuringCompile(err error, pipelineId uuid.UUID) {
-	log.Printf("parallelRunCode: Compile: " + err.Error())
+func processErrDuringCompile(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+	log.Printf("%s: Compile: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 
 	// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
-	err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_CompileOutput, err.Error())
 }
 
 // processErrDuringGetExecutableName processes error received during getting executable file name
-func processErrDuringGetExecutableName(err error, pipelineId uuid.UUID) {
-	log.Printf("parallelRunCode: get executable file name: " + err.Error())
+func processErrDuringGetExecutableName(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+	log.Printf("%s: get executable file name: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processErrDuringRun processes error received during Run step
-func processErrDuringRun(err error, pipelineId uuid.UUID) {
-	log.Printf("parallelRunCode: Run: " + err.Error())
+func processErrDuringRun(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+	log.Printf("%s: Run: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
-	err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, err.Error())
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.Subkey_RunOutput, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-	}
+	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processSuccessRun processes case after successfully Run step
-func processSuccessRun(pipelineId uuid.UUID, output string) {
+func processSuccessRun(pipelineId uuid.UUID, output string, cacheService cache.Cache) {
 	// set to cache pipelineId: cache.SubKey_RunOutput: output
-	err := cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, output)
-	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-		return
-	}
+	setToCache(cacheService, pipelineId, cache.Subkey_RunOutput, output)
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
-	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
+	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
+}
+
+// setToCache puts value to cache by key and subKey
+func setToCache(cacheService cache.Cache, key uuid.UUID, subKey cache.SubKey, value interface{}) {
+	err := cacheService.SetValue(key, subKey, value)
 	if err != nil {
-		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
-		return
+		log.Printf("%s: cache.SetValue: %s\n", key, err.Error())
 	}
 }

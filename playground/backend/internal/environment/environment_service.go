@@ -24,22 +24,23 @@ import (
 )
 
 const (
-	serverIpKey            = "SERVER_IP"
-	serverPortKey          = "SERVER_PORT"
-	beamSdkKey             = "BEAM_SDK"
-	cacheExpirationKey     = "CACHE_EXPIRATION"
-	runCodeTimeoutKey      = "RUN_CODE_TIMEOUT"
-	defaultIp              = "localhost"
-	defaultPort            = 8080
-	defaultSdk             = pb.Sdk_SDK_JAVA
-	defaultCacheExpiration = time.Minute * 30
-	defaultRunCodeTimeout  = time.Minute * 10
+	serverIpKey                   = "SERVER_IP"
+	serverPortKey                 = "SERVER_PORT"
+	beamSdkKey                    = "BEAM_SDK"
+	cacheExpirationKey            = "CACHE_EXPIRATION"
+	pipelineExecuteTimeoutKey     = "PIPELINE_EXECUTION_TIMEOUT"
+	defaultIp                     = "localhost"
+	defaultPort                   = 8080
+	defaultSdk                    = pb.Sdk_SDK_JAVA
+	defaultCacheExpiration        = time.Minute * 30
+	defaultPipelineExecuteTimeout = time.Minute * 10
 )
 
 // Environment operates with environment structures: ServerEnvs, LogWriters, BeamEnvs
 type Environment struct {
-	ServerEnvs  ServerEnvs
-	BeamSdkEnvs BeamEnvs
+	ServerEnvs      ServerEnvs
+	BeamSdkEnvs     BeamEnvs
+	cacheExpiration time.Duration
 }
 
 // NewEnvironment is a constructor for Environment.
@@ -51,6 +52,7 @@ func NewEnvironment() *Environment {
 	svc := Environment{}
 	svc.ServerEnvs = *getServerEnvsFromOsEnvs()
 	svc.BeamSdkEnvs = *getSdkEnvsFromOsEnvs()
+	svc.cacheExpiration = getCacheExpirationFromEnvs()
 
 	return &svc
 }
@@ -59,8 +61,7 @@ func NewEnvironment() *Environment {
 func getServerEnvsFromOsEnvs() *ServerEnvs {
 	ip := defaultIp
 	port := defaultPort
-	cacheExpiration := defaultCacheExpiration
-	runCodeTimeout := defaultRunCodeTimeout
+	pipelineExecuteTimeout := defaultPipelineExecuteTimeout
 
 	if value, present := os.LookupEnv(serverIpKey); present {
 		ip = value
@@ -74,22 +75,15 @@ func getServerEnvsFromOsEnvs() *ServerEnvs {
 		}
 	}
 
-	if value, present := os.LookupEnv(cacheExpirationKey); present {
+	if value, present := os.LookupEnv(pipelineExecuteTimeoutKey); present {
 		if converted, err := time.ParseDuration(value); err == nil {
-			cacheExpiration = converted
+			pipelineExecuteTimeout = converted
 		} else {
-			grpclog.Errorf("couldn't convert provided cache expiration. Using default %s\n", defaultCacheExpiration)
-		}
-	}
-	if value, present := os.LookupEnv(runCodeTimeoutKey); present {
-		if converted, err := time.ParseDuration(value); err == nil {
-			runCodeTimeout = converted
-		} else {
-			grpclog.Errorf("couldn't convert provided request timeout. Using default %s\n", defaultRunCodeTimeout)
+			grpclog.Errorf("couldn't convert provided request timeout. Using default %s\n", defaultPipelineExecuteTimeout)
 		}
 	}
 
-	return NewServerEnvs(ip, port, cacheExpiration, runCodeTimeout)
+	return NewServerEnvs(ip, port, pipelineExecuteTimeout)
 }
 
 // getServerEnvsFromOsEnvs lookups in os environment variables and takes value for Apache Beam SDK. If not exists - using default
@@ -114,4 +108,22 @@ func getSdkEnvsFromOsEnvs() *BeamEnvs {
 	}
 
 	return NewBeamEnvs(sdk)
+}
+
+// getCacheExpirationFromEnvs lookups in os environment variables and takes value for cache expiration time. If not exists - using default
+func getCacheExpirationFromEnvs() time.Duration {
+	cacheExpiration := defaultCacheExpiration
+	if value, present := os.LookupEnv(cacheExpirationKey); present {
+		if converted, err := time.ParseDuration(value); err == nil {
+			cacheExpiration = converted
+		} else {
+			grpclog.Errorf("couldn't convert provided cache expiration. Using default %s\n", defaultCacheExpiration)
+		}
+	}
+	return cacheExpiration
+}
+
+// GetCacheExpirationTime returns cache expiration time from environment
+func (e *Environment) GetCacheExpirationTime() time.Duration {
+	return e.cacheExpiration
 }

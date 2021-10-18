@@ -53,23 +53,31 @@ func teardown(javaFS *fs_tool.LifeCycle) {
 }
 
 func TestValidateJavaFile(t *testing.T) {
-	err := javaExecutor.Validate()
+	ch := make(chan interface{}, 1)
+	javaExecutor.Validate(ch)
+	err := <-ch
 	if err != nil {
 		t.Fatalf(`TestValidateJavaFile error: %v `, err)
 	}
 }
 
 func TestCompileJavaFile(t *testing.T) {
-	err := javaExecutor.Compile()
+	ch := make(chan interface{}, 1)
+	javaExecutor.Compile(ch)
+	err := <-ch
 	if err != nil {
-		t.Fatalf("TestCompileJavaFile: Unexpexted error at compiliation: %s ", err.Error())
+		t.Fatalf("TestCompileJavaFile: Unexpexted error at compiliation: %s ", err.(error).Error())
 	}
 }
 
 func TestRunJavaFile(t *testing.T) {
+	ch := make(chan interface{}, 1)
 	className := "HelloWorld"
 	expected := "Hello World!\n"
-	out, err := javaExecutor.Run(className)
+	javaExecutor.Run(ch, className)
+	result := <-ch
+	out := result.(*RunResult).Output
+	err := result.(*RunResult).Err
 	if expected != out || err != nil {
 		t.Fatalf(`TestRunJavaFile: '%q, %v' doesn't match for '%#q', nil`, out, err, expected)
 	}

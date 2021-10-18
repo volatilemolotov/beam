@@ -20,6 +20,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func setOsEnvs(envsToSet map[string]string) error {
@@ -38,8 +39,9 @@ func TestNewEnvironment(t *testing.T) {
 		want *Environment
 	}{
 		{name: "create env service with default envs", want: &Environment{
-			ServerEnvs:  *NewServerEnvs(defaultIp, defaultPort),
-			BeamSdkEnvs: *NewBeamEnvs(pb.Sdk_SDK_JAVA),
+			ServerEnvs:      ServerEnvs{ip: defaultIp, port: defaultPort, pipelineExecuteTimeout: defaultPipelineExecuteTimeout},
+			BeamSdkEnvs:     *NewBeamEnvs(pb.Sdk_SDK_JAVA),
+			cacheExpiration: defaultCacheExpiration,
 		}},
 	}
 	for _, tt := range tests {
@@ -54,12 +56,12 @@ func TestNewEnvironment(t *testing.T) {
 func Test_getSdkEnvsFromOsEnvs(t *testing.T) {
 	tests := []struct {
 		name      string
-		want      BeamEnvs
+		want      *BeamEnvs
 		envsToSet map[string]string
 	}{
-		{name: "default sdk envs", want: BeamEnvs{defaultSdk}},
-		{name: "right sdk key in os envs", want: BeamEnvs{pb.Sdk_SDK_JAVA}, envsToSet: map[string]string{"BEAM_SDK": "SDK_JAVA"}},
-		{name: "wrong sdk key in os envs", want: BeamEnvs{defaultSdk}, envsToSet: map[string]string{"BEAM_SDK": "SDK_J"}},
+		{name: "default sdk envs", want: &BeamEnvs{defaultSdk}},
+		{name: "right sdk key in os envs", want: &BeamEnvs{pb.Sdk_SDK_JAVA}, envsToSet: map[string]string{"BEAM_SDK": "SDK_JAVA"}},
+		{name: "wrong sdk key in os envs", want: &BeamEnvs{defaultSdk}, envsToSet: map[string]string{"BEAM_SDK": "SDK_J"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -76,12 +78,13 @@ func Test_getSdkEnvsFromOsEnvs(t *testing.T) {
 func Test_getServerEnvsFromOsEnvs(t *testing.T) {
 	tests := []struct {
 		name      string
-		want      ServerEnvs
+		want      *ServerEnvs
 		envsToSet map[string]string
 	}{
-		{name: "default values", want: ServerEnvs{defaultIp, defaultPort}},
-		{name: "values from os envs", want: ServerEnvs{"12.12.12.21", 1234}, envsToSet: map[string]string{serverIpKey: "12.12.12.21", serverPortKey: "1234"}},
-		{name: "not int port in os env, should be default", want: ServerEnvs{"12.12.12.21", defaultPort}, envsToSet: map[string]string{serverIpKey: "12.12.12.21", serverPortKey: "1a34"}},
+		{name: "default values", want: &ServerEnvs{defaultIp, defaultPort, defaultPipelineExecuteTimeout}},
+		{name: "values from os envs", want: &ServerEnvs{"12.12.12.21", 1234, time.Second}, envsToSet: map[string]string{serverIpKey: "12.12.12.21", serverPortKey: "1234", pipelineExecuteTimeoutKey: time.Second.String()}},
+		{name: "not int port in os env, should be default", want: &ServerEnvs{"12.12.12.21", defaultPort, defaultPipelineExecuteTimeout}, envsToSet: map[string]string{serverIpKey: "12.12.12.21", serverPortKey: "1a34", pipelineExecuteTimeoutKey: defaultPipelineExecuteTimeout.String()}},
+		{name: "not correct expiration time, should be default", want: &ServerEnvs{"12.12.12.21", 1234, defaultPipelineExecuteTimeout}, envsToSet: map[string]string{serverIpKey: "12.12.12.21", serverPortKey: "1234", pipelineExecuteTimeoutKey: "test"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

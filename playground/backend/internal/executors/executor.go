@@ -53,8 +53,10 @@ func (ex *Executor) Validate(channel chan interface{}) {
 		err := validator.validator(ex.absoulteFilePath, validator.args...)
 		if err != nil {
 			channel <- err
+			return
 		}
 	}
+	channel <- nil
 }
 
 // Compile compiles the code and creates executable file.
@@ -68,7 +70,9 @@ func (ex *Executor) Compile(channel chan interface{}) {
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		channel <- &CompileError{string(out)}
+		return
 	}
+	channel <- nil
 }
 
 // Run runs the executable file.
