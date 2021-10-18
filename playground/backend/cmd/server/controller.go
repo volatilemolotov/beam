@@ -23,7 +23,6 @@ import (
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"context"
 	"github.com/google/uuid"
-	"google.golang.org/grpc/grpclog"
 	"log"
 	"os"
 	"time"
@@ -49,39 +48,39 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 	// create file system service
 	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipelineId)
 	if err != nil {
-		grpclog.Error("RunCode: NewLifeCycle: " + err.Error())
+		log.Printf("RunCode: NewLifeCycle: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file system service: "+err.Error())
 	}
 
 	// create folders
 	err = lc.CreateFolders()
 	if err != nil {
-		grpclog.Error("RunCode: CreateFolders: " + err.Error())
+		log.Printf("RunCode: CreateFolders: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during preparing folders: "+err.Error())
 	}
 
 	// create file with code
 	_, err = lc.CreateExecutableFile(info.Code)
 	if err != nil {
-		grpclog.Error("RunCode: CreateExecutableFile: " + err.Error())
+		log.Printf("RunCode: CreateExecutableFile: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file with code: "+err.Error())
 	}
 
 	// create executor
 	exec, err := executors.NewExecutor(info.Sdk, lc)
 	if err != nil {
-		grpclog.Error("RunCode: NewExecutor: " + err.Error())
+		log.Printf("RunCode: NewExecutor: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating executor: "+err.Error())
 	}
 
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXECUTING)
 	if err != nil {
-		grpclog.Error("RunCode: cache.SetValue: " + err.Error())
+		log.Printf("RunCode: cache.SetValue: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during set value to cache: "+err.Error())
 	}
 	err = cacheService.SetExpTime(pipelineId, expTime)
 	if err != nil {
-		grpclog.Error("RunCode: cache.SetExpTime: " + err.Error())
+		log.Printf("RunCode: cache.SetExpTime: " + err.Error())
 		return nil, errors.InternalError("Run code", "Error during set expiration to cache: "+err.Error())
 	}
 
@@ -162,7 +161,7 @@ func runCode(ctx context.Context, lc *fs_tool.LifeCycle, exec *executors.Executo
 	// set empty value to pipelineId: cache.SubKey_CompileOutput
 	err := cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, "")
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 		return
 	}
 
@@ -204,7 +203,7 @@ func finishByContext(pipelineId uuid.UUID) {
 	// set to cache pipelineId: cache.SubKey_Status: Status_STATUS_TIMEOUT
 	err := cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
@@ -215,64 +214,64 @@ func cleanUp(lc *fs_tool.LifeCycle) {
 	log.Println("parallelRunCode: DeleteFolders ...")
 	err := lc.DeleteFolders()
 	if err != nil {
-		grpclog.Error("parallelRunCode: DeleteFolders: " + err.Error())
+		log.Printf("parallelRunCode: DeleteFolders: " + err.Error())
 	}
 	log.Println("parallelRunCode: DeleteFolders complete")
 }
 
 // processErrDuringValidate processes error received during Validate step
 func processErrDuringValidate(err error, pipelineId uuid.UUID) {
-	grpclog.Error("parallelRunCode: Validate: " + err.Error())
+	log.Printf("parallelRunCode: Validate: " + err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
 // processErrDuringCompile processes error received during Compile step
 func processErrDuringCompile(err error, pipelineId uuid.UUID) {
-	grpclog.Error("parallelRunCode: Compile: " + err.Error())
+	log.Printf("parallelRunCode: Compile: " + err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 
 	// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
 	err = cacheService.SetValue(pipelineId, cache.SubKey_CompileOutput, err.Error())
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
 // processErrDuringGetExecutableName processes error received during getting executable file name
 func processErrDuringGetExecutableName(err error, pipelineId uuid.UUID) {
-	grpclog.Error("parallelRunCode: get executable file name: " + err.Error())
+	log.Printf("parallelRunCode: get executable file name: " + err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
 // processErrDuringRun processes error received during Run step
 func processErrDuringRun(err error, pipelineId uuid.UUID) {
-	grpclog.Error("parallelRunCode: Run: " + err.Error())
+	log.Printf("parallelRunCode: Run: " + err.Error())
 
 	// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
 	err = cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, err.Error())
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 	}
 }
 
@@ -281,14 +280,14 @@ func processSuccessRun(pipelineId uuid.UUID, output string) {
 	// set to cache pipelineId: cache.SubKey_RunOutput: output
 	err := cacheService.SetValue(pipelineId, cache.Subkey_RunOutput, output)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 		return
 	}
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
 	err = cacheService.SetValue(pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
 	if err != nil {
-		grpclog.Error("parallelRunCode: cache.SetValue: " + err.Error())
+		log.Printf("parallelRunCode: cache.SetValue: " + err.Error())
 		return
 	}
 }
