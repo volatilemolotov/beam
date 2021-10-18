@@ -21,18 +21,18 @@ import (
 	"os/exec"
 )
 
-//cmdSetting for base cmd code execution
-type cmdSetting struct {
+//CmdConfiguration for base cmd code execution
+type CmdConfiguration struct {
 	fileName    string
-	dirPath     string
+	workingDir  string
 	commandName string
 	commandArgs []string
 }
 
 // Executor struct for all executors (Java/Python/Go/SCIO)
 type Executor struct {
-	compileArgs cmdSetting
-	runArgs     cmdSetting
+	compileArgs CmdConfiguration
+	runArgs     CmdConfiguration
 	validators  []validators.Validator
 }
 
@@ -54,7 +54,7 @@ func (ex *Executor) Validate() func() error {
 func (ex *Executor) Compile() *exec.Cmd {
 	args := append(ex.compileArgs.commandArgs, ex.compileArgs.fileName)
 	cmd := exec.Command(ex.compileArgs.commandName, args...)
-	cmd.Dir = ex.compileArgs.dirPath
+	cmd.Dir = ex.compileArgs.workingDir
 	return cmd
 }
 
@@ -63,6 +63,6 @@ func (ex *Executor) Compile() *exec.Cmd {
 func (ex *Executor) Run() *exec.Cmd {
 	args := append(ex.runArgs.commandArgs, ex.runArgs.fileName)
 	cmd := exec.Command(ex.runArgs.commandName, args...)
-	cmd.Dir = ex.runArgs.dirPath
+	cmd.Dir = ex.runArgs.workingDir
 	return cmd
 }

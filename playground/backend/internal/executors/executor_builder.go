@@ -73,7 +73,7 @@ func (b *CompileBuilder) withFileName(fileName string) *CompileBuilder {
 //withWorkingDir adds dir path to executor
 func (b *CompileBuilder) withWorkingDir(dir string) *CompileBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
-		e.compileArgs.dirPath = dir
+		e.compileArgs.workingDir = dir
 	})
 	return b
 }
@@ -102,10 +102,10 @@ func (b *RunBuilder) withClassName(name string) *RunBuilder {
 	return b
 }
 
-//withClassName adds file name to executor
+//withGraphOutput adds the need of graph output to executor
 func (b *RunBuilder) withGraphOutput() *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
-		//smth
+		//todo
 	})
 	return b
 }
@@ -113,12 +113,12 @@ func (b *RunBuilder) withGraphOutput() *RunBuilder {
 //withWorkingDir adds dir path to executor
 func (b *RunBuilder) withWorkingDir(dir string) *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
-		e.runArgs.dirPath = dir
+		e.runArgs.workingDir = dir
 	})
 	return b
 }
 
-//withClassName adds file name to executor
+//withSdkValidators sets validators to executor
 func (b *ValidatorBuilder) withSdkValidators(validators *[]validators.Validator) *ValidatorBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.validators = *validators

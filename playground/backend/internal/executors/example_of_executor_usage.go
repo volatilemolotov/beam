@@ -36,8 +36,8 @@ func ExampleOfExecutorUsage() {
 	env := environment.NewEnvironment()
 
 	exec := NewExecutorBuilder().
-		WithCompiler().withCommand(env.BeamSdkEnvs.CmdConfig.CompileCmd).withArgs(env.BeamSdkEnvs.CmdConfig.CompileArgs).withFileName(file).withWorkingDir("").
-		WithRunner().withCommand(env.BeamSdkEnvs.CmdConfig.RunCmd).withArgs(env.BeamSdkEnvs.CmdConfig.RunArgs).withClassName("HelloWorld").withWorkingDir("").
+		WithCompiler().withCommand(env.BeamSdkEnvs.ExecutorConfig.CompileCmd).withArgs(env.BeamSdkEnvs.ExecutorConfig.CompileArgs).withFileName(file).withWorkingDir("").
+		WithRunner().withCommand(env.BeamSdkEnvs.ExecutorConfig.RunCmd).withArgs(env.BeamSdkEnvs.ExecutorConfig.RunArgs).withClassName("HelloWorld").withWorkingDir("").
 		WithValidator().withSdkValidators(validators.GetJavaValidators(cycle.GetAbsoluteExecutableFilePath())).
 		Build()
 

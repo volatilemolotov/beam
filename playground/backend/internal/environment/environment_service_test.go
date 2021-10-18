@@ -39,7 +39,7 @@ func TestNewEnvironment(t *testing.T) {
 	}{
 		{name: "create env service with default envs", want: &Environment{
 			ServerEnvs:  *NewServerEnvs(defaultIp, defaultPort),
-			BeamSdkEnvs: *NewBeamEnvs(pb.Sdk_SDK_JAVA),
+			BeamSdkEnvs: *NewBeamEnvs(pb.Sdk_SDK_JAVA, nil),
 		}},
 	}
 	for _, tt := range tests {
