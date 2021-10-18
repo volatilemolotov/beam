@@ -99,31 +99,31 @@ func getSdkEnvsFromOsEnvs() *BeamEnvs {
 }
 
 func readExecutorConfig(apacheBeamSdk pb.Sdk) *ExecutorConfig {
-	cmdConfig, _ := getConfigFromJson(apacheBeamSdk)
+	executorConfig, _ := getConfigFromJson(apacheBeamSdk)
 	switch apacheBeamSdk {
 	case pb.Sdk_SDK_JAVA:
-		cmdConfig.CompileArgs = append(cmdConfig.CompileArgs,
+		executorConfig.CompileArgs = append(executorConfig.CompileArgs,
 			getEnv(beamSdkKey, defaultBeamSdk))
 		jars := strings.Join([]string{
 			getEnv(beamSdkKey, defaultBeamSdk),
 			getEnv(beamRunner, defaultBeamRunner),
 			getEnv(jdk, defaultJDK),
 		}, ":")
-		cmdConfig.RunArgs[1] += jars
+		executorConfig.RunArgs[1] += jars
 	case pb.Sdk_SDK_GO:
 	case pb.Sdk_SDK_PYTHON:
 	case pb.Sdk_SDK_SCIO:
 	}
 
-	return &cmdConfig
+	return &executorConfig
 }
 
 func getConfigFromJson(apacheBeamSdk pb.Sdk) (ExecutorConfig, error) {
 	folder := getEnv(executorConfigFolder, defaultConfigFolder)
 	CmdConfigPath := folder + apacheBeamSdk.String() + jsonExt
-	cmdConfig := ExecutorConfig{}
-	err := gonfig.GetConf(CmdConfigPath, &cmdConfig)
-	return cmdConfig, err
+	executorConfig := ExecutorConfig{}
+	err := gonfig.GetConf(CmdConfigPath, &executorConfig)
+	return executorConfig, err
 }
 
 func getEnv(key, defaultValue string) string {
