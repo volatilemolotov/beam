@@ -17,22 +17,24 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:playground/l10n/l10n.dart';
 
-class OutputTabs extends StatelessWidget {
-  const OutputTabs({Key? key}) : super(key: key);
+class LocaleProvider extends ChangeNotifier {
+  Locale? _locale;
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 300,
-      child: TabBar(
-        tabs: <Widget>[
-          Tab(text: AppLocalizations.of(context)!.output),
-          Tab(text: AppLocalizations.of(context)!.log),
-          Tab(text: AppLocalizations.of(context)!.graph),
-        ],
-      ),
-    );
+  Locale get locale => _locale ?? const Locale('en');
+
+  void setLocale(Locale locale) {
+    if (L10n.all.contains(locale)) {
+      _locale = locale;
+      notifyListeners();
+    } else {
+      return;
+    }
+  }
+
+  void resetLocale() {
+    _locale = const Locale('en');
+    notifyListeners();
   }
 }
