@@ -73,9 +73,9 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		return nil, errors.InternalError("Run code()", "Error during creating executor: "+err.Error())
 	}
 
-	setToCache(controller.cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXECUTING)
+	setToCache(ctx, controller.cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_EXECUTING)
 
-	err = controller.cacheService.SetExpTime(pipelineId, expTime)
+	err = controller.cacheService.SetExpTime(ctx, pipelineId, expTime)
 	if err != nil {
 		log.Printf("%s: RunCode(): cache.SetExpTime(): %s\n", pipelineId, err.Error())
 		return nil, errors.InternalError("Run code()", "Error during set expiration to cache: "+err.Error())
@@ -128,12 +128,12 @@ func processCode(ctx context.Context, cacheService cache.Cache, lc *fs_tool.Life
 	go exec.Validate(channel)
 	select {
 	case <-ctxWithTimeout.Done():
-		finishByContext(pipelineId, cacheService)
+		finishByContext(ctxWithTimeout, pipelineId, cacheService)
 		return
 	case err := <-channel:
 		if err != nil {
 			// error during validation
-			processErrDuringValidate(err.(error), pipelineId, cacheService)
+			processErrDuringValidate(ctxWithTimeout, err.(error), pipelineId, cacheService)
 			return
 		}
 	}
@@ -144,26 +144,26 @@ func processCode(ctx context.Context, cacheService cache.Cache, lc *fs_tool.Life
 	go exec.Compile(channel)
 	select {
 	case <-ctxWithTimeout.Done():
-		finishByContext(pipelineId, cacheService)
+		finishByContext(ctxWithTimeout, pipelineId, cacheService)
 		return
 	case err := <-channel:
 		if err != nil {
 			// error during compilation
-			processErrDuringCompile(err.(error), pipelineId, cacheService)
+			processErrDuringCompile(ctxWithTimeout, err.(error), pipelineId, cacheService)
 			return
 		}
 	}
 	log.Printf("%s: Compile() finish\n", pipelineId)
 
 	// set empty value to pipelineId: cache.SubKey_CompileOutput
-	setToCache(cacheService, pipelineId, cache.SubKey_CompileOutput, "")
+	setToCache(ctxWithTimeout, cacheService, pipelineId, cache.SubKey_CompileOutput, "")
 
 	// get executable file name
 	log.Printf("%s: get executable file name ...\n", pipelineId)
 	fileName, err := lc.GetExecutableName()
 	if err != nil {
 		// error during get executable file name
-		processErrDuringGetExecutableName(err, pipelineId, cacheService)
+		processErrDuringGetExecutableName(ctxWithTimeout, err, pipelineId, cacheService)
 		return
 	}
 	log.Printf("%s: executable file name: %s\n", pipelineId, fileName)
@@ -174,27 +174,27 @@ func processCode(ctx context.Context, cacheService cache.Cache, lc *fs_tool.Life
 	go exec.Run(channel, fileName)
 	select {
 	case <-ctxWithTimeout.Done():
-		finishByContext(pipelineId, cacheService)
+		finishByContext(ctxWithTimeout, pipelineId, cacheService)
 		return
 	case runResult := <-channel:
 		err := runResult.(*executors.RunResult).Err
 		output = runResult.(*executors.RunResult).Output
 		if err != nil {
 			// error during run code
-			processErrDuringRun(err, pipelineId, cacheService)
+			processErrDuringRun(ctxWithTimeout, err, pipelineId, cacheService)
 			return
 		}
 	}
 	log.Printf("%s: Run() finish\n", pipelineId)
-	processSuccessRun(pipelineId, output, cacheService)
+	processSuccessRun(ctxWithTimeout, pipelineId, output, cacheService)
 }
 
 // finishByContext is used in case of runCode method finished by timeout
-func finishByContext(pipelineId uuid.UUID, cacheService cache.Cache) {
+func finishByContext(ctx context.Context, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: processCode finish because of ctxWithTimeout.Done\n", pipelineId)
 
 	// set to cache pipelineId: cache.SubKey_Status: Status_STATUS_TIMEOUT
-	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // cleanUp removes all prepared folders for received LifeCycle
@@ -209,55 +209,55 @@ func cleanUp(pipelineId uuid.UUID, lc *fs_tool.LifeCycle) {
 }
 
 // processErrDuringValidate processes error received during Validate step
-func processErrDuringValidate(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+func processErrDuringValidate(ctx context.Context, err error, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: Validate: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processErrDuringCompile processes error received during Compile step
-func processErrDuringCompile(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+func processErrDuringCompile(ctx context.Context, err error, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: Compile: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 
 	// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
-	setToCache(cacheService, pipelineId, cache.SubKey_CompileOutput, err.Error())
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_CompileOutput, err.Error())
 }
 
 // processErrDuringGetExecutableName processes error received during getting executable file name
-func processErrDuringGetExecutableName(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+func processErrDuringGetExecutableName(ctx context.Context, err error, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: get executable file name: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processErrDuringRun processes error received during Run step
-func processErrDuringRun(err error, pipelineId uuid.UUID, cacheService cache.Cache) {
+func processErrDuringRun(ctx context.Context, err error, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: Run: %s\n", pipelineId, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
-	setToCache(cacheService, pipelineId, cache.Subkey_RunOutput, err.Error())
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_RunOutput, err.Error())
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processSuccessRun processes case after successfully Run step
-func processSuccessRun(pipelineId uuid.UUID, output string, cacheService cache.Cache) {
+func processSuccessRun(ctx context.Context, pipelineId uuid.UUID, output string, cacheService cache.Cache) {
 	// set to cache pipelineId: cache.SubKey_RunOutput: output
-	setToCache(cacheService, pipelineId, cache.Subkey_RunOutput, output)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_RunOutput, output)
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
-	setToCache(cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
 }
 
 // setToCache puts value to cache by key and subKey
-func setToCache(cacheService cache.Cache, key uuid.UUID, subKey cache.SubKey, value interface{}) {
-	err := cacheService.SetValue(key, subKey, value)
+func setToCache(ctx context.Context, cacheService cache.Cache, key uuid.UUID, subKey cache.SubKey, value interface{}) {
+	err := cacheService.SetValue(ctx, key, subKey, value)
 	if err != nil {
 		log.Printf("%s: cache.SetValue: %s\n", key, err.Error())
 	}

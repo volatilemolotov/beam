@@ -36,6 +36,7 @@ import (
 const bufSize = 1024 * 1024
 
 var lis *bufconn.Listener
+var cacheService cache.Cache
 
 func TestMain(m *testing.M) {
 	server := setup()
@@ -46,9 +47,14 @@ func TestMain(m *testing.M) {
 func setup() *grpc.Server {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
+	var err error
+	cacheService, err = cache.NewCache(context.Background(), "")
+	if err != nil {
+		panic(err)
+	}
 	pb.RegisterPlaygroundServiceServer(s, &playgroundController{
 		env:          environment.NewEnvironment(),
-		cacheService: cache.NewCache(""),
+		cacheService: cacheService,
 	})
 	go func() {
 		if err := s.Serve(lis); err != nil {
@@ -72,9 +78,10 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 		request *pb.RunCodeRequest
 	}
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name       string
+		args       args
+		wantStatus pb.Status
+		wantErr    bool
 	}{
 		{
 			name: "RunCode with incorrect sdk",
@@ -96,7 +103,8 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 					Sdk:  pb.Sdk_SDK_JAVA,
 				},
 			},
-			wantErr: false,
+			wantStatus: pb.Status_STATUS_EXECUTING,
+			wantErr:    false,
 		},
 	}
 	for _, tt := range tests {
@@ -120,6 +128,13 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 					} else {
 						path := "internal/executable_files_" + response.PipelineUuid
 						os.RemoveAll(path)
+					}
+					status, _ := cacheService.GetValue(tt.args.ctx, uuid.MustParse(response.PipelineUuid), cache.SubKey_Status)
+					if status == nil {
+						t.Errorf("PlaygroundController_RunCode() status shoudn't be nil")
+					}
+					if !reflect.DeepEqual(status, tt.wantStatus) {
+						t.Errorf("PlaygroundController_RunCode() status = %v, wantStatus %v", status, tt.wantStatus)
 					}
 				}
 			}
@@ -182,6 +197,7 @@ func TestPlaygroundController_GetRunOutput(t *testing.T) {
 }
 
 func Test_processCode(t *testing.T) {
+	cacheService, _ := cache.NewCache(context.Background(), "")
 	type args struct {
 		ctx     context.Context
 		timeout time.Duration
@@ -272,15 +288,14 @@ func Test_processCode(t *testing.T) {
 				_, _ = lc.CreateExecutableFile(tt.code)
 			}
 
-			cacheService := cache.NewCache("")
 			processCode(tt.args.ctx, cacheService, lc, exec, pipelineId, tt.args.timeout)
 
-			status, _ := cacheService.GetValue(pipelineId, cache.SubKey_Status)
+			status, _ := cacheService.GetValue(tt.args.ctx, pipelineId, cache.SubKey_Status)
 			if !reflect.DeepEqual(status, tt.expectedStatus) {
 				t.Errorf("processCode() set status: %s, but expectes: %s", status, tt.expectedStatus)
 			}
 
-			compileOutput, _ := cacheService.GetValue(pipelineId, cache.SubKey_CompileOutput)
+			compileOutput, _ := cacheService.GetValue(tt.args.ctx, pipelineId, cache.SubKey_CompileOutput)
 			if compileOutput == nil || compileOutput.(string) == "" {
 				if !reflect.DeepEqual(compileOutput, tt.expectedCompileOutput) {
 					t.Errorf("processCode() set compileOutput: %s, but expectes: %s", compileOutput, tt.expectedCompileOutput)
@@ -291,7 +306,7 @@ func Test_processCode(t *testing.T) {
 				}
 			}
 
-			runOutput, _ := cacheService.GetValue(pipelineId, cache.Subkey_RunOutput)
+			runOutput, _ := cacheService.GetValue(tt.args.ctx, pipelineId, cache.SubKey_RunOutput)
 			if !reflect.DeepEqual(runOutput, tt.expectedRunOutput) {
 				t.Errorf("processCode() set runOutput: %s, but expectes: %s", runOutput, tt.expectedRunOutput)
 			}
@@ -300,6 +315,7 @@ func Test_processCode(t *testing.T) {
 }
 
 func Test_processErrDuringGetExecutableName(t *testing.T) {
+	cacheService, _ := cache.NewCache(context.Background(), "")
 	type args struct {
 		err        error
 		pipelineId uuid.UUID
@@ -318,8 +334,7 @@ func Test_processErrDuringGetExecutableName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cacheService := cache.NewCache("")
-			value, err := cacheService.GetValue(tt.args.pipelineId, cache.SubKey_Status)
+			value, err := cacheService.GetValue(context.Background(), tt.args.pipelineId, cache.SubKey_Status)
 			if value != nil {
 				t.Errorf("processErrDuringGetExecutableName() value should be: nil, but receive: %s", value)
 			}
@@ -327,9 +342,9 @@ func Test_processErrDuringGetExecutableName(t *testing.T) {
 				t.Errorf("processErrDuringGetExecutableName() err should not be nil, but receive: %s", err)
 			}
 
-			processErrDuringGetExecutableName(tt.args.err, tt.args.pipelineId, cacheService)
+			processErrDuringGetExecutableName(context.Background(), tt.args.err, tt.args.pipelineId, cacheService)
 
-			value, _ = cacheService.GetValue(tt.args.pipelineId, cache.SubKey_Status)
+			value, _ = cacheService.GetValue(context.Background(), tt.args.pipelineId, cache.SubKey_Status)
 			if !reflect.DeepEqual(value, pb.Status_STATUS_ERROR) {
 				t.Errorf("processErrDuringGetExecutableName() value : %s, but want: %s", value, pb.Status_STATUS_ERROR)
 			}
