@@ -298,3 +298,41 @@ func Test_processCode(t *testing.T) {
 		})
 	}
 }
+
+func Test_processErrDuringGetExecutableName(t *testing.T) {
+	type args struct {
+		err        error
+		pipelineId uuid.UUID
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "all success",
+			args: args{
+				err:        fmt.Errorf("MOCK_ERROR"),
+				pipelineId: uuid.New(),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cacheService := cache.NewCache("")
+			value, err := cacheService.GetValue(tt.args.pipelineId, cache.SubKey_Status)
+			if value != nil {
+				t.Errorf("processErrDuringGetExecutableName() value should be: nil, but receive: %s", value)
+			}
+			if err == nil {
+				t.Errorf("processErrDuringGetExecutableName() err should not be nil, but receive: %s", err)
+			}
+
+			processErrDuringGetExecutableName(tt.args.err, tt.args.pipelineId, cacheService)
+
+			value, _ = cacheService.GetValue(tt.args.pipelineId, cache.SubKey_Status)
+			if !reflect.DeepEqual(value, pb.Status_STATUS_ERROR) {
+				t.Errorf("processErrDuringGetExecutableName() value : %s, but want: %s", value, pb.Status_STATUS_ERROR)
+			}
+		})
+	}
+}
