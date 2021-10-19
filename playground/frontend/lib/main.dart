@@ -17,8 +17,10 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl_browser.dart';
 import 'package:playground/playground_app.dart';
 
-void main() {
+void main() async {
+  findSystemLocale();
   runApp(const PlaygroundApp());
 }
