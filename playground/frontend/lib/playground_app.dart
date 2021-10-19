@@ -50,7 +50,7 @@ class PlaygroundApp extends StatelessWidget {
                   home: const PlaygroundPage(),
                   debugShowCheckedModeBanner: false,
                   locale: localeProvider.locale,
-                  supportedLocales: L10n.all,
+                  supportedLocales: L10n.locales,
                   localizationsDelegates: const [
                     AppLocalizations.delegate,
                     GlobalMaterialLocalizations.delegate,
