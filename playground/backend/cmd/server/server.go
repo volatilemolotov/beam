@@ -16,9 +16,13 @@
 package main
 
 import (
-	"beam.apache.org/playground/backend/internal/executors"
+	"fmt"
+	"os"
 )
 
 func main() {
-	_ = executors.GoExecutor{}
+	//executors.ExampleOfExecutorUsage()
+	arr := os.Environ()
+	fmt.Println(arr)
+	os.Getwd()
 }

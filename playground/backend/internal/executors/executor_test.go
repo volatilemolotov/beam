@@ -159,7 +159,7 @@ func TestBaseExecutorBuilder(t *testing.T) {
 	os.MkdirAll("configs", fs.ModePerm)
 	os.WriteFile("configs/SDK_JAVA.json", []byte(javaConfig), 0600)
 	os.Setenv("CONFIG_FOLDER", p+"/configs/")
-	env := environment.NewEnvironment()
+	env, _ := environment.NewEnvironment()
 	type args struct {
 		envs            environment.BeamEnvs
 		workingDir      string

@@ -20,25 +20,26 @@ import (
 	"github.com/tkanos/gonfig"
 	"google.golang.org/grpc/grpclog"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
 
 const (
-	serverIpKey          = "SERVER_IP"
-	serverPortKey        = "SERVER_PORT"
-	beamSdkKey           = "BEAM_SDK"
-	beamRunner           = "BEAM_RUNNER"
-	jdk                  = "JDK"
-	defaultIp            = "localhost"
-	defaultPort          = 8080
-	defaultSdk           = pb.Sdk_SDK_JAVA
-	executorConfigFolder = "CONFIG_FOLDER"
-	defaultConfigFolder  = "./"
-	defaultBeamSdk       = "/opt/apache/beam/jars/beam-sdks-java-harness.jar"
-	defaultBeamRunner    = "/opt/apache/beam/jars/beam-runners-direct.jar"
-	defaultJDK           = "/opt/apache/beam/jars/slf4j-jdk14.jar"
-	jsonExt              = ".json"
+	serverIpKey         = "SERVER_IP"
+	serverPortKey       = "SERVER_PORT"
+	beamSdkKey          = "BEAM_SDK"
+	beamRunner          = "BEAM_RUNNER"
+	jdk                 = "JDK"
+	backendAbsolutePath = "PWD"
+	defaultIp           = "localhost"
+	defaultPort         = 8080
+	defaultSdk          = pb.Sdk_SDK_JAVA
+	defaultBeamSdk      = "/opt/apache/beam/jars/beam-sdks-java-harness.jar"
+	defaultBeamRunner   = "/opt/apache/beam/jars/beam-runners-direct.jar"
+	defaultJDK          = "/opt/apache/beam/jars/slf4j-jdk14.jar"
+	jsonExt             = ".json"
+	configFolderName    = "configs"
 )
 
 // Environment operates with environment structures: ServerEnvs, LogWriters, BeamEnvs
@@ -52,12 +53,15 @@ type Environment struct {
 // LogWriters: by default using os.Stdout
 // ServerEnvs: by default using defaultIp and defaultPort from constants
 // BeamEnvs: by default using pb.Sdk_SDK_JAVA
-func NewEnvironment() *Environment {
+func NewEnvironment() (*Environment, error) {
 	svc := Environment{}
 	svc.ServerEnvs = *getServerEnvsFromOsEnvs()
-	svc.BeamSdkEnvs = *getSdkEnvsFromOsEnvs()
-
-	return &svc
+	sdk, err := getSdkEnvsFromOsEnvs()
+	if err != nil {
+		return nil, err
+	}
+	svc.BeamSdkEnvs = *sdk
+	return &svc, nil
 }
 
 // getServerEnvsFromOsEnvs lookups in os environment variables and takes value for ip and port. If not exists - using default
@@ -75,7 +79,7 @@ func getServerEnvsFromOsEnvs() *ServerEnvs {
 }
 
 // getServerEnvsFromOsEnvs lookups in os environment variables and takes value for Apache Beam SDK. If not exists - using default
-func getSdkEnvsFromOsEnvs() *BeamEnvs {
+func getSdkEnvsFromOsEnvs() (*BeamEnvs, error) {
 	sdk := pb.Sdk_SDK_UNSPECIFIED
 	if value, present := os.LookupEnv(beamSdkKey); present {
 
@@ -94,12 +98,19 @@ func getSdkEnvsFromOsEnvs() *BeamEnvs {
 		grpclog.Infof("couldn't get sdk from %s os env, using default: %s", beamSdkKey, defaultSdk)
 		sdk = defaultSdk
 	}
-	executorConfig := readExecutorConfig(sdk)
-	return NewBeamEnvs(sdk, executorConfig)
+	configPath := filepath.Join(os.Getenv(backendAbsolutePath), configFolderName, sdk.String()+jsonExt)
+	executorConfig, err := createExecutorConfig(sdk, configPath)
+	if err != nil {
+		return nil, err
+	}
+	return NewBeamEnvs(sdk, executorConfig), nil
 }
 
-func readExecutorConfig(apacheBeamSdk pb.Sdk) *ExecutorConfig {
-	executorConfig, _ := getConfigFromJson(apacheBeamSdk)
+func createExecutorConfig(apacheBeamSdk pb.Sdk, configPath string) (*ExecutorConfig, error) {
+	executorConfig, err := getConfigFromJson(configPath)
+	if err != nil {
+		return nil, err
+	}
 	switch apacheBeamSdk {
 	case pb.Sdk_SDK_JAVA:
 		executorConfig.CompileArgs = append(executorConfig.CompileArgs,
@@ -115,14 +126,12 @@ func readExecutorConfig(apacheBeamSdk pb.Sdk) *ExecutorConfig {
 	case pb.Sdk_SDK_SCIO:
 	}
 
-	return &executorConfig
+	return &executorConfig, nil
 }
 
-func getConfigFromJson(apacheBeamSdk pb.Sdk) (ExecutorConfig, error) {
-	folder := getEnv(executorConfigFolder, defaultConfigFolder)
-	CmdConfigPath := folder + apacheBeamSdk.String() + jsonExt
+func getConfigFromJson(configPath string) (ExecutorConfig, error) {
 	executorConfig := ExecutorConfig{}
-	err := gonfig.GetConf(CmdConfigPath, &executorConfig)
+	err := gonfig.GetConf(configPath, &executorConfig)
 	return executorConfig, err
 }
 

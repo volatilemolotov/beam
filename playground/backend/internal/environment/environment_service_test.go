@@ -44,7 +44,7 @@ func TestNewEnvironment(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewEnvironment(); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := NewEnvironment(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
@@ -66,7 +66,7 @@ func Test_getSdkEnvsFromOsEnvs(t *testing.T) {
 			if err := setOsEnvs(tt.envsToSet); err != nil {
 				t.Fatalf("couldn't setup os env")
 			}
-			if got := getSdkEnvsFromOsEnvs(); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := getSdkEnvsFromOsEnvs(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getSdkEnvsFromOsEnvs() = %v, want %v", got, tt.want)
 			}
 		})
