@@ -29,10 +29,10 @@ class ToggleThemeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Consumer<ThemeProvider>(builder: (context, theme, child) {
-      final text = theme.isDarkMode
-          ? AppLocalizations.of(context)!.lightMode
-          : AppLocalizations.of(context)!.darkMode;
+      final text = theme.isDarkMode ? appLocale.lightMode : appLocale.darkMode;
       return Padding(
         padding: const EdgeInsets.symmetric(
           vertical: kSmSpacing,

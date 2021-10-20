@@ -27,6 +27,8 @@ class TypeFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: kLgSpacing,
@@ -36,19 +38,19 @@ class TypeFilter extends StatelessWidget {
         children: <CategoryBubble>[
           CategoryBubble(
             type: ExampleType.all,
-            name: AppLocalizations.of(context)!.all,
+            name: appLocale.all,
           ),
           CategoryBubble(
             type: ExampleType.example,
-            name: AppLocalizations.of(context)!.examples,
+            name: appLocale.examples,
           ),
           CategoryBubble(
             type: ExampleType.kata,
-            name: AppLocalizations.of(context)!.katas,
+            name: appLocale.katas,
           ),
           CategoryBubble(
             type: ExampleType.test,
-            name: AppLocalizations.of(context)!.unitTests,
+            name: appLocale.unitTests,
           ),
         ],
       ),
