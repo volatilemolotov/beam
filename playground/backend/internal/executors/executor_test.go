@@ -37,17 +37,17 @@ func BaseExecutorBuilder(envs environment.BeamEnvs, workingDir string, filePath 
 	}
 	builder := NewExecutorBuilder().
 		WithCompiler().
-		withCommand(envs.ExecutorConfig.CompileCmd).
-		withArgs(envs.ExecutorConfig.CompileArgs).
-		withFileName(filePath).
-		withWorkingDir(workingDir).
+		WithCommand(envs.ExecutorConfig.CompileCmd).
+		WithArgs(envs.ExecutorConfig.CompileArgs).
+		WithFileName(filePath).
+		WithWorkingDir(workingDir).
 		WithRunner().
-		withCommand(envs.ExecutorConfig.RunCmd).
-		withArgs(envs.ExecutorConfig.RunArgs).
-		withClassName("HelloWorld").
-		withWorkingDir(workingDir).
+		WithCommand(envs.ExecutorConfig.RunCmd).
+		WithArgs(envs.ExecutorConfig.RunArgs).
+		WithClassName("HelloWorld").
+		WithWorkingDir(workingDir).
 		WithValidator().
-		withSdkValidators(validatorsFuncs).ExecutorBuilder
+		WithSdkValidators(validatorsFuncs).ExecutorBuilder
 	return &builder
 }
 

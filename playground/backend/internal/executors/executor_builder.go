@@ -61,80 +61,80 @@ func (b *ExecutorBuilder) WithValidator() *ValidatorBuilder {
 	return &ValidatorBuilder{*b}
 }
 
-//withCommand adds compile command to executor
-func (b *CompileBuilder) withCommand(compileCmd string) *CompileBuilder {
+//WithCommand adds compile command to executor
+func (b *CompileBuilder) WithCommand(compileCmd string) *CompileBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.compileArgs.commandName = compileCmd
 	})
 	return b
 }
 
-//withArgs adds compile args to executor
-func (b *CompileBuilder) withArgs(compileArgs []string) *CompileBuilder {
+//WithArgs adds compile args to executor
+func (b *CompileBuilder) WithArgs(compileArgs []string) *CompileBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.compileArgs.commandArgs = compileArgs
 	})
 	return b
 }
 
-//withFileName adds file name to executor
-func (b *CompileBuilder) withFileName(fileName string) *CompileBuilder {
+//WithFileName adds file name to executor
+func (b *CompileBuilder) WithFileName(fileName string) *CompileBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.compileArgs.fileName = fileName
 	})
 	return b
 }
 
-//withWorkingDir adds dir path to executor
-func (b *CompileBuilder) withWorkingDir(dir string) *CompileBuilder {
+//WithWorkingDir adds dir path to executor
+func (b *CompileBuilder) WithWorkingDir(dir string) *CompileBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.compileArgs.workingDir = dir
 	})
 	return b
 }
 
-//withCommand adds run command to executor
-func (b *RunBuilder) withCommand(runCmd string) *RunBuilder {
+//WithCommand adds run command to executor
+func (b *RunBuilder) WithCommand(runCmd string) *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.runArgs.commandName = runCmd
 	})
 	return b
 }
 
-//withArgs adds run args to executor
-func (b *RunBuilder) withArgs(runArgs []string) *RunBuilder {
+//WithArgs adds run args to executor
+func (b *RunBuilder) WithArgs(runArgs []string) *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.runArgs.commandArgs = runArgs
 	})
 	return b
 }
 
-//withClassName adds file name to executor
-func (b *RunBuilder) withClassName(name string) *RunBuilder {
+//WithClassName adds file name to executor
+func (b *RunBuilder) WithClassName(name string) *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.runArgs.fileName = name
 	})
 	return b
 }
 
-//withGraphOutput adds the need of graph output to executor
-func (b *RunBuilder) withGraphOutput() *RunBuilder {
+//WithGraphOutput adds the need of graph output to executor
+func (b *RunBuilder) WithGraphOutput() *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		//todo
 	})
 	return b
 }
 
-//withWorkingDir adds dir path to executor
-func (b *RunBuilder) withWorkingDir(dir string) *RunBuilder {
+//WithWorkingDir adds dir path to executor
+func (b *RunBuilder) WithWorkingDir(dir string) *RunBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.runArgs.workingDir = dir
 	})
 	return b
 }
 
-//withSdkValidators sets validators to executor
-func (b *ValidatorBuilder) withSdkValidators(validators *[]validators.Validator) *ValidatorBuilder {
+//WithSdkValidators sets validators to executor
+func (b *ValidatorBuilder) WithSdkValidators(validators *[]validators.Validator) *ValidatorBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.validators = *validators
 	})
