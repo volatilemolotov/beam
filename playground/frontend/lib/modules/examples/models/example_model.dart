@@ -25,21 +25,6 @@ enum ExampleType {
   test,
 }
 
-extension ExampleTypeToString on ExampleType {
-  String get name {
-    switch (this) {
-      case ExampleType.example:
-        return 'Examples';
-      case ExampleType.kata:
-        return 'Katas';
-      case ExampleType.test:
-        return 'Unit tests';
-      case ExampleType.all:
-        return 'All';
-    }
-  }
-}
-
 class ExampleModel {
   final Map<SDK, String> sources;
   final ExampleType type;

@@ -25,8 +25,13 @@ import 'package:provider/provider.dart';
 
 class CategoryBubble extends StatelessWidget {
   final ExampleType type;
+  final String name;
 
-  const CategoryBubble({Key? key, required this.type}) : super(key: key);
+  const CategoryBubble({
+    Key? key,
+    required this.type,
+    required this.name,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +58,7 @@ class CategoryBubble extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  type.name,
+                  name,
                   style: TextStyle(
                     color: type == dropdownState.selectedFilterType
                         ? ThemeColors.of(context).primaryBackgroundTextColor
