@@ -24,13 +24,15 @@ class OutputTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return SizedBox(
       width: 300,
       child: TabBar(
         tabs: <Widget>[
-          Tab(text: AppLocalizations.of(context)!.output),
-          Tab(text: AppLocalizations.of(context)!.log),
-          Tab(text: AppLocalizations.of(context)!.graph),
+          Tab(text: appLocale.output),
+          Tab(text: appLocale.log),
+          Tab(text: appLocale.graph),
         ],
       ),
     );

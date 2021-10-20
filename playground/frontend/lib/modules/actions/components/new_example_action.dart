@@ -33,7 +33,7 @@ class NewExampleAction extends StatelessWidget {
         color: ThemeColors.of(context).grey1Color,
       ),
       label: AppLocalizations.of(context)!.newExample,
-      onPressed: () => launch("/"),
+      onPressed: () => launch('/'),
     );
   }
 }

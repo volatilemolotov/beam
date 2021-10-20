@@ -33,20 +33,22 @@ enum HeaderAction {
 }
 
 const kBeamPlaygroundGithubLink =
-    "https://github.com/apache/beam/tree/master/playground/frontend";
+    'https://github.com/apache/beam/tree/master/playground/frontend';
 
 const kApacheBeamGithubLink =
-    "https://github.com/apache/beam/tree/master/playground/frontend";
+    'https://github.com/apache/beam/tree/master/playground/frontend';
 
-const kScioGithubLink = "https://github.com/spotify/scio";
+const kScioGithubLink = 'https://github.com/spotify/scio';
 
-const kBeamWebsiteLink = "https://beam.apache.org/";
+const kBeamWebsiteLink = 'https://beam.apache.org/';
 
 class MoreActions extends StatelessWidget {
   const MoreActions({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: PopupMenuButton<HeaderAction>(
@@ -60,7 +62,7 @@ class MoreActions extends StatelessWidget {
             value: HeaderAction.shortcuts,
             child: ListTile(
               leading: SvgPicture.asset(kShortcutsIconAsset),
-              title: Text(AppLocalizations.of(context)!.shortcuts),
+              title: Text(appLocale.shortcuts),
             ),
           ),
           PopupMenuItem<HeaderAction>(
@@ -68,7 +70,7 @@ class MoreActions extends StatelessWidget {
             value: HeaderAction.beamPlaygroundGithub,
             child: ListTile(
               leading: SvgPicture.asset(kGithubIconAsset),
-              title: Text(AppLocalizations.of(context)!.beamPlaygroundOnGithub),
+              title: Text(appLocale.beamPlaygroundOnGithub),
               onTap: () => launch(kBeamPlaygroundGithubLink),
             ),
           ),
@@ -77,7 +79,7 @@ class MoreActions extends StatelessWidget {
             value: HeaderAction.apacheBeamGithub,
             child: ListTile(
               leading: SvgPicture.asset(kGithubIconAsset),
-              title: Text(AppLocalizations.of(context)!.apacheBeamOnGithub),
+              title: Text(appLocale.apacheBeamOnGithub),
               onTap: () => launch(kApacheBeamGithubLink),
             ),
           ),
@@ -86,7 +88,7 @@ class MoreActions extends StatelessWidget {
             value: HeaderAction.scioGithub,
             child: ListTile(
               leading: SvgPicture.asset(kGithubIconAsset),
-              title: Text(AppLocalizations.of(context)!.scioOnGithub),
+              title: Text(appLocale.scioOnGithub),
               onTap: () => launch(kScioGithubLink),
             ),
           ),
@@ -96,7 +98,7 @@ class MoreActions extends StatelessWidget {
             value: HeaderAction.beamWebsite,
             child: ListTile(
               leading: const Image(image: AssetImage('beam.png')),
-              title: Text(AppLocalizations.of(context)!.toApacheBeamWebsite),
+              title: Text(appLocale.toApacheBeamWebsite),
               onTap: () => launch(kBeamWebsiteLink),
             ),
           ),
@@ -105,7 +107,7 @@ class MoreActions extends StatelessWidget {
             value: HeaderAction.beamWebsite,
             child: ListTile(
               leading: const Icon(Icons.info_outline),
-              title: Text(AppLocalizations.of(context)!.aboutApacheBeam),
+              title: Text(appLocale.aboutApacheBeam),
             ),
           ),
         ],

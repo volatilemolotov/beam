@@ -27,6 +27,8 @@ class OutputArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Container(
       color: Theme.of(context).backgroundColor,
       child: Consumer<PlaygroundState>(
@@ -35,10 +37,10 @@ class OutputArea extends StatelessWidget {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.all(kLgSpacing),
-                child: Text(state.result?.output ?? ""),
+                child: Text(state.result?.output ?? ''),
               ),
-              Center(child: Text(AppLocalizations.of(context)!.log)),
-              Center(child: Text(AppLocalizations.of(context)!.graph)),
+              Center(child: Text(appLocale.log)),
+              Center(child: Text(appLocale.graph)),
             ],
           );
         },

@@ -27,6 +27,8 @@ class PlaygroundPageFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Container(
       color: ThemeColors.of(context).secondaryBackground,
       width: double.infinity,
@@ -45,21 +47,19 @@ class PlaygroundPageFooter extends StatelessWidget {
                 primary: Theme.of(context).primaryColor,
               ),
               // ignore: avoid_print
-              onPressed: () =>
-                  print(AppLocalizations.of(context)!.sendFeedback),
-              child: Text(AppLocalizations.of(context)!.sendFeedback),
+              onPressed: () => print(appLocale.sendFeedback),
+              child: Text(appLocale.sendFeedback),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
               ),
               // ignore: avoid_print
-              onPressed: () =>
-                  print(AppLocalizations.of(context)!.privacyPolicy),
-              child: Text(AppLocalizations.of(context)!.privacyPolicy),
+              onPressed: () => print(appLocale.privacyPolicy),
+              child: Text(appLocale.privacyPolicy),
             ),
             Text(
-              AppLocalizations.of(context)!.copyright,
+              appLocale.copyright,
               style: TextStyle(color: ThemeColors.of(context).grey1Color),
             ),
           ],
