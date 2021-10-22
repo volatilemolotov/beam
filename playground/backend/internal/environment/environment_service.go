@@ -20,28 +20,34 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
-	serverIpKey        = "SERVER_IP"
-	serverPortKey      = "SERVER_PORT"
-	beamSdkKey         = "BEAM_SDK"
-	workingDirKey      = "APP_WORK_DIR"
-	beamPathKey        = "BEAM_PATH"
-	beamRunnerKey      = "BEAM_RUNNER"
-	SLF4jKey           = "SLF4J"
-	defaultIp          = "localhost"
-	defaultPort        = 8080
-	defaultSdk         = pb.Sdk_SDK_JAVA
-	defaultBeamSdkPath = "/opt/apache/beam/jars/beam-sdks-java-harness.jar"
-	defaultBeamRunner  = "/opt/apache/beam/jars/beam-runners-direct.jar"
-	defaultSLF4j       = "/opt/apache/beam/jars/slf4j-jdk14.jar"
-	jsonExt            = ".json"
-	configFolderName   = "configs"
+	serverIpKey                   = "SERVER_IP"
+	serverPortKey                 = "SERVER_PORT"
+	beamSdkKey                    = "BEAM_SDK"
+	workingDirKey                 = "APP_WORK_DIR"
+	beamPathKey                   = "BEAM_PATH"
+	beamRunnerKey                 = "BEAM_RUNNER"
+	SLF4jKey                      = "SLF4J"
+	cacheExpirationTimeKey        = "CACHE_EXPIRATION_TIME"
+	pipelineExecuteTimeoutKey     = "PIPELINE_EXPIRATION_TIMEOUT"
+	defaultIp                     = "localhost"
+	defaultPort                   = 8080
+	defaultSdk                    = pb.Sdk_SDK_JAVA
+	defaultCacheExpirationTime    = time.Minute * 15
+	defaultPipelineExecuteTimeout = time.Minute * 10
+	defaultBeamSdkPath            = "/opt/apache/beam/jars/beam-sdks-java-harness.jar"
+	defaultBeamRunner             = "/opt/apache/beam/jars/beam-runners-direct.jar"
+	defaultSLF4j                  = "/opt/apache/beam/jars/slf4j-jdk14.jar"
+	jsonExt                       = ".json"
+	configFolderName              = "configs"
 )
 
 // Environment operates with environment structures: NetworkEnvs, BeamEnvs, ApplicationEnvs
@@ -68,8 +74,26 @@ func NewEnvironment(networkEnvs NetworkEnvs, beamEnvs BeamEnvs, appEnvs Applicat
 
 //GetApplicationEnvsFromOsEnvs lookups in os environment variables and takes value for app working dir. If not exists - return error
 func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
+	cacheExpirationTime := defaultCacheExpirationTime
+	pipelineExecuteTimeout := defaultPipelineExecuteTimeout
+
+	if value, present := os.LookupEnv(cacheExpirationTimeKey); present {
+		if converted, err := time.ParseDuration(value); err == nil {
+			cacheExpirationTime = converted
+		} else {
+			log.Printf("couldn't convert provided cache expiration time. Using default %s\n", defaultCacheExpirationTime)
+		}
+	}
+	if value, present := os.LookupEnv(pipelineExecuteTimeoutKey); present {
+		if converted, err := time.ParseDuration(value); err == nil {
+			pipelineExecuteTimeout = converted
+		} else {
+			log.Printf("couldn't convert provided pipeline execute timeout. Using default %s\n", defaultPipelineExecuteTimeout)
+		}
+	}
+
 	if value, present := os.LookupEnv(workingDirKey); present {
-		return NewApplicationEnvs(value), nil
+		return NewApplicationEnvs(value, cacheExpirationTime, pipelineExecuteTimeout), nil
 	}
 	return nil, errors.New("APP_WORK_DIR env should be provided with os.env")
 }

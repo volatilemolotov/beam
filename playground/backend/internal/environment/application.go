@@ -15,7 +15,10 @@
 
 package environment
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 // NetworkEnvs contains all environment variables that need to run server.
 type NetworkEnvs struct {
@@ -35,10 +38,27 @@ func (serverEnvs NetworkEnvs) Address() string {
 
 //ApplicationEnvs contains all environment variables that needed to run backend processes
 type ApplicationEnvs struct {
-	workingDir string
+	workingDir             string
+	cacheExpirationTime    time.Duration
+	pipelineExecuteTimeout time.Duration
 }
 
 // NewApplicationEnvs constructor for ApplicationEnvs
-func NewApplicationEnvs(workingDir string) *ApplicationEnvs {
-	return &ApplicationEnvs{workingDir: workingDir}
+func NewApplicationEnvs(workingDir string, cacheExpirationTime, pipelineExecuteTimeout time.Duration) *ApplicationEnvs {
+	return &ApplicationEnvs{workingDir: workingDir, cacheExpirationTime: cacheExpirationTime, pipelineExecuteTimeout: pipelineExecuteTimeout}
+}
+
+// GetWorkingDir returns workingDir
+func (ae *ApplicationEnvs) GetWorkingDir() string {
+	return ae.workingDir
+}
+
+// GetCacheExpirationTime returns cacheExpirationTime
+func (ae *ApplicationEnvs) GetCacheExpirationTime() time.Duration {
+	return ae.cacheExpirationTime
+}
+
+// GetPipelineExecuteTimeout returns pipelineExecuteTimeout
+func (ae *ApplicationEnvs) GetPipelineExecuteTimeout() time.Duration {
+	return ae.pipelineExecuteTimeout
 }
