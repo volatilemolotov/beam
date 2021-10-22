@@ -131,13 +131,13 @@ func Test_getSdkEnvsFromOsEnvs(t *testing.T) {
 			if err := setOsEnvs(tt.envsToSet); err != nil {
 				t.Fatalf("couldn't setup os env")
 			}
-			got, err := getSdkEnvsFromOsEnvs()
+			got, err := GetSdkEnvsFromOsEnvs()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getSdkEnvsFromOsEnvs() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetSdkEnvsFromOsEnvs() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getSdkEnvsFromOsEnvs() got = %v, want %v", got, tt.want)
+				t.Errorf("GetSdkEnvsFromOsEnvs() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -198,14 +198,14 @@ func Test_getApplicationEnvsFromOsEnvs(t *testing.T) {
 			if err := setOsEnvs(tt.envsToSet); err != nil {
 				t.Fatalf("couldn't setup os env")
 			}
-			got, err := getApplicationEnvsFromOsEnvs()
+			got, err := GetApplicationEnvsFromOsEnvs()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getApplicationEnvsFromOsEnvs() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetApplicationEnvsFromOsEnvs() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getApplicationEnvsFromOsEnvs() got = %v, want %v", got, tt.want)
+				t.Errorf("GetApplicationEnvsFromOsEnvs() got = %v, want %v", got, tt.want)
 			}
 			os.Clearenv()
 		})

@@ -32,9 +32,9 @@ WORKDIR /go/src/playground/backend
 
 # Build Application
 RUN go mod download &&\
-    go mod tidy &&\ 
+    go mod tidy &&\
     cd cmd/server &&\
-    go build -o /go/bin/server_java_backend 
+    go build -o /go/bin/server_java_backend
 
 FROM apache/beam_java8_sdk:2.33.0
 ENV BEAM_VERSION=2.33.0
@@ -48,4 +48,4 @@ COPY --from=build /go/bin/server_java_backend /opt
 RUN wget https://repo1.maven.org/maven2/org/apache/beam/beam-runners-direct-java/$BEAM_VERSION/beam-runners-direct-java-$BEAM_VERSION.jar &&\
     mv beam-runners-direct-java-$BEAM_VERSION.jar /opt/apache/beam/jars/beam-runners-direct.jar
 
-ENTRYPOINT ["/opt/server_java_backend"]
+ENTRYPOINT ["sh"]

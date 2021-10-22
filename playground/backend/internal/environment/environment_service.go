@@ -66,8 +66,8 @@ func NewEnvironment(networkEnvs NetworkEnvs, beamEnvs BeamEnvs, appEnvs Applicat
 	return &svc
 }
 
-//getApplicationEnvsFromOsEnvs lookups in os environment variables and takes value for app working dir. If not exists - return error
-func getApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
+//GetApplicationEnvsFromOsEnvs lookups in os environment variables and takes value for app working dir. If not exists - return error
+func GetApplicationEnvsFromOsEnvs() (*ApplicationEnvs, error) {
 	if value, present := os.LookupEnv(workingDirKey); present {
 		return NewApplicationEnvs(value), nil
 	}
@@ -88,8 +88,8 @@ func getNetworkEnvsFromOsEnvs() (*NetworkEnvs, error) {
 	return NewNetworkEnvs(ip, port), nil
 }
 
-// getSdkEnvsFromOsEnvs lookups in os environment variables and takes value for Apache Beam SDK. If not exists - using default
-func getSdkEnvsFromOsEnvs() (*BeamEnvs, error) {
+// GetSdkEnvsFromOsEnvs lookups in os environment variables and takes value for Apache Beam SDK. If not exists - using default
+func GetSdkEnvsFromOsEnvs() (*BeamEnvs, error) {
 	sdk := pb.Sdk_SDK_UNSPECIFIED
 	if value, present := os.LookupEnv(beamSdkKey); present {
 
