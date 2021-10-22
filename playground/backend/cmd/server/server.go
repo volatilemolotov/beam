@@ -16,6 +16,7 @@
 package main
 
 import (
+	"beam.apache.org/playground/backend/internal/cache/local"
 	"context"
 	"log"
 	"os"
@@ -37,7 +38,9 @@ func runServer() error {
 		return err
 	}
 	grpcServer := grpc.NewServer()
-	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{})
+	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
+		env: envService, cacheService: local.New(ctx),
+	})
 
 	grpclog.SetLoggerV2(grpclog.NewLoggerV2(os.Stdout, os.Stdout, os.Stderr))
 	handler := Wrap(grpcServer, getGrpcWebOptions())
