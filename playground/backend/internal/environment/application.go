@@ -13,16 +13,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// TODO: remove this code when merging https://github.com/apache/beam/pull/15654
-
 package environment
 
-type ServerEnvs struct {}
+import "fmt"
 
-func (envs ServerEnvs) Address() string {
-	return ""
+// NetworkEnvs contains all environment variables that need to run server.
+type NetworkEnvs struct {
+	ip   string
+	port int
 }
 
-func NewEnvironment() ServerEnvs {
-	return ServerEnvs{}
+// NewNetworkEnvs constructor for NetworkEnvs
+func NewNetworkEnvs(ip string, port int) *NetworkEnvs {
+	return &NetworkEnvs{ip: ip, port: port}
+}
+
+// Address returns concatenated ip and port through ':'
+func (serverEnvs NetworkEnvs) Address() string {
+	return fmt.Sprintf("%s:%d", serverEnvs.ip, serverEnvs.port)
+}
+
+//ApplicationEnvs contains all environment variables that needed to run backend processes
+type ApplicationEnvs struct {
+	workingDir string
+}
+
+// NewApplicationEnvs constructor for ApplicationEnvs
+func NewApplicationEnvs(workingDir string) *ApplicationEnvs {
+	return &ApplicationEnvs{workingDir: workingDir}
 }
