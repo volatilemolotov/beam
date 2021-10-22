@@ -18,21 +18,40 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:playground/constants/sizes.dart';
+import 'package:playground/modules/examples/components/examples_components.dart';
+import 'package:playground/modules/examples/models/example_model.dart';
 
-class OutputTabs extends StatelessWidget {
-  const OutputTabs({Key? key}) : super(key: key);
+class TypeFilter extends StatelessWidget {
+  const TypeFilter({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     AppLocalizations appLocale = AppLocalizations.of(context)!;
 
-    return SizedBox(
-      width: 300,
-      child: TabBar(
-        tabs: <Widget>[
-          Tab(text: appLocale.output),
-          Tab(text: appLocale.log),
-          Tab(text: appLocale.graph),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: kLgSpacing,
+        vertical: kMdSpacing,
+      ),
+      child: Row(
+        children: <CategoryBubble>[
+          CategoryBubble(
+            type: ExampleType.all,
+            name: appLocale.all,
+          ),
+          CategoryBubble(
+            type: ExampleType.example,
+            name: appLocale.examples,
+          ),
+          CategoryBubble(
+            type: ExampleType.kata,
+            name: appLocale.katas,
+          ),
+          CategoryBubble(
+            type: ExampleType.test,
+            name: appLocale.unitTests,
+          ),
         ],
       ),
     );

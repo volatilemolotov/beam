@@ -17,19 +17,18 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
-
-const kSendFeedbackText = "Send Feedback";
-const kPrivacyPolicyText = "Privacy Policy";
-const kCopyright = "© The Apache Software Foundation";
 
 class PlaygroundPageFooter extends StatelessWidget {
   const PlaygroundPageFooter({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Container(
       color: ThemeColors.of(context).secondaryBackground,
       width: double.infinity,
@@ -48,19 +47,19 @@ class PlaygroundPageFooter extends StatelessWidget {
                 primary: Theme.of(context).primaryColor,
               ),
               // ignore: avoid_print
-              onPressed: () => print(kSendFeedbackText),
-              child: const Text(kSendFeedbackText),
+              onPressed: () => print(appLocale.sendFeedback),
+              child: Text(appLocale.sendFeedback),
             ),
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
               ),
               // ignore: avoid_print
-              onPressed: () => print(kPrivacyPolicyText),
-              child: const Text(kPrivacyPolicyText),
+              onPressed: () => print(appLocale.privacyPolicy),
+              child: Text(appLocale.privacyPolicy),
             ),
             Text(
-              kCopyright,
+              appLocale.copyright,
               style: TextStyle(color: ThemeColors.of(context).grey1Color),
             ),
           ],

@@ -18,9 +18,17 @@
 
 import 'package:playground/modules/sdk/models/sdk.dart';
 
+enum ExampleType {
+  all,
+  example,
+  kata,
+  test,
+}
+
 class ExampleModel {
   final Map<SDK, String> sources;
+  final ExampleType type;
   final String name;
 
-  const ExampleModel(this.sources, this.name);
+  const ExampleModel(this.sources, this.name, this.type);
 }

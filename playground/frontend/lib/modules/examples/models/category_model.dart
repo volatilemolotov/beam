@@ -16,25 +16,11 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:playground/modules/examples/models/example_model.dart';
 
-class OutputTabs extends StatelessWidget {
-  const OutputTabs({Key? key}) : super(key: key);
+class CategoryModel {
+  final String name;
+  final List<ExampleModel> examples;
 
-  @override
-  Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
-
-    return SizedBox(
-      width: 300,
-      child: TabBar(
-        tabs: <Widget>[
-          Tab(text: appLocale.output),
-          Tab(text: appLocale.log),
-          Tab(text: appLocale.graph),
-        ],
-      ),
-    );
-  }
+  const CategoryModel(this.name, this.examples);
 }

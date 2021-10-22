@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 
-const kThemeIconAsset = "theme.svg";
-const kResetIconAsset = "reset.svg";
-const kOutputBottomIconAsset = "output_bottom.svg";
-const kOutputRightIconAsset = "output_right.svg";
-const kOutputLeftIconAsset = "output_left.svg";
-const kShortcutsIconAsset = "shortcuts.svg";
-const kGithubIconAsset = "github.svg";
-const kBeamIconAsset = "beam.png";
+const kThemeIconAsset = 'theme.svg';
+const kResetIconAsset = 'reset.svg';
+const kOutputBottomIconAsset = 'output_bottom.svg';
+const kOutputRightIconAsset = 'output_right.svg';
+const kOutputLeftIconAsset = 'output_left.svg';
+const kShortcutsIconAsset = 'shortcuts.svg';
+const kGithubIconAsset = 'github.svg';
+const kBeamIconAsset = 'beam.png';
 
 // notifications icons
-const kErrorNotificationIconAsset = "error_notification.svg";
-const kWarningNotificationIconAsset = "warning_notification.svg";
-const kSuccessNotificationIconAsset = "success_notification.svg";
-const kInfoNotificationIconAsset = "info_notification.svg";
+const kErrorNotificationIconAsset = 'error_notification.svg';
+const kWarningNotificationIconAsset = 'warning_notification.svg';
+const kSuccessNotificationIconAsset = 'success_notification.svg';
+const kInfoNotificationIconAsset = 'info_notification.svg';
