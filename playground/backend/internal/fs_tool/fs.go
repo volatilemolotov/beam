@@ -122,7 +122,7 @@ func (l *LifeCycle) GetExecutableName() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if len(dirEntries) < 2 {
+	if len(dirEntries) < 1 {
 		return "", errors.New("number of executable files should be more than one")
 	}
 	return strings.Split(dirEntries[len(dirEntries)-1].Name(), ".")[0], nil
