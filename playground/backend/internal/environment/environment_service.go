@@ -42,7 +42,7 @@ const (
 	defaultPort                   = 8080
 	defaultSdk                    = pb.Sdk_SDK_JAVA
 	defaultCacheExpirationTime    = time.Minute * 15
-	defaultPipelineExecuteTimeout = time.Minute * 10
+	defaultPipelineExecuteTimeout = time.Minute * 1
 	defaultBeamSdkPath            = "/opt/apache/beam/jars/beam-sdks-java-harness.jar"
 	defaultBeamRunner             = "/opt/apache/beam/jars/beam-runners-direct.jar"
 	defaultSLF4j                  = "/opt/apache/beam/jars/slf4j-jdk14.jar"

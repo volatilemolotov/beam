@@ -298,11 +298,11 @@ func processErrDuringValidate(ctx context.Context, err error, pipelineId uuid.UU
 func processErrDuringCompile(ctx context.Context, err error, data []byte, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: Compile: err: %s, output: %s\n", pipelineId, err.Error(), data)
 
-	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-
 	// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
 	setToCache(ctx, cacheService, pipelineId, cache.SubKey_CompileOutput, "error: "+err.Error()+", output: "+string(data))
+
+	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processErrDuringGetExecutableName processes error received during getting executable file name
@@ -317,20 +317,20 @@ func processErrDuringGetExecutableName(ctx context.Context, err error, pipelineI
 func processErrDuringRun(ctx context.Context, err error, data []byte, pipelineId uuid.UUID, cacheService cache.Cache) {
 	log.Printf("%s: Run: err: %s, output: %s\n", pipelineId, err.Error(), data)
 
-	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
-
 	// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
 	setToCache(ctx, cacheService, pipelineId, cache.SubKey_RunOutput, "error: "+err.Error()+", output: "+string(data))
+
+	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
 }
 
 // processSuccessRun processes case after successfully Run step
 func processSuccessRun(ctx context.Context, pipelineId uuid.UUID, output []byte, cacheService cache.Cache) {
-	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
-	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
-
 	// set to cache pipelineId: cache.SubKey_RunOutput: output
 	setToCache(ctx, cacheService, pipelineId, cache.SubKey_RunOutput, string(output))
+
+	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_FINISHED)
 }
 
 // setToCache puts value to cache by key and subKey
