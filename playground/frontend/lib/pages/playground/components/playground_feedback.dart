@@ -17,28 +17,35 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:playground/constants/assets.dart';
+import 'package:playground/constants/font_weight.dart';
 
-class Logo extends StatelessWidget {
-  const Logo({Key? key}) : super(key: key);
+const kFeedbackText = "Enjoying Playground?";
+
+class PlaygroundFeedback extends StatelessWidget {
+  const PlaygroundFeedback({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Image(image: AssetImage(kBeamLgIconAsset)),
-        RichText(
-          text: TextSpan(
-            style:
-                theme.textTheme.headline6?.copyWith(fontFamily: 'RobotoMono'),
-            children: <TextSpan>[
-              TextSpan(
-                  text: 'Beam', style: TextStyle(color: theme.primaryColor)),
-              const TextSpan(text: ' Playground'),
-            ],
-          ),
+        const Text(
+          kFeedbackText,
+          style: TextStyle(fontWeight: kBoldWeight),
+        ),
+        IconButton(
+          padding: EdgeInsets.zero,
+          // ignore: avoid_print
+          onPressed: () => print('Feedback Up'),
+          icon: SvgPicture.asset(kThumbUpIconAsset),
+        ),
+        IconButton(
+          padding: EdgeInsets.zero,
+          // ignore: avoid_print
+          onPressed: () => print('Feedback down'),
+          icon: SvgPicture.asset(kThumbDownIconAsset),
         ),
       ],
     );
