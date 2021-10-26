@@ -21,6 +21,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/assets.dart';
+import 'package:playground/modules/shortcuts/components/shortcuts_modal.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 enum HeaderAction {
@@ -42,9 +43,14 @@ const kScioGithubLink = 'https://github.com/spotify/scio';
 
 const kBeamWebsiteLink = 'https://beam.apache.org/';
 
-class MoreActions extends StatelessWidget {
+class MoreActions extends StatefulWidget {
   const MoreActions({Key? key}) : super(key: key);
 
+  @override
+  State<MoreActions> createState() => _MoreActionsState();
+}
+
+class _MoreActionsState extends State<MoreActions> {
   @override
   Widget build(BuildContext context) {
     AppLocalizations appLocale = AppLocalizations.of(context)!;
@@ -63,6 +69,13 @@ class MoreActions extends StatelessWidget {
             child: ListTile(
               leading: SvgPicture.asset(kShortcutsIconAsset),
               title: Text(appLocale.shortcuts),
+              title: const Text(kShortcutsText),
+              onTap: () => {
+                showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) => const ShortcutsModal(),
+                )
+              },
             ),
           ),
           PopupMenuItem<HeaderAction>(
