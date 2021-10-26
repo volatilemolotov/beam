@@ -78,7 +78,7 @@ func TestNewEnvironment(t *testing.T) {
 		{name: "create env service with default envs", want: &Environment{
 			NetworkEnvs:     *NewNetworkEnvs(defaultIp, defaultPort),
 			BeamSdkEnvs:     *NewBeamEnvs(defaultSdk, executorConfig),
-			ApplicationEnvs: *NewApplicationEnvs("/app"),
+			ApplicationEnvs: *NewApplicationEnvs("/app", &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout),
 		}},
 	}
 	for _, tt := range tests {
@@ -86,7 +86,7 @@ func TestNewEnvironment(t *testing.T) {
 			if got := NewEnvironment(
 				*NewNetworkEnvs(defaultIp, defaultPort),
 				*NewBeamEnvs(defaultSdk, executorConfig),
-				*NewApplicationEnvs("/app")); !reflect.DeepEqual(got, tt.want) {
+				*NewApplicationEnvs("/app", &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout)); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewEnvironment() = %v, want %v", got, tt.want)
 			}
 		})
@@ -190,7 +190,7 @@ func Test_getApplicationEnvsFromOsEnvs(t *testing.T) {
 		wantErr   bool
 		envsToSet map[string]string
 	}{
-		{name: "working dir is provided", want: NewApplicationEnvs("/app"), wantErr: false, envsToSet: map[string]string{workingDirKey: "/app"}},
+		{name: "working dir is provided", want: NewApplicationEnvs("/app", &CacheEnvs{defaultCacheType, defaultCacheAddress, defaultCacheKeyExpirationTime}, defaultPipelineExecuteTimeout), wantErr: false, envsToSet: map[string]string{workingDirKey: "/app"}},
 		{name: "working dir isn't provided", want: nil, wantErr: true},
 	}
 	for _, tt := range tests {
