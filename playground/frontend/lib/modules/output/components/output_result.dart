@@ -17,6 +17,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/constants/fonts.dart';
 import 'package:playground/constants/sizes.dart';
 
 class OutputResult extends StatelessWidget {
@@ -29,7 +30,7 @@ class OutputResult extends StatelessWidget {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(kXlSpacing),
-        child: SelectableText(text),
+        child: SelectableText(text, style: getCodeFontStyle()),
       ),
     );
   }

@@ -19,6 +19,7 @@
 import 'package:flutter/material.dart';
 import 'package:playground/constants/colors.dart';
 import 'package:playground/constants/font_weight.dart';
+import 'package:playground/constants/fonts.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:provider/provider.dart';
 
@@ -36,23 +37,25 @@ class ThemeProvider extends ChangeNotifier {
 }
 
 TextTheme createTextTheme(Color textColor) {
-  return const TextTheme(
-    headline1: TextStyle(),
-    headline2: TextStyle(),
-    headline3: TextStyle(),
-    headline4: TextStyle(),
-    headline5: TextStyle(),
-    headline6: TextStyle(),
-    subtitle1: TextStyle(),
-    subtitle2: TextStyle(),
-    bodyText1: TextStyle(),
-    bodyText2: TextStyle(),
-    caption: TextStyle(),
-    overline: TextStyle(),
-    button: TextStyle(fontWeight: kBoldWeight),
-  ).apply(
-    bodyColor: textColor,
-    displayColor: textColor,
+  return getBaseFontTheme(
+    const TextTheme(
+      headline1: TextStyle(),
+      headline2: TextStyle(),
+      headline3: TextStyle(),
+      headline4: TextStyle(),
+      headline5: TextStyle(),
+      headline6: TextStyle(),
+      subtitle1: TextStyle(),
+      subtitle2: TextStyle(),
+      bodyText1: TextStyle(),
+      bodyText2: TextStyle(),
+      caption: TextStyle(),
+      overline: TextStyle(),
+      button: TextStyle(fontWeight: kBoldWeight),
+    ).apply(
+      bodyColor: textColor,
+      displayColor: textColor,
+    ),
   );
 }
 

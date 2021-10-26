@@ -33,9 +33,11 @@ class SdkSelectorRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     return TextButton(
       style: ButtonStyle(
+        textStyle: MaterialStateProperty.all<TextStyle>(
+          const TextStyle(fontWeight: kNormalWeight),
+        ),
         alignment: Alignment.centerLeft,
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           const RoundedRectangleBorder(
@@ -45,12 +47,7 @@ class SdkSelectorRow extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(kLgSpacing),
-        child: Text(
-          sdk.displayName,
-          style: textTheme.button?.copyWith(
-            fontWeight: kNormalWeight,
-          ),
-        ),
+        child: Text(sdk.displayName),
       ),
       onPressed: onSelect,
     );

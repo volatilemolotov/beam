@@ -18,6 +18,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/constants/assets.dart';
+import 'package:playground/constants/font_weight.dart';
+import 'package:playground/constants/fonts.dart';
+import 'package:playground/constants/sizes.dart';
+
+const double kTitleFontSize = 18;
 
 class Logo extends StatelessWidget {
   const Logo({Key? key}) : super(key: key);
@@ -28,14 +33,24 @@ class Logo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Image(image: AssetImage(kBeamLgIconAsset)),
+        const Image(
+          image: AssetImage(kBeamLgIconAsset),
+          width: kIconSizeLg,
+          height: kIconSizeLg,
+        ),
         RichText(
           text: TextSpan(
-            style:
-                theme.textTheme.headline6?.copyWith(fontFamily: 'RobotoMono'),
+            style: getTitleFontStyle(
+              textStyle: const TextStyle(
+                fontSize: kTitleFontSize,
+                fontWeight: kLightWeight,
+              ),
+            ),
             children: <TextSpan>[
               TextSpan(
-                  text: 'Beam', style: TextStyle(color: theme.primaryColor)),
+                text: 'Beam',
+                style: TextStyle(color: theme.primaryColor),
+              ),
               const TextSpan(text: ' Playground'),
             ],
           ),

@@ -16,13 +16,15 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
+import 'package:flutter/material.dart';
+import 'package:highlight/languages/go.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
-import 'package:highlight/languages/go.dart';
 import 'package:playground/config/theme.dart';
+import 'package:playground/constants/fonts.dart';
+import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/editor/components/editor_themes.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
@@ -75,10 +77,14 @@ class _EditorTextAreaState extends State<EditorTextArea> {
   Widget build(BuildContext context) {
     return CodeField(
       controller: _codeController!,
-      textStyle: const TextStyle(fontFamily: 'SourceCode'),
+      textStyle: getCodeFontStyle(
+        textStyle: const TextStyle(fontSize: kCodeFontSize),
+      ),
       expands: true,
       lineNumberStyle: LineNumberStyle(
-        textStyle: TextStyle(color: ThemeColors.of(context).grey1Color),
+        textStyle: TextStyle(
+          color: ThemeColors.of(context).grey1Color,
+        ),
       ),
     );
   }
