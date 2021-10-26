@@ -98,7 +98,6 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
   }
 
   OverlayEntry createDropdown() {
-    print('render');
     SelectorPositionModel posModel = findSelectorPositionData();
 
     return OverlayEntry(

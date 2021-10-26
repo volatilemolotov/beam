@@ -21,7 +21,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:playground/constants/assets.dart';
 import 'package:playground/constants/font_weight.dart';
 
-const kFeedbackText = "Enjoying Playground?";
+const kFeedbackText = 'Enjoying Playground?';
 
 class PlaygroundFeedback extends StatelessWidget {
   const PlaygroundFeedback({Key? key}) : super(key: key);
