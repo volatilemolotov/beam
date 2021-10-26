@@ -23,6 +23,7 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/shortcuts/models/shortcut.dart';
 
 const kMetaKeyName = 'CMD/CTRL';
+const kShortcutKeyJoinSymbol = ' + ';
 
 class ShortcutRow extends StatelessWidget {
   final Shortcut shortcut;
@@ -45,8 +46,8 @@ class ShortcutRow extends StatelessWidget {
           padding: const EdgeInsets.all(kMdSpacing),
           child: Text(
             shortcut.shortcuts.keys
-                .map((e) => this.getKeyDisplayName(e))
-                .join(' + '),
+                .map((e) => getKeyDisplayName(e))
+                .join(kShortcutKeyJoinSymbol),
             style: TextStyle(color: primaryColor),
           ),
         ),
