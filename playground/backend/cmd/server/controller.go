@@ -272,7 +272,7 @@ func finishByContext(ctx context.Context, pipelineId uuid.UUID, cacheService cac
 	log.Printf("%s: processCode finish because of ctxWithTimeout.Done\n", pipelineId)
 
 	// set to cache pipelineId: cache.SubKey_Status: Status_STATUS_TIMEOUT
-	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_RUN_TIMEOUT)
 }
 
 // cleanUp removes all prepared folders for received LifeCycle
@@ -302,7 +302,7 @@ func processErrDuringCompile(ctx context.Context, err error, data []byte, pipeli
 	setToCache(ctx, cacheService, pipelineId, cache.SubKey_CompileOutput, "error: "+err.Error()+", output: "+string(data))
 
 	// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
-	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_ERROR)
+	setToCache(ctx, cacheService, pipelineId, cache.SubKey_Status, pb.Status_STATUS_COMPILE_ERROR)
 }
 
 // processErrDuringGetExecutableName processes error received during getting executable file name
