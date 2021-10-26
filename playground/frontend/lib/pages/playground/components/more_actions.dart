@@ -69,7 +69,6 @@ class _MoreActionsState extends State<MoreActions> {
             child: ListTile(
               leading: SvgPicture.asset(kShortcutsIconAsset),
               title: Text(appLocale.shortcuts),
-              title: const Text(kShortcutsText),
               onTap: () => {
                 showDialog<void>(
                   context: context,
