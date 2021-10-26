@@ -46,11 +46,15 @@ class PlaygroundPageProviders extends StatelessWidget {
           create: (context) => PlaygroundState(codeRepository: kCodeRepository),
           update: (context, exampleState, playground) {
             if (playground == null) {
-              return PlaygroundState(codeRepository: kCodeRepository);
+              return PlaygroundState(
+                exampleState: exampleState,
+                codeRepository: kCodeRepository,
+              );
             }
             if ((exampleState.categories?.isNotEmpty ?? false) &&
                 playground.selectedExample == null) {
               return PlaygroundState(
+                exampleState: exampleState,
                 codeRepository: kCodeRepository,
                 sdk: playground.sdk,
                 selectedExample: exampleState.categories?.first.examples.first,

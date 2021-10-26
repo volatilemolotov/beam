@@ -38,7 +38,7 @@ const double kLgBorderRadius = 8.0;
 const double kXlBorderRadius = 28.0;
 
 // elevation
-const int kElevation = 1;
+const double kElevation = 2;
 
 // icon sizes
 const double kIconSizeSm = 16.0;

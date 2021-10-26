@@ -47,8 +47,8 @@ class CodeTextAreaWrapper extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: kLgSpacing,
-            top: kLgSpacing,
+            right: kXlSpacing,
+            top: kXlSpacing,
             width: kRunButtonWidth,
             height: kRunButtonHeight,
             child: RunButton(
@@ -63,7 +63,7 @@ class CodeTextAreaWrapper extends StatelessWidget {
 
   _handleError(BuildContext context, PlaygroundState state) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(state.result?.errorMessage ?? "")),
+      SnackBar(content: Text(state.result?.errorMessage ?? '')),
     );
     state.resetError();
   }

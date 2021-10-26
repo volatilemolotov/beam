@@ -161,4 +161,15 @@ class ThemeColors {
 
   Color get secondaryBackground =>
       isDark ? kDarkSecondaryBackground : kLightSecondaryBackground;
+
+  Color get primaryBackground =>
+      isDark ? kDarkPrimaryBackground : kLightPrimaryBackground;
+
+  Color get code1 => isDark ? kDarkCode2 : kLightCode2;
+
+  Color get code2 => isDark ? kDarkCode1 : kLightCode1;
+
+  Color get codeComment => isDark ? kDarkCodeComment : kLightCodeComment;
+
+  Color get textColor => isDark ? kDarkText : kLightText;
 }

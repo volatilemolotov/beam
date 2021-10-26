@@ -36,11 +36,11 @@ class PlaygroundPageFooter extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: kMdSpacing,
-          horizontal: kLgSpacing,
+          vertical: kSmSpacing,
+          horizontal: kXlSpacing,
         ),
         child: Wrap(
-          spacing: kLgSpacing,
+          spacing: kXlSpacing,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             const PlaygroundFeedback(),

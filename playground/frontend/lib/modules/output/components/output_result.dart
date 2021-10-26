@@ -28,7 +28,7 @@ class OutputResult extends StatelessWidget {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(kLgSpacing),
+        padding: const EdgeInsets.all(kXlSpacing),
         child: SelectableText(text),
       ),
     );

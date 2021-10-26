@@ -18,13 +18,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:flutter_highlight/themes/vs.dart';
-import 'package:flutter_highlight/themes/darcula.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
 import 'package:highlight/languages/go.dart';
 import 'package:playground/config/theme.dart';
+import 'package:playground/modules/editor/components/editor_themes.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +58,7 @@ class _EditorTextAreaState extends State<EditorTextArea> {
     _codeController = CodeController(
       text: _codeController?.text ?? widget.example?.sources[widget.sdk] ?? '',
       language: _getLanguageFromSdk(),
-      theme: themeProvider.isDarkMode ? darculaTheme : vsTheme,
+      theme: themeProvider.isDarkMode ? kDarkCodeTheme : kLightCodeTheme,
       onChange: (newSource) => widget.onSourceChange(newSource),
       webSpaceFix: false,
     );
@@ -78,6 +77,9 @@ class _EditorTextAreaState extends State<EditorTextArea> {
       controller: _codeController!,
       textStyle: const TextStyle(fontFamily: 'SourceCode'),
       expands: true,
+      lineNumberStyle: LineNumberStyle(
+        textStyle: TextStyle(color: ThemeColors.of(context).grey1Color),
+      ),
     );
   }
 
