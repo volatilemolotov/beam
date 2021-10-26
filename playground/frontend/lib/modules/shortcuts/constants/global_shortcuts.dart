@@ -63,7 +63,7 @@ final List<Shortcut> globalShortcuts = [
     shortcuts: LogicalKeySet(
       LogicalKeyboardKey.meta,
       LogicalKeyboardKey.shift,
-      LogicalKeyboardKey.keyR,
+      LogicalKeyboardKey.keyE,
     ),
     actionIntent: const ResetIntent(),
     name: kResetText,

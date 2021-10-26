@@ -24,6 +24,7 @@ import 'package:playground/modules/editor/repository/code_repository/run_code_re
 import 'package:playground/modules/editor/repository/code_repository/run_code_result.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
+import 'package:playground/pages/playground/states/examples_state.dart';
 
 const kTitleLength = 15;
 const kTitle = 'Catalog';
@@ -34,6 +35,7 @@ class PlaygroundState with ChangeNotifier {
   ExampleModel? _selectedExample;
   String _source = '';
   RunCodeResult? _result;
+  ExampleState? _exampleState;
 
   String get examplesTitle {
     final name = _selectedExample?.name ?? '';
@@ -44,11 +46,13 @@ class PlaygroundState with ChangeNotifier {
     SDK sdk = SDK.java,
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
+    ExampleState? exampleState,
   }) {
     _selectedExample = selectedExample;
     _sdk = sdk;
     _source = _selectedExample?.sources[_sdk] ?? '';
     _codeRepository = codeRepository;
+    _exampleState = exampleState;
   }
 
   ExampleModel? get selectedExample => _selectedExample;
@@ -82,6 +86,7 @@ class PlaygroundState with ChangeNotifier {
   }
 
   reset() {
+    _selectedExample = _exampleState?.categories?.first.examples.first;
     _sdk = SDK.java;
     _source = _selectedExample?.sources[_sdk] ?? '';
     notifyListeners();
