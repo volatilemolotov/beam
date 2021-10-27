@@ -20,57 +20,56 @@ import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
-const javaHelloWorld = '''class HelloWorld {
-  public static void main(String[] args) {
-    System.out.println("Hello World!");
-  }
-}''';
+const javaMinimalWordCount =
+    '''import java.util.Arrays;\nimport org.apache.beam.sdk.Pipeline;\nimport org.apache.beam.sdk.io.TextIO;\nimport org.apache.beam.sdk.options.PipelineOptions;\nimport org.apache.beam.sdk.options.PipelineOptionsFactory;\nimport org.apache.beam.sdk.transforms.*;\nimport org.apache.beam.sdk.values.KV;\nimport org.apache.beam.sdk.values.PCollection;\nimport org.apache.beam.sdk.values.TypeDescriptors;\n\nclass MinimalWordCount {\n    private static class LogIt extends DoFn<String, String> {\n        @ProcessElement\n        public void process(ProcessContext context) {\n            System.out.println(context.element());\n            context.output(context.element());\n        }\n    }\n    public static void main(String[] args) {\n        PipelineOptions options = PipelineOptionsFactory.create();\n        Pipeline p = Pipeline.create(options);\n        PCollection<String> output = p\n                .apply(TextIO.read().from(\"gs://apache-beam-samples/shakespeare/kinglear.txt\"))\n                .apply(FlatMapElements.into(TypeDescriptors.strings()).via((String line) -> Arrays.asList(line.split(\"[^\\\\p{L}]+\"))))\n                .apply(Filter.by((String word) -> !word.isEmpty()))\n                .apply(Count.perElement())\n                .apply(MapElements.into(TypeDescriptors.strings()).via(\n                    (KV<String, Long> wordCount) ->\n                        wordCount.getKey() + \": \" + wordCount.getValue().toString()));\n        output.apply(\"printIt\", ParDo.of(new LogIt()));\n        p.run().waitUntilFinish();\n    }\n}''';
+const javaJoin =
+    '''import org.apache.beam.sdk.Pipeline;\nimport org.apache.beam.sdk.options.PipelineOptions;\nimport org.apache.beam.sdk.options.PipelineOptionsFactory;\nimport org.apache.beam.sdk.transforms.DoFn;\nimport org.apache.beam.sdk.transforms.ParDo;\nimport org.apache.beam.sdk.transforms.join.CoGbkResult;\nimport org.apache.beam.sdk.transforms.join.CoGroupByKey;\nimport org.apache.beam.sdk.transforms.join.KeyedPCollectionTuple;\nimport org.apache.beam.sdk.values.KV;\nimport org.apache.beam.sdk.values.PCollection;\nimport org.apache.beam.sdk.values.Row;\nimport org.apache.beam.sdk.values.TupleTag;\nimport org.apache.beam.sdk.transforms.Create;\nimport org.apache.beam.sdk.transforms.join.CoGbkResult;\nimport java.util.Collections;\nimport java.util.HashMap;\nimport java.util.List;\nimport java.util.Map;\nimport java.util.ArrayList;\nimport java.util.Arrays;\n\nclass TestCoGroupByKeyTuple {\n  \n  private static class LogIt extends DoFn<String, String> {\n        @ProcessElement\n        public void process(ProcessContext context) {\n            System.out.println(context.element());\n            context.output(context.element());\n        }\n  }\n  \n  public static void main(String[] args) throws Exception {\n    PipelineOptions options = PipelineOptionsFactory.create();\n    Pipeline p = Pipeline.create(options);\n    \n    final List<KV<String, String>> emailsList =\n        Arrays.asList(\n            KV.of(\"amy\", \"amy@example.com\"),\n            KV.of(\"carl\", \"carl@example.com\"),\n            KV.of(\"julia\", \"julia@example.com\"),\n            KV.of(\"carl\", \"carl@email.com\"));\n\n    final List<KV<String, String>> phonesList =\n        Arrays.asList(\n            KV.of(\"amy\", \"111-222-3333\"),\n            KV.of(\"james\", \"222-333-4444\"),\n            KV.of(\"amy\", \"333-444-5555\"),\n            KV.of(\"carl\", \"444-555-6666\"));\n\n    PCollection<KV<String, String>> emails = p.apply(\"CreateEmails\", Create.of(emailsList));\n    PCollection<KV<String, String>> phones = p.apply(\"CreatePhones\", Create.of(phonesList));\n    final TupleTag<String> emailsTag = new TupleTag<>();\n    final TupleTag<String> phonesTag = new TupleTag<>();\n    \n    PCollection<String> output = coGroupByKeyTuple(emailsTag, phonesTag, emails, phones);\n        \n    output.apply(\"printIt\", ParDo.of(new LogIt()));        \n    \n    p.run().waitUntilFinish();\n  }\n\n  \n  public static String formatCoGbkResults(\n      String name, Iterable<String> emails, Iterable<String> phones) {\n\n    List<String> emailsList = new ArrayList<>();\n    for (String elem : emails) {\n      emailsList.add(\"'\" + elem + \"'\");\n    }\n    Collections.sort(emailsList);\n    String emailsStr = \"[\" + String.join(\", \", emailsList) + \"]\";\n\n    List<String> phonesList = new ArrayList<>();\n    for (String elem : phones) {\n      phonesList.add(\"'\" + elem + \"'\");\n    }\n    Collections.sort(phonesList);\n    String phonesStr = \"[\" + String.join(\", \", phonesList) + \"]\";\n\n    return name + \"; \" + emailsStr + \"; \" + phonesStr;\n  }\n  \n  public static PCollection<String> coGroupByKeyTuple(\n      TupleTag<String> emailsTag,\n      TupleTag<String> phonesTag,\n      PCollection<KV<String, String>> emails,\n      PCollection<KV<String, String>> phones) {\n\n    // [START CoGroupByKeyTuple]\n    PCollection<KV<String, CoGbkResult>> results =\n        KeyedPCollectionTuple.of(emailsTag, emails)\n            .and(phonesTag, phones)\n            .apply(CoGroupByKey.create());\n\n    PCollection<String> contactLines =\n        results.apply(\n            ParDo.of(\n                new DoFn<KV<String, CoGbkResult>, String>() {\n                  @ProcessElement\n                  public void processElement(ProcessContext c) {\n                    KV<String, CoGbkResult> e = c.element();\n                    String name = e.getKey();\n                    Iterable<String> emailsIter = e.getValue().getAll(emailsTag);\n                    Iterable<String> phonesIter = e.getValue().getAll(phonesTag);\n                    String formattedResult = formatCoGbkResults(name, emailsIter, phonesIter);\n                    c.output(formattedResult);\n                  }\n                }));\n    // [END CoGroupByKeyTuple]\n    return contactLines;\n  }\n}''';
+const javaIO =
+    '''import org.apache.beam.sdk.Pipeline;\nimport org.apache.beam.sdk.io.TextIO;\nimport org.apache.beam.sdk.options.PipelineOptions;\nimport org.apache.beam.sdk.options.PipelineOptionsFactory;\nimport org.apache.beam.sdk.transforms.*;\nimport org.apache.beam.sdk.values.KV;\nimport org.apache.beam.sdk.values.PCollection;\nimport org.apache.beam.sdk.values.TypeDescriptors;\n\nclass ReadText {\n    private static class LogIt extends DoFn<String, String> {\n        @ProcessElement\n        public void process(ProcessContext context) {\n            System.out.println(context.element());\n            context.output(context.element());\n        }\n    }\n    public static void main(String[] args) {\n        PipelineOptions options = PipelineOptionsFactory.create();\n        Pipeline p = Pipeline.create(options);\n\n        TextIO.Read read = TextIO.read().from(\"gs://apache-beam-samples/shakespeare/kinglear.txt\");\n        PCollection<String> output = p.apply(read);\n\n        output.apply(\"printIt\", ParDo.of(new LogIt()));\n        p.run().waitUntilFinish();\n    }\n}''';
 
-const pythonHelloWorld = 'print(‘Hello World’)';
+const pythonMinimalWordCount =
+    '''import apache_beam as beam\nimport re\n\noutputs_prefix = 'outputs/part'\n\nwith beam.Pipeline() as pipeline:\n  (\n      pipeline\n      | 'Read lines' >> beam.io.ReadFromText(\"gs://dataflow-samples/shakespeare/kinglear.txt\")\n      | 'Find words' >> beam.FlatMap(lambda line: re.findall(r\"[a-zA-Z']+\", line))\n      | 'Pair words with 1' >> beam.Map(lambda word: (word, 1))\n      | 'Group and sum' >> beam.CombinePerKey(sum)\n      | 'Format results' >> beam.Map(lambda word_count: str(word_count))\n      | 'Write results' >> beam.io.WriteToText(outputs_prefix)\n  )''';
+const pythonIO =
+    "import json\nimport logging\nimport unittest\nimport uuid\n\nimport pytest\nfrom avro.schema import Parse\nfrom fastavro import parse_schema\n\nfrom apache_beam.io.avroio import ReadAllFromAvro\nfrom apache_beam.io.avroio import WriteToAvro\nfrom apache_beam.runners.runner import PipelineState\nfrom apache_beam.testing.test_pipeline import TestPipeline\nfrom apache_beam.testing.test_utils import delete_files\nfrom apache_beam.testing.util import BeamAssertException\nfrom apache_beam.transforms.core import Create\nfrom apache_beam.transforms.core import FlatMap\nfrom apache_beam.transforms.core import Map\nfrom apache_beam.transforms.util import CoGroupByKey\n\nLABELS = ['abc', 'def', 'ghi', 'jkl', 'mno', 'pqr', 'stu', 'vwx']\nCOLORS = ['RED', 'ORANGE', 'YELLOW', 'GREEN', 'BLUE', 'PURPLE', None]\n\n\ndef record(i):\n  return {\n      'label': LABELS[i % len(LABELS)],\n      'number': i,\n      'number_str': str(i),\n      'color': COLORS[i % len(COLORS)]\n  }\n\n\nclass FastavroIT(unittest.TestCase):\n\n  SCHEMA_STRING = '''\n    {\"namespace\": \"example.avro\",\n     \"type\": \"record\",\n     \"name\": \"User\",\n     \"fields\": [\n         {\"name\": \"label\", \"type\": \"string\"},\n         {\"name\": \"number\",  \"type\": [\"int\", \"null\"]},\n         {\"name\": \"number_str\", \"type\": [\"string\", \"null\"]},\n         {\"name\": \"color\", \"type\": [\"string\", \"null\"]}\n     ]\n    }\n    '''\n\n  def setUp(self):\n    self.test_pipeline = TestPipeline(is_integration_test=True)\n    self.uuid = str(uuid.uuid4())\n    self.output = '/'.join([self.test_pipeline.get_option('output'), self.uuid])\n\n  @pytest.mark.it_postcommit\n  def test_avro_it(self):\n    num_records = 5000\n\n    # Seed a `PCollection` with indices that will each be FlatMap'd into\n    # `batch_size` records, to avoid having a too-large list in memory at\n    # the outset\n    batch_size = self.test_pipeline.get_option('batch-size')\n    batch_size = int(batch_size) if batch_size else 10000\n\n    # pylint: disable=bad-option-value\n    batches = range(int(num_records / batch_size))\n\n    def batch_indices(start):\n      # pylint: disable=bad-option-value\n      return range(start * batch_size, (start + 1) * batch_size)\n\n    # A `PCollection` with `num_records` avro records\n    records_pcoll = \\\n        self.test_pipeline \\\n        | 'create-batches' >> Create(batches) \\\n        | 'expand-batches' >> FlatMap(batch_indices) \\\n        | 'create-records' >> Map(record)\n\n    fastavro_output = '/'.join([self.output, 'fastavro'])\n    avro_output = '/'.join([self.output, 'avro'])\n\n    # pylint: disable=expression-not-assigned\n    records_pcoll \\\n    | 'write_fastavro' >> WriteToAvro(\n        fastavro_output,\n        parse_schema(json.loads(self.SCHEMA_STRING)),\n        use_fastavro=True\n    )\n\n    # pylint: disable=expression-not-assigned\n    records_pcoll \\\n    | 'write_avro' >> WriteToAvro(\n        avro_output,\n        Parse(self.SCHEMA_STRING),\n        use_fastavro=False\n    )\n\n    result = self.test_pipeline.run()\n    result.wait_until_finish()\n    assert result.state == PipelineState.DONE\n\n    with TestPipeline(is_integration_test=True) as fastavro_read_pipeline:\n\n      fastavro_records = \\\n          fastavro_read_pipeline \\\n          | 'create-fastavro' >> Create(['%s*' % fastavro_output]) \\\n          | 'read-fastavro' >> ReadAllFromAvro(use_fastavro=True) \\\n          | Map(lambda rec: (rec['number'], rec))\n\n      avro_records = \\\n          fastavro_read_pipeline \\\n          | 'create-avro' >> Create(['%s*' % avro_output]) \\\n          | 'read-avro' >> ReadAllFromAvro(use_fastavro=False) \\\n          | Map(lambda rec: (rec['number'], rec))\n\n      def check(elem):\n        v = elem[1]\n\n        def assertEqual(l, r):\n          if l != r:\n            raise BeamAssertException('Assertion failed: %s == %s' % (l, r))\n\n        assertEqual(sorted(v.keys()), ['avro', 'fastavro'])\n        avro_values = v['avro']\n        fastavro_values = v['fastavro']\n        assertEqual(avro_values, fastavro_values)\n        assertEqual(len(avro_values), 1)\n\n      # pylint: disable=expression-not-assigned\n      {\n          'avro': avro_records,\n          'fastavro': fastavro_records\n      } \\\n      | CoGroupByKey() \\\n      | Map(check)\n\n      self.addCleanup(delete_files, [self.output])\n    assert result.state == PipelineState.DONE\n\n\nif __name__ == '__main__':\n  logging.getLogger().setLevel(logging.DEBUG)\n  unittest.main()";
+const pythonJoin =
+    '''import apache_beam as beam\n\nwith beam.Pipeline() as pipeline:\n  icon_pairs = pipeline | 'Create icons' >> beam.Create([\n      ('Apple', '🍎'),\n      ('Apple', '🍏'),\n      ('Eggplant', '🍆'),\n      ('Tomato', '🍅'),\n  ])\n\n  duration_pairs = pipeline | 'Create durations' >> beam.Create([\n      ('Apple', 'perennial'),\n      ('Carrot', 'biennial'),\n      ('Tomato', 'perennial'),\n      ('Tomato', 'annual'),\n  ])\n\n  plants = (({\n      'icons': icon_pairs, 'durations': duration_pairs\n  })\n            | 'Merge' >> beam.CoGroupByKey()\n            | beam.Map(print))''';
 
-const goHelloWorld = '''package main
+const goMinimalWordCount =
+    '''package main\n\nimport (\n    \"context\"\n    \"fmt\"\n    \"regexp\"\n\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam\"\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam/io/textio\"\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam/runners/direct\"\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/stats\"\n\n    _ \"github.com/apache/beam/sdks/v2/go/pkg/beam/io/filesystem/gcs\"\n    _ \"github.com/apache/beam/sdks/v2/go/pkg/beam/io/filesystem/local\"\n)\n\nvar wordRE = regexp.MustCompile(`[a-zA-Z]+('[a-z])?`)\n\nfunc main() {\n    // beam.Init() is an initialization hook that must be called on startup.\n    beam.Init()\n\n    // Create the Pipeline object and root scope.\n    p := beam.NewPipeline()\n    s := p.Root()\n\n    // Apply the pipeline's transforms.\n\n    // Concept #1: Invoke a root transform with the pipeline; in this case,\n    // textio.Read to read a set of input text file. textio.Read returns a\n    // PCollection where each element is one line from the input text\n    // (one of of Shakespeare's texts).\n\n    // This example reads a public data set consisting of the complete works\n    // of Shakespeare.\n    lines := textio.Read(s, \"gs://apache-beam-samples/shakespeare/*\")\n\n    // Concept #2: Invoke a ParDo transform on our PCollection of text lines.\n    // This ParDo invokes a DoFn (defined in-line) on each element that\n    // tokenizes the text line into individual words. The ParDo returns a\n    // PCollection of type string, where each element is an individual word in\n    // Shakespeare's collected texts.\n    words := beam.ParDo(s, func(line string, emit func(string)) {\n        for _, word := range wordRE.FindAllString(line, -1) {\n            emit(word)\n        }\n    }, lines)\n\n    // Concept #3: Invoke the stats.Count transform on our PCollection of\n    // individual words. The Count transform returns a new PCollection of\n    // key/value pairs, where each key represents a unique word in the text.\n    // The associated value is the occurrence count for that word.\n    counted := stats.Count(s, words)\n\n    // Use a ParDo to format our PCollection of word counts into a printable\n    // string, suitable for writing to an output file. When each element\n    // produces exactly one element, the DoFn can simply return it.\n    formatted := beam.ParDo(s, func(w string, c int) string {\n        return fmt.Sprintf(\"%s: %v\", w, c)\n    }, counted)\n\n    // Concept #4: Invoke textio.Write at the end of the pipeline to write\n    // the contents of a PCollection (in this case, our PCollection of\n    // formatted strings) to a text file.\n    textio.Write(s, \"wordcounts.txt\", formatted)\n\n    // Run the pipeline on the direct runner.\n    direct.Execute(context.Background(), p)\n}''';
+const goIO =
+    '''package main\n\nimport (\n    \"context\"\n    \"encoding/json\"\n    \"flag\"\n    \"log\"\n    \"reflect\"\n\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam\"\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam/io/avroio\"\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam/x/beamx\"\n    \"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug\"\n)\n\nvar (\n    input  = flag.String(\"input\", \"./twitter.avro\", \"input avro file\")\n    output = flag.String(\"output\", \"./output.avro\", \"output avro file\")\n)\n\n// Doc type used to unmarshal avro json data\ntype Doc struct {\n    Stamp int64  `json:\"timestamp\"`\n    Tweet string `json:\"tweet\"`\n    User  string `json:\"username\"`\n}\n\n// Note that the schema is only required for Writing avro.\n// not Reading.\nconst schema = `{\n    \"type\": \"record\",\n    \"name\": \"tweet\",\n    \"namespace\": \"twitter\",\n    \"fields\": [\n        { \"name\": \"timestamp\", \"type\": \"double\" },\n        { \"name\": \"tweet\", \"type\": \"string\" },\n        { \"name\": \"username\", \"type\": \"string\" }\n    ]\n}`\n\nfunc main() {\n    flag.Parse()\n    beam.Init()\n\n    p := beam.NewPipeline()\n    s := p.Root()\n\n    // read rows and return JSON string PCollection - PCollection<string>\n    rows := avroio.Read(s, *input, reflect.TypeOf(\"\"))\n    debug.Print(s, rows)\n\n    // read rows and return Doc Type PCollection - PCollection<Doc>\n    docs := avroio.Read(s, *input, reflect.TypeOf(Doc{}))\n    debug.Print(s, docs)\n\n    // update all values with a single user and tweet.\n    format := beam.ParDo(s, func(d Doc, emit func(string)) {\n        d.User = \"daidokoro\"\n        d.Tweet = \"I was here......\"\n\n        b, _ := json.Marshal(d)\n        emit(string(b))\n    }, docs)\n\n    debug.Print(s, format)\n\n    // write output\n    avroio.Write(s, *output, schema, format)\n\n    if err := beamx.Run(context.Background(), p); err != nil {\n        log.Fatalf(\"Failed to execute job: %v\", err)\n    }\n}\n''';
+const goJoin =
+    '''func CreateAndSplit(s beam.Scope, input []stringPair) beam.PCollection {\n    initial := beam.CreateList(s, input)\n    return beam.ParDo(s, splitStringPair, initial)\n}\n\nfunc coGBKExample(s beam.Scope) beam.PCollection {\n    // [START cogroupbykey_inputs]\n    var emailSlice = []stringPair{\n        {\"amy\", \"amy@example.com\"},\n        {\"carl\", \"carl@example.com\"},\n        {\"julia\", \"julia@example.com\"},\n        {\"carl\", \"carl@email.com\"},\n    }\n\n    var phoneSlice = []stringPair{\n        {\"amy\", \"111-222-3333\"},\n        {\"james\", \"222-333-4444\"},\n        {\"amy\", \"333-444-5555\"},\n        {\"carl\", \"444-555-6666\"},\n    }\n    emails := CreateAndSplit(s.Scope(\"CreateEmails\"), emailSlice)\n    phones := CreateAndSplit(s.Scope(\"CreatePhones\"), phoneSlice)\n    // [END cogroupbykey_inputs]\n\n    // [START cogroupbykey_outputs]\n    results := beam.CoGroupByKey(s, emails, phones)\n\n    contactLines := beam.ParDo(s, formatCoGBKResults, results)\n    // [END cogroupbykey_outputs]\n\n    return contactLines\n}\n\n\nfunc main() {\n    results := []struct {\n            Key            string\n            Emails, Phones []string\n    }{\n        {\n            Key:    \"amy\",\n            Emails: []string{\"amy@example.com\"},\n            Phones: []string{\"111-222-3333\", \"333-444-5555\"},\n        }, {\n            Key:    \"carl\",\n            Emails: []string{\"carl@email.com\", \"carl@example.com\"},\n            Phones: []string{\"444-555-6666\"},\n        }, {\n            Key:    \"james\",\n            Emails: []string{},\n            Phones: []string{\"222-333-4444\"},\n        }, {\n            Key:    \"julia\",\n            Emails: []string{\"julia@example.com\"},\n            Phones: []string{},\n        },\n    }\n    // [END cogroupbykey_outputs]\n\n    // [START cogroupbykey_formatted_outputs]\n    formattedResults := []string{\n        \"amy; ['amy@example.com']; ['111-222-3333', '333-444-5555']\",\n        \"carl; ['carl@email.com', 'carl@example.com']; ['444-555-6666']\",\n        \"james; []; ['222-333-4444']\",\n        \"julia; ['julia@example.com']; []\",\n    }\n    // [END cogroupbykey_formatted_outputs]\n\n    // Helper to fake iterators for unit testing.\n    makeIter := func(vs []string) func(*string) bool {\n        i := 0\n        return func(v *string) bool {\n            if i >= len(vs) {\n                return false\n            }\n            *v = vs[i]\n            i++\n            return true\n        }\n    }\n\n    for i, result := range results {\n        got := formatCoGBKResults(result.Key, makeIter(result.Emails), makeIter(result.Phones))\n        want := formattedResults[i]\n        if got != want {\n            t.Errorf(\"%d.%v, got %q, want %q\", i, result.Key, got, want)\n        }\n    }\n\n    p, s := beam.NewPipelineWithRoot()\n    formattedCoGBK := coGBKExample(s)\n}''';
 
-import "fmt"
-
-// this is a comment
-
-func main() {
-  fmt.Println("Hello World")
-}''';
-
-const scioHelloWorld = ''' 
-object Hello {
-    def main(args: Array[String]) = {
-        println("Hello, world")
-    }
-}''';
+const scioMinimalWordCount =
+    '''package com.spotify.scio.examples\n\nimport com.spotify.scio._\nimport com.spotify.scio.examples.common.ExampleData\n\nobject MinimalWordCount {\n  def main(cmdlineArgs: Array[String]): Unit = { \n    val (sc, args) = ContextAndArgs(cmdlineArgs)\n    sc.textFile(args.getOrElse(\"input\", ExampleData.KING_LEAR))\n      .transform(\"counter\") { \n        _.flatMap(_.split(\"[^a-zA-Z']+\").filter(_.nonEmpty)) \n          .countByValue\n      } \n      .map(t => t._1 + \": \" + t._2) \n      .saveAsTextFile(args(\"output\"))\n    sc.run()\n    ()\n  }\n} ''';
 
 class ExampleRepository {
   List<CategoryModel>? getCategories() {
     return const [
-      CategoryModel('Side Inputs', [
+      CategoryModel('Common', [
         ExampleModel(
           {
-            SDK.java: javaHelloWorld,
-            SDK.go: goHelloWorld,
-            SDK.python: pythonHelloWorld,
-            SDK.scio: scioHelloWorld,
+            SDK.java: javaMinimalWordCount,
+            SDK.go: goMinimalWordCount,
+            SDK.python: pythonMinimalWordCount,
+            SDK.scio: scioMinimalWordCount,
           },
-          'HelloWorld',
+          'Minimal Wordcount',
           ExampleType.example,
         ),
         ExampleModel(
           {
-            SDK.java: 'JAVA Source code 1',
-            SDK.go: 'GO  Source code 1',
-            SDK.python: 'PYTHON  Source code 1',
+            SDK.java: javaJoin,
+            SDK.go: goJoin,
+            SDK.python: pythonJoin,
             SDK.scio: 'SCIO  Source code 1',
           },
-          'KATA Source code 1',
-          ExampleType.kata,
+          'CoGroupByKey',
+          ExampleType.test,
         ),
       ]),
-      CategoryModel('Side Outputs', [
+      CategoryModel('Side Inputs', [
         ExampleModel(
           {
             SDK.java: 'JAVA Source code 2',
@@ -88,29 +87,19 @@ class ExampleRepository {
             SDK.python: 'PYTHON  Source code 3',
             SDK.scio: 'SCIO  Source code 3',
           },
-          'EXAMPLE Source code 3',
-          ExampleType.example,
+          'KATA Source code 3',
+          ExampleType.kata,
         ),
       ]),
       CategoryModel('I/O', [
         ExampleModel(
           {
-            SDK.java: 'JAVA Source code 4',
-            SDK.go: 'GO  Source code 4',
-            SDK.python: 'PYTHON  Source code 4',
+            SDK.java: javaIO,
+            SDK.go: goIO,
+            SDK.python: pythonIO,
             SDK.scio: 'SCIO  Source code 4',
           },
-          'KATA Source code 4',
-          ExampleType.kata,
-        ),
-        ExampleModel(
-          {
-            SDK.java: 'JAVA Source code 5',
-            SDK.go: 'GO  Source code 5',
-            SDK.python: 'PYTHON  Source code 5',
-            SDK.scio: 'SCIO  Source code 5',
-          },
-          'UNIT TEST Source code 5',
+          'TextIO',
           ExampleType.test,
         ),
       ]),
