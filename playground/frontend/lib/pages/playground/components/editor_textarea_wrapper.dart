@@ -50,8 +50,8 @@ class CodeTextAreaWrapper extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: kLgSpacing,
-            top: kLgSpacing,
+            right: kXlSpacing,
+            top: kXlSpacing,
             width: kRunButtonWidth,
             height: kRunButtonHeight,
             child: RunButton(

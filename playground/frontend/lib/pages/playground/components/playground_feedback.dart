@@ -17,31 +17,37 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/output/components/output_header/output_placements.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:playground/constants/assets.dart';
+import 'package:playground/constants/font_weight.dart';
 
-import 'output_tabs.dart';
+const kFeedbackText = 'Enjoying Playground?';
 
-class OutputHeader extends StatelessWidget {
-  const OutputHeader({Key? key}) : super(key: key);
+class PlaygroundFeedback extends StatelessWidget {
+  const PlaygroundFeedback({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: kXlSpacing,
-          vertical: kZeroSpacing,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          kFeedbackText,
+          style: TextStyle(fontWeight: kBoldWeight),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            OutputTabs(),
-            OutputPlacements(),
-          ],
+        IconButton(
+          padding: EdgeInsets.zero,
+          // ignore: avoid_print
+          onPressed: () => print('Feedback Up'),
+          icon: SvgPicture.asset(kThumbUpIconAsset),
         ),
-      ),
+        IconButton(
+          padding: EdgeInsets.zero,
+          // ignore: avoid_print
+          onPressed: () => print('Feedback down'),
+          icon: SvgPicture.asset(kThumbDownIconAsset),
+        ),
+      ],
     );
   }
 }

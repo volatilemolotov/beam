@@ -109,7 +109,7 @@ class _MoreActionsState extends State<MoreActions> {
             padding: EdgeInsets.zero,
             value: HeaderAction.beamWebsite,
             child: ListTile(
-              leading: const Image(image: AssetImage('beam.png')),
+              leading: const Image(image: AssetImage(kBeamIconAsset)),
               title: Text(appLocale.toApacheBeamWebsite),
               onTap: () => launch(kBeamWebsiteLink),
             ),

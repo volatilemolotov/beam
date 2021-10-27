@@ -17,31 +17,39 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/output/components/output_header/output_placements.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-import 'output_tabs.dart';
+class SdkSelectorRow extends StatelessWidget {
+  final SDK sdk;
+  final VoidCallback onSelect;
 
-class OutputHeader extends StatelessWidget {
-  const OutputHeader({Key? key}) : super(key: key);
+  const SdkSelectorRow({
+    Key? key,
+    required this.sdk,
+    required this.onSelect,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: kXlSpacing,
-          vertical: kZeroSpacing,
+    return TextButton(
+      style: ButtonStyle(
+        textStyle: MaterialStateProperty.all<TextStyle>(
+          const TextStyle(fontWeight: kNormalWeight),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
-            OutputTabs(),
-            OutputPlacements(),
-          ],
+        alignment: Alignment.centerLeft,
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          const RoundedRectangleBorder(
+            borderRadius: BorderRadius.zero,
+          ),
         ),
       ),
+      child: Padding(
+        padding: const EdgeInsets.all(kLgSpacing),
+        child: Text(sdk.displayName),
+      ),
+      onPressed: onSelect,
     );
   }
 }
