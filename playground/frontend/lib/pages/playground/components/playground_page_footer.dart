@@ -48,8 +48,8 @@ class PlaygroundPageFooter extends StatelessWidget {
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
               ),
               // ignore: avoid_print
-              onPressed: () => print(appLocale.sendFeedback),
-              child: Text(appLocale.sendFeedback),
+              onPressed: () => print('Report issue in Jira'),
+              child: const Text('Report issue in Jira'),
             ),
             TextButton(
               style: TextButton.styleFrom(
