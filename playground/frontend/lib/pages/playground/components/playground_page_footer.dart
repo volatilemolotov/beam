@@ -59,7 +59,7 @@ class PlaygroundPageFooter extends StatelessWidget {
               onPressed: () => print(appLocale.privacyPolicy),
               child: Text(appLocale.privacyPolicy),
             ),
-            const Text(appLocale.copyright),
+            Text(appLocale.copyright),
           ],
         ),
       ),

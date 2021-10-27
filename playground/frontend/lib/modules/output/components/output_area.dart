@@ -36,12 +36,7 @@ class OutputArea extends StatelessWidget {
           return TabBarView(
             physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
-              SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(kLgSpacing),
-                  child: SelectableText(state.result?.output ?? ''),
-                ),
-              ),
+              OutputResult(text: state.result?.output ?? ''),
               Center(child: Text(appLocale.log)),
               Center(child: Text(appLocale.graph)),
             ],

@@ -21,6 +21,8 @@ import 'package:playground/components/dropdown_button/dropdown_button.dart';
 import 'package:playground/modules/examples/components/examples_components.dart';
 import 'package:playground/modules/examples/components/search_field/search_field.dart';
 import 'package:playground/modules/examples/models/category_model.dart';
+import 'package:playground/pages/playground/states/example_selector_state.dart';
+import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
 
@@ -60,18 +62,22 @@ class _ExampleSelectorState extends State<ExampleSelector> {
       buttonText: Consumer<PlaygroundState>(
         builder: (context, state, child) => Text(state.examplesTitle),
       ),
-      createDropdown: (_) => ChangeNotifierProvider(
-        create: (context) => ExampleDropdownState(),
-        builder: (context, _) => Column(
-          children: [
-            SearchField(controller: textController),
-            const TypeFilter(),
-            ExampleList(
-              controller: scrollController,
-              items: widget.categories,
+      createDropdown: (_) => Consumer<ExampleState>(
+        builder: (context, state, child) {
+          return ChangeNotifierProvider<ExampleSelectorState>(
+            create: (context) => ExampleSelectorState(
+              state,
+              state.categories!,
             ),
-          ],
-        ),
+            builder: (context, _) => Column(
+              children: [
+                SearchField(controller: textController),
+                const TypeFilter(),
+                ExampleList(controller: scrollController),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
