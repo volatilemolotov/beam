@@ -1,0 +1,33 @@
+name: Build python source distribution and wheels
+
+on:
+  push:
+    branches: ['master', 'release-*', 'playground_demo_2']
+    tags: 'v*'
+  pull_request:
+    branches: ['master', 'release-*', 'playground_demo_2']
+    tags: 'v*'
+    paths: ['playground/backend/**']
+  workflow_dispatch:
+
+jobs:
+  build_playground_backend_docker_image:
+    name: Build Playground Backend App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: "Installing local env dependencies"
+        run: "sudo ./local-env-setup.sh"
+        id: local_env_install_ubuntu
+      - name: Prepare Go lint env
+        run: "sudo ./playground/backend/env_setup.sh"
+      - name: Run Lint
+        run: "golangci-lint run internal/..."
+        working-directory: playground/backend/
+        continue-on-error: true
+      - name: Run Tests
+        run: ./gradlew playground:backend:test
+        continue-on-error: true
+      - name: Preapre Build
+        run: ./gradlew playground:backend:containers:java:dockerPush -Pdocker-repository-root='us-central1-docker.pkg.dev/datatokenization/playground-repository' -Pbase-image='apache/beam_java8_sdk:2.33.0'
