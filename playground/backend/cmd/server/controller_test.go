@@ -27,15 +27,21 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
+	"io/fs"
 	"log"
 	"net"
 	"os"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
 
-const bufSize = 1024 * 1024
+const (
+	bufSize    = 1024 * 1024
+	javaConfig = "{\n  \"compile_cmd\": \"javac\",\n  \"run_cmd\": \"java\",\n  \"compile_args\": [\"-d\", \"bin\", \"-classpath\"],\n  \"run_args\": [\"-cp\", \"bin:\"]\n}"
+)
 
 var lis *bufconn.Listener
 var cacheService cache.Cache
@@ -49,9 +55,27 @@ func TestMain(m *testing.M) {
 func setup() *grpc.Server {
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
+
+	// create configs for java
+	err := os.MkdirAll("configs", fs.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	filePath := filepath.Join("configs", pb.Sdk_SDK_JAVA.String()+".json")
+	err = os.WriteFile(filePath, []byte(javaConfig), 0600)
+	if err != nil {
+		panic(err)
+	}
+
+	// setup cache
 	cacheService = local.New(context.Background())
 
+	path, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
 	os.Setenv("BEAM_SDK", pb.Sdk_SDK_JAVA.String())
+	os.Setenv("APP_WORK_DIR", path)
 
 	networkEnv, err := environment.GetNetworkEnvsFromOsEnvs()
 	if err != nil {
@@ -62,9 +86,6 @@ func setup() *grpc.Server {
 		panic(err)
 	}
 	appEnv, err := environment.GetApplicationEnvsFromOsEnvs()
-	if err != nil {
-		panic(err)
-	}
 	if err != nil {
 		panic(err)
 	}
@@ -82,6 +103,11 @@ func setup() *grpc.Server {
 
 func teardown(server *grpc.Server) {
 	server.Stop()
+
+	err := os.RemoveAll("configs")
+	if err != nil {
+		fmt.Errorf("error during test setup: %s", err.Error())
+	}
 }
 
 func bufDialer(context.Context, string) (net.Conn, error) {
@@ -100,6 +126,8 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 		wantErr    bool
 	}{
 		{
+			// Test case with calling RunCode method with incorrect SDK.
+			// As a result want to receive error.
 			name: "RunCode with incorrect sdk",
 			args: args{
 				ctx: context.Background(),
@@ -111,6 +139,8 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			// Test case with calling RunCode method with correct SDK.
+			// As a result want to receive response with pipelineId and status into cache should be set as Status_STATUS_EXECUTING.
 			name: "RunCode with correct sdk",
 			args: args{
 				ctx: context.Background(),
@@ -161,56 +191,194 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 
 func TestPlaygroundController_CheckStatus(t *testing.T) {
 	ctx := context.Background()
+	pipelineId := uuid.New()
+	wantStatus := pb.Status_STATUS_FINISHED
 	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
 	if err != nil {
 		t.Fatalf("Failed to dial bufnet: %v", err)
 	}
 	defer conn.Close()
 	client := pb.NewPlaygroundServiceClient(conn)
-	pipelineMeta := pb.CheckStatusRequest{
-		PipelineUuid: uuid.NewString(),
+
+	type args struct {
+		ctx     context.Context
+		request *pb.CheckStatusRequest
 	}
-	status, err := client.CheckStatus(ctx, &pipelineMeta)
-	if err != nil {
-		t.Fatalf("runCode failed: %v", err)
+	tests := []struct {
+		name       string
+		prepare    func()
+		args       args
+		wantStatus *pb.Status
+		wantErr    bool
+	}{
+		{
+			name:    "status is not set",
+			prepare: func() {},
+			args: args{
+				ctx:     ctx,
+				request: &pb.CheckStatusRequest{PipelineUuid: pipelineId.String()},
+			},
+			wantStatus: nil,
+			wantErr:    true,
+		},
+		{
+			name: "all success",
+			prepare: func() {
+				_ = cacheService.SetValue(ctx, pipelineId, cache.SubKey_Status, wantStatus)
+			},
+			args: args{
+				ctx:     ctx,
+				request: &pb.CheckStatusRequest{PipelineUuid: pipelineId.String()},
+			},
+			wantStatus: &wantStatus,
+			wantErr:    false,
+		},
 	}
-	log.Printf("Response: %+v", status)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			got, err := client.CheckStatus(ctx, tt.args.request)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("PlaygroundController_CheckStatus() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if got == nil && tt.wantStatus != nil {
+				t.Errorf("PlaygroundController_CheckStatus() return = %v, want response with status %v", got, tt.wantStatus)
+			}
+			if got != nil && !reflect.DeepEqual(got.Status, *tt.wantStatus) {
+				t.Errorf("PlaygroundController_CheckStatus() return status = %v, want status %v", got.Status, tt.wantStatus)
+			}
+		})
+	}
 }
 
 func TestPlaygroundController_GetCompileOutput(t *testing.T) {
 	ctx := context.Background()
+	pipelineId := uuid.New()
+	compileOutput := "MOCK_COMPILE_OUTPUT"
 	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
 	if err != nil {
 		t.Fatalf("Failed to dial bufnet: %v", err)
 	}
 	defer conn.Close()
 	client := pb.NewPlaygroundServiceClient(conn)
-	pipelineMeta := pb.GetCompileOutputRequest{
-		PipelineUuid: uuid.NewString(),
+
+	type args struct {
+		ctx  context.Context
+		info *pb.GetCompileOutputRequest
 	}
-	compileOutput, err := client.GetCompileOutput(ctx, &pipelineMeta)
-	if err != nil {
-		t.Fatalf("runCode failed: %v", err)
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		want    *pb.GetRunOutputResponse
+		wantErr bool
+	}{
+		{
+			name:    "pipelineId doesn't exist",
+			prepare: func() {},
+			args: args{
+				ctx:  ctx,
+				info: &pb.GetCompileOutputRequest{PipelineUuid: pipelineId.String()},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "run output exist",
+			prepare: func() {
+				_ = cacheService.SetValue(ctx, pipelineId, cache.SubKey_CompileOutput, compileOutput)
+			},
+			args: args{
+				ctx:  ctx,
+				info: &pb.GetCompileOutputRequest{PipelineUuid: pipelineId.String()},
+			},
+			want:    &pb.GetRunOutputResponse{Output: compileOutput},
+			wantErr: false,
+		},
 	}
-	log.Printf("Response: %+v", compileOutput)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			got, err := client.GetCompileOutput(tt.args.ctx, tt.args.info)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetCompileOutput() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr {
+				if !strings.EqualFold(got.Output, tt.want.Output) {
+					t.Errorf("GetCompileOutput() got = %v, want %v", got.Output, tt.want.Output)
+				}
+				if !reflect.DeepEqual(got.CompilationStatus, tt.want.CompilationStatus) {
+					t.Errorf("GetCompileOutput() got = %v, want %v", got.CompilationStatus, tt.want.CompilationStatus)
+				}
+			}
+		})
+	}
 }
 
 func TestPlaygroundController_GetRunOutput(t *testing.T) {
 	ctx := context.Background()
+	pipelineId := uuid.New()
+	runOutput := "MOCK_RUN_OUTPUT"
 	conn, err := grpc.DialContext(ctx, "bufnet", grpc.WithContextDialer(bufDialer), grpc.WithInsecure())
 	if err != nil {
 		t.Fatalf("Failed to dial bufnet: %v", err)
 	}
 	defer conn.Close()
 	client := pb.NewPlaygroundServiceClient(conn)
-	pipelineMeta := pb.GetRunOutputRequest{
-		PipelineUuid: uuid.NewString(),
+
+	type args struct {
+		ctx  context.Context
+		info *pb.GetRunOutputRequest
 	}
-	runOutput, err := client.GetRunOutput(ctx, &pipelineMeta)
-	if err != nil {
-		t.Fatalf("runCode failed: %v", err)
+	tests := []struct {
+		name    string
+		prepare func()
+		args    args
+		want    *pb.GetRunOutputResponse
+		wantErr bool
+	}{
+		{
+			name:    "pipelineId doesn't exist",
+			prepare: func() {},
+			args: args{
+				ctx:  ctx,
+				info: &pb.GetRunOutputRequest{PipelineUuid: pipelineId.String()},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "run output exist",
+			prepare: func() {
+				_ = cacheService.SetValue(ctx, pipelineId, cache.SubKey_RunOutput, runOutput)
+			},
+			args: args{
+				ctx:  ctx,
+				info: &pb.GetRunOutputRequest{PipelineUuid: pipelineId.String()},
+			},
+			want:    &pb.GetRunOutputResponse{Output: runOutput},
+			wantErr: false,
+		},
 	}
-	log.Printf("Response: %+v", runOutput)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.prepare()
+			got, err := client.GetRunOutput(tt.args.ctx, tt.args.info)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetRunOutput() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr {
+				if !strings.EqualFold(got.Output, tt.want.Output) {
+					t.Errorf("GetRunOutput() got = %v, want %v", got.Output, tt.want.Output)
+				}
+				if !reflect.DeepEqual(got.CompilationStatus, tt.want.CompilationStatus) {
+					t.Errorf("GetRunOutput() got = %v, want %v", got.CompilationStatus, tt.want.CompilationStatus)
+				}
+			}
+		})
+	}
 }
 
 func Test_processCode(t *testing.T) {
@@ -249,10 +417,12 @@ func Test_processCode(t *testing.T) {
 		args                  args
 	}{
 		{
+			// Test case with calling processCode method with small timeout.
+			// As a result status into cache should be set as Status_STATUS_RUN_TIMEOUT.
 			name:                  "small pipeline execution timeout",
 			createExecFile:        false,
 			code:                  "",
-			expectedStatus:        pb.Status_STATUS_ERROR,
+			expectedStatus:        pb.Status_STATUS_RUN_TIMEOUT,
 			expectedCompileOutput: nil,
 			expectedRunOutput:     nil,
 			args: args{
@@ -278,7 +448,7 @@ func Test_processCode(t *testing.T) {
 			name:                  "compilation failed",
 			createExecFile:        true,
 			code:                  "MOCK_CODE",
-			expectedStatus:        pb.Status_STATUS_ERROR,
+			expectedStatus:        pb.Status_STATUS_COMPILE_ERROR,
 			expectedCompileOutput: fmt.Sprintf("error: exit status 1, output: %s:1: error: reached end of file while parsing\nMOCK_CODE\n^\n1 error\n", lc.GetAbsoluteExecutableFilePath()),
 			expectedRunOutput:     nil,
 			args: args{
@@ -344,43 +514,6 @@ func Test_processCode(t *testing.T) {
 			// remove
 			path := os.Getenv("APP_WORK_DIR") + "/executable_files"
 			os.RemoveAll(path)
-		})
-	}
-}
-
-func Test_processErrDuringGetExecutableName(t *testing.T) {
-	type args struct {
-		err        error
-		pipelineId uuid.UUID
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "all success",
-			args: args{
-				err:        fmt.Errorf("MOCK_ERROR"),
-				pipelineId: uuid.New(),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			value, err := cacheService.GetValue(context.Background(), tt.args.pipelineId, cache.SubKey_Status)
-			if value != nil {
-				t.Errorf("processErrDuringGetExecutableName() value should be: nil, but receive: %s", value)
-			}
-			if err == nil {
-				t.Errorf("processErrDuringGetExecutableName() err should not be nil, but receive: %s", err)
-			}
-
-			processErrDuringGetExecutableName(context.Background(), tt.args.err, tt.args.pipelineId, cacheService)
-
-			value, _ = cacheService.GetValue(context.Background(), tt.args.pipelineId, cache.SubKey_Status)
-			if !reflect.DeepEqual(value, pb.Status_STATUS_ERROR) {
-				t.Errorf("processErrDuringGetExecutableName() value : %s, but want: %s", value, pb.Status_STATUS_ERROR)
-			}
 		})
 	}
 }

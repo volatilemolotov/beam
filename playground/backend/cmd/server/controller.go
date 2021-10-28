@@ -50,11 +50,11 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		log.Printf("RunCode() is completed for pipeline with id: %s\n", pipelineId)
 	}()
 
-	cacheExpirationTime := controller.env.ApplicationEnvs.GetCacheExpirationTime()
-	pipelineExecuteTimeout := controller.env.ApplicationEnvs.GetPipelineExecuteTimeout()
+	cacheExpirationTime := controller.env.ApplicationEnvs.CacheEnvs().KeyExpirationTime()
+	pipelineExecuteTimeout := controller.env.ApplicationEnvs.PipelineExecuteTimeout()
 
 	// create file system service
-	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipelineId, controller.env.ApplicationEnvs.GetWorkingDir())
+	lc, err := fs_tool.NewLifeCycle(info.Sdk, pipelineId, controller.env.ApplicationEnvs.WorkingDir())
 	if err != nil {
 		log.Printf("%s: RunCode(): NewLifeCycle(): %s\n", pipelineId, err.Error())
 		return nil, errors.InternalError("Run code", "Error during creating file system service: "+err.Error())
