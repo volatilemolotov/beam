@@ -27,7 +27,9 @@ jobs:
         working-directory: playground/backend/
         continue-on-error: true
       - name: Run Tests
-        run: ./gradlew playground:backend:test
+#        run: ./gradlew playground:backend:test
+        run: go test ...
+        working-directory: playground/backend
         continue-on-error: true
       - name: Setup GCP account
         run: echo ${{ secrets.GCP_ACCESS_KEY }} | base64 -d > /tmp/gcp_access.json
