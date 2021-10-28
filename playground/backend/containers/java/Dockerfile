@@ -15,6 +15,7 @@
 #  See the License for the specific language governing permissions and
 # limitations under the License.
 ###############################################################################
+ARG BASE_IMAGE
 
 FROM golang:1.17-buster AS build
 
@@ -32,11 +33,11 @@ WORKDIR /go/src/playground/backend
 RUN ls
 # Build Application
 RUN go mod download &&\
-    go mod tidy &&\ 
+    go mod tidy &&\
     cd cmd/server &&\
-    go build -o /go/bin/server_java_backend 
+    go build -o /go/bin/server_java_backend
 
-FROM apache/beam_java8_sdk:2.33.0
+FROM $BASE_IMAGE
 ENV BEAM_VERSION=2.33.0
 ENV SERVER_IP=0.0.0.0
 ENV SERVER_PORT=8080
