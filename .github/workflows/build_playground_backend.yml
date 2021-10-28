@@ -38,5 +38,5 @@ jobs:
       - name: Deploy Backend Application
         env: 
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-        run: terraform apply -auto-approve -var="project_id=datatokenization" -var="docker_registry_address=us-central1-docker.pkg.dev/datatokenization/playground-repository"
+        run: terraform init && terraform apply -auto-approve -var="project_id=datatokenization" -var="docker_registry_address=us-central1-docker.pkg.dev/datatokenization/playground-repository"
         working-directory: playground/terraform/applications/backend
