@@ -36,6 +36,7 @@ jobs:
       - name: Preapre Build
         run: ./gradlew playground:backend:containers:java:dockerPush -Pdocker-repository-root='us-central1-docker.pkg.dev/datatokenization/playground-repository' -Pbase-image='apache/beam_java8_sdk:2.33.0'
       - name: Deploy Backend Application
-        env: GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_access.json
+        env: 
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
         run: terraform apply -auto-approve -var="project_id=datatokenization" -var="docker_registry_address=us-central1-docker.pkg.dev/datatokenization/playground-repository"
         working-directory: playground/terraform/applications/backend
