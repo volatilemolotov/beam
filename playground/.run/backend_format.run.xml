@@ -7,13 +7,13 @@
         <option name="containerName" value="playgroundPrecomit" />
         <option name="contextFolderPath" value="../../beam" />
         <option name="entrypoint" value="./gradlew :playground:backend:format --stacktrace" />
-        <option name="commandLineOptions" value="-w /beam -rm" />
+        <option name="commandLineOptions" value="-w /beam " />
         <option name="sourceFilePath" value="dev-env/gradle/Dockerfile" />
         <option name="volumeBindings">
           <list>
             <DockerVolumeBindingImpl>
               <option name="containerPath" value="/beam/playground" />
-              <option name="hostPath" value="$PROJECT_DIR$/../" />
+              <option name="hostPath" value="$PROJECT_DIR$/" />
             </DockerVolumeBindingImpl>
           </list>
         </option>
