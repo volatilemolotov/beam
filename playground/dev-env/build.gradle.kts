@@ -21,14 +21,9 @@ plugins {
   // This plugin provides a task to determine which dependencies have updates.
   // Additionally, the plugin checks for updates to Gradle itself.
   //
-  // See https://github.com/ben-manes/gradle-versions-plugin for further details.
-  id("com.github.ben-manes.versions") version "0.33.0"
-  // Apply one top level rat plugin to perform any required license enforcement analysis
+
   id("org.nosphere.apache.rat") version "0.7.0"
-  // Enable gradle-based release management
-  id("net.researchgate.release") version "2.8.1"
-  id("org.apache.beam.module")
-  id("org.sonarqube") version "3.0"
+
 }
 
 /*************************************************************************************************/

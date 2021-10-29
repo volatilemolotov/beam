@@ -1,11 +1,11 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="backend:RunServer" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+  <configuration default="false" name="runServer" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="playground-dev" />
         <option name="buildKitEnabled" value="true" />
         <option name="containerName" value="playgroundPrecomit" />
-        <option name="contextFolderPath" value="../../../beam" />
+        <option name="contextFolderPath" value="../../beam" />
         <option name="entrypoint" value="go run ." />
         <option name="envVars">
           <list>
@@ -20,7 +20,7 @@
           </list>
         </option>
         <option name="commandLineOptions" value="-w /go/src/playground/backend/cmd/server -rm" />
-        <option name="sourceFilePath" value="../dev-env/Dockerfile" />
+        <option name="sourceFilePath" value="dev-env/gradle/Dockerfile" />
         <option name="volumeBindings">
           <list>
             <DockerVolumeBindingImpl>

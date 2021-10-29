@@ -1,14 +1,14 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="backend:format" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
+  <configuration default="false" name="playgroundPreCommit" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
         <option name="imageTag" value="playground-dev" />
         <option name="buildKitEnabled" value="true" />
         <option name="containerName" value="playgroundPrecomit" />
-        <option name="contextFolderPath" value="../../../beam" />
-        <option name="entrypoint" value="./gradlew :playground:backend:format --stacktrace" />
+        <option name="contextFolderPath" value="../../beam" />
+        <option name="entrypoint" value="./gradlew playgroundPreCommit" />
         <option name="commandLineOptions" value="-w /beam -rm" />
-        <option name="sourceFilePath" value="../dev-env/Dockerfile" />
+        <option name="sourceFilePath" value="dev-env/gradle/Dockerfile" />
         <option name="volumeBindings">
           <list>
             <DockerVolumeBindingImpl>

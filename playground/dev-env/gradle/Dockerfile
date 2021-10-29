@@ -77,7 +77,7 @@ COPY ./gradlew /beam/gradlew
 COPY ./playground/dev-env/build.gradle.kts /beam/build.gradle.kts
 COPY ./playground/dev-env/settings.gradle.kts /beam/settings.gradle.kts
 COPY ./gradle.properties /beam/gradle.properties
-COPY ./buildSrc /beam/buildSrc
+#COPY ./buildSrc /beam/buildSrc
 COPY ./gradle/wrapper/* /beam/gradle/wrapper
 
 RUN cd /beam && ./gradlew --daemon
