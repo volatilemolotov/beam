@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build beam.apache.org/playground/backend/cmd/server" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="backend" />
+    <target name="playground-dev" />
+    <working_directory value="$PROJECT_DIR$" />
+    <envs>
+      <env name="BEAM_SDK" value="SDK_JAVA" />
+      <env name="APP_WORK_DIR" value="/go/src/playground" />
+    </envs>
+    <kind value="DIRECTORY" />
+    <directory value="$PROJECT_DIR$/cmd/server" />
+    <filePath value="$PROJECT_DIR$" />
+    <method v="2" />
+  </configuration>
+</component>
