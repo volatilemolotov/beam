@@ -44,3 +44,5 @@
   translation: "Code of Conduct"
 - id: nav-powered-by
   translation: "Powered by"
+- id: nav-playground
+  translation: "Playground"
