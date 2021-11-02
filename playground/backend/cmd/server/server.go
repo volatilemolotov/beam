@@ -18,7 +18,10 @@ package main
 import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
+	"beam.apache.org/playground/backend/internal/storage"
 	"context"
+	"fmt"
+	"github.com/google/uuid"
 	"log"
 	"os"
 
@@ -103,8 +106,17 @@ func setupCache(ctx context.Context, appEnv environment.ApplicationEnvs) (cache.
 }
 
 func main() {
-	err := runServer()
+	//err := runServer()
+	//if err != nil {
+	//	panic(err)
+	//}
+	examplesUuids := make(map[uuid.UUID]string)
+	var u = uuid.New()
+	examplesUuids[u] = "SDK_JAVA/Common/HelloWorld.java"
+	cd := storage.NewCloudStorage(nil, examplesUuids)
+	example, err := cd.GetExample(u, context.Background())
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(example.String())
 }
