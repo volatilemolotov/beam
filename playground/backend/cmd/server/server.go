@@ -16,20 +16,14 @@
 package main
 
 import (
+	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
-	"beam.apache.org/playground/backend/internal/storage"
-	"context"
-	"fmt"
-	"github.com/google/uuid"
-	"log"
-	"os"
-
-	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/environment"
+	"beam.apache.org/playground/backend/internal/logger"
+	"context"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/grpclog"
 )
 
 // runServer is starting http server wrapped on grpc
@@ -52,18 +46,22 @@ func runServer() error {
 		cacheService: cacheService,
 	})
 
-	grpclog.SetLoggerV2(grpclog.NewLoggerV2(os.Stdout, os.Stdout, os.Stderr))
-	handler := Wrap(grpcServer, getGrpcWebOptions())
 	errChan := make(chan error)
 
-	go listenHttp(ctx, errChan, envService.NetworkEnvs, handler)
+	switch envService.NetworkEnvs.Protocol() {
+	case "TCP":
+		go listenTcp(ctx, errChan, envService.NetworkEnvs, grpcServer)
+	case "HTTP":
+		handler := Wrap(grpcServer, getGrpcWebOptions())
+		go listenHttp(ctx, errChan, envService.NetworkEnvs, handler)
+	}
 
 	for {
 		select {
 		case err := <-errChan:
 			return err
 		case <-ctx.Done():
-			log.Println("interrupt signal received; stopping...")
+			logger.Info("interrupt signal received; stopping...")
 			return nil
 		}
 	}
@@ -106,17 +104,8 @@ func setupCache(ctx context.Context, appEnv environment.ApplicationEnvs) (cache.
 }
 
 func main() {
-	//err := runServer()
-	//if err != nil {
-	//	panic(err)
-	//}
-	examplesUuids := make(map[uuid.UUID]string)
-	var u = uuid.New()
-	examplesUuids[u] = "SDK_JAVA/Common/HelloWorld.java"
-	cd := storage.NewCloudStorage(nil, examplesUuids)
-	example, err := cd.GetExample(u, context.Background())
+	err := runServer()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(example.String())
 }
