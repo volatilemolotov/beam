@@ -514,7 +514,7 @@ class Example extends $pb.GeneratedMessage {
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
-    ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_DEFAULT, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
+    ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_EXAMPLE, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
     ..hasRequiredFields = false
   ;
 
@@ -751,17 +751,17 @@ class GetListOfExamplesResponse extends $pb.GeneratedMessage {
 
 class GetExampleRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetExampleRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePath')
     ..hasRequiredFields = false
   ;
 
   GetExampleRequest._() : super();
   factory GetExampleRequest({
-    $core.String? exampleUuid,
+    $core.String? examplePath,
   }) {
     final _result = create();
-    if (exampleUuid != null) {
-      _result.exampleUuid = exampleUuid;
+    if (examplePath != null) {
+      _result.examplePath = examplePath;
     }
     return _result;
   }
@@ -787,13 +787,13 @@ class GetExampleRequest extends $pb.GeneratedMessage {
   static GetExampleRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get exampleUuid => $_getSZ(0);
+  $core.String get examplePath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set exampleUuid($core.String v) { $_setString(0, v); }
+  set examplePath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExampleUuid() => $_has(0);
+  $core.bool hasExamplePath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExampleUuid() => clearField(1);
+  void clearExamplePath() => clearField(1);
 }
 
 class GetExampleResponse extends $pb.GeneratedMessage {

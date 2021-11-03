@@ -42,7 +42,7 @@ enum Status {
 }
 
 enum ExampleType {
-  EXAMPLE_TYPE_DEFAULT = 0;
+  EXAMPLE_TYPE_EXAMPLE = 0;
   EXAMPLE_TYPE_KATA = 1;
   EXAMPLE_TYPE_UNIT_TEST = 2;
 }
@@ -121,7 +121,7 @@ message GetListOfExamplesResponse{
 
 // ExampleRequest contains information of the example uuid.
 message GetExampleRequest{
-  string example_uuid = 1;
+  string example_path = 1;
 }
 
 // ExampleResponse represents the source code of the example.

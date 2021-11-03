@@ -22,6 +22,7 @@ import (
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/storage"
 	"beam.apache.org/playground/backend/internal/validators"
 	"context"
 	"github.com/google/uuid"
@@ -123,35 +124,61 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 
 //GetListOfExamples returns the list of examples
 func (controller *playgroundController) GetListOfExamples(ctx context.Context, info *pb.GetListOfExamplesRequest) (*pb.GetListOfExamplesResponse, error) {
-	// TODO implement this method
-	example1 := pb.Example{ExampleUuid: "001", Name: "Example1", Description: "Test example 1", Type: pb.ExampleType_EXAMPLE_TYPE_DEFAULT}
-	example2 := pb.Example{ExampleUuid: "003", Name: "Example3", Description: "Test example 3", Type: pb.ExampleType_EXAMPLE_TYPE_KATA}
-
-	cat1 := pb.Categories_Category{
-		CategoryName: "Common",
-		Examples:     []*pb.Example{&example1, {ExampleUuid: "002", Name: "Example2", Description: "Test example 1", Type: pb.ExampleType_EXAMPLE_TYPE_UNIT_TEST}},
+	cd := storage.NewCloudStorage()
+	examples, err := cd.GetListOfExamples(ctx, info.Sdk.String(), info.Category)
+	if err != nil {
+		logger.Errorf("%s: GetListOfExamples(): cloud storage error: %s", err.Error())
+		return nil, errors.InternalError("GetListOfExamples(): ", err.Error())
 	}
-	cat2 := pb.Categories_Category{
-		CategoryName: "I/O",
-		Examples:     []*pb.Example{&example2},
+	response := pb.GetListOfExamplesResponse{SdkExamples: make([]*pb.Categories, 0)}
+	for sdk, categories := range *examples {
+		sdkCats := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdk]), Categories: make([]*pb.Categories_Category, 0)}
+		for category, examplesArr := range categories {
+			cat1 := pb.Categories_Category{
+				CategoryName: category,
+				Examples:     make([]*pb.Example, 0),
+			}
+			for _, example := range examplesArr {
+				var exampleType pb.ExampleType
+				switch example.Type {
+				case "Example":
+					exampleType = pb.ExampleType_EXAMPLE_TYPE_EXAMPLE
+				case "Unit Test":
+					exampleType = pb.ExampleType_EXAMPLE_TYPE_UNIT_TEST
+				case "Kata":
+					exampleType = pb.ExampleType_EXAMPLE_TYPE_KATA
+				}
+				pbExample := pb.Example{ExampleUuid: example.CsPath, Name: example.Name, Description: example.Description, Type: exampleType}
+				cat1.Examples = append(cat1.Examples, &pbExample)
+			}
+			sdkCats.Categories = append(sdkCats.Categories, &cat1)
+		}
+		response.SdkExamples = append(response.SdkExamples, &sdkCats)
 	}
-	javaCats := pb.Categories{Sdk: pb.Sdk_SDK_JAVA, Categories: []*pb.Categories_Category{&cat1, &cat2}}
-	goCats := pb.Categories{Sdk: pb.Sdk_SDK_GO, Categories: []*pb.Categories_Category{&cat1, &cat2}}
-	response := pb.GetListOfExamplesResponse{SdkExamples: []*pb.Categories{&javaCats, &goCats}}
 	return &response, nil
 }
 
 // GetExample returns the code of the specific example
 func (controller *playgroundController) GetExample(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetExampleResponse, error) {
-	// TODO implement this method
-	response := pb.GetExampleResponse{Code: "example code"}
+	cd := storage.NewCloudStorage()
+	codeString, err := cd.GetExample(ctx, info.GetExamplePath())
+	if err != nil {
+		logger.Errorf("%s: GetExample(): cloud storage error: %s", err.Error())
+		return nil, errors.InternalError("GetListOfExamples(): ", err.Error())
+	}
+	response := pb.GetExampleResponse{Code: *codeString}
 	return &response, nil
 }
 
 // GetExampleOutput returns the output of the compiled and run example
 func (controller *playgroundController) GetExampleOutput(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetRunOutputResponse, error) {
-	// TODO implement this method
-	response := pb.GetRunOutputResponse{Output: "Response Output"}
+	cd := storage.NewCloudStorage()
+	output, err := cd.GetExampleOutput(ctx, info.ExamplePath)
+	if err != nil {
+		logger.Errorf("%s: GetExampleOutput(): cloud storage error: %s", err.Error())
+		return nil, errors.InternalError("GetExampleOutput(): ", err.Error())
+	}
+	response := pb.GetRunOutputResponse{Output: *output}
 	return &response, nil
 }
 

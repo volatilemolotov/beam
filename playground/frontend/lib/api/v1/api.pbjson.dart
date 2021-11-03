@@ -61,14 +61,14 @@ final $typed_data.Uint8List statusDescriptor = $convert.base64Decode('CgZTdGF0dX
 const ExampleType$json = const {
   '1': 'ExampleType',
   '2': const [
-    const {'1': 'EXAMPLE_TYPE_DEFAULT', '2': 0},
+    const {'1': 'EXAMPLE_TYPE_EXAMPLE', '2': 0},
     const {'1': 'EXAMPLE_TYPE_KATA', '2': 1},
     const {'1': 'EXAMPLE_TYPE_UNIT_TEST', '2': 2},
   ],
 };
 
 /// Descriptor for `ExampleType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List exampleTypeDescriptor = $convert.base64Decode('CgtFeGFtcGxlVHlwZRIYChRFWEFNUExFX1RZUEVfREVGQVVMVBAAEhUKEUVYQU1QTEVfVFlQRV9LQVRBEAESGgoWRVhBTVBMRV9UWVBFX1VOSVRfVEVTVBAC');
+final $typed_data.Uint8List exampleTypeDescriptor = $convert.base64Decode('CgtFeGFtcGxlVHlwZRIYChRFWEFNUExFX1RZUEVfRVhBTVBMRRAAEhUKEUVYQU1QTEVfVFlQRV9LQVRBEAESGgoWRVhBTVBMRV9UWVBFX1VOSVRfVEVTVBAC');
 @$core.Deprecated('Use runCodeRequestDescriptor instead')
 const RunCodeRequest$json = const {
   '1': 'RunCodeRequest',
@@ -211,12 +211,12 @@ final $typed_data.Uint8List getListOfExamplesResponseDescriptor = $convert.base6
 const GetExampleRequest$json = const {
   '1': 'GetExampleRequest',
   '2': const [
-    const {'1': 'example_uuid', '3': 1, '4': 1, '5': 9, '10': 'exampleUuid'},
+    const {'1': 'example_path', '3': 1, '4': 1, '5': 9, '10': 'examplePath'},
   ],
 };
 
 /// Descriptor for `GetExampleRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIhCgxleGFtcGxlX3V1aWQYASABKAlSC2V4YW1wbGVVdWlk');
+final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIhCgxleGFtcGxlX3BhdGgYASABKAlSC2V4YW1wbGVQYXRo');
 @$core.Deprecated('Use getExampleResponseDescriptor instead')
 const GetExampleResponse$json = const {
   '1': 'GetExampleResponse',

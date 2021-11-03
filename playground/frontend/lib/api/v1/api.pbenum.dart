@@ -77,12 +77,12 @@ class Status extends $pb.ProtobufEnum {
 }
 
 class ExampleType extends $pb.ProtobufEnum {
-  static const ExampleType EXAMPLE_TYPE_DEFAULT = ExampleType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'EXAMPLE_TYPE_DEFAULT');
+  static const ExampleType EXAMPLE_TYPE_EXAMPLE = ExampleType._(0, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'EXAMPLE_TYPE_EXAMPLE');
   static const ExampleType EXAMPLE_TYPE_KATA = ExampleType._(1, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'EXAMPLE_TYPE_KATA');
   static const ExampleType EXAMPLE_TYPE_UNIT_TEST = ExampleType._(2, const $core.bool.fromEnvironment('protobuf.omit_enum_names') ? '' : 'EXAMPLE_TYPE_UNIT_TEST');
 
   static const $core.List<ExampleType> values = <ExampleType> [
-    EXAMPLE_TYPE_DEFAULT,
+    EXAMPLE_TYPE_EXAMPLE,
     EXAMPLE_TYPE_KATA,
     EXAMPLE_TYPE_UNIT_TEST,
   ];
