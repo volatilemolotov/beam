@@ -21,6 +21,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
+import 'package:playground/pages/playground/components/playground_feedback.dart';
 
 class PlaygroundPageFooter extends StatelessWidget {
   const PlaygroundPageFooter({Key? key}) : super(key: key);
@@ -34,17 +35,17 @@ class PlaygroundPageFooter extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: kMdSpacing,
-          horizontal: kLgSpacing,
+          vertical: kSmSpacing,
+          horizontal: kXlSpacing,
         ),
         child: Wrap(
-          spacing: kLgSpacing,
+          spacing: kXlSpacing,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
+            const PlaygroundFeedback(),
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
-                primary: Theme.of(context).primaryColor,
               ),
               // ignore: avoid_print
               onPressed: () => print(appLocale.sendFeedback),
