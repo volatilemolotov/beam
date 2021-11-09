@@ -29,3 +29,9 @@ const kThumbUpIconAsset = 'thumb_up.svg';
 const kThumbDownIconAsset = 'thumb_down.svg';
 const kCopyIconAsset = 'copy.svg';
 const kLinkIconAsset = 'link.svg';
+
+// notifications icons
+const kErrorNotificationIconAsset = 'error_notification.svg';
+const kWarningNotificationIconAsset = 'warning_notification.svg';
+const kSuccessNotificationIconAsset = 'success_notification.svg';
+const kInfoNotificationIconAsset = 'info_notification.svg';
