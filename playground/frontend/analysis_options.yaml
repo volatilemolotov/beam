@@ -26,9 +26,9 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
-# exclude generated files
+# exclude generated files & JSON localization files
 analyzer:
-  exclude: [lib/api/**, test/**.mocks.dart, lib/**.g.dart]
+  exclude: [lib/api/**, test/**.mocks.dart, lib/**.g.dart, lib/l10n/**.arb]
 
 linter:
   # The lint rules applied to this project can be customized in the

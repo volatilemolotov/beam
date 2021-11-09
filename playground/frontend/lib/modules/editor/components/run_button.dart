@@ -17,9 +17,10 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/constants/sizes.dart';
-
-const kRunText = 'Run';
+import 'package:playground/modules/shortcuts/components/shortcut_tooltip.dart';
+import 'package:playground/modules/shortcuts/constants/global_shortcuts.dart';
 
 class RunButton extends StatelessWidget {
   final bool isRunning;
@@ -30,18 +31,21 @@ class RunButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      icon: isRunning
-          ? SizedBox(
-              width: kIconSizeSm,
-              height: kIconSizeSm,
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            )
-          : const Icon(Icons.play_arrow),
-      label: const Text(kRunText),
-      onPressed: !isRunning ? runCode : null,
+    return ShortcutTooltip(
+      shortcut: kRunShortcut,
+      child: ElevatedButton.icon(
+        icon: isRunning
+            ? SizedBox(
+                width: kIconSizeSm,
+                height: kIconSizeSm,
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ),
+              )
+            : const Icon(Icons.play_arrow),
+        label: Text(AppLocalizations.of(context)!.run),
+        onPressed: !isRunning ? runCode : null,
+      ),
     );
   }
 }

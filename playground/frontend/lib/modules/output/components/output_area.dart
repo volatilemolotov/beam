@@ -17,30 +17,29 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:playground/constants/sizes.dart';
+import 'package:playground/modules/output/components/output_result.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
-
-const kLogText = 'Log';
-const kGraphText = 'Graph';
 
 class OutputArea extends StatelessWidget {
   const OutputArea({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Container(
       color: Theme.of(context).backgroundColor,
       child: Consumer<PlaygroundState>(
         builder: (context, state, child) {
           return TabBarView(
+            physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.all(kLgSpacing),
-                child: Text(state.result?.output ?? ''),
-              ),
-              const Center(child: Text(kLogText)),
-              const Center(child: Text(kGraphText)),
+              OutputResult(text: state.result?.output ?? ''),
+              Center(child: Text(appLocale.log)),
+              Center(child: Text(appLocale.graph)),
             ],
           );
         },

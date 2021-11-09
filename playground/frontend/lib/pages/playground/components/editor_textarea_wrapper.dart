@@ -40,15 +40,19 @@ class CodeTextAreaWrapper extends StatelessWidget {
         children: [
           Positioned.fill(
             child: EditorTextArea(
-              key: ValueKey(EditorKeyObject(state.sdk, state.selectedExample)),
+              key: ValueKey(EditorKeyObject(
+                state.sdk,
+                state.selectedExample,
+                state.resetKey,
+              )),
               example: state.selectedExample,
               sdk: state.sdk,
               onSourceChange: state.setSource,
             ),
           ),
           Positioned(
-            right: kLgSpacing,
-            top: kLgSpacing,
+            right: kXlSpacing,
+            top: kXlSpacing,
             width: kRunButtonWidth,
             height: kRunButtonHeight,
             child: RunButton(
@@ -72,8 +76,9 @@ class CodeTextAreaWrapper extends StatelessWidget {
 class EditorKeyObject {
   final SDK sdk;
   final ExampleModel? example;
+  final DateTime? resetKey;
 
-  const EditorKeyObject(this.sdk, this.example);
+  const EditorKeyObject(this.sdk, this.example, this.resetKey);
 
   @override
   bool operator ==(Object other) =>
@@ -81,8 +86,9 @@ class EditorKeyObject {
       other is EditorKeyObject &&
           runtimeType == other.runtimeType &&
           sdk == other.sdk &&
-          example == other.example;
+          example == other.example &&
+          resetKey == other.resetKey;
 
   @override
-  int get hashCode => sdk.hashCode ^ example.hashCode;
+  int get hashCode => sdk.hashCode ^ example.hashCode ^ resetKey.hashCode;
 }

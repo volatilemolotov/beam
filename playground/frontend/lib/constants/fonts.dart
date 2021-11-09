@@ -17,16 +17,16 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class ExampleDropdownState with ChangeNotifier {
-  String _selectedCategory;
+TextStyle getTitleFontStyle({TextStyle? textStyle}) {
+  return GoogleFonts.roboto(textStyle: textStyle);
+}
 
-  ExampleDropdownState([this._selectedCategory = 'All']);
+TextStyle getCodeFontStyle({TextStyle? textStyle}) {
+  return GoogleFonts.sourceCodePro(textStyle: textStyle);
+}
 
-  String get selectedCategory => _selectedCategory;
-
-  setSelectedCategory(String name) async {
-    _selectedCategory = name;
-    notifyListeners();
-  }
+TextTheme getBaseFontTheme(TextTheme theme) {
+  return GoogleFonts.sourceSansProTextTheme(theme);
 }
