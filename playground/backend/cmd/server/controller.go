@@ -45,14 +45,14 @@ type playgroundController struct {
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
 	// check for correct sdk
 	switch info.Sdk {
-	case pb.Sdk_SDK_UNSPECIFIED, pb.Sdk_SDK_GO, pb.Sdk_SDK_PYTHON, pb.Sdk_SDK_SCIO:
+	case pb.Sdk_SDK_UNSPECIFIED, pb.Sdk_SDK_PYTHON, pb.Sdk_SDK_SCIO:
 		logger.Errorf("RunCode(): unimplemented sdk: %s\n", info.Sdk)
 		return nil, errors.InvalidArgumentError("Run code()", "unimplemented sdk: "+info.Sdk.String())
 	}
 
 	cacheExpirationTime := controller.env.ApplicationEnvs.CacheEnvs().KeyExpirationTime()
 	pipelineId := uuid.New()
-
+	info.Code = "package main\nimport \"fmt\"\nfunc main() {\n\tfmt.Println(\"hello world\")\n}"
 	lc, err := setupLifeCycle(info.Sdk, info.Code, pipelineId, controller.env.ApplicationEnvs.WorkingDir())
 	if err != nil {
 		return nil, errors.InternalError("Run code", "Error during setup file system: "+err.Error())
@@ -104,23 +104,6 @@ func (controller *playgroundController) GetRunOutput(ctx context.Context, info *
 	return &pipelineResult, nil
 }
 
-//GetRunError is returning error output of execution for specific pipeline by PipelineUuid
-func (controller *playgroundController) GetRunError(ctx context.Context, info *pb.GetRunErrorRequest) (*pb.GetRunErrorResponse, error) {
-	pipelineId := info.PipelineUuid
-	runErrorInterface, err := controller.cacheService.GetValue(ctx, uuid.MustParse(pipelineId), cache.RunError)
-	if err != nil {
-		logger.Errorf("%s: GetRunError(): cache.GetValue: error: %s", pipelineId, err.Error())
-		return nil, errors.NotFoundError("GetRunError", "there is no run error output for pipelineId: "+pipelineId+", subKey: cache.RunError")
-	}
-	runError, converted := runErrorInterface.(string)
-	if !converted {
-		return nil, errors.InternalError("GetRunError", "run output can't be converted to string")
-	}
-	pipelineResult := pb.GetRunErrorResponse{Output: runError}
-
-	return &pipelineResult, nil
-}
-
 //GetCompileOutput is returning output of compilation for specific pipeline by PipelineUuid
 func (controller *playgroundController) GetCompileOutput(ctx context.Context, info *pb.GetCompileOutputRequest) (*pb.GetCompileOutputResponse, error) {
 	pipelineId := info.PipelineUuid
@@ -136,40 +119,6 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 	pipelineResult := pb.GetCompileOutputResponse{Output: compileOutput}
 
 	return &pipelineResult, nil
-}
-
-//GetListOfExamples returns the list of examples
-func (controller *playgroundController) GetListOfExamples(ctx context.Context, info *pb.GetListOfExamplesRequest) (*pb.GetListOfExamplesResponse, error) {
-	// TODO implement this method
-	example1 := pb.Example{ExampleUuid: "001", Name: "Example1", Description: "Test example 1", Type: pb.ExampleType_EXAMPLE_TYPE_DEFAULT}
-	example2 := pb.Example{ExampleUuid: "003", Name: "Example3", Description: "Test example 3", Type: pb.ExampleType_EXAMPLE_TYPE_KATA}
-
-	cat1 := pb.Categories_Category{
-		CategoryName: "Common",
-		Examples:     []*pb.Example{&example1, {ExampleUuid: "002", Name: "Example2", Description: "Test example 1", Type: pb.ExampleType_EXAMPLE_TYPE_UNIT_TEST}},
-	}
-	cat2 := pb.Categories_Category{
-		CategoryName: "I/O",
-		Examples:     []*pb.Example{&example2},
-	}
-	javaCats := pb.Categories{Sdk: pb.Sdk_SDK_JAVA, Categories: []*pb.Categories_Category{&cat1, &cat2}}
-	goCats := pb.Categories{Sdk: pb.Sdk_SDK_GO, Categories: []*pb.Categories_Category{&cat1, &cat2}}
-	response := pb.GetListOfExamplesResponse{SdkExamples: []*pb.Categories{&javaCats, &goCats}}
-	return &response, nil
-}
-
-// GetExample returns the code of the specific example
-func (controller *playgroundController) GetExample(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetExampleResponse, error) {
-	// TODO implement this method
-	response := pb.GetExampleResponse{Code: "example code"}
-	return &response, nil
-}
-
-// GetExampleOutput returns the output of the compiled and run example
-func (controller *playgroundController) GetExampleOutput(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetRunOutputResponse, error) {
-	// TODO implement this method
-	response := pb.GetRunOutputResponse{Output: "Response Output"}
-	return &response, nil
 }
 
 // setupLifeCycle creates fs_tool.LifeCycle and prepares files and folders needed to code processing
@@ -208,7 +157,7 @@ func setupCompileBuilder(lc *fs_tool.LifeCycle, sdk pb.Sdk, executorConfig *envi
 		WithCompiler()
 
 	switch sdk {
-	case pb.Sdk_SDK_JAVA:
+	case pb.Sdk_SDK_JAVA, pb.Sdk_SDK_GO:
 		workingDir := lc.GetAbsoluteExecutableFilesFolderPath()
 
 		compileBuilder = compileBuilder.
@@ -238,6 +187,8 @@ func setupRunBuilder(pipelineId uuid.UUID, lc *fs_tool.LifeCycle, sdk pb.Sdk, en
 
 		runBuilder = runBuilder.
 			WithClassName(className)
+	case pb.Sdk_SDK_GO:
+		runBuilder = runBuilder.WithClassName(lc.GetAbsoluteCompiledFilePath())
 	}
 	return runBuilder, nil
 }
@@ -248,16 +199,18 @@ func setupValidators(sdk pb.Sdk, filepath string) *[]validators.Validator {
 	switch sdk {
 	case pb.Sdk_SDK_JAVA:
 		val = validators.GetJavaValidators(filepath)
+	case pb.Sdk_SDK_GO:
+		val = &[]validators.Validator{}
 	}
 	return val
 }
 
 // processCode validates, compiles and runs code by pipelineId.
 // During each operation updates status of execution and saves it into cache:
-// - In case of validation step is failed saves playground.Status_STATUS_VALIDATION_ERROR as cache.Status into cache.
+// - In case of validation step is failed saves playground.Status_STATUS_ERROR as cache.Status into cache.
 // - In case of compile step is failed saves playground.Status_STATUS_COMPILE_ERROR as cache.Status and compile logs as cache.CompileOutput into cache.
-// - In case of compile step is completed with no errors saves compile output as cache.CompileOutput into cache.
-// - In case of run step is failed saves playground.Status_STATUS_RUN_ERROR as cache.Status and run logs as cache.RunError into cache.
+// - In case of compile step is completed with no errors saves empty string ("") as cache.CompileOutput into cache.
+// - In case of run step is failed saves playground.Status_STATUS_ERROR as cache.Status and run logs as cache.RunOutput into cache.
 // - In case of run step is completed with no errors saves playground.Status_STATUS_FINISHED as cache.Status and run output as cache.RunOutput into cache.
 // At the end of this method deletes all created folders.
 func processCode(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycle, compileBuilder *executors.CompileBuilder, pipelineId uuid.UUID, env *environment.Environment, sdk pb.Sdk) {
@@ -299,7 +252,7 @@ func processCode(ctx context.Context, cacheService cache.Cache, lc *fs_tool.Life
 	logger.Infof("%s: Run() ...\n", pipelineId)
 	runCmd := exec.Run()
 	if data, err := runCmd.CombinedOutput(); err != nil {
-		processError(ctx, err, data, pipelineId, cacheService, pb.Status_STATUS_RUN_ERROR)
+		processError(ctx, err, data, pipelineId, cacheService, pb.Status_STATUS_ERROR)
 		return
 	} else {
 		processSuccess(ctx, data, pipelineId, cacheService, pb.Status_STATUS_FINISHED)
@@ -322,19 +275,24 @@ func processError(ctx context.Context, err error, data []byte, pipelineId uuid.U
 	case pb.Status_STATUS_VALIDATION_ERROR:
 		logger.Errorf("%s: Validate: %s\n", pipelineId, err.Error())
 
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_VALIDATION_ERROR
 		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_VALIDATION_ERROR)
 	case pb.Status_STATUS_COMPILE_ERROR:
 		logger.Errorf("%s: Compile: err: %s, output: %s\n", pipelineId, err.Error(), data)
 
+		// set to cache pipelineId: cache.SubKey_CompileOutput: err.Error()
 		setToCache(ctx, cacheService, pipelineId, cache.CompileOutput, "error: "+err.Error()+", output: "+string(data))
 
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
 		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_COMPILE_ERROR)
-	case pb.Status_STATUS_RUN_ERROR:
+	case pb.Status_STATUS_ERROR:
 		logger.Errorf("%s: Run: err: %s, output: %s\n", pipelineId, err.Error(), data)
 
-		setToCache(ctx, cacheService, pipelineId, cache.RunError, "error: "+err.Error()+", output: "+string(data))
+		// set to cache pipelineId: cache.SubKey_RunOutput: err.Error()
+		setToCache(ctx, cacheService, pipelineId, cache.RunOutput, "error: "+err.Error()+", output: "+string(data))
 
-		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_RUN_ERROR)
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_ERROR
+		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_ERROR)
 	}
 }
 
@@ -344,18 +302,23 @@ func processSuccess(ctx context.Context, output []byte, pipelineId uuid.UUID, ca
 	case pb.Status_STATUS_COMPILING:
 		logger.Infof("%s: Validate() finish\n", pipelineId)
 
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_EXECUTING
 		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_COMPILING)
 	case pb.Status_STATUS_EXECUTING:
 		logger.Infof("%s: Compile() finish\n", pipelineId)
 
+		// set to cache pipelineId: cache.SubKey_CompileOutput: output
 		setToCache(ctx, cacheService, pipelineId, cache.CompileOutput, string(output))
 
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_EXECUTING
 		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_EXECUTING)
 	case pb.Status_STATUS_FINISHED:
 		logger.Infof("%s: Run() finish\n", pipelineId)
 
+		// set to cache pipelineId: cache.SubKey_RunOutput: output
 		setToCache(ctx, cacheService, pipelineId, cache.RunOutput, string(output))
 
+		// set to cache pipelineId: cache.SubKey_Status: pb.Status_STATUS_FINISHED
 		setToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_FINISHED)
 	}
 }

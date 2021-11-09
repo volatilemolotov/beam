@@ -24,15 +24,13 @@ import (
 )
 
 const (
-	javaBaseFileFolder          = "executable_files"
-	javaExecutableFileExtension = "java"
-	javaCompiledFileExtension   = "class"
-	javaSourceFolderName        = "src"
-	javaCompiledFolderName      = "bin"
+	javaBaseFileFolder     = "executable_files"
+	javaSourceFolderName   = "src"
+	javaCompiledFolderName = "bin"
 )
 
-// newJavaLifeCycle creates LifeCycle with java SDK environment.
-func newJavaLifeCycle(pipelineId uuid.UUID, workingDir string) *LifeCycle {
+// newCompiledLifeCycle creates LifeCycle with compiled SDK environment.
+func newCompiledLifeCycle(pipelineId uuid.UUID, workingDir string, execFileExtension string, compFileExtension string) *LifeCycle {
 	baseFileFolder := filepath.Join(workingDir, javaBaseFileFolder, pipelineId.String())
 	srcFileFolder := filepath.Join(baseFileFolder, javaSourceFolderName)
 	binFileFolder := filepath.Join(baseFileFolder, javaCompiledFolderName)
@@ -45,8 +43,8 @@ func newJavaLifeCycle(pipelineId uuid.UUID, workingDir string) *LifeCycle {
 			CompiledFolder:   binFileFolder,
 		},
 		Extension: Extension{
-			ExecutableExtension: javaExecutableFileExtension,
-			CompiledExtension:   javaCompiledFileExtension,
+			ExecutableExtension: execFileExtension,
+			CompiledExtension:   compFileExtension,
 		},
 		ExecutableName: executableName,
 		pipelineId:     pipelineId,

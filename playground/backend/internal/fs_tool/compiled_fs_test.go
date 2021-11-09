@@ -24,7 +24,7 @@ import (
 	"testing"
 )
 
-func Test_newJavaLifeCycle(t *testing.T) {
+func Test_newCompiledLifeCycle(t *testing.T) {
 	pipelineId := uuid.New()
 	workingDir := "workingDir"
 	baseFileFolder := fmt.Sprintf("%s/%s/%s", workingDir, javaBaseFileFolder, pipelineId)
@@ -32,8 +32,10 @@ func Test_newJavaLifeCycle(t *testing.T) {
 	binFileFolder := baseFileFolder + "/bin"
 
 	type args struct {
-		pipelineId uuid.UUID
-		workingDir string
+		pipelineId    uuid.UUID
+		workingDir    string
+		execExtension string
+		compExtension string
 	}
 	tests := []struct {
 		name string
@@ -41,10 +43,12 @@ func Test_newJavaLifeCycle(t *testing.T) {
 		want *LifeCycle
 	}{
 		{
-			name: "newJavaLifeCycle",
+			name: "newCompiledLifeCycle",
 			args: args{
-				pipelineId: pipelineId,
-				workingDir: workingDir,
+				pipelineId:    pipelineId,
+				workingDir:    workingDir,
+				execExtension: javaExecutableFileExtension,
+				compExtension: javaCompiledFileExtension,
 			},
 			want: &LifeCycle{
 				folderGlobs: []string{baseFileFolder, srcFileFolder, binFileFolder},
@@ -64,18 +68,18 @@ func Test_newJavaLifeCycle(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := newJavaLifeCycle(tt.args.pipelineId, tt.args.workingDir)
+			got := newCompiledLifeCycle(tt.args.pipelineId, tt.args.workingDir, tt.args.execExtension, tt.args.compExtension)
 			if !reflect.DeepEqual(got.folderGlobs, tt.want.folderGlobs) {
-				t.Errorf("newJavaLifeCycle() folderGlobs = %v, want %v", got.folderGlobs, tt.want.folderGlobs)
+				t.Errorf("newCompiledLifeCycle() folderGlobs = %v, want %v", got.folderGlobs, tt.want.folderGlobs)
 			}
 			if !reflect.DeepEqual(got.Folder, tt.want.Folder) {
-				t.Errorf("newJavaLifeCycle() Folder = %v, want %v", got.Folder, tt.want.Folder)
+				t.Errorf("newCompiledLifeCycle() Folder = %v, want %v", got.Folder, tt.want.Folder)
 			}
 			if !reflect.DeepEqual(got.Extension, tt.want.Extension) {
-				t.Errorf("newJavaLifeCycle() Extension = %v, want %v", got.Extension, tt.want.Extension)
+				t.Errorf("newCompiledLifeCycle() Extension = %v, want %v", got.Extension, tt.want.Extension)
 			}
 			if !reflect.DeepEqual(got.pipelineId, tt.want.pipelineId) {
-				t.Errorf("newJavaLifeCycle() pipelineId = %v, want %v", got.pipelineId, tt.want.pipelineId)
+				t.Errorf("newCompiledLifeCycle() pipelineId = %v, want %v", got.pipelineId, tt.want.pipelineId)
 			}
 		})
 	}
@@ -85,7 +89,7 @@ func Test_executableName(t *testing.T) {
 	pipelineId := uuid.New()
 	workDir := "workingDir"
 
-	lc := newJavaLifeCycle(pipelineId, workDir)
+	lc := newCompiledLifeCycle(pipelineId, workDir, javaExecutableFileExtension, javaCompiledFileExtension)
 	lc.CreateFolders()
 	defer os.RemoveAll(workDir)
 

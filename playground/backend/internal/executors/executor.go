@@ -17,9 +17,10 @@
 package executors
 
 import (
-	"beam.apache.org/playground/backend/internal/preparators"
 	"beam.apache.org/playground/backend/internal/validators"
+	"fmt"
 	"os/exec"
+	"strings"
 )
 
 //CmdConfiguration for base cmd code execution
@@ -35,7 +36,6 @@ type Executor struct {
 	compileArgs CmdConfiguration
 	runArgs     CmdConfiguration
 	validators  []validators.Validator
-	preparators []preparators.Preparator
 }
 
 // Validate returns the function that applies all validators of executor
@@ -43,19 +43,6 @@ func (ex *Executor) Validate() func() error {
 	return func() error {
 		for _, validator := range ex.validators {
 			err := validator.Validator(validator.Args...)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-}
-
-// Prepare returns the function that applies all preparations of executor
-func (ex *Executor) Prepare() func() error {
-	return func() error {
-		for _, preparator := range ex.preparators {
-			err := preparator.Prepare(preparator.Args...)
 			if err != nil {
 				return err
 			}
@@ -78,6 +65,9 @@ func (ex *Executor) Compile() *exec.Cmd {
 func (ex *Executor) Run() *exec.Cmd {
 	args := append(ex.runArgs.commandArgs, ex.runArgs.fileName)
 	cmd := exec.Command(ex.runArgs.commandName, args...)
+	if ex.runArgs.commandName == "" {
+		cmd = exec.Command(fmt.Sprint(strings.Join(args, " ")))
+	}
 	cmd.Dir = ex.runArgs.workingDir
 	return cmd
 }

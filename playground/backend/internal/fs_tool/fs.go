@@ -25,7 +25,11 @@ import (
 )
 
 const (
-	fileMode = 0600
+	fileMode                    = 0600
+	javaExecutableFileExtension = "java"
+	javaCompiledFileExtension   = "class"
+	goExecutableFileExtension   = "go"
+	goCompiledFileExtension     = ""
 )
 
 // Folder contains names of folders with executable and compiled files.
@@ -58,7 +62,9 @@ type LifeCycle struct {
 func NewLifeCycle(sdk pb.Sdk, pipelineId uuid.UUID, workingDir string) (*LifeCycle, error) {
 	switch sdk {
 	case pb.Sdk_SDK_JAVA:
-		return newJavaLifeCycle(pipelineId, workingDir), nil
+		return newCompiledLifeCycle(pipelineId, workingDir, javaExecutableFileExtension, javaCompiledFileExtension), nil
+	case pb.Sdk_SDK_GO:
+		return newCompiledLifeCycle(pipelineId, workingDir, goExecutableFileExtension, goCompiledFileExtension), nil
 	default:
 		return nil, fmt.Errorf("%s isn't supported now", sdk)
 	}
@@ -109,6 +115,14 @@ func (l *LifeCycle) GetAbsoluteExecutableFilePath() string {
 	return absoluteFilePath
 }
 
+// GetAbsoluteCompiledFilePath returns absolute filepath to compiled file.
+func (l *LifeCycle) GetAbsoluteCompiledFilePath() string {
+	fileName := getFileName(l.pipelineId, l.Extension.CompiledExtension)
+	filePath := filepath.Join(l.Folder.CompiledFolder, fileName)
+	absoluteFilePath, _ := filepath.Abs(filePath)
+	return absoluteFilePath
+}
+
 // GetAbsoluteExecutableFilesFolderPath returns absolute path to executable folder (/path/to/workingDir/executable_files/{pipelineId}).
 func (l *LifeCycle) GetAbsoluteExecutableFilesFolderPath() string {
 	absoluteFilePath, _ := filepath.Abs(l.Folder.BaseFolder)
@@ -117,5 +131,10 @@ func (l *LifeCycle) GetAbsoluteExecutableFilesFolderPath() string {
 
 // getFileName returns fileName by pipelineId and fileType ({pipelineId}.java for java SDK).
 func getFileName(pipelineId uuid.UUID, fileType string) string {
-	return fmt.Sprintf("%s.%s", pipelineId, fileType)
+	if fileType != "" {
+		return fmt.Sprintf("%s.%s", pipelineId, fileType)
+	} else {
+		return pipelineId.String()
+	}
+
 }
