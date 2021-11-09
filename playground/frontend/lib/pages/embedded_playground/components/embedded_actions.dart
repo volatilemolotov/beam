@@ -21,6 +21,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:playground/components/toggle_theme_button/toggle_theme_icon_button.dart';
 import 'package:playground/constants/assets.dart';
+import 'package:playground/constants/params.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
@@ -60,8 +61,8 @@ class EmbeddedActions extends StatelessWidget {
           icon: SvgPicture.asset(kLinkIconAsset),
           label: const Text(kPlaygroundText),
           onPressed: () {
-            final exampleId = Uri.base.queryParameters['example'];
-            launch('/?example=$exampleId');
+            final exampleId = Uri.base.queryParameters[kExampleParam];
+            launch('/?$kExampleParam=$exampleId');
           },
         ),
       ],
