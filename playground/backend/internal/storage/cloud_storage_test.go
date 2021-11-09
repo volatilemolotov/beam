@@ -123,8 +123,8 @@ func TestCloudStorage_GetListOfExamples(t *testing.T) {
 	testExample := Examples{"SDK_JAVA": SdkCategories{"Common": ExamplesInfo{pb.Example{
 		Name:        "HelloWorld",
 		CloudPath:   "SDK_JAVA/Common/HelloWorld/",
-		Description: "Description HelloWorld",
-		Type:        0,
+		Description: "Description Hello World",
+		Type:        pb.ExampleType_EXAMPLE_TYPE_EXAMPLE,
 	}}}}
 	tests := []struct {
 		name    string
