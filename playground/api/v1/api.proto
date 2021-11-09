@@ -98,7 +98,7 @@ message GetListOfExamplesRequest{
 
 // Example represents one example with its information
 message Example{
-  string example_uuid = 1;
+  string cloud_path = 1;
   string name = 2;
   string description = 3;
   ExampleType type = 4;
@@ -121,7 +121,7 @@ message GetListOfExamplesResponse{
 
 // ExampleRequest contains information of the example uuid.
 message GetExampleRequest{
-  string example_path = 1;
+  string cloud_path = 1;
 }
 
 // ExampleResponse represents the source code of the example.

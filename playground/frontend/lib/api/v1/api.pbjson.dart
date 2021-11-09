@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 ///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
@@ -167,7 +150,7 @@ final $typed_data.Uint8List getListOfExamplesRequestDescriptor = $convert.base64
 const Example$json = const {
   '1': 'Example',
   '2': const [
-    const {'1': 'example_uuid', '3': 1, '4': 1, '5': 9, '10': 'exampleUuid'},
+    const {'1': 'cloud_path', '3': 1, '4': 1, '5': 9, '10': 'cloudPath'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'description', '3': 3, '4': 1, '5': 9, '10': 'description'},
     const {'1': 'type', '3': 4, '4': 1, '5': 14, '6': '.api.v1.ExampleType', '10': 'type'},
@@ -175,7 +158,7 @@ const Example$json = const {
 };
 
 /// Descriptor for `Example`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List exampleDescriptor = $convert.base64Decode('CgdFeGFtcGxlEiEKDGV4YW1wbGVfdXVpZBgBIAEoCVILZXhhbXBsZVV1aWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIgCgtkZXNjcmlwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SJwoEdHlwZRgEIAEoDjITLmFwaS52MS5FeGFtcGxlVHlwZVIEdHlwZQ==');
+final $typed_data.Uint8List exampleDescriptor = $convert.base64Decode('CgdFeGFtcGxlEh0KCmNsb3VkX3BhdGgYASABKAlSCWNsb3VkUGF0aBISCgRuYW1lGAIgASgJUgRuYW1lEiAKC2Rlc2NyaXB0aW9uGAMgASgJUgtkZXNjcmlwdGlvbhInCgR0eXBlGAQgASgOMhMuYXBpLnYxLkV4YW1wbGVUeXBlUgR0eXBl');
 @$core.Deprecated('Use categoriesDescriptor instead')
 const Categories$json = const {
   '1': 'Categories',
@@ -211,12 +194,12 @@ final $typed_data.Uint8List getListOfExamplesResponseDescriptor = $convert.base6
 const GetExampleRequest$json = const {
   '1': 'GetExampleRequest',
   '2': const [
-    const {'1': 'example_path', '3': 1, '4': 1, '5': 9, '10': 'examplePath'},
+    const {'1': 'cloud_path', '3': 1, '4': 1, '5': 9, '10': 'cloudPath'},
   ],
 };
 
 /// Descriptor for `GetExampleRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIhCgxleGFtcGxlX3BhdGgYASABKAlSC2V4YW1wbGVQYXRo');
+final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIdCgpjbG91ZF9wYXRoGAEgASgJUgljbG91ZFBhdGg=');
 @$core.Deprecated('Use getExampleResponseDescriptor instead')
 const GetExampleResponse$json = const {
   '1': 'GetExampleResponse',

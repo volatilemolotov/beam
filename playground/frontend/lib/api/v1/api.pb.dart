@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- ///
+///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
 //
@@ -511,7 +494,7 @@ class GetListOfExamplesRequest extends $pb.GeneratedMessage {
 
 class Example extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Example', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
     ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_EXAMPLE, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
@@ -520,14 +503,14 @@ class Example extends $pb.GeneratedMessage {
 
   Example._() : super();
   factory Example({
-    $core.String? exampleUuid,
+    $core.String? cloudPath,
     $core.String? name,
     $core.String? description,
     ExampleType? type,
   }) {
     final _result = create();
-    if (exampleUuid != null) {
-      _result.exampleUuid = exampleUuid;
+    if (cloudPath != null) {
+      _result.cloudPath = cloudPath;
     }
     if (name != null) {
       _result.name = name;
@@ -562,13 +545,13 @@ class Example extends $pb.GeneratedMessage {
   static Example? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get exampleUuid => $_getSZ(0);
+  $core.String get cloudPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set exampleUuid($core.String v) { $_setString(0, v); }
+  set cloudPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExampleUuid() => $_has(0);
+  $core.bool hasCloudPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExampleUuid() => clearField(1);
+  void clearCloudPath() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -751,17 +734,17 @@ class GetListOfExamplesResponse extends $pb.GeneratedMessage {
 
 class GetExampleRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetExampleRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePath')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
     ..hasRequiredFields = false
   ;
 
   GetExampleRequest._() : super();
   factory GetExampleRequest({
-    $core.String? examplePath,
+    $core.String? cloudPath,
   }) {
     final _result = create();
-    if (examplePath != null) {
-      _result.examplePath = examplePath;
+    if (cloudPath != null) {
+      _result.cloudPath = cloudPath;
     }
     return _result;
   }
@@ -787,13 +770,13 @@ class GetExampleRequest extends $pb.GeneratedMessage {
   static GetExampleRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get examplePath => $_getSZ(0);
+  $core.String get cloudPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set examplePath($core.String v) { $_setString(0, v); }
+  set cloudPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExamplePath() => $_has(0);
+  $core.bool hasCloudPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExamplePath() => clearField(1);
+  void clearCloudPath() => clearField(1);
 }
 
 class GetExampleResponse extends $pb.GeneratedMessage {
