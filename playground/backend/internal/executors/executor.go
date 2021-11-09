@@ -79,8 +79,10 @@ func (ex *Executor) Compile() *exec.Cmd {
 // Returns Cmd instance
 func (ex *Executor) Run() *exec.Cmd {
 	args := append(ex.runArgs.commandArgs, ex.runArgs.fileName)
-	cmd := exec.Command(ex.runArgs.commandName, args...)
-	if ex.runArgs.commandName == "" {
+	var cmd *exec.Cmd
+	if ex.runArgs.commandName != "" {
+		cmd = exec.Command(ex.runArgs.commandName, args...)
+	} else {
 		cmd = exec.Command(fmt.Sprint(strings.Join(args, " ")))
 	}
 	cmd.Dir = ex.runArgs.workingDir
