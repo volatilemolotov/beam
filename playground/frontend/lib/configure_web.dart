@@ -16,16 +16,8 @@
  * limitations under the License.
  */
 
-const kThemeIconAsset = 'theme.svg';
-const kResetIconAsset = 'reset.svg';
-const kOutputBottomIconAsset = 'output_bottom.svg';
-const kOutputRightIconAsset = 'output_right.svg';
-const kOutputLeftIconAsset = 'output_left.svg';
-const kShortcutsIconAsset = 'shortcuts.svg';
-const kGithubIconAsset = 'github.svg';
-const kBeamIconAsset = 'beam.png';
-const kBeamLgIconAsset = 'beam_lg.png';
-const kThumbUpIconAsset = 'thumb_up.svg';
-const kThumbDownIconAsset = 'thumb_down.svg';
-const kCopyIconAsset = 'copy.svg';
-const kLinkIconAsset = 'link.svg';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+
+void configureApp() {
+  setUrlStrategy(PathUrlStrategy());
+}

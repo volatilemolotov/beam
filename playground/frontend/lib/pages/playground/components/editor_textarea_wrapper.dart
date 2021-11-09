@@ -40,6 +40,7 @@ class CodeTextAreaWrapper extends StatelessWidget {
         children: [
           Positioned.fill(
             child: EditorTextArea(
+              enabled: true,
               key: ValueKey(EditorKeyObject(
                 state.sdk,
                 state.selectedExample,

@@ -50,10 +50,20 @@ class PlaygroundPageProviders extends StatelessWidget {
             }
             if ((exampleState.categories?.isNotEmpty ?? false) &&
                 playground.selectedExample == null) {
+              final exampleId = Uri.base.queryParameters['example'];
+              final allExamples = exampleState.categories!
+                  .expand((category) => category.examples);
+              final defaultExample = allExamples.first;
+              final selectedExample = exampleState.categories
+                  ?.expand((category) => category.examples)
+                  .firstWhere(
+                    (example) => example.name == exampleId,
+                    orElse: () => defaultExample,
+                  );
               return PlaygroundState(
                 codeRepository: kCodeRepository,
                 sdk: playground.sdk,
-                selectedExample: exampleState.categories?.first.examples.first,
+                selectedExample: selectedExample,
               );
             }
             return playground;
