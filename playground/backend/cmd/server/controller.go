@@ -22,7 +22,7 @@ import (
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/storage"
+	"beam.apache.org/playground/backend/internal/precompiled_objects"
 	"beam.apache.org/playground/backend/internal/validators"
 	"context"
 	"github.com/google/uuid"
@@ -151,41 +151,30 @@ func (controller *playgroundController) Cancel(ctx context.Context, info *pb.Can
 
 //GetListOfExamples returns the list of examples
 func (controller *playgroundController) GetListOfExamples(ctx context.Context, info *pb.GetListOfExamplesRequest) (*pb.GetListOfExamplesResponse, error) {
-	cd := storage.New()
-	examples, err := cd.GetListOfExamples(ctx, info.Sdk, info.Category)
+	cd := precompiled_objects.New()
+	sdkToCategories, err := cd.GetPrecompiledObjects(ctx, info.Sdk, info.Category)
 	if err != nil {
-		logger.Errorf("%s: GetListOfExamples(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("GetListOfExamples(): ", err.Error())
+		logger.Errorf("%s: GetPrecompiledObjects(): cloud storage error: %s", err.Error())
+		return nil, errors.InternalError("GetPrecompiledObjects(): ", err.Error())
 	}
 	response := pb.GetListOfExamplesResponse{SdkExamples: make([]*pb.Categories, 0)}
-	for sdk, categories := range *examples {
-		sdkCategories := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdk]), Categories: make([]*pb.Categories_Category, 0)}
+	for sdkName, categories := range *sdkToCategories {
+		sdkCategory := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdkName]), Categories: make([]*pb.Categories_Category, 0)}
 		for categoryName, examplesArr := range categories {
-			getCategoryWithExamples(categoryName, examplesArr, &sdkCategories)
+			precompiled_objects.GetCategoryToPrecompiledObjects(categoryName, examplesArr, &sdkCategory)
 		}
-		response.SdkExamples = append(response.SdkExamples, &sdkCategories)
+		response.SdkExamples = append(response.SdkExamples, &sdkCategory)
 	}
 	return &response, nil
 }
 
-func getCategoryWithExamples(categoryName string, examplesArr storage.ExamplesInfo, sdkCategories *pb.Categories) {
-	category := pb.Categories_Category{
-		CategoryName: categoryName,
-		Examples:     make([]*pb.Example, 0),
-	}
-	for _, example := range examplesArr {
-		category.Examples = append(category.Examples, &example)
-	}
-	sdkCategories.Categories = append(sdkCategories.Categories, &category)
-}
-
 // GetExample returns the code of the specific example
 func (controller *playgroundController) GetExample(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetExampleResponse, error) {
-	cd := storage.New()
-	codeString, err := cd.GetExample(ctx, info.GetCloudPath())
+	cd := precompiled_objects.New()
+	codeString, err := cd.GetPrecompiledObject(ctx, info.GetCloudPath())
 	if err != nil {
-		logger.Errorf("%s: GetExample(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("GetListOfExamples(): ", err.Error())
+		logger.Errorf("%s: GetPrecompiledObject(): cloud storage error: %s", err.Error())
+		return nil, errors.InternalError("GetPrecompiledObjects(): ", err.Error())
 	}
 	response := pb.GetExampleResponse{Code: *codeString}
 	return &response, nil
@@ -193,11 +182,11 @@ func (controller *playgroundController) GetExample(ctx context.Context, info *pb
 
 // GetExampleOutput returns the output of the compiled and run example
 func (controller *playgroundController) GetExampleOutput(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetRunOutputResponse, error) {
-	cd := storage.New()
-	output, err := cd.GetExampleOutput(ctx, info.GetCloudPath())
+	cd := precompiled_objects.New()
+	output, err := cd.GetPrecompiledObjectOutput(ctx, info.GetCloudPath())
 	if err != nil {
-		logger.Errorf("%s: GetExampleOutput(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("GetExampleOutput(): ", err.Error())
+		logger.Errorf("%s: GetPrecompiledObjectOutput(): cloud storage error: %s", err.Error())
+		return nil, errors.InternalError("GetPrecompiledObjectOutput(): ", err.Error())
 	}
 	response := pb.GetRunOutputResponse{Output: *output}
 	return &response, nil
