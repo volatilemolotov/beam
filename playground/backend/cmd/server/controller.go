@@ -152,7 +152,7 @@ func (controller *playgroundController) GetListOfExamples(ctx context.Context, i
 	for sdk, categories := range *examples {
 		sdkCategories := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdk]), Categories: make([]*pb.Categories_Category, 0)}
 		for categoryName, examplesArr := range categories {
-			precompiled_objects.GetCategoryWithExamples(categoryName, examplesArr, &sdkCategories)
+			precompiled_objects.GetCategoryToPrecompiledObjects(categoryName, examplesArr, &sdkCategories)
 		}
 		response.SdkExamples = append(response.SdkExamples, &sdkCategories)
 	}
