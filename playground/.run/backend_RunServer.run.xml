@@ -17,9 +17,13 @@
               <option name="name" value="APP_WORK_DIR" />
               <option name="value" value="/go/src/playground/backend" />
             </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="SERVER_IP" />
+              <option name="value" value="0.0.0.0" />
+            </DockerEnvVarImpl>
           </list>
         </option>
-        <option name="commandLineOptions" value="-w /go/src/playground/backend/cmd/server -rm" />
+        <option name="commandLineOptions" value="-w /go/src/playground/backend/cmd/server -rm -p 8080:8080" />
         <option name="sourceFilePath" value="dev-env/gradle/Dockerfile" />
         <option name="volumeBindings">
           <list>

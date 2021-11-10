@@ -54,18 +54,11 @@ class PlaygroundPageProviders extends StatelessWidget {
 
             if (exampleState.sdkCategories != null &&
                 playground.selectedExample == null) {
-              final defaultExample = exampleState
-                  .sdkCategories![playground.sdk]!.first.examples.first;
-              exampleState.getExampleSource(defaultExample.uuid).then((value) {
-                defaultExample.setSource(value);
-              });
-              exampleState.getExampleOutput(defaultExample.uuid).then((value) {
-                defaultExample.setOutputs(value);
-              });
               return PlaygroundState(
                 codeRepository: kCodeRepository,
                 sdk: playground.sdk,
-                selectedExample: defaultExample,
+                selectedExample:
+                    exampleState.defaultExamplesMap?[playground.sdk],
               );
             }
             return playground;

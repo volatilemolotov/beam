@@ -87,3 +87,4 @@ COPY playground/backend/go.mod /go/src/tmp
 COPY playground/backend/go.sum /go/src/tmp
 RUN cd /go/src/tmp &&\
     go mod download
+EXPOSE 8080

@@ -25,8 +25,6 @@ import 'package:playground/modules/actions/components/header_icon_button.dart';
 import 'package:playground/modules/shortcuts/components/shortcut_tooltip.dart';
 import 'package:playground/modules/shortcuts/constants/global_shortcuts.dart';
 
-const kResetButtonText = "Reset";
-
 class ResetAction extends StatelessWidget {
   final VoidCallback reset;
 
