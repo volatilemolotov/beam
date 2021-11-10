@@ -1,7 +1,23 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package storage
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/logger"
 	"cloud.google.com/go/storage"
 	"context"
 	"encoding/json"
@@ -9,6 +25,7 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -18,25 +35,38 @@ const (
 	BucketName      = "playground-examples"
 	OutputExtension = "output"
 	MetaInfoName    = "meta.info"
+	Timeout         = 10
+	javaExtension   = "java"
+	goExtension     = "go"
+	pyExtension     = "py"
+	scioExtension   = "scala"
 )
 
+type ExamplesInfo []pb.Example
+type SdkCategories map[string]ExamplesInfo
+type Examples map[string]SdkCategories
+
+// CloudStorage represents working tools for getting compiled and
+// run beam examples from Google Cloud Storage. It is required that
+// the bucket where examples are stored would be public,
+// and it has a concrete structure of directories, namely:
+// /SDK_JAVA
+// ---- /Category1
+// --------/Example1
+// --------/Example2
+// ----  ...
+// /SDK_GO
+// ---- /Category2
+// --------/Example1
+// --------/Example2
+// ----  ...
+// ...
 type CloudStorage struct {
 }
 
-func NewCloudStorage() *CloudStorage {
+func New() *CloudStorage {
 	return &CloudStorage{}
 }
-
-type ExampleInfo struct {
-	Name        string
-	CsPath      string
-	Description string `json:"Description"`
-	Type        string `json:"Type"`
-}
-
-type ExampleInfoArr []ExampleInfo
-type SdkCategories map[string]ExampleInfoArr
-type Examples map[string]SdkCategories
 
 // GetExample returns the source code of the example
 func (cd *CloudStorage) GetExample(ctx context.Context, examplePath string) (*string, error) {
@@ -60,23 +90,24 @@ func (cd *CloudStorage) GetExampleOutput(ctx context.Context, examplePath string
 }
 
 // GetListOfExamples returns the list of stored example at cloud storage bucket
-func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk string, category string) (*Examples, error) {
+func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk pb.Sdk, category string) (*Examples, error) {
 	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
 	if err != nil {
 		return nil, fmt.Errorf("storage.NewClient: %v", err)
 	}
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*Timeout)
 	defer cancel()
 
 	bucket := client.Bucket(BucketName)
-	if sdk == "SDK_UNSPECIFIED" {
-		sdk = ""
+	prefix := sdk.String()
+	if sdk == pb.Sdk_SDK_UNSPECIFIED {
+		prefix = ""
 	}
 	examples := make(Examples, 0)
 	it := bucket.Objects(ctx, &storage.Query{
-		Prefix: filepath.Join(sdk, category),
+		Prefix: filepath.Join(prefix, category),
 	})
 	for {
 		attrs, err := it.Next()
@@ -87,33 +118,42 @@ func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk string, categ
 			return nil, fmt.Errorf("Bucket(%q).Objects: %v", BucketName, err)
 		}
 		path := attrs.Name
-		if strings.Count(path, "/") == 3 && path[len(path)-1] == '/' {
+		if isFullPathToExample(path) {
 			infoPath := filepath.Join(path, MetaInfoName)
 			rc, err := bucket.Object(infoPath).NewReader(ctx)
 			if err != nil {
-				return nil, fmt.Errorf("Object(%q).NewReader: %v", infoPath, err)
+				logger.Errorf("Object(%q).NewReader: %v", infoPath, err.Error())
+				continue
 			}
 			data, err := ioutil.ReadAll(rc)
 			if err != nil {
-				return nil, fmt.Errorf("ioutil.ReadAll: %v", err)
+				logger.Errorf("ioutil.ReadAll: %v", err.Error())
+				continue
 			}
-			exampleInfo := ExampleInfo{}
+			exampleInfo := pb.Example{}
 			err = json.Unmarshal(data, &exampleInfo)
 			if err != nil {
-				return nil, fmt.Errorf("json.Unmarshal: %v", err)
+				logger.Errorf("json.Unmarshal: %v", err.Error())
+				continue
 			}
-			exampleInfo.CsPath = path
+
+			exampleInfo.CloudPath = path
 			exampleInfo.Name = filepath.Base(path)
-			cd.setExampleToMap(path, &examples, &exampleInfo)
+			cd.writeExample(path, &examples, &exampleInfo)
+			rc.Close()
 		}
 	}
 	return &examples, nil
 }
 
-func (cd *CloudStorage) setExampleToMap(path string, examples *Examples, exampleInfo *ExampleInfo) {
-	splittedPath := strings.Split(path, "/")
-	sdk := splittedPath[0]
-	category := splittedPath[1]
+func isFullPathToExample(path string) bool {
+	return strings.Count(path, string(os.PathSeparator)) == 3 && path[len(path)-1] == os.PathSeparator
+}
+
+func (cd *CloudStorage) writeExample(path string, examples *Examples, exampleInfo *pb.Example) {
+	splintedPath := strings.Split(path, string(os.PathSeparator))
+	sdk := splintedPath[0]      // the path of the form "sdk/category/example", where the first part is sdk
+	category := splintedPath[1] // and the second part is the name of the category
 	catMap, ok := (*examples)[sdk]
 	if !ok {
 		(*examples)[sdk] = make(SdkCategories, 0)
@@ -121,7 +161,7 @@ func (cd *CloudStorage) setExampleToMap(path string, examples *Examples, example
 	}
 	exampleArr, ok := catMap[category]
 	if !ok {
-		catMap[category] = make(ExampleInfoArr, 0)
+		catMap[category] = make(ExamplesInfo, 0)
 		exampleArr = catMap[category]
 	}
 	exampleArr = append(exampleArr, *exampleInfo)
@@ -166,13 +206,13 @@ func getFileExtensionBySdk(examplePath string) string {
 	var extension string
 	switch sdk {
 	case pb.Sdk_SDK_JAVA.String():
-		extension = "java"
+		extension = javaExtension
 	case pb.Sdk_SDK_PYTHON.String():
-		extension = "py"
+		extension = pyExtension
 	case pb.Sdk_SDK_GO.String():
-		extension = "go"
+		extension = goExtension
 	case pb.Sdk_SDK_SCIO.String():
-		extension = "scala"
+		extension = scioExtension
 	}
 	return extension
 }

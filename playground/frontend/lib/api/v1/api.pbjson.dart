@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 ///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
@@ -46,17 +29,20 @@ const Status$json = const {
     const {'1': 'STATUS_UNSPECIFIED', '2': 0},
     const {'1': 'STATUS_VALIDATING', '2': 1},
     const {'1': 'STATUS_VALIDATION_ERROR', '2': 2},
-    const {'1': 'STATUS_COMPILING', '2': 3},
-    const {'1': 'STATUS_COMPILE_ERROR', '2': 4},
-    const {'1': 'STATUS_EXECUTING', '2': 5},
-    const {'1': 'STATUS_FINISHED', '2': 6},
-    const {'1': 'STATUS_ERROR', '2': 7},
-    const {'1': 'STATUS_RUN_TIMEOUT', '2': 8},
+    const {'1': 'STATUS_PREPARING', '2': 3},
+    const {'1': 'STATUS_PREPARATION_ERROR', '2': 4},
+    const {'1': 'STATUS_COMPILING', '2': 5},
+    const {'1': 'STATUS_COMPILE_ERROR', '2': 6},
+    const {'1': 'STATUS_EXECUTING', '2': 7},
+    const {'1': 'STATUS_FINISHED', '2': 8},
+    const {'1': 'STATUS_RUN_ERROR', '2': 9},
+    const {'1': 'STATUS_ERROR', '2': 10},
+    const {'1': 'STATUS_RUN_TIMEOUT', '2': 11},
   ],
 };
 
 /// Descriptor for `Status`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List statusDescriptor = $convert.base64Decode('CgZTdGF0dXMSFgoSU1RBVFVTX1VOU1BFQ0lGSUVEEAASFQoRU1RBVFVTX1ZBTElEQVRJTkcQARIbChdTVEFUVVNfVkFMSURBVElPTl9FUlJPUhACEhQKEFNUQVRVU19DT01QSUxJTkcQAxIYChRTVEFUVVNfQ09NUElMRV9FUlJPUhAEEhQKEFNUQVRVU19FWEVDVVRJTkcQBRITCg9TVEFUVVNfRklOSVNIRUQQBhIQCgxTVEFUVVNfRVJST1IQBxIWChJTVEFUVVNfUlVOX1RJTUVPVVQQCA==');
+final $typed_data.Uint8List statusDescriptor = $convert.base64Decode('CgZTdGF0dXMSFgoSU1RBVFVTX1VOU1BFQ0lGSUVEEAASFQoRU1RBVFVTX1ZBTElEQVRJTkcQARIbChdTVEFUVVNfVkFMSURBVElPTl9FUlJPUhACEhQKEFNUQVRVU19QUkVQQVJJTkcQAxIcChhTVEFUVVNfUFJFUEFSQVRJT05fRVJST1IQBBIUChBTVEFUVVNfQ09NUElMSU5HEAUSGAoUU1RBVFVTX0NPTVBJTEVfRVJST1IQBhIUChBTVEFUVVNfRVhFQ1VUSU5HEAcSEwoPU1RBVFVTX0ZJTklTSEVEEAgSFAoQU1RBVFVTX1JVTl9FUlJPUhAJEhAKDFNUQVRVU19FUlJPUhAKEhYKElNUQVRVU19SVU5fVElNRU9VVBAL');
 @$core.Deprecated('Use exampleTypeDescriptor instead')
 const ExampleType$json = const {
   '1': 'ExampleType',
@@ -146,12 +132,31 @@ const GetRunOutputResponse$json = const {
   '1': 'GetRunOutputResponse',
   '2': const [
     const {'1': 'output', '3': 1, '4': 1, '5': 9, '10': 'output'},
-    const {'1': 'compilation_status', '3': 2, '4': 1, '5': 14, '6': '.api.v1.Status', '10': 'compilationStatus'},
   ],
 };
 
 /// Descriptor for `GetRunOutputResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getRunOutputResponseDescriptor = $convert.base64Decode('ChRHZXRSdW5PdXRwdXRSZXNwb25zZRIWCgZvdXRwdXQYASABKAlSBm91dHB1dBI9ChJjb21waWxhdGlvbl9zdGF0dXMYAiABKA4yDi5hcGkudjEuU3RhdHVzUhFjb21waWxhdGlvblN0YXR1cw==');
+final $typed_data.Uint8List getRunOutputResponseDescriptor = $convert.base64Decode('ChRHZXRSdW5PdXRwdXRSZXNwb25zZRIWCgZvdXRwdXQYASABKAlSBm91dHB1dA==');
+@$core.Deprecated('Use getRunErrorRequestDescriptor instead')
+const GetRunErrorRequest$json = const {
+  '1': 'GetRunErrorRequest',
+  '2': const [
+    const {'1': 'pipeline_uuid', '3': 1, '4': 1, '5': 9, '10': 'pipelineUuid'},
+  ],
+};
+
+/// Descriptor for `GetRunErrorRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getRunErrorRequestDescriptor = $convert.base64Decode('ChJHZXRSdW5FcnJvclJlcXVlc3QSIwoNcGlwZWxpbmVfdXVpZBgBIAEoCVIMcGlwZWxpbmVVdWlk');
+@$core.Deprecated('Use getRunErrorResponseDescriptor instead')
+const GetRunErrorResponse$json = const {
+  '1': 'GetRunErrorResponse',
+  '2': const [
+    const {'1': 'output', '3': 1, '4': 1, '5': 9, '10': 'output'},
+  ],
+};
+
+/// Descriptor for `GetRunErrorResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getRunErrorResponseDescriptor = $convert.base64Decode('ChNHZXRSdW5FcnJvclJlc3BvbnNlEhYKBm91dHB1dBgBIAEoCVIGb3V0cHV0');
 @$core.Deprecated('Use getListOfExamplesRequestDescriptor instead')
 const GetListOfExamplesRequest$json = const {
   '1': 'GetListOfExamplesRequest',
@@ -167,7 +172,7 @@ final $typed_data.Uint8List getListOfExamplesRequestDescriptor = $convert.base64
 const Example$json = const {
   '1': 'Example',
   '2': const [
-    const {'1': 'example_uuid', '3': 1, '4': 1, '5': 9, '10': 'exampleUuid'},
+    const {'1': 'cloud_path', '3': 1, '4': 1, '5': 9, '10': 'cloudPath'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'description', '3': 3, '4': 1, '5': 9, '10': 'description'},
     const {'1': 'type', '3': 4, '4': 1, '5': 14, '6': '.api.v1.ExampleType', '10': 'type'},
@@ -175,7 +180,7 @@ const Example$json = const {
 };
 
 /// Descriptor for `Example`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List exampleDescriptor = $convert.base64Decode('CgdFeGFtcGxlEiEKDGV4YW1wbGVfdXVpZBgBIAEoCVILZXhhbXBsZVV1aWQSEgoEbmFtZRgCIAEoCVIEbmFtZRIgCgtkZXNjcmlwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SJwoEdHlwZRgEIAEoDjITLmFwaS52MS5FeGFtcGxlVHlwZVIEdHlwZQ==');
+final $typed_data.Uint8List exampleDescriptor = $convert.base64Decode('CgdFeGFtcGxlEh0KCmNsb3VkX3BhdGgYASABKAlSCWNsb3VkUGF0aBISCgRuYW1lGAIgASgJUgRuYW1lEiAKC2Rlc2NyaXB0aW9uGAMgASgJUgtkZXNjcmlwdGlvbhInCgR0eXBlGAQgASgOMhMuYXBpLnYxLkV4YW1wbGVUeXBlUgR0eXBl');
 @$core.Deprecated('Use categoriesDescriptor instead')
 const Categories$json = const {
   '1': 'Categories',
@@ -211,12 +216,12 @@ final $typed_data.Uint8List getListOfExamplesResponseDescriptor = $convert.base6
 const GetExampleRequest$json = const {
   '1': 'GetExampleRequest',
   '2': const [
-    const {'1': 'example_path', '3': 1, '4': 1, '5': 9, '10': 'examplePath'},
+    const {'1': 'cloud_path', '3': 1, '4': 1, '5': 9, '10': 'cloudPath'},
   ],
 };
 
 /// Descriptor for `GetExampleRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIhCgxleGFtcGxlX3BhdGgYASABKAlSC2V4YW1wbGVQYXRo');
+final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIdCgpjbG91ZF9wYXRoGAEgASgJUgljbG91ZFBhdGg=');
 @$core.Deprecated('Use getExampleResponseDescriptor instead')
 const GetExampleResponse$json = const {
   '1': 'GetExampleResponse',

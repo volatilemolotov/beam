@@ -1,21 +1,4 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
- ///
+///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
 //
@@ -390,21 +373,16 @@ class GetRunOutputRequest extends $pb.GeneratedMessage {
 class GetRunOutputResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetRunOutputResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
     ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'output')
-    ..e<Status>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'compilationStatus', $pb.PbFieldType.OE, defaultOrMaker: Status.STATUS_UNSPECIFIED, valueOf: Status.valueOf, enumValues: Status.values)
     ..hasRequiredFields = false
   ;
 
   GetRunOutputResponse._() : super();
   factory GetRunOutputResponse({
     $core.String? output,
-    Status? compilationStatus,
   }) {
     final _result = create();
     if (output != null) {
       _result.output = output;
-    }
-    if (compilationStatus != null) {
-      _result.compilationStatus = compilationStatus;
     }
     return _result;
   }
@@ -437,15 +415,100 @@ class GetRunOutputResponse extends $pb.GeneratedMessage {
   $core.bool hasOutput() => $_has(0);
   @$pb.TagNumber(1)
   void clearOutput() => clearField(1);
+}
 
-  @$pb.TagNumber(2)
-  Status get compilationStatus => $_getN(1);
-  @$pb.TagNumber(2)
-  set compilationStatus(Status v) { setField(2, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasCompilationStatus() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearCompilationStatus() => clearField(2);
+class GetRunErrorRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetRunErrorRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pipelineUuid')
+    ..hasRequiredFields = false
+  ;
+
+  GetRunErrorRequest._() : super();
+  factory GetRunErrorRequest({
+    $core.String? pipelineUuid,
+  }) {
+    final _result = create();
+    if (pipelineUuid != null) {
+      _result.pipelineUuid = pipelineUuid;
+    }
+    return _result;
+  }
+  factory GetRunErrorRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetRunErrorRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetRunErrorRequest clone() => GetRunErrorRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetRunErrorRequest copyWith(void Function(GetRunErrorRequest) updates) => super.copyWith((message) => updates(message as GetRunErrorRequest)) as GetRunErrorRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static GetRunErrorRequest create() => GetRunErrorRequest._();
+  GetRunErrorRequest createEmptyInstance() => create();
+  static $pb.PbList<GetRunErrorRequest> createRepeated() => $pb.PbList<GetRunErrorRequest>();
+  @$core.pragma('dart2js:noInline')
+  static GetRunErrorRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetRunErrorRequest>(create);
+  static GetRunErrorRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pipelineUuid => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pipelineUuid($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasPipelineUuid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPipelineUuid() => clearField(1);
+}
+
+class GetRunErrorResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetRunErrorResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'output')
+    ..hasRequiredFields = false
+  ;
+
+  GetRunErrorResponse._() : super();
+  factory GetRunErrorResponse({
+    $core.String? output,
+  }) {
+    final _result = create();
+    if (output != null) {
+      _result.output = output;
+    }
+    return _result;
+  }
+  factory GetRunErrorResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetRunErrorResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  GetRunErrorResponse clone() => GetRunErrorResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  GetRunErrorResponse copyWith(void Function(GetRunErrorResponse) updates) => super.copyWith((message) => updates(message as GetRunErrorResponse)) as GetRunErrorResponse; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static GetRunErrorResponse create() => GetRunErrorResponse._();
+  GetRunErrorResponse createEmptyInstance() => create();
+  static $pb.PbList<GetRunErrorResponse> createRepeated() => $pb.PbList<GetRunErrorResponse>();
+  @$core.pragma('dart2js:noInline')
+  static GetRunErrorResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetRunErrorResponse>(create);
+  static GetRunErrorResponse? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get output => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set output($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasOutput() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearOutput() => clearField(1);
 }
 
 class GetListOfExamplesRequest extends $pb.GeneratedMessage {
@@ -511,7 +574,7 @@ class GetListOfExamplesRequest extends $pb.GeneratedMessage {
 
 class Example extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Example', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
     ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_EXAMPLE, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
@@ -520,14 +583,14 @@ class Example extends $pb.GeneratedMessage {
 
   Example._() : super();
   factory Example({
-    $core.String? exampleUuid,
+    $core.String? cloudPath,
     $core.String? name,
     $core.String? description,
     ExampleType? type,
   }) {
     final _result = create();
-    if (exampleUuid != null) {
-      _result.exampleUuid = exampleUuid;
+    if (cloudPath != null) {
+      _result.cloudPath = cloudPath;
     }
     if (name != null) {
       _result.name = name;
@@ -562,13 +625,13 @@ class Example extends $pb.GeneratedMessage {
   static Example? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get exampleUuid => $_getSZ(0);
+  $core.String get cloudPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set exampleUuid($core.String v) { $_setString(0, v); }
+  set cloudPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExampleUuid() => $_has(0);
+  $core.bool hasCloudPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExampleUuid() => clearField(1);
+  void clearCloudPath() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -751,17 +814,17 @@ class GetListOfExamplesResponse extends $pb.GeneratedMessage {
 
 class GetExampleRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetExampleRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'examplePath')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
     ..hasRequiredFields = false
   ;
 
   GetExampleRequest._() : super();
   factory GetExampleRequest({
-    $core.String? examplePath,
+    $core.String? cloudPath,
   }) {
     final _result = create();
-    if (examplePath != null) {
-      _result.examplePath = examplePath;
+    if (cloudPath != null) {
+      _result.cloudPath = cloudPath;
     }
     return _result;
   }
@@ -787,13 +850,13 @@ class GetExampleRequest extends $pb.GeneratedMessage {
   static GetExampleRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get examplePath => $_getSZ(0);
+  $core.String get cloudPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set examplePath($core.String v) { $_setString(0, v); }
+  set cloudPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExamplePath() => $_has(0);
+  $core.bool hasCloudPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExamplePath() => clearField(1);
+  void clearCloudPath() => clearField(1);
 }
 
 class GetExampleResponse extends $pb.GeneratedMessage {
