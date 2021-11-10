@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 ///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
@@ -47,14 +64,14 @@ final $typed_data.Uint8List statusDescriptor = $convert.base64Decode('CgZTdGF0dX
 const PrecompiledObjectType$json = const {
   '1': 'PrecompiledObjectType',
   '2': const [
-    const {'1': 'PRECOMPILED_OBJECT_TYPE_EXAMPLE', '2': 0},
-    const {'1': 'PRECOMPILED_OBJECT_TYPE_KATA', '2': 1},
-    const {'1': 'PRECOMPILED_OBJECT_TYPE_UNIT_TEST', '2': 2},
+    const {'1': 'EXAMPLE', '2': 0},
+    const {'1': 'KATA', '2': 1},
+    const {'1': 'UNIT_TEST', '2': 2},
   ],
 };
 
 /// Descriptor for `PrecompiledObjectType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List precompiledObjectTypeDescriptor = $convert.base64Decode('ChVQcmVjb21waWxlZE9iamVjdFR5cGUSIwofUFJFQ09NUElMRURfT0JKRUNUX1RZUEVfRVhBTVBMRRAAEiAKHFBSRUNPTVBJTEVEX09CSkVDVF9UWVBFX0tBVEEQARIlCiFQUkVDT01QSUxFRF9PQkpFQ1RfVFlQRV9VTklUX1RFU1QQAg==');
+final $typed_data.Uint8List precompiledObjectTypeDescriptor = $convert.base64Decode('ChVQcmVjb21waWxlZE9iamVjdFR5cGUSCwoHRVhBTVBMRRAAEggKBEtBVEEQARINCglVTklUX1RFU1QQAg==');
 @$core.Deprecated('Use runCodeRequestDescriptor instead')
 const RunCodeRequest$json = const {
   '1': 'RunCodeRequest',

@@ -17,12 +17,12 @@ package main
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
+	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/precompiled_objects"
 	"beam.apache.org/playground/backend/internal/validators"
 	"context"
 	"github.com/google/uuid"
@@ -142,8 +142,8 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 
 //GetPrecompiledObjects returns the list of examples
 func (controller *playgroundController) GetPrecompiledObjects(ctx context.Context, info *pb.GetPrecompiledObjectsRequest) (*pb.GetPrecompiledObjectsResponse, error) {
-	cd := precompiled_objects.New()
-	sdkToCategories, err := cd.GetPrecompiledObjects(ctx, info.Sdk, info.Category)
+	bucket := cloud_bucket.New()
+	sdkToCategories, err := bucket.GetPrecompiledObjects(ctx, info.Sdk, info.Category)
 	if err != nil {
 		logger.Errorf("%s: GetPrecompiledObjects(): cloud storage error: %s", err.Error())
 		return nil, errors.InternalError("GetPrecompiledObjects(): ", err.Error())
@@ -151,8 +151,8 @@ func (controller *playgroundController) GetPrecompiledObjects(ctx context.Contex
 	response := pb.GetPrecompiledObjectsResponse{SdkCategories: make([]*pb.Categories, 0)}
 	for sdkName, categories := range *sdkToCategories {
 		sdkCategory := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdkName]), Categories: make([]*pb.Categories_Category, 0)}
-		for categoryName, examplesArr := range categories {
-			precompiled_objects.GetCategoryToPrecompiledObjects(categoryName, examplesArr, &sdkCategory)
+		for categoryName, precompiledObjects := range categories {
+			cloud_bucket.GetCategoryToPrecompiledObjects(categoryName, &precompiledObjects, &sdkCategory)
 		}
 		response.SdkCategories = append(response.SdkCategories, &sdkCategory)
 	}
@@ -161,7 +161,7 @@ func (controller *playgroundController) GetPrecompiledObjects(ctx context.Contex
 
 // GetPrecompiledObjectCode returns the code of the specific example
 func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Context, info *pb.GetPrecompiledObjectRequest) (*pb.GetPrecompiledObjectCodeResponse, error) {
-	cd := precompiled_objects.New()
+	cd := cloud_bucket.New()
 	codeString, err := cd.GetPrecompiledObject(ctx, info.GetCloudPath())
 	if err != nil {
 		logger.Errorf("%s: GetPrecompiledObject(): cloud storage error: %s", err.Error())
@@ -173,7 +173,7 @@ func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Con
 
 // GetPrecompiledObjectOutput returns the output of the compiled and run example
 func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.Context, info *pb.GetPrecompiledObjectRequest) (*pb.GetRunOutputResponse, error) {
-	cd := precompiled_objects.New()
+	cd := cloud_bucket.New()
 	output, err := cd.GetPrecompiledObjectOutput(ctx, info.GetCloudPath())
 	if err != nil {
 		logger.Errorf("%s: GetPrecompiledObjectOutput(): cloud storage error: %s", err.Error())

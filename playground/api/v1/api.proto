@@ -45,9 +45,9 @@ enum Status {
 }
 
 enum PrecompiledObjectType {
-  PRECOMPILED_OBJECT_TYPE_EXAMPLE = 0;
-  PRECOMPILED_OBJECT_TYPE_KATA = 1;
-  PRECOMPILED_OBJECT_TYPE_UNIT_TEST = 2;
+  EXAMPLE = 0;
+  KATA = 1;
+  UNIT_TEST = 2;
 }
 
 // RunCodeRequest represents a code text and options of SDK which executes the code.
