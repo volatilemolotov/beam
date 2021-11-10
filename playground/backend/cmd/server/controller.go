@@ -140,39 +140,39 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 	return &pipelineResult, nil
 }
 
-//GetListOfExamples returns the list of examples
-func (controller *playgroundController) GetListOfExamples(ctx context.Context, info *pb.GetListOfExamplesRequest) (*pb.GetListOfExamplesResponse, error) {
+//GetPrecompiledObjects returns the list of examples
+func (controller *playgroundController) GetPrecompiledObjects(ctx context.Context, info *pb.GetPrecompiledObjectsRequest) (*pb.GetPrecompiledObjectsResponse, error) {
 	cd := precompiled_objects.New()
 	sdkToCategories, err := cd.GetPrecompiledObjects(ctx, info.Sdk, info.Category)
 	if err != nil {
 		logger.Errorf("%s: GetPrecompiledObjects(): cloud storage error: %s", err.Error())
 		return nil, errors.InternalError("GetPrecompiledObjects(): ", err.Error())
 	}
-	response := pb.GetListOfExamplesResponse{SdkExamples: make([]*pb.Categories, 0)}
+	response := pb.GetPrecompiledObjectsResponse{SdkCategories: make([]*pb.Categories, 0)}
 	for sdkName, categories := range *sdkToCategories {
 		sdkCategory := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdkName]), Categories: make([]*pb.Categories_Category, 0)}
 		for categoryName, examplesArr := range categories {
 			precompiled_objects.GetCategoryToPrecompiledObjects(categoryName, examplesArr, &sdkCategory)
 		}
-		response.SdkExamples = append(response.SdkExamples, &sdkCategory)
+		response.SdkCategories = append(response.SdkCategories, &sdkCategory)
 	}
 	return &response, nil
 }
 
-// GetExample returns the code of the specific example
-func (controller *playgroundController) GetExample(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetExampleResponse, error) {
+// GetPrecompiledObjectCode returns the code of the specific example
+func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Context, info *pb.GetPrecompiledObjectRequest) (*pb.GetPrecompiledObjectCodeResponse, error) {
 	cd := precompiled_objects.New()
 	codeString, err := cd.GetPrecompiledObject(ctx, info.GetCloudPath())
 	if err != nil {
 		logger.Errorf("%s: GetPrecompiledObject(): cloud storage error: %s", err.Error())
 		return nil, errors.InternalError("GetPrecompiledObjects(): ", err.Error())
 	}
-	response := pb.GetExampleResponse{Code: *codeString}
+	response := pb.GetPrecompiledObjectCodeResponse{Code: *codeString}
 	return &response, nil
 }
 
-// GetExampleOutput returns the output of the compiled and run example
-func (controller *playgroundController) GetExampleOutput(ctx context.Context, info *pb.GetExampleRequest) (*pb.GetRunOutputResponse, error) {
+// GetPrecompiledObjectOutput returns the output of the compiled and run example
+func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.Context, info *pb.GetPrecompiledObjectRequest) (*pb.GetRunOutputResponse, error) {
 	cd := precompiled_objects.New()
 	output, err := cd.GetPrecompiledObjectOutput(ctx, info.GetCloudPath())
 	if err != nil {

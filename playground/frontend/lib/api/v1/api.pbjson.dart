@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 ///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
@@ -60,18 +43,18 @@ const Status$json = const {
 
 /// Descriptor for `Status`. Decode as a `google.protobuf.EnumDescriptorProto`.
 final $typed_data.Uint8List statusDescriptor = $convert.base64Decode('CgZTdGF0dXMSFgoSU1RBVFVTX1VOU1BFQ0lGSUVEEAASFQoRU1RBVFVTX1ZBTElEQVRJTkcQARIbChdTVEFUVVNfVkFMSURBVElPTl9FUlJPUhACEhQKEFNUQVRVU19QUkVQQVJJTkcQAxIcChhTVEFUVVNfUFJFUEFSQVRJT05fRVJST1IQBBIUChBTVEFUVVNfQ09NUElMSU5HEAUSGAoUU1RBVFVTX0NPTVBJTEVfRVJST1IQBhIUChBTVEFUVVNfRVhFQ1VUSU5HEAcSEwoPU1RBVFVTX0ZJTklTSEVEEAgSFAoQU1RBVFVTX1JVTl9FUlJPUhAJEhAKDFNUQVRVU19FUlJPUhAKEhYKElNUQVRVU19SVU5fVElNRU9VVBAL');
-@$core.Deprecated('Use exampleTypeDescriptor instead')
-const ExampleType$json = const {
-  '1': 'ExampleType',
+@$core.Deprecated('Use precompiledObjectTypeDescriptor instead')
+const PrecompiledObjectType$json = const {
+  '1': 'PrecompiledObjectType',
   '2': const [
-    const {'1': 'EXAMPLE_TYPE_EXAMPLE', '2': 0},
-    const {'1': 'EXAMPLE_TYPE_KATA', '2': 1},
-    const {'1': 'EXAMPLE_TYPE_UNIT_TEST', '2': 2},
+    const {'1': 'PRECOMPILED_OBJECT_TYPE_EXAMPLE', '2': 0},
+    const {'1': 'PRECOMPILED_OBJECT_TYPE_KATA', '2': 1},
+    const {'1': 'PRECOMPILED_OBJECT_TYPE_UNIT_TEST', '2': 2},
   ],
 };
 
-/// Descriptor for `ExampleType`. Decode as a `google.protobuf.EnumDescriptorProto`.
-final $typed_data.Uint8List exampleTypeDescriptor = $convert.base64Decode('CgtFeGFtcGxlVHlwZRIYChRFWEFNUExFX1RZUEVfRVhBTVBMRRAAEhUKEUVYQU1QTEVfVFlQRV9LQVRBEAESGgoWRVhBTVBMRV9UWVBFX1VOSVRfVEVTVBAC');
+/// Descriptor for `PrecompiledObjectType`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List precompiledObjectTypeDescriptor = $convert.base64Decode('ChVQcmVjb21waWxlZE9iamVjdFR5cGUSIwofUFJFQ09NUElMRURfT0JKRUNUX1RZUEVfRVhBTVBMRRAAEiAKHFBSRUNPTVBJTEVEX09CSkVDVF9UWVBFX0tBVEEQARIlCiFQUkVDT01QSUxFRF9PQkpFQ1RfVFlQRV9VTklUX1RFU1QQAg==');
 @$core.Deprecated('Use runCodeRequestDescriptor instead')
 const RunCodeRequest$json = const {
   '1': 'RunCodeRequest',
@@ -174,30 +157,30 @@ const GetRunErrorResponse$json = const {
 
 /// Descriptor for `GetRunErrorResponse`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List getRunErrorResponseDescriptor = $convert.base64Decode('ChNHZXRSdW5FcnJvclJlc3BvbnNlEhYKBm91dHB1dBgBIAEoCVIGb3V0cHV0');
-@$core.Deprecated('Use getListOfExamplesRequestDescriptor instead')
-const GetListOfExamplesRequest$json = const {
-  '1': 'GetListOfExamplesRequest',
+@$core.Deprecated('Use getPrecompiledObjectsRequestDescriptor instead')
+const GetPrecompiledObjectsRequest$json = const {
+  '1': 'GetPrecompiledObjectsRequest',
   '2': const [
     const {'1': 'sdk', '3': 1, '4': 1, '5': 14, '6': '.api.v1.Sdk', '10': 'sdk'},
     const {'1': 'category', '3': 2, '4': 1, '5': 9, '10': 'category'},
   ],
 };
 
-/// Descriptor for `GetListOfExamplesRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getListOfExamplesRequestDescriptor = $convert.base64Decode('ChhHZXRMaXN0T2ZFeGFtcGxlc1JlcXVlc3QSHQoDc2RrGAEgASgOMgsuYXBpLnYxLlNka1IDc2RrEhoKCGNhdGVnb3J5GAIgASgJUghjYXRlZ29yeQ==');
-@$core.Deprecated('Use exampleDescriptor instead')
-const Example$json = const {
-  '1': 'Example',
+/// Descriptor for `GetPrecompiledObjectsRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getPrecompiledObjectsRequestDescriptor = $convert.base64Decode('ChxHZXRQcmVjb21waWxlZE9iamVjdHNSZXF1ZXN0Eh0KA3NkaxgBIAEoDjILLmFwaS52MS5TZGtSA3NkaxIaCghjYXRlZ29yeRgCIAEoCVIIY2F0ZWdvcnk=');
+@$core.Deprecated('Use precompiledObjectDescriptor instead')
+const PrecompiledObject$json = const {
+  '1': 'PrecompiledObject',
   '2': const [
     const {'1': 'cloud_path', '3': 1, '4': 1, '5': 9, '10': 'cloudPath'},
     const {'1': 'name', '3': 2, '4': 1, '5': 9, '10': 'name'},
     const {'1': 'description', '3': 3, '4': 1, '5': 9, '10': 'description'},
-    const {'1': 'type', '3': 4, '4': 1, '5': 14, '6': '.api.v1.ExampleType', '10': 'type'},
+    const {'1': 'type', '3': 4, '4': 1, '5': 14, '6': '.api.v1.PrecompiledObjectType', '10': 'type'},
   ],
 };
 
-/// Descriptor for `Example`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List exampleDescriptor = $convert.base64Decode('CgdFeGFtcGxlEh0KCmNsb3VkX3BhdGgYASABKAlSCWNsb3VkUGF0aBISCgRuYW1lGAIgASgJUgRuYW1lEiAKC2Rlc2NyaXB0aW9uGAMgASgJUgtkZXNjcmlwdGlvbhInCgR0eXBlGAQgASgOMhMuYXBpLnYxLkV4YW1wbGVUeXBlUgR0eXBl');
+/// Descriptor for `PrecompiledObject`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List precompiledObjectDescriptor = $convert.base64Decode('ChFQcmVjb21waWxlZE9iamVjdBIdCgpjbG91ZF9wYXRoGAEgASgJUgljbG91ZFBhdGgSEgoEbmFtZRgCIAEoCVIEbmFtZRIgCgtkZXNjcmlwdGlvbhgDIAEoCVILZGVzY3JpcHRpb24SMQoEdHlwZRgEIAEoDjIdLmFwaS52MS5QcmVjb21waWxlZE9iamVjdFR5cGVSBHR5cGU=');
 @$core.Deprecated('Use categoriesDescriptor instead')
 const Categories$json = const {
   '1': 'Categories',
@@ -213,39 +196,39 @@ const Categories_Category$json = const {
   '1': 'Category',
   '2': const [
     const {'1': 'category_name', '3': 1, '4': 1, '5': 9, '10': 'categoryName'},
-    const {'1': 'examples', '3': 2, '4': 3, '5': 11, '6': '.api.v1.Example', '10': 'examples'},
+    const {'1': 'precompiled_objects', '3': 2, '4': 3, '5': 11, '6': '.api.v1.PrecompiledObject', '10': 'precompiledObjects'},
   ],
 };
 
 /// Descriptor for `Categories`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List categoriesDescriptor = $convert.base64Decode('CgpDYXRlZ29yaWVzEh0KA3NkaxgBIAEoDjILLmFwaS52MS5TZGtSA3NkaxI7CgpjYXRlZ29yaWVzGAIgAygLMhsuYXBpLnYxLkNhdGVnb3JpZXMuQ2F0ZWdvcnlSCmNhdGVnb3JpZXMaXAoIQ2F0ZWdvcnkSIwoNY2F0ZWdvcnlfbmFtZRgBIAEoCVIMY2F0ZWdvcnlOYW1lEisKCGV4YW1wbGVzGAIgAygLMg8uYXBpLnYxLkV4YW1wbGVSCGV4YW1wbGVz');
-@$core.Deprecated('Use getListOfExamplesResponseDescriptor instead')
-const GetListOfExamplesResponse$json = const {
-  '1': 'GetListOfExamplesResponse',
+final $typed_data.Uint8List categoriesDescriptor = $convert.base64Decode('CgpDYXRlZ29yaWVzEh0KA3NkaxgBIAEoDjILLmFwaS52MS5TZGtSA3NkaxI7CgpjYXRlZ29yaWVzGAIgAygLMhsuYXBpLnYxLkNhdGVnb3JpZXMuQ2F0ZWdvcnlSCmNhdGVnb3JpZXMaewoIQ2F0ZWdvcnkSIwoNY2F0ZWdvcnlfbmFtZRgBIAEoCVIMY2F0ZWdvcnlOYW1lEkoKE3ByZWNvbXBpbGVkX29iamVjdHMYAiADKAsyGS5hcGkudjEuUHJlY29tcGlsZWRPYmplY3RSEnByZWNvbXBpbGVkT2JqZWN0cw==');
+@$core.Deprecated('Use getPrecompiledObjectsResponseDescriptor instead')
+const GetPrecompiledObjectsResponse$json = const {
+  '1': 'GetPrecompiledObjectsResponse',
   '2': const [
-    const {'1': 'sdk_examples', '3': 1, '4': 3, '5': 11, '6': '.api.v1.Categories', '10': 'sdkExamples'},
+    const {'1': 'sdk_categories', '3': 1, '4': 3, '5': 11, '6': '.api.v1.Categories', '10': 'sdkCategories'},
   ],
 };
 
-/// Descriptor for `GetListOfExamplesResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getListOfExamplesResponseDescriptor = $convert.base64Decode('ChlHZXRMaXN0T2ZFeGFtcGxlc1Jlc3BvbnNlEjUKDHNka19leGFtcGxlcxgBIAMoCzISLmFwaS52MS5DYXRlZ29yaWVzUgtzZGtFeGFtcGxlcw==');
-@$core.Deprecated('Use getExampleRequestDescriptor instead')
-const GetExampleRequest$json = const {
-  '1': 'GetExampleRequest',
+/// Descriptor for `GetPrecompiledObjectsResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getPrecompiledObjectsResponseDescriptor = $convert.base64Decode('Ch1HZXRQcmVjb21waWxlZE9iamVjdHNSZXNwb25zZRI5Cg5zZGtfY2F0ZWdvcmllcxgBIAMoCzISLmFwaS52MS5DYXRlZ29yaWVzUg1zZGtDYXRlZ29yaWVz');
+@$core.Deprecated('Use getPrecompiledObjectRequestDescriptor instead')
+const GetPrecompiledObjectRequest$json = const {
+  '1': 'GetPrecompiledObjectRequest',
   '2': const [
     const {'1': 'cloud_path', '3': 1, '4': 1, '5': 9, '10': 'cloudPath'},
   ],
 };
 
-/// Descriptor for `GetExampleRequest`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getExampleRequestDescriptor = $convert.base64Decode('ChFHZXRFeGFtcGxlUmVxdWVzdBIdCgpjbG91ZF9wYXRoGAEgASgJUgljbG91ZFBhdGg=');
-@$core.Deprecated('Use getExampleResponseDescriptor instead')
-const GetExampleResponse$json = const {
-  '1': 'GetExampleResponse',
+/// Descriptor for `GetPrecompiledObjectRequest`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getPrecompiledObjectRequestDescriptor = $convert.base64Decode('ChtHZXRQcmVjb21waWxlZE9iamVjdFJlcXVlc3QSHQoKY2xvdWRfcGF0aBgBIAEoCVIJY2xvdWRQYXRo');
+@$core.Deprecated('Use getPrecompiledObjectCodeResponseDescriptor instead')
+const GetPrecompiledObjectCodeResponse$json = const {
+  '1': 'GetPrecompiledObjectCodeResponse',
   '2': const [
     const {'1': 'code', '3': 1, '4': 1, '5': 9, '10': 'code'},
   ],
 };
 
-/// Descriptor for `GetExampleResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getExampleResponseDescriptor = $convert.base64Decode('ChJHZXRFeGFtcGxlUmVzcG9uc2USEgoEY29kZRgBIAEoCVIEY29kZQ==');
+/// Descriptor for `GetPrecompiledObjectCodeResponse`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List getPrecompiledObjectCodeResponseDescriptor = $convert.base64Decode('CiBHZXRQcmVjb21waWxlZE9iamVjdENvZGVSZXNwb25zZRISCgRjb2RlGAEgASgJUgRjb2Rl');

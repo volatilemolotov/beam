@@ -32,17 +32,24 @@ import (
 )
 
 const (
-	BucketName      = "playground-examples"
-	OutputExtension = "output"
-	MetaInfoName    = "meta.info"
-	Timeout         = 10
-	javaExtension   = "java"
-	goExtension     = "go"
-	pyExtension     = "py"
-	scioExtension   = "scala"
+	BucketName       = "playground-examples"
+	OutputExtension  = "output"
+	MetaInfoName     = "meta.info"
+	Timeout          = 10
+	javaExtension    = "java"
+	goExtension      = "go"
+	pyExtension      = "py"
+	scioExtension    = "scala"
+	separatorsNumber = 2
 )
 
-type PrecompiledObjects []pb.Example
+type ObjectInfo struct {
+	Description string                   `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Type        pb.PrecompiledObjectType `protobuf:"varint,4,opt,name=type,proto3,enum=api.v1.PrecompiledObjectType" json:"type,omitempty"`
+	Categories  []string                 `json:"categories,omitempty"`
+}
+
+type PrecompiledObjects []pb.PrecompiledObject
 type CategoryToPrecompiledObjects map[string]PrecompiledObjects
 type SdkToCategories map[string]CategoryToPrecompiledObjects
 
@@ -51,13 +58,17 @@ type SdkToCategories map[string]CategoryToPrecompiledObjects
 // the bucket where examples are stored would be public,
 // and it has a concrete structure of directories, namely:
 // SDK_JAVA/
-// ---- Category1/
 // --------PrecompiledObject1/
+// ----------- PrecompiledObject1.java
+// ----------- PrecompiledObject1.output
+// ----------- meta.info
 // --------PrecompiledObject2/
 // ----  ...
 // SDK_GO/
-// ---- Category2/
 // --------PrecompiledObject1/
+// ----------- PrecompiledObject1.go
+// ----------- PrecompiledObject1.output
+// ----------- meta.info
 // --------PrecompiledObject2/
 // ----  ...
 // ...
@@ -130,16 +141,15 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, sdk pb.Sdk, c
 				logger.Errorf("ioutil.ReadAll: %v", err.Error())
 				continue
 			}
-			precompiledObject := pb.Example{}
+			precompiledObject := ObjectInfo{}
 			err = json.Unmarshal(data, &precompiledObject)
 			if err != nil {
 				logger.Errorf("json.Unmarshal: %v", err.Error())
 				continue
 			}
-
-			precompiledObject.CloudPath = path
-			precompiledObject.Name = filepath.Base(path)
-			cd.appendPrecompiledObject(path, &precompiledObjects, &precompiledObject)
+			for _, categoryName := range precompiledObject.Categories {
+				cd.appendPrecompiledObject(&precompiledObject, &precompiledObjects, path, categoryName)
+			}
 			rc.Close()
 		}
 	}
@@ -149,18 +159,18 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, sdk pb.Sdk, c
 // GetCategoryToPrecompiledObjects adds categories with precompiled objects to protobuf object
 func GetCategoryToPrecompiledObjects(categoryName string, precompiledObjects PrecompiledObjects, sdkCategories *pb.Categories) {
 	category := pb.Categories_Category{
-		CategoryName: categoryName,
-		Examples:     make([]*pb.Example, 0),
+		CategoryName:       categoryName,
+		PrecompiledObjects: make([]*pb.PrecompiledObject, 0),
 	}
 	for _, example := range precompiledObjects {
-		category.Examples = append(category.Examples, &example)
+		category.PrecompiledObjects = append(category.PrecompiledObjects, &example)
 	}
 	sdkCategories.Categories = append(sdkCategories.Categories, &category)
 }
 
 // isPathToPrecompiledObjectDir is it a path where object is stored
 func isPathToPrecompiledObjectDir(path string) bool {
-	return strings.Count(path, string(os.PathSeparator)) == 3 && isDir(path)
+	return strings.Count(path, string(os.PathSeparator)) == separatorsNumber && isDir(path)
 }
 
 func isDir(path string) bool {
@@ -168,8 +178,8 @@ func isDir(path string) bool {
 }
 
 // appendPrecompiledObject add precompiled object to the common structure of precompiled objects
-func (cd *CloudStorage) appendPrecompiledObject(path string, sdkToCategories *SdkToCategories, precompiledObject *pb.Example) {
-	sdkName, categoryName := getCategoryAndSdk(path)
+func (cd *CloudStorage) appendPrecompiledObject(objectInfo *ObjectInfo, sdkToCategories *SdkToCategories, path string, categoryName string) {
+	sdkName := getSdkName(path)
 	categoryToPrecompiledObjects, ok := (*sdkToCategories)[sdkName]
 	if !ok {
 		(*sdkToCategories)[sdkName] = make(CategoryToPrecompiledObjects, 0)
@@ -180,16 +190,22 @@ func (cd *CloudStorage) appendPrecompiledObject(path string, sdkToCategories *Sd
 		categoryToPrecompiledObjects[categoryName] = make(PrecompiledObjects, 0)
 		objects = categoryToPrecompiledObjects[categoryName]
 	}
-	objects = append(objects, *precompiledObject)
+	precompiledObject := pb.PrecompiledObject{
+		CloudPath:   path,
+		Name:        filepath.Base(path),
+		Description: objectInfo.Description,
+		Type:        objectInfo.Type,
+	}
+	precompiledObject.CloudPath = path
+	precompiledObject.Name = filepath.Base(path)
+	objects = append(objects, precompiledObject)
 	categoryToPrecompiledObjects[categoryName] = objects
 }
 
-// getCategoryAndSdk get category and sdk from the name of the file name (path)
-func getCategoryAndSdk(path string) (string, string) {
-	splintedPath := strings.Split(path, string(os.PathSeparator))
-	sdkName := splintedPath[0]      // the path of the form "sdkName/categoryName/example/", where the first part is sdkName
-	categoryName := splintedPath[1] // and the second part is the name of the categoryName
-	return sdkName, categoryName
+// getSdkName get category and sdk from the name of the file name (path)
+func getSdkName(path string) string {
+	sdkName := strings.Split(path, string(os.PathSeparator))[0] // the path of the form "sdkName/example/", where the first part is sdkName
+	return sdkName
 }
 
 func (cd *CloudStorage) getFileFromBucket(ctx context.Context, pathToObject string, extension string) ([]byte, error) {
