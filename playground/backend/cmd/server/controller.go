@@ -143,18 +143,18 @@ func (controller *playgroundController) GetCompileOutput(ctx context.Context, in
 //GetListOfExamples returns the list of examples
 func (controller *playgroundController) GetListOfExamples(ctx context.Context, info *pb.GetListOfExamplesRequest) (*pb.GetListOfExamplesResponse, error) {
 	cd := precompiled_objects.New()
-	examples, err := cd.GetPrecompiledObjects(ctx, info.Sdk, info.Category)
+	sdkToCategories, err := cd.GetPrecompiledObjects(ctx, info.Sdk, info.Category)
 	if err != nil {
 		logger.Errorf("%s: GetPrecompiledObjects(): cloud storage error: %s", err.Error())
 		return nil, errors.InternalError("GetPrecompiledObjects(): ", err.Error())
 	}
 	response := pb.GetListOfExamplesResponse{SdkExamples: make([]*pb.Categories, 0)}
-	for sdk, categories := range *examples {
-		sdkCategories := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdk]), Categories: make([]*pb.Categories_Category, 0)}
+	for sdkName, categories := range *sdkToCategories {
+		sdkCategory := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdkName]), Categories: make([]*pb.Categories_Category, 0)}
 		for categoryName, examplesArr := range categories {
-			precompiled_objects.GetCategoryToPrecompiledObjects(categoryName, examplesArr, &sdkCategories)
+			precompiled_objects.GetCategoryToPrecompiledObjects(categoryName, examplesArr, &sdkCategory)
 		}
-		response.SdkExamples = append(response.SdkExamples, &sdkCategories)
+		response.SdkExamples = append(response.SdkExamples, &sdkCategory)
 	}
 	return &response, nil
 }
