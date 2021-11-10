@@ -667,23 +667,23 @@ class GetListOfExamplesRequest extends $pb.GeneratedMessage {
 
 class Example extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Example', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
-    ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_DEFAULT, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
+    ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_EXAMPLE, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
     ..hasRequiredFields = false
   ;
 
   Example._() : super();
   factory Example({
-    $core.String? exampleUuid,
+    $core.String? cloudPath,
     $core.String? name,
     $core.String? description,
     ExampleType? type,
   }) {
     final _result = create();
-    if (exampleUuid != null) {
-      _result.exampleUuid = exampleUuid;
+    if (cloudPath != null) {
+      _result.cloudPath = cloudPath;
     }
     if (name != null) {
       _result.name = name;
@@ -718,13 +718,13 @@ class Example extends $pb.GeneratedMessage {
   static Example? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get exampleUuid => $_getSZ(0);
+  $core.String get cloudPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set exampleUuid($core.String v) { $_setString(0, v); }
+  set cloudPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExampleUuid() => $_has(0);
+  $core.bool hasCloudPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExampleUuid() => clearField(1);
+  void clearCloudPath() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -907,17 +907,17 @@ class GetListOfExamplesResponse extends $pb.GeneratedMessage {
 
 class GetExampleRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetExampleRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
     ..hasRequiredFields = false
   ;
 
   GetExampleRequest._() : super();
   factory GetExampleRequest({
-    $core.String? exampleUuid,
+    $core.String? cloudPath,
   }) {
     final _result = create();
-    if (exampleUuid != null) {
-      _result.exampleUuid = exampleUuid;
+    if (cloudPath != null) {
+      _result.cloudPath = cloudPath;
     }
     return _result;
   }
@@ -943,13 +943,13 @@ class GetExampleRequest extends $pb.GeneratedMessage {
   static GetExampleRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get exampleUuid => $_getSZ(0);
+  $core.String get cloudPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set exampleUuid($core.String v) { $_setString(0, v); }
+  set cloudPath($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasExampleUuid() => $_has(0);
+  $core.bool hasCloudPath() => $_has(0);
   @$pb.TagNumber(1)
-  void clearExampleUuid() => clearField(1);
+  void clearCloudPath() => clearField(1);
 }
 
 class GetExampleResponse extends $pb.GeneratedMessage {
