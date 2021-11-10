@@ -17,13 +17,24 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/configure_nonweb.dart'
-    if (dart.library.html) 'package:playground/configure_web.dart';
-import 'package:intl/intl_browser.dart';
-import 'package:playground/playground_app.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:playground/config/theme.dart';
+import 'package:playground/constants/assets.dart';
+import 'package:playground/constants/sizes.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
-  findSystemLocale();
-  configureApp();
-  runApp(const PlaygroundApp());
+class ToggleThemeIconButton extends StatelessWidget {
+  const ToggleThemeIconButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeProvider>(builder: (context, theme, child) {
+      return IconButton(
+        iconSize: kIconSizeLg,
+        splashRadius: kIconButtonSplashRadius,
+        icon: SvgPicture.asset(kThemeIconAsset),
+        onPressed: theme.toggleTheme,
+      );
+    });
+  }
 }

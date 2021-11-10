@@ -17,6 +17,7 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/constants/params.dart';
 import 'package:playground/modules/editor/repository/code_repository/code_client/grpc_code_client.dart';
 import 'package:playground/modules/editor/repository/code_repository/code_repository.dart';
 import 'package:playground/modules/examples/repositories/example_client/grpc_example_client.dart';
@@ -54,11 +55,23 @@ class PlaygroundPageProviders extends StatelessWidget {
 
             if (exampleState.sdkCategories != null &&
                 playground.selectedExample == null) {
+              final examplePath = Uri.base.queryParameters[kExampleParam];
+              final allExamples = exampleState.sdkCategories?.values
+                  .expand((sdkCategory) => sdkCategory.map((e) => e.examples))
+                  .expand((element) => element)
+                  .toList();
+              final defaultExample =
+                  exampleState.defaultExamplesMap?[playground.sdk];
+              final selectedExample = defaultExample != null
+                  ? allExamples?.firstWhere(
+                      (example) => example.path == examplePath,
+                      orElse: () => defaultExample,
+                    )
+                  : null;
               return PlaygroundState(
                 codeRepository: kCodeRepository,
                 sdk: playground.sdk,
-                selectedExample:
-                    exampleState.defaultExamplesMap?[playground.sdk],
+                selectedExample: selectedExample,
               );
             }
             return playground;

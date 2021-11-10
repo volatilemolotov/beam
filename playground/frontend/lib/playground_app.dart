@@ -23,7 +23,7 @@ import 'package:playground/config/locale.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/l10n/l10n.dart';
 import 'package:playground/pages/playground/components/playground_page_providers.dart';
-import 'package:playground/pages/playground/playground_page.dart';
+import 'package:playground/pages/routes.dart';
 import 'package:provider/provider.dart';
 
 class PlaygroundApp extends StatelessWidget {
@@ -45,7 +45,7 @@ class PlaygroundApp extends StatelessWidget {
                   themeMode: themeProvider.themeMode,
                   theme: kLightTheme,
                   darkTheme: kDarkTheme,
-                  home: const PlaygroundPage(),
+                  onGenerateRoute: Routes.generateRoute,
                   debugShowCheckedModeBanner: false,
                   locale: localeProvider.locale,
                   supportedLocales: L10n.locales,

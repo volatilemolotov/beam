@@ -16,14 +16,6 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
-import 'package:playground/configure_nonweb.dart'
-    if (dart.library.html) 'package:playground/configure_web.dart';
-import 'package:intl/intl_browser.dart';
-import 'package:playground/playground_app.dart';
-
-void main() async {
-  findSystemLocale();
-  configureApp();
-  runApp(const PlaygroundApp());
+void configureApp() {
+  // see https://flutter.dev/docs/development/ui/navigation/url-strategies
 }

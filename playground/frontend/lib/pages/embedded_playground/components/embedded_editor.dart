@@ -17,13 +17,20 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/configure_nonweb.dart'
-    if (dart.library.html) 'package:playground/configure_web.dart';
-import 'package:intl/intl_browser.dart';
-import 'package:playground/playground_app.dart';
+import 'package:playground/modules/editor/components/editor_textarea.dart';
+import 'package:playground/pages/playground/states/playground_state.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
-  findSystemLocale();
-  configureApp();
-  runApp(const PlaygroundApp());
+class EmbeddedEditor extends StatelessWidget {
+  const EmbeddedEditor({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final state = Provider.of<PlaygroundState>(context);
+    return EditorTextArea(
+      enabled: false,
+      sdk: state.sdk,
+      example: state.selectedExample,
+    );
+  }
 }

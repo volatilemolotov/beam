@@ -146,7 +146,7 @@ class GrpcExampleClient implements ExampleClient {
       for (var category in sdkMap.categories) {
         List<ExampleModel> examples = category.examples
             .map((e) => ExampleModel(
-                  name: e.name,
+          name: e.name,
                   description: e.description,
                   type: _exampleTypeFromString(e.type),
                   path: e.cloudPath,
