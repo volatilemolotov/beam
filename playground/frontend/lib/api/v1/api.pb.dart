@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 ///
 //  Generated code. Do not modify.
 //  source: api/v1/api.proto
@@ -511,6 +528,82 @@ class GetRunErrorResponse extends $pb.GeneratedMessage {
   void clearOutput() => clearField(1);
 }
 
+class CancelRequest extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CancelRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pipelineUuid')
+    ..hasRequiredFields = false
+  ;
+
+  CancelRequest._() : super();
+  factory CancelRequest({
+    $core.String? pipelineUuid,
+  }) {
+    final _result = create();
+    if (pipelineUuid != null) {
+      _result.pipelineUuid = pipelineUuid;
+    }
+    return _result;
+  }
+  factory CancelRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CancelRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  CancelRequest clone() => CancelRequest()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  CancelRequest copyWith(void Function(CancelRequest) updates) => super.copyWith((message) => updates(message as CancelRequest)) as CancelRequest; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static CancelRequest create() => CancelRequest._();
+  CancelRequest createEmptyInstance() => create();
+  static $pb.PbList<CancelRequest> createRepeated() => $pb.PbList<CancelRequest>();
+  @$core.pragma('dart2js:noInline')
+  static CancelRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CancelRequest>(create);
+  static CancelRequest? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get pipelineUuid => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set pipelineUuid($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasPipelineUuid() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPipelineUuid() => clearField(1);
+}
+
+class CancelResponse extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'CancelResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
+    ..hasRequiredFields = false
+  ;
+
+  CancelResponse._() : super();
+  factory CancelResponse() => create();
+  factory CancelResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory CancelResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  CancelResponse clone() => CancelResponse()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  CancelResponse copyWith(void Function(CancelResponse) updates) => super.copyWith((message) => updates(message as CancelResponse)) as CancelResponse; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static CancelResponse create() => CancelResponse._();
+  CancelResponse createEmptyInstance() => create();
+  static $pb.PbList<CancelResponse> createRepeated() => $pb.PbList<CancelResponse>();
+  @$core.pragma('dart2js:noInline')
+  static CancelResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<CancelResponse>(create);
+  static CancelResponse? _defaultInstance;
+}
+
 class GetListOfExamplesRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetListOfExamplesRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
     ..e<Sdk>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
@@ -574,23 +667,23 @@ class GetListOfExamplesRequest extends $pb.GeneratedMessage {
 
 class Example extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Example', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
     ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
-    ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_EXAMPLE, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
+    ..e<ExampleType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: ExampleType.EXAMPLE_TYPE_DEFAULT, valueOf: ExampleType.valueOf, enumValues: ExampleType.values)
     ..hasRequiredFields = false
   ;
 
   Example._() : super();
   factory Example({
-    $core.String? cloudPath,
+    $core.String? exampleUuid,
     $core.String? name,
     $core.String? description,
     ExampleType? type,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (exampleUuid != null) {
+      _result.exampleUuid = exampleUuid;
     }
     if (name != null) {
       _result.name = name;
@@ -625,13 +718,13 @@ class Example extends $pb.GeneratedMessage {
   static Example? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  $core.String get exampleUuid => $_getSZ(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set exampleUuid($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasExampleUuid() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearExampleUuid() => clearField(1);
 
   @$pb.TagNumber(2)
   $core.String get name => $_getSZ(1);
@@ -814,17 +907,17 @@ class GetListOfExamplesResponse extends $pb.GeneratedMessage {
 
 class GetExampleRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetExampleRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'exampleUuid')
     ..hasRequiredFields = false
   ;
 
   GetExampleRequest._() : super();
   factory GetExampleRequest({
-    $core.String? cloudPath,
+    $core.String? exampleUuid,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (exampleUuid != null) {
+      _result.exampleUuid = exampleUuid;
     }
     return _result;
   }
@@ -850,13 +943,13 @@ class GetExampleRequest extends $pb.GeneratedMessage {
   static GetExampleRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  $core.String get exampleUuid => $_getSZ(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set exampleUuid($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasExampleUuid() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearExampleUuid() => clearField(1);
 }
 
 class GetExampleResponse extends $pb.GeneratedMessage {
