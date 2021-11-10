@@ -49,7 +49,7 @@ const (
 	defaultCacheType              = "local"
 	defaultCacheAddress           = "localhost:6379"
 	defaultCacheKeyExpirationTime = time.Minute * 15
-	defaultPipelineExecuteTimeout = time.Minute * 10
+	defaultPipelineExecuteTimeout = time.Minute * 1
 	defaultBeamRunner             = "/opt/apache/beam/jars/beam-runners-direct.jar"
 	defaultSLF4j                  = "/opt/apache/beam/jars/slf4j-jdk14.jar"
 	jsonExt                       = ".json"
