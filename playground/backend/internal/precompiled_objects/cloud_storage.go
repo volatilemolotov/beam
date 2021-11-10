@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package storage
+package precompiled_objects
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -42,23 +42,23 @@ const (
 	scioExtension   = "scala"
 )
 
-type ExamplesInfo []pb.Example
-type SdkCategories map[string]ExamplesInfo
-type Examples map[string]SdkCategories
+type PrecompiledObjects []pb.Example
+type CategoryToPrecompiledObjects map[string]PrecompiledObjects
+type SdkToCategories map[string]CategoryToPrecompiledObjects
 
 // CloudStorage represents working tools for getting compiled and
 // run beam examples from Google Cloud Storage. It is required that
 // the bucket where examples are stored would be public,
 // and it has a concrete structure of directories, namely:
-// /SDK_JAVA
-// ---- /Category1
-// --------/Example1
-// --------/Example2
+// SDK_JAVA/
+// ---- Category1/
+// --------PrecompiledObject1/
+// --------PrecompiledObject2/
 // ----  ...
-// /SDK_GO
-// ---- /Category2
-// --------/Example1
-// --------/Example2
+// SDK_GO/
+// ---- Category2/
+// --------PrecompiledObject1/
+// --------PrecompiledObject2/
 // ----  ...
 // ...
 type CloudStorage struct {
@@ -68,10 +68,10 @@ func New() *CloudStorage {
 	return &CloudStorage{}
 }
 
-// GetExample returns the source code of the example
-func (cd *CloudStorage) GetExample(ctx context.Context, examplePath string) (*string, error) {
-	extension := getFileExtensionBySdk(examplePath)
-	data, err := cd.getFileFromStorage(ctx, examplePath, extension)
+// GetPrecompiledObject returns the source code of the example
+func (cd *CloudStorage) GetPrecompiledObject(ctx context.Context, precompiledObjectPath string) (*string, error) {
+	extension := getFileExtensionByFileSdk(precompiledObjectPath)
+	data, err := cd.getFileFromBucket(ctx, precompiledObjectPath, extension)
 	if err != nil {
 		return nil, err
 	}
@@ -79,9 +79,9 @@ func (cd *CloudStorage) GetExample(ctx context.Context, examplePath string) (*st
 	return &result, nil
 }
 
-// GetExampleOutput returns the run output of the example
-func (cd *CloudStorage) GetExampleOutput(ctx context.Context, examplePath string) (*string, error) {
-	data, err := cd.getFileFromStorage(ctx, examplePath, OutputExtension)
+// GetPrecompiledObjectOutput returns the run output of the example
+func (cd *CloudStorage) GetPrecompiledObjectOutput(ctx context.Context, precompiledObjectPath string) (*string, error) {
+	data, err := cd.getFileFromBucket(ctx, precompiledObjectPath, OutputExtension)
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +89,8 @@ func (cd *CloudStorage) GetExampleOutput(ctx context.Context, examplePath string
 	return &result, nil
 }
 
-// GetListOfExamples returns the list of stored example at cloud storage bucket
-func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk pb.Sdk, category string) (*Examples, error) {
+// GetPrecompiledObjects returns the list of stored example at cloud storage bucket
+func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, sdk pb.Sdk, category string) (*SdkToCategories, error) {
 	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
 	if err != nil {
 		return nil, fmt.Errorf("storage.NewClient: %v", err)
@@ -105,7 +105,7 @@ func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk pb.Sdk, categ
 	if sdk == pb.Sdk_SDK_UNSPECIFIED {
 		prefix = ""
 	}
-	examples := make(Examples, 0)
+	precompiledObjects := make(SdkToCategories, 0)
 	it := bucket.Objects(ctx, &storage.Query{
 		Prefix: filepath.Join(prefix, category),
 	})
@@ -118,7 +118,7 @@ func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk pb.Sdk, categ
 			return nil, fmt.Errorf("Bucket(%q).Objects: %v", BucketName, err)
 		}
 		path := attrs.Name
-		if isFullPathToExample(path) {
+		if isFullPathToPrecompiledObjectDir(path) {
 			infoPath := filepath.Join(path, MetaInfoName)
 			rc, err := bucket.Object(infoPath).NewReader(ctx)
 			if err != nil {
@@ -130,57 +130,66 @@ func (cd *CloudStorage) GetListOfExamples(ctx context.Context, sdk pb.Sdk, categ
 				logger.Errorf("ioutil.ReadAll: %v", err.Error())
 				continue
 			}
-			exampleInfo := pb.Example{}
-			err = json.Unmarshal(data, &exampleInfo)
+			precompiledObject := pb.Example{}
+			err = json.Unmarshal(data, &precompiledObject)
 			if err != nil {
 				logger.Errorf("json.Unmarshal: %v", err.Error())
 				continue
 			}
 
-			exampleInfo.CloudPath = path
-			exampleInfo.Name = filepath.Base(path)
-			cd.writeExample(path, &examples, &exampleInfo)
+			precompiledObject.CloudPath = path
+			precompiledObject.Name = filepath.Base(path)
+			cd.appendPrecompiledObject(path, &precompiledObjects, &precompiledObject)
 			rc.Close()
 		}
 	}
-	return &examples, nil
+	return &precompiledObjects, nil
 }
 
-func isFullPathToExample(path string) bool {
-	return strings.Count(path, string(os.PathSeparator)) == 3 && path[len(path)-1] == os.PathSeparator
+func isFullPathToPrecompiledObjectDir(path string) bool {
+	return strings.Count(path, string(os.PathSeparator)) == 3 && isDir(path)
 }
 
-func (cd *CloudStorage) writeExample(path string, examples *Examples, exampleInfo *pb.Example) {
+func isDir(path string) bool {
+	return path[len(path)-1] == os.PathSeparator
+}
+
+func (cd *CloudStorage) appendPrecompiledObject(path string, sdkToCategories *SdkToCategories, precompiledObject *pb.Example) {
+	sdkName, categoryName := getCategoryAndSdk(path)
+	categoryToPrecompiledObjects, ok := (*sdkToCategories)[sdkName]
+	if !ok {
+		(*sdkToCategories)[sdkName] = make(CategoryToPrecompiledObjects, 0)
+		categoryToPrecompiledObjects = (*sdkToCategories)[sdkName]
+	}
+	objects, ok := categoryToPrecompiledObjects[categoryName]
+	if !ok {
+		categoryToPrecompiledObjects[categoryName] = make(PrecompiledObjects, 0)
+		objects = categoryToPrecompiledObjects[categoryName]
+	}
+	objects = append(objects, *precompiledObject)
+	categoryToPrecompiledObjects[categoryName] = objects
+}
+
+func getCategoryAndSdk(path string) (string, string) {
 	splintedPath := strings.Split(path, string(os.PathSeparator))
-	sdk := splintedPath[0]      // the path of the form "sdk/category/example", where the first part is sdk
-	category := splintedPath[1] // and the second part is the name of the category
-	catMap, ok := (*examples)[sdk]
-	if !ok {
-		(*examples)[sdk] = make(SdkCategories, 0)
-		catMap = (*examples)[sdk]
-	}
-	exampleArr, ok := catMap[category]
-	if !ok {
-		catMap[category] = make(ExamplesInfo, 0)
-		exampleArr = catMap[category]
-	}
-	exampleArr = append(exampleArr, *exampleInfo)
-	catMap[category] = exampleArr
+	sdkName := splintedPath[0]      // the path of the form "sdkName/categoryName/example/", where the first part is sdkName
+	categoryName := splintedPath[1] // and the second part is the name of the categoryName
+	return sdkName, categoryName
 }
 
-func (cd *CloudStorage) getFileFromStorage(ctx context.Context, examplePath string, extension string) ([]byte, error) {
+func (cd *CloudStorage) getFileFromBucket(ctx context.Context, pathToObject string, extension string) ([]byte, error) {
 	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
 	if err != nil {
 		return nil, fmt.Errorf("storage.NewClient: %v", err)
 	}
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	ctx, cancel := context.WithTimeout(ctx, time.Second*Timeout)
 	defer cancel()
 
 	bucket := client.Bucket(BucketName)
 
-	filePath := getFullFilePath(examplePath, extension)
+	filePath := getFullFilePath(pathToObject, extension)
 	rc, err := bucket.Object(filePath).NewReader(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("Object(%q).NewReader: %v", filePath, err)
@@ -194,15 +203,15 @@ func (cd *CloudStorage) getFileFromStorage(ctx context.Context, examplePath stri
 	return data, nil
 }
 
-func getFullFilePath(examplePath string, extension string) string {
-	exampleName := filepath.Base(examplePath)
-	fileName := strings.Join([]string{exampleName, extension}, ".")
-	filePath := filepath.Join(examplePath, fileName)
+func getFullFilePath(pathToObject string, extension string) string {
+	precompiledObjectName := filepath.Base(pathToObject)
+	fileName := strings.Join([]string{precompiledObjectName, extension}, ".")
+	filePath := filepath.Join(pathToObject, fileName)
 	return filePath
 }
 
-func getFileExtensionBySdk(examplePath string) string {
-	sdk := strings.Split(examplePath, "/")[0]
+func getFileExtensionByFileSdk(precompiledObjectPath string) string {
+	sdk := strings.Split(precompiledObjectPath, "/")[0]
 	var extension string
 	switch sdk {
 	case pb.Sdk_SDK_JAVA.String():
@@ -215,4 +224,15 @@ func getFileExtensionBySdk(examplePath string) string {
 		extension = scioExtension
 	}
 	return extension
+}
+
+func GetCategoryWithExamples(categoryName string, examplesArr PrecompiledObjects, sdkCategories *pb.Categories) {
+	category := pb.Categories_Category{
+		CategoryName: categoryName,
+		Examples:     make([]*pb.Example, 0),
+	}
+	for _, example := range examplesArr {
+		category.Examples = append(category.Examples, &example)
+	}
+	sdkCategories.Categories = append(sdkCategories.Categories, &category)
 }

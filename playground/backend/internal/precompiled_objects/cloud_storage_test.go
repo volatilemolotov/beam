@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package storage
+package precompiled_objects
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -35,7 +35,7 @@ func TestCloudStorage_GetExample(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Test GetExample",
+			name: "Test GetPrecompiledObject: try get object from the bucket",
 			args: args{
 				ctx:         context.Background(),
 				examplePath: "SDK_JAVA/Common/HelloWorld",
@@ -44,7 +44,7 @@ func TestCloudStorage_GetExample(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test Get FakeExample",
+			name: "Test Get FakeExample: try get non-existent object from the bucket",
 			args: args{
 				ctx:         context.Background(),
 				examplePath: "SDK_JAVA/Common/Fake",
@@ -56,13 +56,13 @@ func TestCloudStorage_GetExample(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cd := &CloudStorage{}
-			got, err := cd.GetExample(tt.args.ctx, tt.args.examplePath)
+			got, err := cd.GetPrecompiledObject(tt.args.ctx, tt.args.examplePath)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetExample() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetPrecompiledObject() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetExample() got = %v, want %v", got, tt.want)
+				t.Errorf("GetPrecompiledObject() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -81,7 +81,7 @@ func TestCloudStorage_GetExampleOutput(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "Test GetExampleOutput",
+			name: "Test GetPrecompiledObjectOutput: try get output file from the bucket",
 			args: args{
 				ctx:         context.Background(),
 				examplePath: "SDK_JAVA/Common/HelloWorld",
@@ -90,7 +90,7 @@ func TestCloudStorage_GetExampleOutput(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test FakeExampleOutput",
+			name: "Test FakeExampleOutput: try get non-existent output file from the bucket",
 			args: args{
 				ctx:         context.Background(),
 				examplePath: "SDK_JAVA/Common/Fake",
@@ -102,13 +102,13 @@ func TestCloudStorage_GetExampleOutput(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cd := &CloudStorage{}
-			got, err := cd.GetExampleOutput(tt.args.ctx, tt.args.examplePath)
+			got, err := cd.GetPrecompiledObjectOutput(tt.args.ctx, tt.args.examplePath)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetExampleOutput() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetPrecompiledObjectOutput() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetExampleOutput() got = %v, want %v", got, tt.want)
+				t.Errorf("GetPrecompiledObjectOutput() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -120,7 +120,7 @@ func TestCloudStorage_GetListOfExamples(t *testing.T) {
 		sdk      pb.Sdk
 		category string
 	}
-	testExample := Examples{"SDK_JAVA": SdkCategories{"Common": ExamplesInfo{pb.Example{
+	testExample := SdkToCategories{"SDK_JAVA": CategoryToPrecompiledObjects{"Common": PrecompiledObjects{pb.Example{
 		Name:        "HelloWorld",
 		CloudPath:   "SDK_JAVA/Common/HelloWorld/",
 		Description: "Description Hello World",
@@ -129,11 +129,11 @@ func TestCloudStorage_GetListOfExamples(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Examples
+		want    *SdkToCategories
 		wantErr bool
 	}{
 		{
-			name: "Test GetListOfExamples()",
+			name: "Test GetPrecompiledObjects(): try get precompiled objects from the bucket with the \"java\" SDK and \"Common\" category",
 			args: args{
 				ctx:      context.Background(),
 				sdk:      pb.Sdk_SDK_JAVA,
@@ -146,13 +146,13 @@ func TestCloudStorage_GetListOfExamples(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cd := &CloudStorage{}
-			got, err := cd.GetListOfExamples(tt.args.ctx, tt.args.sdk, tt.args.category)
+			got, err := cd.GetPrecompiledObjects(tt.args.ctx, tt.args.sdk, tt.args.category)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetListOfExamples() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetPrecompiledObjects() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetListOfExamples() got = %v, want %v", got, tt.want)
+				t.Errorf("GetPrecompiledObjects() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -168,15 +168,15 @@ func Test_getFileExtensionBySdk(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Test getFileExtensionBySdk()",
+			name: "Test getFileExtensionByFileSdk(): try get extension of the file by the name of the directory with SDK",
 			args: args{examplePath: "SDK_JAVA/Common/HelloWorld"},
 			want: "java",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getFileExtensionBySdk(tt.args.examplePath); got != tt.want {
-				t.Errorf("getFileExtensionBySdk() = %v, want %v", got, tt.want)
+			if got := getFileExtensionByFileSdk(tt.args.examplePath); got != tt.want {
+				t.Errorf("getFileExtensionByFileSdk() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -193,7 +193,7 @@ func Test_getFullFilePath(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Test getFullFilePath()",
+			name: "Test getFullFilePath(): try get the full path to the code of the precompiled example",
 			args: args{
 				examplePath: "SDK_JAVA/Common/HelloWorld",
 				extension:   "java",
