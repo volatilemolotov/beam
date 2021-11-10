@@ -107,6 +107,7 @@ class GrpcCodeClient implements CodeClient {
       case grpc.Status.STATUS_ERROR:
       case grpc.Status.STATUS_RUN_ERROR:
       case grpc.Status.STATUS_VALIDATION_ERROR:
+      case grpc.Status.STATUS_CANCELED:
         return RunCodeStatus.error;
       case grpc.Status.STATUS_EXECUTING:
       case grpc.Status.STATUS_VALIDATING:
@@ -124,8 +125,6 @@ class GrpcCodeClient implements CodeClient {
         return RunCodeStatus.error;
       case grpc.Status.STATUS_PREPARING:
         break;
-      case grpc.Status.STATUS_RUN_ERROR:
-        return RunCodeStatus.error;
     }
     return RunCodeStatus.unspecified;
   }

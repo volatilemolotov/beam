@@ -91,7 +91,7 @@ class GrpcExampleClient implements ExampleClient {
   grpc.GetExampleRequest _getExampleRequestToGrpcRequest(
     GetExampleRequestWrapper request,
   ) {
-    return grpc.GetExampleRequest()..exampleUuid = request.path;
+    return grpc.GetExampleRequest()..cloudPath = request.path;
   }
 
   grpc.Sdk _getGrpcSdk(SDK sdk) {
@@ -146,10 +146,10 @@ class GrpcExampleClient implements ExampleClient {
       for (var category in sdkMap.categories) {
         List<ExampleModel> examples = category.examples
             .map((e) => ExampleModel(
-                  name: e.name,
+          name: e.name,
                   description: e.description,
                   type: _exampleTypeFromString(e.type),
-                  path: e.exampleUuid,
+                  path: e.cloudPath,
                 ))
             .toList();
         categoriesForSdk.add(CategoryModel(

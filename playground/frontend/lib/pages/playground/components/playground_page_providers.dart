@@ -55,21 +55,23 @@ class PlaygroundPageProviders extends StatelessWidget {
 
             if (exampleState.sdkCategories != null &&
                 playground.selectedExample == null) {
-              final exampleId = Uri.base.queryParameters[kExampleParam];
-              final allExamples = exampleState.categories!
-                  .expand((category) => category.examples);
-              final defaultExample = allExamples.first;
-              final selectedExample = exampleState.categories
-                  ?.expand((category) => category.examples)
-                  .firstWhere(
-                    (example) => example.name == exampleId,
-                    orElse: () => defaultExample,
-                  );
+              final examplePath = Uri.base.queryParameters[kExampleParam];
+              final allExamples = exampleState.sdkCategories?.values
+                  .expand((sdkCategory) => sdkCategory.map((e) => e.examples))
+                  .expand((element) => element)
+                  .toList();
+              final defaultExample =
+                  exampleState.defaultExamplesMap?[playground.sdk];
+              final selectedExample = defaultExample != null
+                  ? allExamples?.firstWhere(
+                      (example) => example.path == examplePath,
+                      orElse: () => defaultExample,
+                    )
+                  : null;
               return PlaygroundState(
                 codeRepository: kCodeRepository,
                 sdk: playground.sdk,
-                selectedExample:
-                    exampleState.defaultExamplesMap?[playground.sdk],
+                selectedExample: selectedExample,
               );
             }
             return playground;
