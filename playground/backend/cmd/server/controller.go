@@ -152,7 +152,7 @@ func (controller *playgroundController) GetPrecompiledObjects(ctx context.Contex
 	for sdkName, categories := range *sdkToCategories {
 		sdkCategory := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdkName]), Categories: make([]*pb.Categories_Category, 0)}
 		for categoryName, precompiledObjects := range categories {
-			cloud_bucket.GetCategoryToPrecompiledObjects(categoryName, &precompiledObjects, &sdkCategory)
+			cloud_bucket.PutPrecompiledObjectsToCategory(categoryName, &precompiledObjects, &sdkCategory)
 		}
 		response.SdkCategories = append(response.SdkCategories, &sdkCategory)
 	}

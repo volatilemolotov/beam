@@ -32,10 +32,10 @@ import (
 )
 
 const (
-	BucketName       = "test_public_bucket_akvelon"
+	BucketName       = "playground-precompiled-objects"
 	OutputExtension  = "output"
 	MetaInfoName     = "meta.info"
-	Timeout          = 100
+	Timeout          = 10
 	javaExtension    = "java"
 	goExtension      = "go"
 	pyExtension      = "py"
@@ -83,7 +83,10 @@ func New() *CloudStorage {
 
 // GetPrecompiledObject returns the source code of the example
 func (cd *CloudStorage) GetPrecompiledObject(ctx context.Context, precompiledObjectPath string) (*string, error) {
-	extension := getFileExtensionByFileSdk(precompiledObjectPath)
+	extension, err := getFileExtensionBySdk(precompiledObjectPath)
+	if err != nil {
+		return nil, err
+	}
 	data, err := cd.getFileFromBucket(ctx, precompiledObjectPath, extension)
 	if err != nil {
 		return nil, err
@@ -102,7 +105,7 @@ func (cd *CloudStorage) GetPrecompiledObjectOutput(ctx context.Context, precompi
 	return &result, nil
 }
 
-// GetPrecompiledObjects returns the list of stored example at cloud storage bucket
+// GetPrecompiledObjects returns stored at the cloud storage bucket precompiled objects for the target category
 func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.Sdk, targetCategory string) (*SdkToCategories, error) {
 	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
 	if err != nil {
@@ -120,7 +123,6 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.
 	if err != nil {
 		return nil, err
 	}
-
 	for objectDir := range dirs {
 		infoPath := filepath.Join(objectDir, MetaInfoName) // helping file with information about this object
 		rc, err := bucket.Object(infoPath).NewReader(ctx)
@@ -149,8 +151,8 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.
 	return &precompiledObjects, nil
 }
 
-// GetCategoryToPrecompiledObjects adds categories with precompiled objects to protobuf object
-func GetCategoryToPrecompiledObjects(categoryName string, precompiledObjects *PrecompiledObjects, sdkCategories *pb.Categories) {
+// PutPrecompiledObjectsToCategory adds categories with precompiled objects to protobuf object
+func PutPrecompiledObjectsToCategory(categoryName string, precompiledObjects *PrecompiledObjects, sdkCategory *pb.Categories) {
 	category := pb.Categories_Category{
 		CategoryName:       categoryName,
 		PrecompiledObjects: make([]*pb.PrecompiledObject, 0),
@@ -163,10 +165,10 @@ func GetCategoryToPrecompiledObjects(categoryName string, precompiledObjects *Pr
 			Type:        object.Type,
 		})
 	}
-	sdkCategories.Categories = append(sdkCategories.Categories, &category)
+	sdkCategory.Categories = append(sdkCategory.Categories, &category)
 }
 
-// getPrecompiledObjectsDirs finds "directories" with precompiled objects
+// getPrecompiledObjectsDirs finds directories with precompiled objects
 func (cd *CloudStorage) getPrecompiledObjectsDirs(ctx context.Context, targetSdk pb.Sdk, bucket *storage.BucketHandle) (map[string]bool, error) {
 	prefix := targetSdk.String()
 	if targetSdk == pb.Sdk_SDK_UNSPECIFIED {
@@ -185,7 +187,7 @@ func (cd *CloudStorage) getPrecompiledObjectsDirs(ctx context.Context, targetSdk
 			return nil, fmt.Errorf("Bucket(%q).Objects: %v", BucketName, err)
 		}
 		path := attrs.Name
-		if isPathToPrecompiledObject(path) {
+		if isPathToPrecompiledObjectFile(path) {
 			precompiledObjectDir := filepath.Dir(path)
 			_, ok := objectDirs[precompiledObjectDir]
 			if !ok {
@@ -241,9 +243,9 @@ func (cd *CloudStorage) getFileFromBucket(ctx context.Context, pathToObject stri
 	return data, nil
 }
 
-// getFileExtensionByFileSdk get extension of the file with code by the sdk name
-func getFileExtensionByFileSdk(precompiledObjectPath string) string {
-	sdk := strings.Split(precompiledObjectPath, "/")[0]
+// getFileExtensionBySdk get extension of the file with code by the sdk name
+func getFileExtensionBySdk(precompiledObjectPath string) (string, error) {
+	sdk := strings.Split(precompiledObjectPath, string(os.PathSeparator))[0]
 	var extension string
 	switch sdk {
 	case pb.Sdk_SDK_JAVA.String():
@@ -254,8 +256,10 @@ func getFileExtensionByFileSdk(precompiledObjectPath string) string {
 		extension = goExtension
 	case pb.Sdk_SDK_SCIO.String():
 		extension = scioExtension
+	default:
+		return "", fmt.Errorf("")
 	}
-	return extension
+	return extension, nil
 }
 
 // getFullFilePath get full path to the precompiled object file
@@ -266,8 +270,8 @@ func getFullFilePath(objectDir string, extension string) string {
 	return filePath
 }
 
-// isPathToPrecompiledObject is it a path where object is stored
-func isPathToPrecompiledObject(path string) bool {
+// isPathToPrecompiledObjectFile is it a path where precompiled object is stored (i.e. SDK/ObjectName/ObjectCode.sdkExtension)
+func isPathToPrecompiledObjectFile(path string) bool {
 	return strings.Count(path, string(os.PathSeparator)) == separatorsNumber && !isDir(path)
 }
 
