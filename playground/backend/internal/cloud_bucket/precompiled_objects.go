@@ -58,7 +58,7 @@ type SdkToCategories map[string]CategoryToPrecompiledObjects
 // CloudStorage represents working tools for getting compiled and
 // run beam examples from Google Cloud Storage. It is required that
 // the bucket where examples are stored would be public,
-// and it has a concrete structure of directories, namely:
+// and it has a specific structure of files, namely:
 // SDK_JAVA/
 // --------PrecompiledObject1/
 // ----------- PrecompiledObject1.java
