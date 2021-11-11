@@ -320,7 +320,7 @@ Note that the `run` method is asynchronous. For a blocking execution, call the
 returned by the call to `run`.
 {{< /paragraph >}}
 
-{{< playground "Hello World" >}}
+{{< playground "SDK_JAVA/IO/WordCount/" >}}
 
 ## WordCount example
 

@@ -138,6 +138,7 @@ class GrpcExampleClient implements ExampleClient {
   Map<SDK, List<CategoryModel>> _toClientCategories(
     List<grpc.Categories> response,
   ) {
+    print(response);
     Map<SDK, List<CategoryModel>> sdkCategoriesMap = {};
     List<MapEntry<SDK, List<CategoryModel>>> entries = [];
     for (var sdkMap in response) {
