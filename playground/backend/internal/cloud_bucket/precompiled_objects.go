@@ -275,7 +275,7 @@ func isPathToPrecompiledObjectFile(path string) bool {
 	return strings.Count(path, string(os.PathSeparator)) == separatorsNumber && !isDir(path)
 }
 
-// isDir whether the path imitates directory
+// isDir checks whether the path imitates directory
 func isDir(path string) bool {
 	return path[len(path)-1] == os.PathSeparator
 }
