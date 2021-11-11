@@ -280,7 +280,7 @@ func isDir(path string) bool {
 	return path[len(path)-1] == os.PathSeparator
 }
 
-// getSdkName get category and sdk from the name of the file name (path)
+// getSdkName gets category and sdk from the filepath
 func getSdkName(path string) string {
 	sdkName := strings.Split(path, string(os.PathSeparator))[0] // the path of the form "sdkName/example/", where the first part is sdkName
 	return sdkName
