@@ -29,10 +29,9 @@ class EmbeddedEditor extends StatelessWidget {
     final state = Provider.of<PlaygroundState>(context);
     return EditorTextArea(
       key: ValueKey(state.selectedExample?.path),
-      enabled: false,
+      enabled: true,
       sdk: state.sdk,
       example: state.selectedExample,
     );
   }
 }
-

@@ -16,4 +16,5 @@
  * limitations under the License.
  */
 
-const String kApiClientURL = 'http://localhost:8080';
+const String kApiClientURL =
+    'https://backend-dot-datatokenization.uc.r.appspot.com';
