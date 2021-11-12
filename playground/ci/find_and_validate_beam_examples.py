@@ -14,19 +14,20 @@
 # limitations under the License.
 
 import logging
-from ci.find_beam_examples import get_examples
+from ci.find_beam_examples import find_examples
 from ci.verify_beam_example import verify_example
 
 
 def main():
-    example_map = []
-    # find all examples and returns file path to each of them
-    examples = get_examples()
-    if examples is None:
-        logging.error("error during get examples")
+    root_dir = os.getenv("BEAM_ROOT_DIR")
+    if root_dir is None:
+        logging.error("BEAM_ROOT_DIR should be set")
         # TODO add return from CI step with a fail
         return
 
+    example_map = []
+    # find all examples and returns file path to each of them
+    examples = find_examples(root_dir)
     for example in examples:
         # get sdk based on filepath of example
         sdk = get_sdk(example)

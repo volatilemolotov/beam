@@ -14,13 +14,14 @@
 # limitations under the License.
 
 
-def get_examples():
-    """Get all beam examples
+def find_examples(work_dir: str) -> List[str]:
+    """Find examples files
+    Find all files which contain the beam-playground tag.
 
-    Find and return file path for each beam example
+    Args:
+        work_dir: directory where to search examples.
 
     Returns:
-        List of examples' file path.
-        If root dir is not present in environment returns None.
+        List of paths to all tagged files.
     """
     return []
