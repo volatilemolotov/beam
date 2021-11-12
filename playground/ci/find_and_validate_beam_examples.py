@@ -14,8 +14,8 @@
 # limitations under the License.
 
 import logging
-from playground.ci.find_beam_examples import get_examples
-from playground.ci.verify_beam_example import verify_example
+from ci.find_beam_examples import get_examples
+from ci.verify_beam_example import verify_example
 
 
 def main():
