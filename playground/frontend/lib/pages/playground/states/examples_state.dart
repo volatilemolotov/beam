@@ -52,6 +52,14 @@ class ExampleState with ChangeNotifier {
     return source;
   }
 
+  Future<ExampleModel> loadExampleInfo(ExampleModel example) async {
+    String source = await getExampleSource(example.path);
+    example.setSource(source);
+    final outputs = await getExampleOutput(example.path);
+    example.setOutputs(outputs);
+    return example;
+  }
+
   _loadCategories() async {
     sdkCategories = await _exampleRepository.getListOfExamples(
       GetListOfExamplesRequestWrapper(sdk: null, category: null),
