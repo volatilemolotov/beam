@@ -42,6 +42,7 @@ enum Status {
   STATUS_RUN_ERROR = 9;
   STATUS_ERROR = 10;
   STATUS_RUN_TIMEOUT = 11;
+  STATUS_CANCELED = 12;
 }
 
 enum PrecompiledObjectType {
@@ -102,6 +103,15 @@ message GetRunErrorResponse {
   string output = 1;
 }
 
+// CancelRequest request to cancel code processing
+message CancelRequest {
+  string pipeline_uuid = 1;
+}
+
+// CancelResponse response for cancel request
+message CancelResponse {
+}
+
 // GetPrecompiledObjectsRequest contains information of the needed PrecompiledObjects sdk and categories.
 message GetPrecompiledObjectsRequest{
   Sdk sdk = 1;
@@ -158,6 +168,9 @@ service PlaygroundService {
 
   // Get the result of pipeline compilation.
   rpc GetCompileOutput(GetCompileOutputRequest) returns (GetCompileOutputResponse);
+
+  // Cancel code processing
+  rpc Cancel(CancelRequest) returns (CancelResponse);
 
   // Get all precompiled objects from the cloud storage.
   rpc GetPrecompiledObjects(GetPrecompiledObjectsRequest) returns (GetPrecompiledObjectsResponse);
