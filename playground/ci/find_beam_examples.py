@@ -22,22 +22,6 @@ EXTENSIONS = ["java", "go", "py"]
 PATTERN = re.compile('Beam-playground:\n {4}name: \w+\n {4}description: .+\n {4}multifile: (true|false)\n {4}categories:\n( {8}- [\w\-]+\n)+')
 
 
-def get_examples():
-    """Get all beam examples
-
-    Find and return file path for each beam example
-
-    Returns:
-        List of examples' file path.
-        If root dir is not present in environment returns None.
-    """
-    root_dir = os.getenv("BEAM_ROOT_DIR")
-    if root_dir is None:
-        logging.error("BEAM_ROOT_DIR should be set")
-        return None
-    return find_examples(root_dir)
-
-
 def find_examples(work_dir: str) -> List[str]:
     """Find examples files
 
