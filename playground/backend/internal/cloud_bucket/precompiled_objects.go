@@ -35,7 +35,7 @@ const (
 	BucketName       = "playground-precompiled-objects"
 	OutputExtension  = "output"
 	MetaInfoName     = "meta.info"
-	Timeout          = 10
+	Timeout          = time.Second * 10
 	javaExtension    = "java"
 	goExtension      = "go"
 	pyExtension      = "py"
@@ -113,7 +113,7 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.
 	}
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second*Timeout)
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
 	precompiledObjects := make(SdkToCategories, 0)
@@ -151,24 +151,9 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.
 	return &precompiledObjects, nil
 }
 
-// PutPrecompiledObjectsToCategory adds categories with precompiled objects to protobuf object
-func PutPrecompiledObjectsToCategory(categoryName string, precompiledObjects *PrecompiledObjects, sdkCategory *pb.Categories) {
-	category := pb.Categories_Category{
-		CategoryName:       categoryName,
-		PrecompiledObjects: make([]*pb.PrecompiledObject, 0),
-	}
-	for _, object := range *precompiledObjects {
-		category.PrecompiledObjects = append(category.PrecompiledObjects, &pb.PrecompiledObject{
-			CloudPath:   object.CloudPath,
-			Name:        object.Name,
-			Description: object.Description,
-			Type:        object.Type,
-		})
-	}
-	sdkCategory.Categories = append(sdkCategory.Categories, &category)
-}
-
 // getPrecompiledObjectsDirs finds directories with precompiled objects
+// Since there is no notion of directory at cloud storage, then
+// to avoid duplicates of a base path (directory) need to store it in a set/map.
 func (cd *CloudStorage) getPrecompiledObjectsDirs(ctx context.Context, targetSdk pb.Sdk, bucket *storage.BucketHandle) (map[string]bool, error) {
 	prefix := targetSdk.String()
 	if targetSdk == pb.Sdk_SDK_UNSPECIFIED {
@@ -188,11 +173,7 @@ func (cd *CloudStorage) getPrecompiledObjectsDirs(ctx context.Context, targetSdk
 		}
 		path := attrs.Name
 		if isPathToPrecompiledObjectFile(path) {
-			precompiledObjectDir := filepath.Dir(path)
-			_, ok := objectDirs[precompiledObjectDir]
-			if !ok {
-				objectDirs[precompiledObjectDir] = true
-			}
+			objectDirs[filepath.Dir(path)] = true //save base path (directory) of a file
 		}
 	}
 	return objectDirs, nil
@@ -224,7 +205,7 @@ func (cd *CloudStorage) getFileFromBucket(ctx context.Context, pathToObject stri
 	}
 	defer client.Close()
 
-	ctx, cancel := context.WithTimeout(ctx, time.Second*Timeout)
+	ctx, cancel := context.WithTimeout(ctx, Timeout)
 	defer cancel()
 
 	bucket := client.Bucket(BucketName)

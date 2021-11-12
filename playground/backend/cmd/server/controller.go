@@ -152,7 +152,7 @@ func (controller *playgroundController) GetPrecompiledObjects(ctx context.Contex
 	for sdkName, categories := range *sdkToCategories {
 		sdkCategory := pb.Categories{Sdk: pb.Sdk(pb.Sdk_value[sdkName]), Categories: make([]*pb.Categories_Category, 0)}
 		for categoryName, precompiledObjects := range categories {
-			cloud_bucket.PutPrecompiledObjectsToCategory(categoryName, &precompiledObjects, &sdkCategory)
+			PutPrecompiledObjectsToCategory(categoryName, &precompiledObjects, &sdkCategory)
 		}
 		response.SdkCategories = append(response.SdkCategories, &sdkCategory)
 	}
@@ -181,6 +181,23 @@ func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.C
 	}
 	response := pb.GetRunOutputResponse{Output: *output}
 	return &response, nil
+}
+
+// PutPrecompiledObjectsToCategory adds categories with precompiled objects to protobuf object
+func PutPrecompiledObjectsToCategory(categoryName string, precompiledObjects *cloud_bucket.PrecompiledObjects, sdkCategory *pb.Categories) {
+	category := pb.Categories_Category{
+		CategoryName:       categoryName,
+		PrecompiledObjects: make([]*pb.PrecompiledObject, 0),
+	}
+	for _, object := range *precompiledObjects {
+		category.PrecompiledObjects = append(category.PrecompiledObjects, &pb.PrecompiledObject{
+			CloudPath:   object.CloudPath,
+			Name:        object.Name,
+			Description: object.Description,
+			Type:        object.Type,
+		})
+	}
+	sdkCategory.Categories = append(sdkCategory.Categories, &category)
 }
 
 // setupLifeCycle creates fs_tool.LifeCycle and prepares files and folders needed to code processing
