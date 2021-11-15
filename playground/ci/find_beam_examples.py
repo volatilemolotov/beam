@@ -18,7 +18,7 @@ import re
 import logging
 from typing import List
 
-EXTENSIONS = ["java", "go", "py"]
+EXTENSIONS = ["java", "go", "py", ".scala"]
 PATTERN = re.compile('Beam-playground:\n {4}name: \w+\n {4}description: .+\n {4}multifile: (true|false)\n {4}categories:\n( {8}- [\w\-]+\n)+')
 
 
