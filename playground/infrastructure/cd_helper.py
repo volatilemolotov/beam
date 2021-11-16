@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ci_helper import CIHelper
+import os
+
+from helper import find_examples, Example
 
 
 class CDHelper:
@@ -22,16 +24,32 @@ class CDHelper:
     It is used to save beam examples/katas/tests and their output on the Google Cloud.
     """
 
-    def __init__(self):
-        self.ci_helper = CIHelper()
-
-    def get_run_output(self):
-        """ Returns beam examples and their output.
-        """
-        self.ci_helper.verify()
-        self.ci_helper.get_run_outputs()
-
-    def store_precompiled_objects(self):
+    def save_to_cloud(self):
         """ Save beam examples and their output in the Google Cloud.
         """
+        root_dir = os.getenv("BEAM_ROOT_DIR")
+        examples = find_examples(root_dir)
+        self._run_code_all_examples(examples)
+        self._save_to_cloud_all_examples(examples)
+
+    def _run_code_all_examples(self, examples: [Example]):
+        """ Run beam examples and keep their ouput.
+
+        Call the backend to start code processing for the examples. Then receive code output.
+
+        Args:
+            examples: beam examples that should be run
+        """
+        for example in examples:
+            # TODO [BEAM-13258] Implement logic of calling backend to run example's code
+            output = ""
+            example.output = output
+
+    def _save_to_cloud_all_examples(self, examples: [Example]):
+        """ Save beam examples and their output using backend instance.
+
+        Args:
+            examples: beam examples with their output
+        """
+        # TODO [BEAM-13258] Implement logic of saving examples
         pass

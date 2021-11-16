@@ -15,13 +15,11 @@
 
 import logging
 import os
-import re
-from typing import List
 
-from api.v1.api_pb2 import Sdk, SDK_JAVA, SDK_GO, SDK_PYTHON, SDK_SCIO
+from api.v1.api_pb2 import SDK_JAVA
+from helper import find_examples, Example
 
 SUPPORTED_SDK = {'java': SDK_JAVA}
-PATTERN = re.compile('Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+')
 
 
 class CIHelper:
@@ -31,7 +29,6 @@ class CIHelper:
     """
 
     def __init__(self):
-        self.examples_output = {}
         logging.info("Start validation examples")
 
     def verify(self):
@@ -39,111 +36,21 @@ class CIHelper:
 
         1. Find all beam examples starting from directory os.getenv("BEAM_ROOT_DIR").
         2. Group code of examples by their SDK.
-        3. Run processing for all examples and keep output to self.examples_sources
-        4. Keep all examples code and their output to self.examples_output {code : output}
+        3. Run processing for all examples and verify examples' code.
         """
         root_dir = os.getenv("BEAM_ROOT_DIR")
-        examples = self._find_examples(root_dir)
-        code_by_sdk = self._group_by_sdk(examples)
-        self._verify_all_examples(code_by_sdk)
+        examples = find_examples(root_dir)
+        self._verify_all_examples(examples)
 
-    def get_run_outputs(self) -> {}:
-        """ Returns beam examples and their output
-        """
-        return self.examples_output
-
-    def _find_examples(self, work_dir: str) -> List[str]:
-        """ Find and return filepath to beam examples/tests/katas.
-
-        Search throws all child files of work_dir directory files with beam tag:
-        /*
-        Beam-playground:
-            name: NameOfExample
-            description: Description of NameOfExample.
-            multifile: false
-            categories:
-                - category-1
-                - category-2
-        */
-
-        Args:
-            work_dir: directory where to search examples.
-
-        Returns:
-            List of paths to all tagged files.
-        """
-        examples = []
-        for root, _, files in os.walk(work_dir):
-            for filename in files:
-                filepath = os.path.join(root, filename)
-                if self._match_pattern(filepath):
-                    examples.append(filepath)
-        return examples
-
-    def _match_pattern(self, filepath: str) -> bool:
-        """Check file to matching
-        Check that file has the correct extension and contains the beam-playground tag.
-        Args:
-            filepath: path to the file.
-        Returns:
-            True if file matched. False if not
-        """
-        extension = filepath.split(os.extsep)[-1]
-        if extension in SUPPORTED_SDK.keys():
-            with open(filepath) as parsed_file:
-                content = parsed_file.read()
-            return re.search(PATTERN, content) is not None
-
-    def _get_sdk(self, example) -> Sdk:
-        """ Return SDK of example.
-
-        Get extension of the example by his filepath and returns associated SDK.
-
-        Args:
-            example: filepath of the beam example.
-
-        Returns:
-            Sdk according to file extension.
-        """
-        extension = example.split(os.extsep)[-1]
-        if SUPPORTED_SDK.get(extension) is not None:
-            return SUPPORTED_SDK[extension]
-        else:
-            raise ValueError(extension + " is not supported now")
-
-    def _group_by_sdk(self, examples: List[str]) -> {}:
-        """ Group code of beam examples by their SDK.
-
-        Args:
-            examples: beam examples' filepath.
-
-        Returns:
-             Map of {sdk : [code of beam examples]}
-        """
-        examples_by_sdk = {}
-        for example in examples:
-            if example.split(os.sep)[-1] == "ci_helper.py":
-                continue
-            sdk = self._get_sdk(example)
-
-            already_added_examples = examples_by_sdk.get(sdk, [])
-
-            with open(example) as parsed_file:
-                content = parsed_file.read()
-
-            already_added_examples.append(content)
-            examples_by_sdk[sdk] = already_added_examples
-        return examples_by_sdk
-
-    def _verify_all_examples(self, examples_by_sdk: {}):
+    def _verify_all_examples(self, examples: [Example]):
         """ Verify beam examples using backend instance.
 
+        Call the backend to start code processing for the examples. Then check status of processing.
+        If status is some error status, then log error case and raise error
+
         Args:
-            examples_by_sdk: map of {sdk : [code of beam examples]}
-            self.example_output: map of {code of example : output}
+            examples: beam examples that should be verified
         """
-        for example_sdk, list_code in examples_by_sdk.items():
-            for example_code in list_code:
-                # TODO [BEAM-13256] Implement logic of calling backend to receive correct output using example_sdk and example_code
-                output = ""
-                self.examples_output[example_code] = output
+        for example in examples:
+            # TODO [BEAM-13256] Implement logic of calling backend to verify example's code
+            continue
