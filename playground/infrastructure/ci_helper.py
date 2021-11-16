@@ -36,7 +36,7 @@ class CIHelper:
 
         1. Find all beam examples starting from directory os.getenv("BEAM_ROOT_DIR").
         2. Group code of examples by their SDK.
-        3. Run processing for all examples and verify examples' code.
+        3. Run processing for all examples to verify examples' code.
         """
         root_dir = os.getenv("BEAM_ROOT_DIR")
         examples = find_examples(root_dir)
