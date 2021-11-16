@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import logging
 import os
 from typing import List
 
@@ -111,7 +111,7 @@ class CIHelper:
 
     def __init__(self):
         self.examples_output = {}
-        print("Start validation examples")
+        logging.info("Start validation examples")
 
     def verify(self):
         """ Verify correctness of beam examples.
