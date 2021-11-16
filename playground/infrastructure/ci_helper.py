@@ -14,13 +14,16 @@ class CIHelper:
                 examples_sources.append(parsed_file.read())
         return examples_sources
 
-    def run_code(self):
+    def run_examples(self):
+        pass
+
+    def get_statuses(self):
         pass
 
     def validate(self):
         pass
 
-    def get_run_output(self):
+    def get_run_outputs(self):
         pass
 
     def _get_sdk(self, example):
