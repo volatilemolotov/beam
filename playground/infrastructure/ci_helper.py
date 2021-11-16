@@ -12,13 +12,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
 import os
 from typing import List
 
 from api.v1.api_pb2 import Sdk, SDK_JAVA, SDK_GO, SDK_PYTHON, SDK_SCIO
 
-possible_sdk = {'java': SDK_JAVA, 'go': SDK_GO, 'py': SDK_PYTHON, 'scala': SDK_SCIO}
+POSSIBLE_SDK = {'java': SDK_JAVA, 'go': SDK_GO, 'py': SDK_PYTHON, 'scala': SDK_SCIO}
 
 
 def _find_examples(work_dir: str) -> List[str]:
@@ -57,11 +58,10 @@ def _get_sdk(example) -> Sdk:
         Sdk according to file extension.
     """
     extension = example.split(os.extsep)[-1]
-    match extension:
-        case 'java':
-            return possible_sdk[extension]
-        case _:
-            raise ValueError(extension + " is not supported now")
+    if extension == "java":
+        return POSSIBLE_SDK[extension]
+    else:
+        raise ValueError(extension + " is not supported now")
 
 
 def _group_by_sdk(examples: List[str]) -> {}:
@@ -75,9 +75,11 @@ def _group_by_sdk(examples: List[str]) -> {}:
     """
     examples_by_sdk = {}
     for example in examples:
+        if example.split(os.sep)[-1] == "ci_helper.py":
+            continue
         sdk = _get_sdk(example)
 
-        already_added_examples = examples_by_sdk[sdk]
+        already_added_examples = examples_by_sdk.get(sdk)
         if already_added_examples is None:
             already_added_examples = []
 
