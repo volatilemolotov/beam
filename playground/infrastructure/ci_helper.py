@@ -12,13 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import logging
 import os
+import re
 from typing import List
 
 from api.v1.api_pb2 import Sdk, SDK_JAVA, SDK_GO, SDK_PYTHON, SDK_SCIO
 
-possible_sdk = {'java': SDK_JAVA, 'go': SDK_GO, 'py': SDK_PYTHON, 'scala': SDK_SCIO}
+POSSIBLE_SDK = {'java': SDK_JAVA, 'go': SDK_GO, 'py': SDK_PYTHON, 'scala': SDK_SCIO}
+PATTERN = re.compile(
+    'Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+')
 
 
 def _find_examples(work_dir: str) -> List[str]:
@@ -41,8 +45,28 @@ def _find_examples(work_dir: str) -> List[str]:
     Returns:
         List of paths to all tagged files.
     """
-    examples = [""]
+    examples = []
+    for root, _, files in os.walk(work_dir):
+        for filename in files:
+            filepath = os.path.join(root, filename)
+            if _match_pattern(filepath):
+                examples.append(filepath)
     return examples
+
+
+def _match_pattern(filepath: str) -> bool:
+    """Check file to matching
+    Check that file has the correct extension and contains the beam-playground tag.
+    Args:
+        filepath: path to the file.
+    Returns:
+        True if file matched. False if not
+    """
+    extension = filepath.split(os.extsep)[-1]
+    if extension in POSSIBLE_SDK.keys():
+        with open(filepath) as parsed_file:
+            content = parsed_file.read()
+        return re.search(PATTERN, content) is not None
 
 
 def _get_sdk(example) -> Sdk:
@@ -57,11 +81,10 @@ def _get_sdk(example) -> Sdk:
         Sdk according to file extension.
     """
     extension = example.split(os.extsep)[-1]
-    match extension:
-        case 'java':
-            return possible_sdk[extension]
-        case _:
-            raise ValueError(extension + " is not supported now")
+    if extension == "java":
+        return POSSIBLE_SDK[extension]
+    else:
+        raise ValueError(extension + " is not supported now")
 
 
 def _group_by_sdk(examples: List[str]) -> {}:
@@ -75,9 +98,11 @@ def _group_by_sdk(examples: List[str]) -> {}:
     """
     examples_by_sdk = {}
     for example in examples:
+        if example.split(os.sep)[-1] == "ci_helper.py":
+            continue
         sdk = _get_sdk(example)
 
-        already_added_examples = examples_by_sdk[sdk]
+        already_added_examples = examples_by_sdk.get(sdk)
         if already_added_examples is None:
             already_added_examples = []
 
@@ -96,7 +121,7 @@ def _verify_all_examples(examples_by_sdk: {}, example_output: {}):
         examples_by_sdk: map of {sdk : [code of beam examples]}
         example_output: map of {code of example : output}
     """
-    for example_sdk, list_code in examples_by_sdk:
+    for example_sdk, list_code in examples_by_sdk.items():
         for example_code in list_code:
             # TODO implement logic of calling backend to receive correct output using example_sdk and example_code
             output = ""
