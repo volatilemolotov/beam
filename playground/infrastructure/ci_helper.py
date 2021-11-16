@@ -104,6 +104,11 @@ def _verify_all_examples(examples_by_sdk: {}, example_output: {}):
 
 
 class CIHelper:
+    """ Helper for CI step.
+
+    It is used to find and verify correctness if beam examples/katas/tests.
+    """
+
     def __init__(self):
         self.examples_output = {}
         print("Start validation examples")

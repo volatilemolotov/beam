@@ -17,14 +17,21 @@ from ci_helper import CIHelper
 
 
 class CDHelper:
+    """ Helper for CD step.
+
+    It is used to save beam examples/katas/tests and their output on the Google Cloud.
+    """
+
     def __init__(self):
         self.ci_helper = CIHelper()
 
     def get_run_output(self):
-        """ Returns beam examples and their output
+        """ Returns beam examples and their output.
         """
         self.ci_helper.verify()
         self.ci_helper.get_run_outputs()
 
     def store_precompiled_objects(self):
+        """ Save beam examples and their output in the Google Cloud.
+        """
         pass
