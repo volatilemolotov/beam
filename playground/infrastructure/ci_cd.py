@@ -13,18 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO implement verification of example
-def verify_example(code, sdk):
-    """Verify example by his code and SDK
+from cd_helper import CDHelper
+from ci_helper import CIHelper
 
-    Send request to the backend on AppEngine and receive output of code running.
 
-    Args:
-        code: code of the example.
-        sdk: SDK of the example.
-
-    Returns:
-        In case of some request returns error - log error and returns None.
-        In case of backend successfully returns an output - return output.
+def ci_step():
+    """ CI step to verify all beam examples/tests/katas
     """
-    return ""
+    ci_helper = CIHelper()
+    ci_helper.verify()
+
+
+def cd_step():
+    """ CD step to save all beam examples/tests/katas and their outputs on the Google Cloud
+    """
+    cd_helper = CDHelper()
+    cd_helper.store_precompiled_objects()
