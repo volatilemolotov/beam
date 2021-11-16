@@ -52,7 +52,7 @@ class CIHelper:
         """
         return self.examples_output
 
-    def _find_examples(work_dir: str) -> List[str]:
+    def _find_examples(self, work_dir: str) -> List[str]:
         """ Find and return filepath to beam examples/tests/katas.
 
         Search throws all child files of work_dir directory files with beam tag:
@@ -76,12 +76,11 @@ class CIHelper:
         for root, _, files in os.walk(work_dir):
             for filename in files:
                 filepath = os.path.join(root, filename)
-                if _match_pattern(filepath):
+                if self._match_pattern(filepath):
                     examples.append(filepath)
         return examples
 
-
-    def _match_pattern(filepath: str) -> bool:
+    def _match_pattern(self, filepath: str) -> bool:
         """Check file to matching
         Check that file has the correct extension and contains the beam-playground tag.
         Args:
@@ -90,11 +89,10 @@ class CIHelper:
             True if file matched. False if not
         """
         extension = filepath.split(os.extsep)[-1]
-        if extension in POSSIBLE_SDK.keys():
+        if extension in SUPPORTED_SDK.keys():
             with open(filepath) as parsed_file:
                 content = parsed_file.read()
             return re.search(PATTERN, content) is not None
-
 
     def _get_sdk(self, example) -> Sdk:
         """ Return SDK of example.
@@ -144,7 +142,7 @@ class CIHelper:
             examples_by_sdk: map of {sdk : [code of beam examples]}
             self.example_output: map of {code of example : output}
         """
-        for example_sdk, list_code in examples_by_sdk:
+        for example_sdk, list_code in examples_by_sdk.items():
             for example_code in list_code:
                 # TODO [BEAM-13256] Implement logic of calling backend to receive correct output using example_sdk and example_code
                 output = ""
