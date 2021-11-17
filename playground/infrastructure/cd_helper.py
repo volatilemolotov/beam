@@ -153,6 +153,11 @@ class CDHelper:
         print("File uploaded to {}.".format(destination_blob_name))
 
     def clear_temp_folder(self):
+        """
+        Remove temporary folder with source files
+        Returns: nothing
+
+        """
         shutil.rmtree(TEMP_FOLDER)
 
 
