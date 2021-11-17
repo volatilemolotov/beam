@@ -126,6 +126,7 @@ def get_sdk(filename) -> Sdk:
     else:
         raise ValueError(extension + " is not supported now")
 
+
 def get_statuses(examples: [Example]):
     """ Receive statuses for examples and update example.status
 
