@@ -24,8 +24,8 @@ class CDHelper:
     It is used to save beam examples/katas/tests and their output on the Google Cloud.
     """
 
-    def save_to_cloud(self):
-        """ Save beam examples and their output in the Google Cloud.
+    def get_examples_and_store(self):
+        """ Store beam examples and their output in the Google Cloud.
         """
         root_dir = os.getenv("BEAM_ROOT_DIR")
         examples = find_examples(root_dir)
@@ -40,10 +40,8 @@ class CDHelper:
         Args:
             examples: beam examples that should be run
         """
-        for example in examples:
-            # TODO [BEAM-13258] Implement logic of calling backend to run example's code
-            output = ""
-            example.output = output
+        # TODO [BEAM-13258] Implement logic
+        pass
 
     def _save_to_cloud_all_examples(self, examples: [Example]):
         """ Save beam examples and their output using backend instance.

@@ -28,4 +28,4 @@ def cd_step():
     """ CD step to save all beam examples/tests/katas and their outputs on the Google Cloud
     """
     cd_helper = CDHelper()
-    cd_helper.save_to_cloud()
+    cd_helper.get_examples_and_store()
