@@ -15,27 +15,27 @@
 
 import grpc
 
-from api import api_pb2_grpc, api_pb2
-from config import SERVER_ADDRESS
+from ci.api import api_pb2_grpc, api_pb2
+from ci.config import Config
 
 
 class GRPCClient:
     """GRPCClient is gRPC client for sending a request to the backend."""
 
     def __init__(self):
-        self._channel = grpc.aio.insecure_channel(SERVER_ADDRESS)
+        self._channel = grpc.aio.insecure_channel(Config.SERVER_ADDRESS)
         self._stub = api_pb2_grpc.PlaygroundServiceStub(self._channel)
 
     async def run_code(self, code: str, sdk: api_pb2.Sdk) -> str:
         """Run example by his code and SDK
 
-            Args:
-                code: code of the example.
-                sdk: SDK of the example.
+        Args:
+            code: code of the example.
+            sdk: SDK of the example.
 
-            Returns:
-                pipeline_uuid: uuid of the pipeline
-            """
+        Returns:
+            pipeline_uuid: uuid of the pipeline
+        """
         request = api_pb2.RunCodeRequest(code=code, sdk=sdk)
         response = await self._stub.RunCode(request)
         return response.pipeline_uuid
