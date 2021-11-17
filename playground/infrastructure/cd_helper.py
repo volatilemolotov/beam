@@ -23,7 +23,6 @@ from google.cloud import storage
 from api.v1.api_pb2 import Sdk, SDK_JAVA
 from helper import Example, find_examples
 
-
 playground_tag = "beam-playground"
 bucket_name = "test_public_bucket_akvelon"
 temp_folder = "temp"
@@ -82,7 +81,8 @@ class CDHelper:
         Returns: array of file names
 
         """
-        path_to_object_folder = os.path.join(temp_folder, example.pipeline_id, Sdk.Name(example.sdk), object_meta["name"])
+        path_to_object_folder = os.path.join(temp_folder, example.pipeline_id, Sdk.Name(example.sdk),
+                                             object_meta["name"])
         Path(path_to_object_folder).mkdir(parents=True, exist_ok=True)
 
         file_names = dict()
@@ -99,9 +99,9 @@ class CDHelper:
             local_file_path = os.path.join(temp_folder, example.pipeline_id, file_name)
             with open(local_file_path, 'w') as file:
                 file.write(file_content)
-            file_names[file_name] = local_file_path ## don't need content anymore, change to the local os path of the stored file
+            file_names[
+                file_name] = local_file_path  ## don't need content anymore, change to the local os path of the stored file
         return file_names
-
 
     def _get_data_from_template(self, code):
         """
@@ -134,7 +134,7 @@ class CDHelper:
         """
         if extension is None:
             extension = extensions[Sdk.Name(sdk)]
-        return "{}/{}/{}.{}".format(Sdk.Name(sdk), base_folder_name, file_name, extension)
+        return os.path.join(Sdk.Name(sdk), base_folder_name, "{}.{}".format(file_name, extension))
 
     def _upload_blob(self, source_file: str, destination_blob_name: str):
         """
