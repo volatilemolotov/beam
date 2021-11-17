@@ -13,19 +13,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from cd_helper import CDHelper
 from ci_helper import CIHelper
+from helper import find_examples
 
 
 def ci_step():
     """ CI step to verify all beam examples/tests/katas
     """
+    root_dir = os.getenv("BEAM_ROOT_DIR")
     ci_helper = CIHelper()
-    ci_helper.verify()
+    examples = find_examples(root_dir)
+    ci_helper.verify_examples(examples)
 
 
 def cd_step():
     """ CD step to save all beam examples/tests/katas and their outputs on the Google Cloud
     """
+    root_dir = os.getenv("BEAM_ROOT_DIR")
     cd_helper = CDHelper()
-    cd_helper.get_examples_and_store()
+    examples = find_examples(root_dir)
+    cd_helper.store_examples(examples)

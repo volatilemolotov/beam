@@ -14,10 +14,9 @@
 # limitations under the License.
 
 import logging
-import os
 
 from api.v1.api_pb2 import SDK_JAVA
-from helper import find_examples, Example, get_statuses
+from helper import Example, get_statuses
 
 SUPPORTED_SDK = {'java': SDK_JAVA}
 
@@ -31,20 +30,18 @@ class CIHelper:
     def __init__(self):
         logging.info("Start validation examples")
 
-    def verify(self):
+    def verify_examples(self, examples: [Example]):
         """ Verify correctness of beam examples.
 
         1. Find all beam examples starting from directory os.getenv("BEAM_ROOT_DIR").
         2. Group code of examples by their SDK.
         3. Run processing for all examples to verify examples' code.
         """
-        root_dir = os.getenv("BEAM_ROOT_DIR")
-        examples = find_examples(root_dir)
         get_statuses(examples)
-        self._verify_all_examples(examples)
+        self.verify_examples_status(examples)
 
-    def _verify_all_examples(self, examples: [Example]):
-        """ Verify beam examples.
+    def verify_examples_status(self, examples: [Example]):
+        """ Verify statuses of beam examples.
 
         Check example.status for each examples. If the status of the example is:
         - STATUS_VALIDATION_ERROR/STATUS_PREPARATION_ERROR/STATUS_ERROR/STATUS_RUN_TIMEOUT: log error

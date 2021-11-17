@@ -13,9 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-
-from helper import find_examples, Example
+from helper import Example
 
 
 class CDHelper:
@@ -24,11 +22,9 @@ class CDHelper:
     It is used to save beam examples/katas/tests and their output on the Google Cloud.
     """
 
-    def get_examples_and_store(self):
+    def store_examples(self, examples: [Example]):
         """ Store beam examples and their output in the Google Cloud.
         """
-        root_dir = os.getenv("BEAM_ROOT_DIR")
-        examples = find_examples(root_dir)
         self._run_code_all_examples(examples)
         self._save_to_cloud_all_examples(examples)
 

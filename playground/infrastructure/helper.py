@@ -13,28 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
 from typing import List
 
-from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED, Status, STATUS_UNSPECIFIED
+from api.v1.api_pb2 import Sdk, Status
 
 
+@dataclass
 class Example:
     """ Class which contains all information about beam example
     """
-    name = ""
-    sdk = Sdk
-    filepath = ""
-    code = ""
-    output = ""
-    status = Status
-
-    def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output="", status=STATUS_UNSPECIFIED):
-        self.name = name
-        self.sdk = sdk
-        self.filepath = filepath
-        self.code = code
-        self.output = output
-        self.status = status
+    name: str
+    sdk: Sdk
+    filepath: str
+    code: str
+    output: str
+    status: Status
 
 
 def find_examples(work_dir: str) -> List[Example]:
