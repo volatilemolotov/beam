@@ -24,7 +24,7 @@ class Example:
     """ Class which contains all information about beam example
     """
     name: str
-    pipelineId: str
+    pipeline_id: str
     sdk: Sdk
     filepath: str
     code: str
@@ -52,7 +52,7 @@ def find_examples(work_dir: str) -> List[Example]:
     Returns:
         List of Examples.
     """
-    examples = [Example()]
+    examples = [Example("", "", Sdk, "", "", "", Status)]
     return examples
 
 
