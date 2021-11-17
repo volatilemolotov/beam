@@ -12,24 +12,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import asyncio
 import os
 import re
+import yaml
 import shutil
 from pathlib import Path
-
-import yaml
 from google.cloud import storage
-from api.v1.api_pb2 import Sdk, SDK_JAVA
-from helper import Example, find_examples
+from api.v1.api_pb2 import Sdk
+from helper import Example, get_statuses
+from grpc_client import GRPCClient
 
-PLAYGROUND_TAG = "beam-playground"
 BUCKET_NAME = "test_public_bucket_akvelon"
 TEMP_FOLDER = "temp"
-
-EXTENSIONS = {"SDK_JAVA": "java", "SDK_GO": "go", "SDK_PYTHON": "py"}
 PATTERN = 'Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+'
-PATTERN_START = 'Beam-playground'
+PLAYGROUND_TAG = "Beam-playground"
+EXTENSIONS = {"SDK_JAVA": "java", "SDK_GO": "go", "SDK_PYTHON": "py"}
 
 
 class CDHelper:
@@ -41,29 +39,33 @@ class CDHelper:
     def store_examples(self, examples: [Example]):
         """ Store beam examples and their output in the Google Cloud.
         """
-        self._run_code_all_examples(examples)
+        asyncio.run(self.get_outputs(examples))
         self._save_to_cloud_storage(examples)
         self.clear_temp_folder()
 
-    def _run_code_all_examples(self, examples: [Example]):
-        """ Run beam examples and keep their ouput.
+    async def get_outputs(self, examples: [Example]):
+        """ Run beam examples and keep their output.
 
         Call the backend to start code processing for the examples. Then receive code output.
 
         Args:
             examples: beam examples that should be run
         """
-        # TODO [BEAM-13258] Implement logic
+        get_statuses(examples)  # run examples code and wait until all are executed
+        tasks = []
+        client = GRPCClient()
         for example in examples:
-            example.output = "output"
-            example.pipeline_id = "testpipeline_id"
-            example.sdk = SDK_JAVA
+            tasks.append(client.get_run_output(example.pipeline_id))
+        outputs = await asyncio.gather(*tasks)
+        for output, example in zip(outputs, examples):
+            example.output = output
 
     def _save_to_cloud_storage(self, examples: [Example]):
-        """ Save beam examples and their output using backend instance.
+        """
+        Save beam examples and their outputs using backend instance.
 
         Args:
-            examples: beam examples with their output
+            examples: precompiled examples
         """
         for example in examples:
             object_meta = self._get_data_from_template(example.code)
@@ -73,12 +75,13 @@ class CDHelper:
 
     def _write_to_os(self, example: Example, object_meta: dict):
         """
+        Write code of an example, output and meta info to the filesystem (in temp folder)
 
         Args:
             example: example object
-            object_meta: meta information to this example
+            object_meta: meta information of this example
 
-        Returns: array of file names
+        Returns: dict {path_at_the_bucket:path_at_the_os}
 
         """
         path_to_object_folder = os.path.join(TEMP_FOLDER, example.pipeline_id, Sdk.Name(example.sdk),
@@ -99,14 +102,14 @@ class CDHelper:
             local_file_path = os.path.join(TEMP_FOLDER, example.pipeline_id, file_name)
             with open(local_file_path, 'w') as file:
                 file.write(file_content)
-            file_names[
-                file_name] = local_file_path  ## don't need content anymore, change to the local os path of the stored file
+            file_names[file_name] = local_file_path  # don't need content anymore, instead save the local path
         return file_names
 
     def _get_data_from_template(self, code):
         """
+        Find beam-playground tag and extract the information of the example.
         Args:
-            code:  source code of an example
+            code: code of an example
 
         Returns: dictionary with name, description, categories, etc of the source code
 
@@ -117,20 +120,20 @@ class CDHelper:
             yaml_code = code[m[0]:m[1]]
             try:
                 object_meta = yaml.load(yaml_code, Loader=yaml.SafeLoader)
-                return object_meta[PATTERN_START]
+                return object_meta[PLAYGROUND_TAG]
             except Exception as exp:
                 print(exp)  ## todo add logErr
 
     def _get_cloud_file_name(self, sdk: Sdk, base_folder_name: str, file_name: str, extension: str = None):
         """
+        Get the path where file will be stored at the bucket.
         Args:
-            sdk:
-            file_name:
-            base_folder_name:
-            extension:
+            sdk: sdk of the example
+            file_name: name of the example
+            base_folder_name: name of the folder where example is stored (eq. to example name)
+            extension: extension of the file
 
-        Returns:
-
+        Returns: file name
         """
         if extension is None:
             extension = EXTENSIONS[Sdk.Name(sdk)]
@@ -138,13 +141,13 @@ class CDHelper:
 
     def _upload_blob(self, source_file: str, destination_blob_name: str):
         """
-        Uploads a file to the bucket.
+        Upload a file to the bucket.
         Args:
             source_file: name of the file to be stored
             destination_blob_name: "storage-object-name"
-        Returns:
-
         """
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/dariamalkova/IdeaProjects/beam/playground' \
+                                                       '/infrastructure/play-test-key.json '
         storage_client = storage.Client()
         bucket = storage_client.bucket(BUCKET_NAME)
         blob = bucket.blob(destination_blob_name)
@@ -154,14 +157,6 @@ class CDHelper:
 
     def clear_temp_folder(self):
         """
-        Remove temporary folder with source files
-        Returns: nothing
-
+        Remove temporary folder with source files.
         """
         shutil.rmtree(TEMP_FOLDER)
-
-
-if __name__ == '__main__':
-    cd = CDHelper()
-    examples = find_examples("/home/daria/IdeaProjects/beam/")
-    cd.store_examples(examples)
