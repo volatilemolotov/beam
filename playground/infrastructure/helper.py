@@ -24,6 +24,7 @@ class Example:
     """ Class which contains all information about beam example
     """
     name: str
+    pipelineId: str
     sdk: Sdk
     filepath: str
     code: str
@@ -56,11 +57,12 @@ def find_examples(work_dir: str) -> List[Example]:
 
 
 def get_statuses(examples: [Example]):
-    """ Receive statuses for examples and update example.status
+    """ Receive statuses for examples and update example.status and example.pipelineId
 
     Use client to send requests to the backend:
     1. Start code processing.
     2. Ping the backend while status is STATUS_VALIDATING/STATUS_PREPARING/STATUS_COMPILING/STATUS_EXECUTING
+    Update example.pipelineId with resulting pipelineId.
     Update example.status with resulting status.
 
     Args:
