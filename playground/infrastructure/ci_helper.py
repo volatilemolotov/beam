@@ -38,9 +38,9 @@ class CIHelper:
         3. Run processing for all examples to verify examples' code.
         """
         get_statuses(examples)
-        self.verify_examples_status(examples)
+        self._verify_examples_status(examples)
 
-    def verify_examples_status(self, examples: [Example]):
+    def _verify_examples_status(self, examples: [Example]):
         """ Verify statuses of beam examples.
 
         Check example.status for each examples. If the status of the example is:
