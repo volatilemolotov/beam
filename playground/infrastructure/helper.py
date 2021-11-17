@@ -13,15 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import re
 import os
-
+import re
 from dataclasses import dataclass
 from typing import List
-from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED, SDK_JAVA, Status, STATUS_UNSPECIFIED
+
+from api.v1.api_pb2 import Sdk, SDK_JAVA, Status
 
 SUPPORTED_SDK = {'java': SDK_JAVA}
-PATTERN = re.compile('Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+')
+PATTERN = re.compile(
+    'Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+')
 
 
 @dataclass
@@ -60,65 +61,9 @@ def find_examples(work_dir: str) -> List[Example]:
     for root, _, files in os.walk(work_dir):
         for filename in files:
             filepath = os.path.join(root, filename)
-            if match_pattern(filepath):
-                name = get_name(filename)
-                sdk = get_sdk(filename)
-                with open(filepath) as parsed_file:
-                    content = parsed_file.read()
-
-                example = Example(name, sdk, filepath, content)
-                examples.append(example)
+            if _match_pattern(filepath):
+                examples.append(_get_example(filepath, filename))
     return examples
-
-
-def match_pattern(filepath: str) -> bool:
-    """Check file to matching
-
-    Check that file has the correct extension and contains the beam-playground tag.
-
-    Args:
-        filepath: path to the file.
-
-    Returns:
-        True if file matched. False if not
-    """
-    extension = filepath.split(os.extsep)[-1]
-    if extension in SUPPORTED_SDK.keys():
-        with open(filepath) as parsed_file:
-            content = parsed_file.read()
-        return re.search(PATTERN, content) is not None
-
-
-def get_name(filename) -> str:
-    """ Return name of the example by his filepath.
-
-    Get name of the example by his filename.
-
-    Args:
-        filename: filename of the beam example file.
-
-    Returns:
-        example's name.
-    """
-    return filename.split(os.extsep)[0]
-
-
-def get_sdk(filename) -> Sdk:
-    """ Return SDK of example by his filename.
-
-    Get extension of the example's file and returns associated SDK.
-
-    Args:
-        filename: filename of the beam example.
-
-    Returns:
-        Sdk according to file extension.
-    """
-    extension = filename.split(os.extsep)[-1]
-    if SUPPORTED_SDK.get(extension) is not None:
-        return SUPPORTED_SDK[extension]
-    else:
-        raise ValueError(extension + " is not supported now")
 
 
 def get_statuses(examples: [Example]):
@@ -134,3 +79,71 @@ def get_statuses(examples: [Example]):
     """
     # TODO [BEAM-13267] Implement
     pass
+
+
+def _get_example(filepath: str, filename: str) -> Example:
+    """ Return an Example by filepath and filename.
+
+    Args:
+         filepath: path of the example's file.
+         filename: name of the example's file.
+
+    Returns:
+        Return an Example.
+    """
+    name = _get_name(filename)
+    sdk = _get_sdk(filename)
+    with open(filepath) as parsed_file:
+        content = parsed_file.read()
+
+    return Example(name, sdk, filepath, content)
+
+
+def _match_pattern(filepath: str) -> bool:
+    """Check file to matching
+
+    Check that file has the correct extension and contains the beam-playground tag.
+
+    Args:
+        filepath: path to the file.
+
+    Returns:
+        True if file matched. False if not
+    """
+    extension = filepath.split(os.extsep)[-1]
+    if extension in SUPPORTED_SDK:
+        with open(filepath) as parsed_file:
+            content = parsed_file.read()
+        return re.search(PATTERN, content) is not None
+
+
+def _get_name(filename) -> str:
+    """ Return name of the example by his filepath.
+
+    Get name of the example by his filename.
+
+    Args:
+        filename: filename of the beam example file.
+
+    Returns:
+        example's name.
+    """
+    return filename.split(os.extsep)[0]
+
+
+def _get_sdk(filename) -> Sdk:
+    """ Return SDK of example by his filename.
+
+    Get extension of the example's file and returns associated SDK.
+
+    Args:
+        filename: filename of the beam example.
+
+    Returns:
+        Sdk according to file extension.
+    """
+    extension = filename.split(os.extsep)[-1]
+    if extension in SUPPORTED_SDK:
+        return SUPPORTED_SDK[extension]
+    else:
+        raise ValueError(extension + " is not supported now")
