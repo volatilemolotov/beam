@@ -15,7 +15,7 @@
 
 from typing import List
 
-from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED
+from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED, Status, STATUS_UNSPECIFIED
 
 
 class Example:
@@ -26,13 +26,15 @@ class Example:
     filepath = ""
     code = ""
     output = ""
+    status = Status
 
-    def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output=""):
+    def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output="", status=STATUS_UNSPECIFIED):
         self.name = name
         self.sdk = sdk
         self.filepath = filepath
         self.code = code
         self.output = output
+        self.status = status
 
 
 def find_examples(work_dir: str) -> List[Example]:
