@@ -98,7 +98,7 @@ def _get_example(filepath: str, filename: str) -> Example:
     with open(filepath) as parsed_file:
         content = parsed_file.read()
 
-    return Example(name, sdk, filepath, content)
+    return Example(name, "", sdk, filepath, content, "", Status)
 
 
 def _match_pattern(filepath: str) -> bool:
