@@ -59,3 +59,18 @@ def find_examples(work_dir: str) -> List[Example]:
     """
     examples = [Example()]
     return examples
+
+
+def get_statuses(examples: [Example]):
+    """ Receive statuses for examples and update example.status
+
+    Use client to send requests to the backend:
+    1. Start code processing.
+    2. Ping the backend while status is STATUS_VALIDATING/STATUS_PREPARING/STATUS_COMPILING/STATUS_EXECUTING
+    Update example.status with resulting status.
+
+    Args:
+        examples: beam examples for processing and updating statuses.
+    """
+    # TODO [BEAM-13267] Implement
+    pass
