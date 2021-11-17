@@ -23,13 +23,13 @@ from google.cloud import storage
 from api.v1.api_pb2 import Sdk, SDK_JAVA
 from helper import Example, find_examples
 
-playground_tag = "beam-playground"
-bucket_name = "test_public_bucket_akvelon"
-temp_folder = "temp"
+PLAYGROUND_TAG = "beam-playground"
+BUCKET_NAME = "test_public_bucket_akvelon"
+TEMP_FOLDER = "temp"
 
-extensions = {"SDK_JAVA": "java", "SDK_GO": "go", "SDK_PYTHON": "py"}
+EXTENSIONS = {"SDK_JAVA": "java", "SDK_GO": "go", "SDK_PYTHON": "py"}
 PATTERN = 'Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+'
-pattern_start = 'Beam-playground'
+PATTERN_START = 'Beam-playground'
 
 
 class CDHelper:
@@ -81,7 +81,7 @@ class CDHelper:
         Returns: array of file names
 
         """
-        path_to_object_folder = os.path.join(temp_folder, example.pipeline_id, Sdk.Name(example.sdk),
+        path_to_object_folder = os.path.join(TEMP_FOLDER, example.pipeline_id, Sdk.Name(example.sdk),
                                              object_meta["name"])
         Path(path_to_object_folder).mkdir(parents=True, exist_ok=True)
 
@@ -96,7 +96,7 @@ class CDHelper:
         file_names[output_path] = example.output
         file_names[meta_path] = str(object_meta)
         for file_name, file_content in file_names.items():
-            local_file_path = os.path.join(temp_folder, example.pipeline_id, file_name)
+            local_file_path = os.path.join(TEMP_FOLDER, example.pipeline_id, file_name)
             with open(local_file_path, 'w') as file:
                 file.write(file_content)
             file_names[
@@ -117,7 +117,7 @@ class CDHelper:
             yaml_code = code[m[0]:m[1]]
             try:
                 object_meta = yaml.load(yaml_code, Loader=yaml.SafeLoader)
-                return object_meta[pattern_start]
+                return object_meta[PATTERN_START]
             except Exception as exp:
                 print(exp)  ## todo add logErr
 
@@ -133,7 +133,7 @@ class CDHelper:
 
         """
         if extension is None:
-            extension = extensions[Sdk.Name(sdk)]
+            extension = EXTENSIONS[Sdk.Name(sdk)]
         return os.path.join(Sdk.Name(sdk), base_folder_name, "{}.{}".format(file_name, extension))
 
     def _upload_blob(self, source_file: str, destination_blob_name: str):
@@ -146,14 +146,14 @@ class CDHelper:
 
         """
         storage_client = storage.Client()
-        bucket = storage_client.bucket(bucket_name)
+        bucket = storage_client.bucket(BUCKET_NAME)
         blob = bucket.blob(destination_blob_name)
         blob.upload_from_filename(source_file)
 
         print("File uploaded to {}.".format(destination_blob_name))
 
     def clear_temp_folder(self):
-        shutil.rmtree(temp_folder)
+        shutil.rmtree(TEMP_FOLDER)
 
 
 if __name__ == '__main__':
