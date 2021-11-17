@@ -15,6 +15,7 @@
 
 import os
 import re
+import shutil
 from pathlib import Path
 
 import yaml
@@ -22,13 +23,10 @@ from google.cloud import storage
 from api.v1.api_pb2 import Sdk, SDK_JAVA
 from helper import Example, find_examples
 
-folder_prefix = "./{}/{}/{}/{}"
-
-file_prefix = "./{}/{}"
 
 playground_tag = "beam-playground"
 bucket_name = "test_public_bucket_akvelon"
-temp_folder = ".temp"
+temp_folder = "temp"
 
 extensions = {"SDK_JAVA": "java", "SDK_GO": "go", "SDK_PYTHON": "py"}
 PATTERN = 'Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+'
@@ -46,6 +44,7 @@ class CDHelper:
         """
         self._run_code_all_examples(examples)
         self._save_to_cloud_storage(examples)
+        self.clear_temp_folder()
 
     def _run_code_all_examples(self, examples: [Example]):
         """ Run beam examples and keep their ouput.
@@ -70,9 +69,8 @@ class CDHelper:
         for example in examples:
             object_meta = self._get_data_from_template(example.code)
             file_names = self._write_to_os(example, object_meta)
-            for file_name in file_names:
-                self._upload_blob(source_file=file_prefix.format(example.pipeline_id, file_name),
-                                  destination_blob_name=file_name)
+            for cloud_file_name, local_file_name in file_names.items():
+                self._upload_blob(source_file=local_file_name, destination_blob_name=cloud_file_name)
 
     def _write_to_os(self, example: Example, object_meta: dict):
         """
@@ -88,23 +86,21 @@ class CDHelper:
         Path(path_to_object_folder).mkdir(parents=True, exist_ok=True)
 
         file_names = dict()
-        code_path = self._get_destination_file_name(sdk=example.sdk, base_folder_name=object_meta["name"],
-                                                    file_name=object_meta["name"])
-        output_path = self._get_destination_file_name(sdk=example.sdk, base_folder_name=object_meta["name"],
-                                                      file_name=object_meta["name"], extension="output")
-        meta_path = self._get_destination_file_name(sdk=example.sdk, base_folder_name=object_meta["name"],
-                                                    file_name="meta", extension="info")
+        code_path = self._get_cloud_file_name(sdk=example.sdk, base_folder_name=object_meta["name"],
+                                              file_name=object_meta["name"])
+        output_path = self._get_cloud_file_name(sdk=example.sdk, base_folder_name=object_meta["name"],
+                                                file_name=object_meta["name"], extension="output")
+        meta_path = self._get_cloud_file_name(sdk=example.sdk, base_folder_name=object_meta["name"],
+                                              file_name="meta", extension="info")
         file_names[code_path] = example.code
         file_names[output_path] = example.output
         file_names[meta_path] = str(object_meta)
         for file_name, file_content in file_names.items():
-            full_file_path = os.path.join(temp_folder, example.pipeline_id, file_name)
-            with open(full_file_path, 'w') as file:
+            local_file_path = os.path.join(temp_folder, example.pipeline_id, file_name)
+            with open(local_file_path, 'w') as file:
                 file.write(file_content)
-            file_names[file_name] = full_file_path ## don't need content anymore, change to the full path of the stored file
+            file_names[file_name] = local_file_path ## don't need content anymore, change to the local os path of the stored file
         return file_names
-
-    def _create_source_name(self, example: Example):
 
 
     def _get_data_from_template(self, code):
@@ -125,7 +121,7 @@ class CDHelper:
             except Exception as exp:
                 print(exp)  ## todo add logErr
 
-    def _get_destination_file_name(self, sdk: Sdk, base_folder_name: str, file_name: str, extension: str = None):
+    def _get_cloud_file_name(self, sdk: Sdk, base_folder_name: str, file_name: str, extension: str = None):
         """
         Args:
             sdk:
@@ -155,6 +151,9 @@ class CDHelper:
         blob.upload_from_filename(source_file)
 
         print("File uploaded to {}.".format(destination_blob_name))
+
+    def clear_temp_folder(self):
+        shutil.rmtree(temp_folder)
 
 
 if __name__ == '__main__':
