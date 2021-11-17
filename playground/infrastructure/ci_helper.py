@@ -16,7 +16,7 @@
 import logging
 
 from api.v1.api_pb2 import SDK_JAVA
-from helper import find_examples, Example
+from helper import find_examples, Example, get_statuses
 
 SUPPORTED_SDK = {'java': SDK_JAVA}
 
@@ -39,17 +39,19 @@ class CIHelper:
         """
         root_dir = os.getenv("BEAM_ROOT_DIR")
         examples = find_examples(root_dir)
+        get_statuses(examples)
         self._verify_all_examples(examples)
 
     def _verify_all_examples(self, examples: [Example]):
-        """ Verify beam examples using backend instance.
+        """ Verify beam examples.
 
-        Call the backend to start code processing for the examples. Then check status of processing.
-        If status is some error status, then log error case and raise error
+        Check example.status for each examples. If the status of the example is:
+        - STATUS_VALIDATION_ERROR/STATUS_PREPARATION_ERROR/STATUS_ERROR/STATUS_RUN_TIMEOUT: log error
+        - STATUS_COMPILE_ERROR: get logs using GetCompileOutput request and log them with error.
+        - STATUS_RUN_ERROR: get logs using GetRunError request and log them with error.
 
         Args:
             examples: beam examples that should be verified
         """
-        for example in examples:
-            # TODO [BEAM-13256] Implement logic of calling backend to verify example's code
-            continue
+        # TODO [BEAM-13256] Implement
+        pass

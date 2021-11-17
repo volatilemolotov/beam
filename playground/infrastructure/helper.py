@@ -17,7 +17,7 @@ import re
 import os
 
 from typing import List
-from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED, SDK_JAVA
+from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED, SDK_JAVA, Status, STATUS_UNSPECIFIED
 
 SUPPORTED_SDK = {'java': SDK_JAVA}
 PATTERN = re.compile('Beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} *categories:\n( {4} *- [\w\-]+\n)+')
@@ -31,13 +31,15 @@ class Example:
     filepath = ""
     code = ""
     output = ""
+    status = Status
 
-    def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output=""):
+    def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output="", status=STATUS_UNSPECIFIED):
         self.name = name
         self.sdk = sdk
         self.filepath = filepath
         self.code = code
         self.output = output
+        self.status = status
 
 
 def find_examples(work_dir: str) -> List[Example]:
@@ -123,3 +125,17 @@ def get_sdk(filename) -> Sdk:
         return SUPPORTED_SDK[extension]
     else:
         raise ValueError(extension + " is not supported now")
+
+def get_statuses(examples: [Example]):
+    """ Receive statuses for examples and update example.status
+
+    Use client to send requests to the backend:
+    1. Start code processing.
+    2. Ping the backend while status is STATUS_VALIDATING/STATUS_PREPARING/STATUS_COMPILING/STATUS_EXECUTING
+    Update example.status with resulting status.
+
+    Args:
+        examples: beam examples for processing and updating statuses.
+    """
+    # TODO [BEAM-13267] Implement
+    pass
