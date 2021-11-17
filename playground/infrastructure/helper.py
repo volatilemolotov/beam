@@ -27,6 +27,7 @@ class Example:
     code = ""
     output = ""
     status = Status
+    pipelineId = ""
 
     def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output="", status=STATUS_UNSPECIFIED):
         self.name = name
