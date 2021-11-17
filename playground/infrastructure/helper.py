@@ -15,9 +15,9 @@
 
 import os
 import re
+
 from dataclasses import dataclass
 from typing import List
-
 from api.v1.api_pb2 import Sdk, SDK_JAVA, Status
 
 SUPPORTED_SDK = {'java': SDK_JAVA}
@@ -30,7 +30,7 @@ class Example:
     """ Class which contains all information about beam example
     """
     name: str
-    pipelineId: str
+    pipeline_id: str
     sdk: Sdk
     filepath: str
     code: str
@@ -68,12 +68,12 @@ def find_examples(work_dir: str) -> List[Example]:
 
 
 def get_statuses(examples: [Example]):
-    """ Receive statuses for examples and update example.status and example.pipelineId
+    """ Receive statuses for examples and update example.status and example.pipeline_id
 
     Use client to send requests to the backend:
     1. Start code processing.
     2. Ping the backend while status is STATUS_VALIDATING/STATUS_PREPARING/STATUS_COMPILING/STATUS_EXECUTING
-    Update example.pipelineId with resulting pipelineId.
+    Update example.pipeline_id with resulting pipelineId.
     Update example.status with resulting status.
 
     Args:
