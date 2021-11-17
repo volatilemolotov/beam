@@ -16,7 +16,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from api.v1.api_pb2 import Sdk, Status
+from api.v1.api_pb2 import SDK_UNSPECIFIED, STATUS_UNSPECIFIED
 
 
 @dataclass
@@ -25,11 +25,11 @@ class Example:
     """
     name: str
     pipeline_id: str
-    sdk: Sdk
+    sdk: SDK_UNSPECIFIED
     filepath: str
     code: str
     output: str
-    status: Status
+    status: STATUS_UNSPECIFIED
 
 
 def find_examples(work_dir: str) -> List[Example]:
@@ -52,7 +52,7 @@ def find_examples(work_dir: str) -> List[Example]:
     Returns:
         List of Examples.
     """
-    examples = [Example("", "", Sdk, "", "", "", Status)]
+    examples = [Example("", "", SDK_UNSPECIFIED, "", "", "", STATUS_UNSPECIFIED)]
     return examples
 
 
