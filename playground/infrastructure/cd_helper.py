@@ -33,6 +33,7 @@ extensions = {"SDK_JAVA": "java", "SDK_GO": "go", "SDK_PYTHON": "py"}
 PATTERN = 'beam-playground:\n {2} *name: \w+\n {2} *description: .+\n {2} *multifile: (true|false)\n {2} ' \
           '*categories:\n( {4} *- [\w\-]+\n)+ '
 pattern_start = 'beam-playground'
+from helper import Example
 
 
 class CDHelper:
@@ -41,13 +42,11 @@ class CDHelper:
     It is used to save beam examples/katas/tests and their output on the Google Cloud.
     """
 
-    def get_examples_and_store(self):
+    def store_examples(self, examples: [Example]):
         """ Store beam examples and their output in the Google Cloud.
         """
-        root_dir = os.getenv("BEAM_ROOT_DIR")
-        examples = find_examples(root_dir)
         self._run_code_all_examples(examples)
-        self._save_to_cloud_storage(examples)
+        self._save_to_cloud_all_examples(examples)
 
     def _run_code_all_examples(self, examples: [Example]):
         """ Run beam examples and keep their ouput.

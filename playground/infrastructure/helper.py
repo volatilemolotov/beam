@@ -13,29 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from dataclasses import dataclass
 from typing import List
 
-from api.v1.api_pb2 import Sdk, SDK_UNSPECIFIED, Status, STATUS_UNSPECIFIED
+from api.v1.api_pb2 import Sdk, Status
 
 
+@dataclass
 class Example:
     """ Class which contains all information about beam example
     """
-    name = ""
-    sdk = Sdk
-    filepath = ""
-    code = ""
-    output = ""
-    status = Status
-    pipelineId = ""
-
-    def __init__(self, name="", sdk=SDK_UNSPECIFIED, filepath="", code="", output="", status=STATUS_UNSPECIFIED):
-        self.name = name
-        self.sdk = sdk
-        self.filepath = filepath
-        self.code = code
-        self.output = output
-        self.status = status
+    name: str
+    pipeline_id: str
+    sdk: Sdk
+    filepath: str
+    code: str
+    output: str
+    status: Status
 
 
 def find_examples(work_dir: str) -> List[Example]:
@@ -58,16 +52,17 @@ def find_examples(work_dir: str) -> List[Example]:
     Returns:
         List of Examples.
     """
-    examples = [Example()]
+    examples = [Example("", "", Sdk, "", "", "", Status)]
     return examples
 
 
 def get_statuses(examples: [Example]):
-    """ Receive statuses for examples and update example.status
+    """ Receive statuses for examples and update example.status and example.pipelineId
 
     Use client to send requests to the backend:
     1. Start code processing.
     2. Ping the backend while status is STATUS_VALIDATING/STATUS_PREPARING/STATUS_COMPILING/STATUS_EXECUTING
+    Update example.pipelineId with resulting pipelineId.
     Update example.status with resulting status.
 
     Args:
