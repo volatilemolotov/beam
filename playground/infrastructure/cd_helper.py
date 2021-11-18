@@ -39,11 +39,11 @@ class CDHelper:
     def store_examples(self, examples: [Example]):
         """ Store beam examples and their output in the Google Cloud.
         """
-        asyncio.run(self.get_outputs(examples))
+        asyncio.run(self._get_outputs(examples))
         self._save_to_cloud_storage(examples)
-        self.clear_temp_folder()
+        self._clear_temp_folder()
 
-    async def get_outputs(self, examples: [Example]):
+    async def _get_outputs(self, examples: [Example]):
         """ Run beam examples and keep their output.
 
         Call the backend to start code processing for the examples. Then receive code output.
@@ -62,7 +62,7 @@ class CDHelper:
 
     def _save_to_cloud_storage(self, examples: [Example]):
         """
-        Save beam examples and their outputs using backend instance.
+        Save examples, outputs and meta to bucket
 
         Args:
             examples: precompiled examples
@@ -107,7 +107,7 @@ class CDHelper:
 
     def _get_data_from_template(self, code):
         """
-        Find beam-playground tag and extract the information of the example.
+        Find beam-playground tag and extract the information of the example to dictionary
         Args:
             code: code of an example
 
@@ -146,6 +146,8 @@ class CDHelper:
             source_file: name of the file to be stored
             destination_blob_name: "storage-object-name"
         """
+        os.environ[
+            'GOOGLE_APPLICATION_CREDENTIALS'] = "/Users/dariamalkova/IdeaProjects/beam/playground/infrastructure/play-test-key.json"
         storage_client = storage.Client()
         bucket = storage_client.bucket(BUCKET_NAME)
         blob = bucket.blob(destination_blob_name)
@@ -155,8 +157,9 @@ class CDHelper:
         blob.patch()
         print("File uploaded to {}.".format(destination_blob_name))
 
-    def clear_temp_folder(self):
+    def _clear_temp_folder(self):
         """
         Remove temporary folder with source files.
         """
-        shutil.rmtree(TEMP_FOLDER)
+        if os.path.exists(TEMP_FOLDER):
+            shutil.rmtree(TEMP_FOLDER)
