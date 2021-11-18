@@ -146,8 +146,6 @@ class CDHelper:
             source_file: name of the file to be stored
             destination_blob_name: "storage-object-name"
         """
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/Users/dariamalkova/IdeaProjects/beam/playground' \
-                                                       '/infrastructure/play-test-key.json '
         storage_client = storage.Client()
         bucket = storage_client.bucket(BUCKET_NAME)
         blob = bucket.blob(destination_blob_name)
