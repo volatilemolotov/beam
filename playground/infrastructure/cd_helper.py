@@ -150,7 +150,9 @@ class CDHelper:
         bucket = storage_client.bucket(BUCKET_NAME)
         blob = bucket.blob(destination_blob_name)
         blob.upload_from_filename(source_file)
-
+        # change caching to no caching
+        blob.cache_control = 'no-store'
+        blob.patch()
         print("File uploaded to {}.".format(destination_blob_name))
 
     def clear_temp_folder(self):
