@@ -20,11 +20,15 @@ import 'package:flutter/material.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
+import 'package:playground/modules/analytics/analytics_service.dart';
 import 'package:playground/pages/playground/components/playground_feedback.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const kPrivacyPolicyText = 'Privacy Policy';
 const kReportIssueText = 'Report issue in Jira';
 const kCopyright = '© The Apache Software Foundation';
+
+const kReportIssueLink = 'https://issues.apache.org/jira/projects/BEAM/issues/';
 
 class PlaygroundPageFooter extends StatelessWidget {
   const PlaygroundPageFooter({Key? key}) : super(key: key);
@@ -57,7 +61,10 @@ class PlaygroundPageFooter extends StatelessWidget {
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
               ),
               // ignore: avoid_print
-              onPressed: () => print(kPrivacyPolicyText),
+              onPressed: () {
+                launch(kReportIssueLink);
+                AnalyticsService.get(context).trackClickReportIssue();
+              },
               child: const Text(kPrivacyPolicyText),
             ),
             const Text(kCopyright),
