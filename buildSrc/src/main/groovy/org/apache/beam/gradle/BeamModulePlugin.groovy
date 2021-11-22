@@ -156,6 +156,13 @@ class BeamModulePlugin implements Plugin<Project> {
      */
     Closure shadowClosure
 
+    /**
+     * If set, suppress the error-prone UnusedVariable check.
+     *
+     * TODO(BEAM-11936): Address all unused variables and remove this option.
+     */
+    boolean suppressUnusedVariable = false
+
     /** Controls whether this project is published to Maven. */
     boolean publish = true
 
@@ -378,7 +385,7 @@ class BeamModulePlugin implements Plugin<Project> {
 
     // Automatically use the official release version if we are performing a release
     // otherwise append '-SNAPSHOT'
-    project.version = '2.35.0'
+    project.version = '2.36.0'
     if (!isRelease(project)) {
       project.version += '-SNAPSHOT'
     }
@@ -1150,9 +1157,11 @@ class BeamModulePlugin implements Plugin<Project> {
         options.errorprone.errorproneArgs.add("-Xep:TimeUnitConversionChecker:OFF")
         options.errorprone.errorproneArgs.add("-Xep:UndefinedEquals:OFF")
         options.errorprone.errorproneArgs.add("-Xep:UnnecessaryLambda:OFF")
-        options.errorprone.errorproneArgs.add("-Xep:UnusedVariable:OFF")
         options.errorprone.errorproneArgs.add("-Xep:UnusedNestedClass:OFF")
         options.errorprone.errorproneArgs.add("-Xep:UnsafeReflectiveConstructionCast:OFF")
+        if (configuration.suppressUnusedVariable) {
+          options.errorprone.errorproneArgs.add("-Xep:UnusedVariable:OFF")
+        }
       }
 
       if (configuration.shadowClosure) {
@@ -2325,14 +2334,17 @@ class BeamModulePlugin implements Plugin<Project> {
       project.task('setupVirtualenv')  {
         doLast {
           def virtualenvCmd = [
-            'virtualenv',
+            "python${project.ext.pythonVersion}",
+            "-m",
+            "venv",
             "${project.ext.envdir}",
-            "--python=python${project.ext.pythonVersion}",
           ]
           project.exec { commandLine virtualenvCmd }
           project.exec {
             executable 'sh'
-            args '-c', ". ${project.ext.envdir}/bin/activate && pip install --retries 10 --upgrade tox==3.20.1 -r ${project.rootDir}/sdks/python/build-requirements.txt"
+            args '-c', ". ${project.ext.envdir}/bin/activate && " +
+                "pip install --retries 10 --upgrade pip && " +
+                "pip install --retries 10 --upgrade tox==3.20.1 -r ${project.rootDir}/sdks/python/build-requirements.txt"
           }
         }
         // Gradle will delete outputs whenever it thinks they are stale. Putting a
