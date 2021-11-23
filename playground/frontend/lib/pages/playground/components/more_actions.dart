@@ -37,11 +37,10 @@ const kShortcutsText = 'Shortcuts';
 
 const kBeamPlaygroundGithubText = 'Beam Playground on GitHub';
 const kBeamPlaygroundGithubLink =
-    'https://github.com/apache/beam/tree/master/playground/frontend';
+    'https://github.com/apache/beam/tree/master/playground';
 
 const kApacheBeamGithubText = 'Apache Beam on GitHub';
-const kApacheBeamGithubLink =
-    'https://github.com/apache/beam/tree/master/playground/frontend';
+const kApacheBeamGithubLink = 'https://github.com/apache/beam';
 
 const kScioGithubText = 'SCIO on GitHub';
 const kScioGithubLink = 'https://github.com/spotify/scio';
