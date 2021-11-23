@@ -18,4 +18,4 @@
 
 const String kApiClientURL =
     'https://backend-dot-datatokenization.uc.r.appspot.com';
-const String kAnalyticsUA = 'UA-213433771-1';
+const String kAnalyticsUA = 'UA-213529784-1';
