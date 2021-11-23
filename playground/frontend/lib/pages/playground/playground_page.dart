@@ -22,6 +22,7 @@ import 'package:playground/components/toggle_theme_button/toggle_theme_button.da
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/actions/components/new_example_action.dart';
 import 'package:playground/modules/actions/components/reset_action.dart';
+import 'package:playground/modules/analytics/analytics_service.dart';
 import 'package:playground/modules/examples/example_selector.dart';
 import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/modules/shortcuts/components/shortcuts_manager.dart';
@@ -52,13 +53,21 @@ class PlaygroundPage extends StatelessWidget {
                   Consumer<ExampleState>(
                     builder: (context, state, child) {
                       return ExampleSelector(
-                        changeSelectorVisibility: state.changeSelectorVisibility,
+                        changeSelectorVisibility:
+                            state.changeSelectorVisibility,
                         isSelectorOpened: state.isSelectorOpened,
-                        categories: state.categories!,
                       );
                     },
                   ),
-                  SDKSelector(sdk: state.sdk, setSdk: state.setSdk),
+                  SDKSelector(
+                    sdk: state.sdk,
+                    setSdk: (newSdk) {
+                      state.setSdk(newSdk);
+                      AnalyticsService.get(context)
+                          .trackSelectSdk(state.sdk, newSdk);
+                    },
+                    setExample: state.setExample,
+                  ),
                   const NewExampleAction(),
                   ResetAction(reset: state.reset),
                 ],
