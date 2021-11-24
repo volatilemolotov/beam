@@ -17,6 +17,7 @@ package environment
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/logger"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -142,7 +143,7 @@ func ConfigureBeamEnvs(workDir string) (*BeamEnvs, error) {
 	sdk := pb.Sdk_SDK_UNSPECIFIED
 	preparedModDir, modDirExist := os.LookupEnv(preparedModDirKey)
 	if value, present := os.LookupEnv(beamSdkKey); present {
-
+		logger.Infof("%s present: %s", beamSdkKey, value)
 		switch value {
 		case pb.Sdk_SDK_JAVA.String():
 			sdk = pb.Sdk_SDK_JAVA
@@ -165,6 +166,8 @@ func ConfigureBeamEnvs(workDir string) (*BeamEnvs, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	logger.Infof("%sdk: %s", sdk)
 	return NewBeamEnvs(sdk, executorConfig, preparedModDir), nil
 }
 
