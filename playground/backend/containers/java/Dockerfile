@@ -53,3 +53,4 @@ RUN wget https://repo1.maven.org/maven2/org/apache/beam/beam-runners-direct-java
     mv beam-runners-direct-java-$BEAM_VERSION.jar /opt/apache/beam/jars/beam-runners-direct.jar
 RUN printenv
 ENTRYPOINT ["/opt/playground/backend/server_java_backend"]
+#temporary comment
