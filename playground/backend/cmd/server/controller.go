@@ -47,6 +47,7 @@ type playgroundController struct {
 func (controller *playgroundController) RunCode(ctx context.Context, info *pb.RunCodeRequest) (*pb.RunCodeResponse, error) {
 	// check for correct sdk
 	if info.Sdk != controller.env.BeamSdkEnvs.ApacheBeamSdk {
+		logger.Errorf("RunCode(): want sdk: %s, but receive: %s", controller.env.BeamSdkEnvs.ApacheBeamSdk, info.Sdk)
 		logger.Errorf("RunCode(): request contains incorrect sdk: %s\n", info.Sdk)
 		return nil, errors.InvalidArgumentError("Run code()", "incorrect sdk: "+info.Sdk.String())
 	}
