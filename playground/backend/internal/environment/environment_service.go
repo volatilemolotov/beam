@@ -167,7 +167,7 @@ func ConfigureBeamEnvs(workDir string) (*BeamEnvs, error) {
 		return nil, err
 	}
 
-	logger.Infof("%sdk: %s", sdk)
+	logger.Infof("sdk: %s", sdk)
 	return NewBeamEnvs(sdk, executorConfig, preparedModDir), nil
 }
 
