@@ -249,7 +249,7 @@ func Test_Process(t *testing.T) {
 					cacheService.SetValue(ctx, pipelineId, cache.Canceled, true)
 				}(tt.args.ctx, tt.args.pipelineId)
 			}
-			Process(tt.args.ctx, cacheService, lc, exec, tt.args.pipelineId, tt.args.appEnv, tt.args.sdkEnv)
+			Process(tt.args.ctx, cacheService, lc, tt.args.pipelineId, tt.args.appEnv, tt.args.sdkEnv)
 
 			status, _ := cacheService.GetValue(tt.args.ctx, tt.args.pipelineId, cache.Status)
 			if !reflect.DeepEqual(status, tt.expectedStatus) {

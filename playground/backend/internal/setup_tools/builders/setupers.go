@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package run_builder
+package builders
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -21,13 +21,52 @@ import (
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/utils"
 	"fmt"
 	"github.com/google/uuid"
 )
 
-// Setup returns executors.RunBuilder setup it according to sdk
-func Setup(pipelineId uuid.UUID, lc *fs_tool.LifeCycle, workingDir string, sdkEnv *environment.BeamEnvs, compileBuilder *executors.CompileBuilder) (*executors.RunBuilder, error) {
-	runBuilder := compileBuilder.
+func SetupValidator(filePath string, sdk pb.Sdk) (*executors.Executor, error) {
+	val, err := utils.GetValidators(sdk, filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	executor := executors.NewExecutorBuilder().
+		WithValidator().
+		WithSdkValidators(val).
+		Build()
+
+	return &executor, nil
+}
+
+func SetupPreparator(filePath string, sdk pb.Sdk) (*executors.Executor, error) {
+	prep, err := utils.GetPreparators(sdk, filePath)
+	if err != nil {
+		return nil, err
+	}
+	executor := executors.NewExecutorBuilder().
+		WithPreparator().
+		WithSdkPreparators(prep).
+		Build()
+
+	return &executor, nil
+}
+
+func SetupCompiler(filePath, filesFolderPath string, executorConfig *environment.ExecutorConfig) (*executors.Executor, error) {
+	executor := executors.NewExecutorBuilder().
+		WithCompiler().
+		WithCommand(executorConfig.CompileCmd).
+		WithArgs(executorConfig.CompileArgs).
+		WithFileName(filePath).
+		WithWorkingDir(filesFolderPath).
+		Build()
+
+	return &executor, nil
+}
+
+func SetupRunner(pipelineId uuid.UUID, lc *fs_tool.LifeCycle, workingDir string, sdkEnv *environment.BeamEnvs) (*executors.Executor, error) {
+	builder := executors.NewExecutorBuilder().
 		WithRunner().
 		WithCommand(sdkEnv.ExecutorConfig.RunCmd).
 		WithArgs(sdkEnv.ExecutorConfig.RunArgs).
@@ -40,13 +79,14 @@ func Setup(pipelineId uuid.UUID, lc *fs_tool.LifeCycle, workingDir string, sdkEn
 			logger.Errorf("%s: get executable file name: %s\n", pipelineId, err.Error())
 			return nil, err
 		}
-
-		runBuilder = runBuilder.
-			WithExecutableName(className)
+		builder = builder.WithExecutableName(className)
 	case pb.Sdk_SDK_GO:
-		runBuilder = runBuilder.WithCommand(lc.GetAbsoluteExecutableFilePath())
+		builder = builder.WithCommand(lc.GetAbsoluteExecutableFilePath())
+	case pb.Sdk_SDK_PYTHON:
+		builder = builder.WithExecutableName(lc.GetAbsoluteExecutableFilePath())
 	default:
 		return nil, fmt.Errorf("incorrect sdk: %s", sdkEnv.ApacheBeamSdk)
 	}
-	return runBuilder, nil
+	executor := builder.Build()
+	return &executor, nil
 }
