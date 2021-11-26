@@ -22,7 +22,7 @@ import (
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/setup_tools/builders"
+	"beam.apache.org/playground/backend/internal/setup_tools/executors"
 	"beam.apache.org/playground/backend/internal/streaming"
 	"bytes"
 	"context"
@@ -57,8 +57,9 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	go cancelCheck(ctxWithTimeout, pipelineId, cancelChannel, cacheService)
 
 	// Validate
-	executor, err := builders.SetupValidator(lc.GetAbsoluteSourceFilePath(), sdkEnv.ApacheBeamSdk)
-	if SetupError(err, pipelineId, cacheService, ctxWithTimeout) {
+	executor, err := executors.SetupValidator(lc.GetAbsoluteSourceFilePath(), sdkEnv.ApacheBeamSdk)
+	if err != nil {
+		processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
 		return
 	}
 	logger.Infof("%s: Validate() ...\n", pipelineId)
@@ -70,8 +71,9 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	}
 
 	// Prepare
-	executor, err = builders.SetupPreparator(lc.GetAbsoluteSourceFilePath(), sdkEnv.ApacheBeamSdk)
-	if SetupError(err, pipelineId, cacheService, ctxWithTimeout) {
+	executor, err = executors.SetupPreparator(lc.GetAbsoluteSourceFilePath(), sdkEnv.ApacheBeamSdk)
+	if err != nil {
+		processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
 		return
 	}
 	logger.Infof("%s: Prepare() ...\n", pipelineId)
@@ -85,8 +87,9 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	// Compile
 	switch sdkEnv.ApacheBeamSdk {
 	case pb.Sdk_SDK_JAVA, pb.Sdk_SDK_GO:
-		executor, err = builders.SetupCompiler(lc.GetAbsoluteSourceFilePath(), lc.GetAbsoluteBaseFolderPath(), sdkEnv.ExecutorConfig)
-		if SetupError(err, pipelineId, cacheService, ctxWithTimeout) {
+		executor, err = executors.SetupCompiler(lc.GetAbsoluteSourceFilePath(), lc.GetAbsoluteBaseFolderPath(), sdkEnv.ExecutorConfig)
+		if err != nil {
+			processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
 			return
 		}
 		logger.Infof("%s: Compile() ...\n", pipelineId)
@@ -103,8 +106,9 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	}
 
 	// Run
-	executor, err = builders.SetupRunner(pipelineId, lc, appEnv.WorkingDir(), sdkEnv)
-	if SetupError(err, pipelineId, cacheService, ctxWithTimeout) {
+	executor, err = executors.SetupRunner(pipelineId, lc, appEnv.WorkingDir(), sdkEnv)
+	if err != nil {
+		processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
 		return
 	}
 	logger.Infof("%s: Run() ...\n", pipelineId)
@@ -116,13 +120,9 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	processStep(ctxWithTimeout, pipelineId, cacheService, cancelChannel, successChannel, nil, &runError, errorChannel, pb.Status_STATUS_RUN_ERROR, pb.Status_STATUS_FINISHED)
 }
 
-func SetupError(err error, pipelineId uuid.UUID, cacheService cache.Cache, ctxWithTimeout context.Context) bool {
-	if err != nil {
-		logger.Errorf("%s: error during setup validate builder: %s\n", pipelineId, err.Error())
-		cacheService.SetValue(ctxWithTimeout, pipelineId, cache.Status, pb.Status_STATUS_ERROR)
-		return true
-	}
-	return false
+func processSetupError(err error, pipelineId uuid.UUID, cacheService cache.Cache, ctxWithTimeout context.Context) {
+	logger.Errorf("%s: error during setup builder: %s\n", pipelineId, err.Error())
+	cacheService.SetValue(ctxWithTimeout, pipelineId, cache.Status, pb.Status_STATUS_ERROR)
 }
 
 // GetProcessingOutput gets processing output value from cache by key and subKey.

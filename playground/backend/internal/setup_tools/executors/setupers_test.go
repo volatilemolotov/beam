@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package builders
+package executors
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -30,7 +30,7 @@ import (
 	"testing"
 )
 
-// SetupHelper returns builders.CompileBuilder setup it according to sdk
+// SetupHelper returns executors.CompileBuilder setup it according to sdk
 func SetupHelper(filePath, filesFolderPath string, sdk pb.Sdk, executorConfig *environment.ExecutorConfig) (*executors.CompileBuilder, error) {
 	val, err := utils.GetValidators(sdk, filePath)
 	if err != nil {

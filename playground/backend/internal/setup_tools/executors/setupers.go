@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package builders
+package executors
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -26,6 +26,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// SetupValidator return executor with set args for validator
 func SetupValidator(filePath string, sdk pb.Sdk) (*executors.Executor, error) {
 	val, err := utils.GetValidators(sdk, filePath)
 	if err != nil {
@@ -40,6 +41,7 @@ func SetupValidator(filePath string, sdk pb.Sdk) (*executors.Executor, error) {
 	return &executor, nil
 }
 
+// SetupPreparator return executor with set args for preparator
 func SetupPreparator(filePath string, sdk pb.Sdk) (*executors.Executor, error) {
 	prep, err := utils.GetPreparators(sdk, filePath)
 	if err != nil {
@@ -53,6 +55,7 @@ func SetupPreparator(filePath string, sdk pb.Sdk) (*executors.Executor, error) {
 	return &executor, nil
 }
 
+// SetupCompiler return executor with set args for compiler
 func SetupCompiler(filePath, filesFolderPath string, executorConfig *environment.ExecutorConfig) (*executors.Executor, error) {
 	executor := executors.NewExecutorBuilder().
 		WithCompiler().
@@ -65,6 +68,7 @@ func SetupCompiler(filePath, filesFolderPath string, executorConfig *environment
 	return &executor, nil
 }
 
+// SetupRunner return executor with set args for runner
 func SetupRunner(pipelineId uuid.UUID, lc *fs_tool.LifeCycle, workingDir string, sdkEnv *environment.BeamEnvs) (*executors.Executor, error) {
 	builder := executors.NewExecutorBuilder().
 		WithRunner().
