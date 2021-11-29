@@ -104,32 +104,3 @@ func TestSetupExecutor(t *testing.T) {
 		})
 	}
 }
-
-//func TestSetupBuilder(t *testing.T) {
-//	type args struct {
-//		srcFilePath    string
-//		baseFolderPath string
-//		execFilePath   string
-//		sdkEnv         *environment.BeamEnvs
-//	}
-//	tests := []struct {
-//		name    string
-//		args    args
-//		want    *executors.RunBuilder
-//		wantErr bool
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			got, err := SetupBuilder(tt.args.srcFilePath, tt.args.baseFolderPath, tt.args.execFilePath, tt.args.sdkEnv)
-//			if (err != nil) != tt.wantErr {
-//				t.Errorf("SetupBuilder() error = %v, wantErr %v", err, tt.wantErr)
-//				return
-//			}
-//			if !reflect.DeepEqual(got, tt.want) {
-//				t.Errorf("SetupBuilder() got = %v, want %v", got, tt.want)
-//			}
-//		})
-//	}
-//}
