@@ -22,7 +22,7 @@ import (
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/setup_tools/executors"
+	"beam.apache.org/playground/backend/internal/setup_tools/builder"
 	"beam.apache.org/playground/backend/internal/streaming"
 	"bytes"
 	"context"
@@ -56,12 +56,14 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 
 	go cancelCheck(ctxWithTimeout, pipelineId, cancelChannel, cacheService)
 
-	// Validate
-	executor, err := executors.SetupValidator(lc.GetAbsoluteSourceFilePath(), sdkEnv.ApacheBeamSdk)
+	executorBuilder, err := builder.SetupBuilder(lc.GetAbsoluteSourceFilePath(), lc.GetAbsoluteBaseFolderPath(), lc.GetAbsoluteExecutableFilePath(), sdkEnv)
 	if err != nil {
 		processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
 		return
 	}
+	executor := executorBuilder.Build()
+
+	// Validate
 	logger.Infof("%s: Validate() ...\n", pipelineId)
 	validateFunc := executor.Validate()
 	go validateFunc(successChannel, errorChannel)
@@ -71,11 +73,6 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	}
 
 	// Prepare
-	executor, err = executors.SetupPreparator(lc.GetAbsoluteSourceFilePath(), sdkEnv.ApacheBeamSdk)
-	if err != nil {
-		processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
-		return
-	}
 	logger.Infof("%s: Prepare() ...\n", pipelineId)
 	prepareFunc := executor.Prepare()
 	go prepareFunc(successChannel, errorChannel)
@@ -87,11 +84,6 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	// Compile
 	switch sdkEnv.ApacheBeamSdk {
 	case pb.Sdk_SDK_JAVA, pb.Sdk_SDK_GO:
-		executor, err = executors.SetupCompiler(lc.GetAbsoluteSourceFilePath(), lc.GetAbsoluteBaseFolderPath(), sdkEnv.ExecutorConfig)
-		if err != nil {
-			processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
-			return
-		}
 		logger.Infof("%s: Compile() ...\n", pipelineId)
 		compileCmd := executor.Compile(ctxWithTimeout)
 		var compileError bytes.Buffer
@@ -106,10 +98,12 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 	}
 
 	// Run
-	executor, err = executors.SetupRunner(pipelineId, lc, appEnv.WorkingDir(), sdkEnv)
-	if err != nil {
-		processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
-		return
+	if sdkEnv.ApacheBeamSdk == pb.Sdk_SDK_JAVA {
+		className, err := lc.ExecutableName(pipelineId, appEnv.WorkingDir())
+		if err != nil {
+			processSetupError(err, pipelineId, cacheService, ctxWithTimeout)
+		}
+		executor = executorBuilder.WithExecutableFileName(className).Build()
 	}
 	logger.Infof("%s: Run() ...\n", pipelineId)
 	runCmd := executor.Run(ctxWithTimeout)
