@@ -31,7 +31,7 @@ func SetupBuilder(srcFilePath, baseFolderPath, execFilePath string, sdkEnv *envi
 	if err != nil {
 		return nil, err
 	}
-	prep, err := utils.GetPreparators(sdk, filePath)
+	prep, err := utils.GetPreparators(sdk, srcFilePath)
 	if err != nil {
 		return nil, err
 	}

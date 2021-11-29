@@ -42,7 +42,7 @@ func TestSetupExecutor(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	prep, err := utils.GetPreparators(sdk, filePath)
+	prep, err := utils.GetPreparators(sdk, lc.GetAbsoluteSourceFilePath())
 	if err != nil {
 		panic(err)
 	}
