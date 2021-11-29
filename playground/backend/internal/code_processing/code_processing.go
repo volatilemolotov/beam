@@ -81,7 +81,9 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 		return
 	}
 
-	// Compile
+	switch sdkEnv.ApacheBeamSdk {
+	case pb.Sdk_SDK_JAVA, pb.Sdk_SDK_GO:
+		// Compile
 	switch sdkEnv.ApacheBeamSdk {
 	case pb.Sdk_SDK_JAVA, pb.Sdk_SDK_GO:
 		logger.Infof("%s: Compile() ...\n", pipelineId)
