@@ -1,0 +1,54 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build And Deploy Playground Backend Application
+
+on:
+  push:
+    tags: 'v*'
+  pull_request:
+    paths: ['playground/backend/**']
+  workflow_dispatch:
+
+jobs:
+  deploy_examples:
+    name: Build Playground Backend App
+    runs-on: ubuntu-latest
+    env:
+      BEAM_ROOT_DIR: /home/ubuntu/beam.master
+      BEAM_EXAMPLE_CATEGORIES: playground/categories.yaml
+      SERVER_ADDRESS: https://backend-python-dot-datatokenization.uc.r.appspot.com
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.6'
+      - name: install deps
+        run: pip install -r requirements.txt
+        working-directory: playground/infrastructure
+      - name: Setup GCP account
+        run: echo ${{ secrets.GCP_ACCESS_KEY }} | base64 -d > /tmp/gcp_access.json
+        if: startsWith(github.ref, 'ref/tags/')
+      - name: run ci step
+        run: python ci_cd.py ci_step
+        working-directory: playground/infrastructure
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+      - name: run cd step
+        run: python ci_cd.py cd_step
+        working-directory: playground/infrastructure
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json

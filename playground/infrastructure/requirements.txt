@@ -22,3 +22,8 @@ protobuf==3.19.1
 pytest==6.2.5
 pytest-mock==3.6.1
 PyYAML==6.0
+google-cloud==0.34.0
+google
+google-api-python-client
+google-cloud-storage
+dataclasses
