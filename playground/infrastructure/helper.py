@@ -103,31 +103,34 @@ def get_tag(filepath):
         If file contains tag, returns tag as a map.
         If file doesn't contain tag, returns None
     """
-    add_to_yaml = False
-    yaml_string = ""
+    try:
+        add_to_yaml = False
+        yaml_string = ""
 
-    with open(filepath) as parsed_file:
-        lines = parsed_file.readlines()
+        with open(filepath) as parsed_file:
+            lines = parsed_file.readlines()
 
-    for line in lines:
-        line = line.replace("//", "").replace("#", "")
-        if add_to_yaml is False:
-            if line.lstrip() == Config.BEAM_PLAYGROUND_TITLE:
-                add_to_yaml = True
-                yaml_string += line.lstrip()
-        else:
-            yaml_with_new_string = yaml_string + line
-            try:
-                yaml.load(yaml_with_new_string, Loader=yaml.SafeLoader)
-                yaml_string += line
-            except YAMLError:
-                break
+        for line in lines:
+            line = line.replace("//", "").replace("#", "")
+            if add_to_yaml is False:
+                if line.lstrip() == Config.BEAM_PLAYGROUND_TITLE:
+                    add_to_yaml = True
+                    yaml_string += line.lstrip()
+            else:
+                yaml_with_new_string = yaml_string + line
+                try:
+                    yaml.load(yaml_with_new_string, Loader=yaml.SafeLoader)
+                    yaml_string += line
+                except YAMLError:
+                    break
 
-    if add_to_yaml:
-        tag_object = yaml.load(yaml_string, Loader=yaml.SafeLoader)
-        return tag_object[Config.BEAM_PLAYGROUND]
-
-    return None
+        if add_to_yaml:
+            tag_object = yaml.load(yaml_string, Loader=yaml.SafeLoader)
+            return tag_object[Config.BEAM_PLAYGROUND]
+        
+        return None
+    except Exception:
+        return None
 
 
 def _check_file(examples, filename, filepath, supported_categories):
@@ -151,6 +154,7 @@ def _check_file(examples, filename, filepath, supported_categories):
     has_error = False
     extension = filepath.split(os.extsep)[-1]
     if extension in Config.SUPPORTED_SDK:
+        print(filepath)
         tag = get_tag(filepath)
         if tag:
             if _validate(tag, supported_categories) is False:

@@ -27,15 +27,15 @@ jobs:
     name: Deploy examples
     runs-on: ubuntu-latest
     env:
-      BEAM_ROOT_DIR: /home/ubuntu/beam.master
-      BEAM_EXAMPLE_CATEGORIES: playground/categories.yaml
+      BEAM_ROOT_DIR: ../../
+      BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
       SERVER_ADDRESS: https://backend-python-dot-datatokenization.uc.r.appspot.com
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          python-version: '3.8'
       - name: install deps
         run: pip install -r requirements.txt
         working-directory: playground/infrastructure
@@ -43,12 +43,12 @@ jobs:
         run: echo ${{ secrets.GCP_ACCESS_KEY }} | base64 -d > /tmp/gcp_access.json
         if: startsWith(github.ref, 'ref/tags/')
       - name: run ci step
-        run: python ci_cd.py ci_step
+        run: python -c 'from ci_cd import ci_step; ci_step()' 
         working-directory: playground/infrastructure
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
       - name: run cd step
-        run: python ci_cd.py cd_step
+        run: python -c 'from ci_cd import cd_step; cd_step()' 
         working-directory: playground/infrastructure
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
