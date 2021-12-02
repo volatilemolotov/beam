@@ -24,7 +24,7 @@ on:
 
 jobs:
   deploy_examples:
-    name: Build Playground Backend App
+    name: Deploy examples
     runs-on: ubuntu-latest
     env:
       BEAM_ROOT_DIR: /home/ubuntu/beam.master
