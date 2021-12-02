@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Build And Deploy Playground Backend Application
+name: Collect And Deploy Playground Examples
 
 on:
   push:
