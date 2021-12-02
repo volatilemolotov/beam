@@ -29,7 +29,7 @@ jobs:
     env:
       BEAM_ROOT_DIR: ../../
       BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
-      SERVER_ADDRESS: https://backend-python-dot-datatokenization.uc.r.appspot.com
+      SERVER_ADDRESS: backend-python-dot-datatokenization.uc.r.appspot.com
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2

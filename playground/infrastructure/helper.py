@@ -154,7 +154,6 @@ def _check_file(examples, filename, filepath, supported_categories):
     has_error = False
     extension = filepath.split(os.extsep)[-1]
     if extension in Config.SUPPORTED_SDK:
-        print(filepath)
         tag = get_tag(filepath)
         if tag:
             if _validate(tag, supported_categories) is False:
