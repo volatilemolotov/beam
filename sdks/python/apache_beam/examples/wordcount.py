@@ -19,6 +19,12 @@
 
 # pytype: skip-file
 
+# Beam-playground:
+#   name: SUPPER NAME
+#   description: SUPPER DESCRIPTION
+#   multifile: False
+#   categories:
+#       - IO
 import argparse
 import logging
 import re
