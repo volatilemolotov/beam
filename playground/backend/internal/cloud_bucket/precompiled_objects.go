@@ -32,8 +32,9 @@ import (
 )
 
 const (
-	BucketName       = "playground-precompiled-objects"
+	BucketName       = "test_public_bucket_akvelon"
 	OutputExtension  = "output"
+	LogsExtension    = "log"
 	MetaInfoName     = "meta.info"
 	Timeout          = time.Second * 10
 	javaExtension    = "java"
@@ -116,6 +117,16 @@ func (cd *CloudStorage) GetPrecompiledObjectOutput(ctx context.Context, precompi
 	return &result, nil
 }
 
+// GetPrecompiledObjectLogs returns the logs of the example
+func (cd *CloudStorage) GetPrecompiledObjectLogs(ctx context.Context, precompiledObjectPath string) (string, error) {
+	data, err := cd.getFileFromBucket(ctx, precompiledObjectPath, LogsExtension)
+	if err != nil {
+		return "", err
+	}
+	result := string(data)
+	return result, nil
+}
+
 // GetPrecompiledObjects returns stored at the cloud storage bucket precompiled objects for the target category
 func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.Sdk, targetCategory string) (*SdkToCategories, error) {
 	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
@@ -151,6 +162,9 @@ func (cd *CloudStorage) GetPrecompiledObjects(ctx context.Context, targetSdk pb.
 		if err != nil {
 			logger.Errorf("json.Unmarshal: %v", err.Error())
 			continue
+		}
+		if precompiledObject.Type == pb.PrecompiledObjectType_PRECOMPILED_OBJECT_TYPE_UNSPECIFIED {
+			precompiledObject.Type = pb.PrecompiledObjectType_PRECOMPILED_OBJECT_TYPE_EXAMPLE
 		}
 		for _, objectCategory := range precompiledObject.Categories {
 			if targetCategory == "" || targetCategory == objectCategory { //take only requested categories

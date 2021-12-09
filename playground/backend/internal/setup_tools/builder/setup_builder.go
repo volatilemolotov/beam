@@ -31,7 +31,7 @@ const (
 )
 
 // SetupExecutorBuilder return executor with set args for validator, preparator, compiler and runner
-func SetupExecutorBuilder(srcFilePath, baseFolderPath, execFilePath, pipelineOptions string, sdkEnv *environment.BeamEnvs) (*executors.ExecutorBuilder, error) {
+func SetupExecutorBuilder(srcFilePath, baseFolderPath, execFilePath, pipelineOptions, workingDir string, sdkEnv *environment.BeamEnvs) (*executors.ExecutorBuilder, error) {
 	sdk := sdkEnv.ApacheBeamSdk
 
 	if sdk == pb.Sdk_SDK_JAVA {
@@ -65,6 +65,7 @@ func SetupExecutorBuilder(srcFilePath, baseFolderPath, execFilePath, pipelineOpt
 		WithTestRunner().
 		WithCommand(executorConfig.TestCmd).
 		WithArgs(executorConfig.TestArgs).
+		WithWorkingDir(workingDir).
 		ExecutorBuilder
 
 	switch sdk {

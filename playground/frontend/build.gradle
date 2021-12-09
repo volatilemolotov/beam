@@ -26,6 +26,7 @@ def playgroundBackendJavaRouteUrl = project.playgroundBackendJavaRouteUrl
 def playgroundBackendGoRouteUrl = project.playgroundBackendGoRouteUrl
 def playgroundBackendPythonRouteUrl = project.playgroundBackendPythonRouteUrl
 def playgroundBackendScioRouteUrl = project.playgroundBackendScioRouteUrl
+def analyticsUA = project.analyticsUA
 
 def playgroundJobServerProject = "${project.path.replace('-container', '')}"
 
@@ -171,6 +172,7 @@ const String kApiPythonClientURL =
     '${playgroundBackendPythonRouteUrl}';
 const String kApiScioClientURL =
     '${playgroundBackendScioRouteUrl}';
+const String kAnalyticsUA = '${analyticsUA}';
 """)
   }
 }

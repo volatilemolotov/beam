@@ -16,52 +16,24 @@
 package validators
 
 import (
-	"fmt"
-	"os"
 	"testing"
 )
 
-const unitTestFilePath = "unitTestCode.java"
-const filePath = "code.java"
-const unitTestCode = "@RunWith(JUnit4.class)\npublic class DeduplicateTest {\n\n  @Rule public TestPipeline p = TestPipeline.create();\n\n  @Test\n  @Category({NeedsRunner.class, UsesTestStream.class})\n  public void testInDifferentWindows() {}}"
-const code = "package org.apache.beam.sdk.transforms; \n public class Class {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World!\");\n    }\n}"
+const (
+	javaUnitTestFilePath = "unitTestCode.java"
+	javaCodePath         = "code.java"
+	javaUnitTestCode     = "@RunWith(JUnit4.class)\npublic class DeduplicateTest {\n\n  @Rule public TestPipeline p = TestPipeline.create();\n\n  @Test\n  @Category({NeedsRunner.class, UsesTestStream.class})\n  public void testInDifferentWindows() {}}"
+	javaCode             = "package org.apache.beam.sdk.transforms; \n public class Class {\n    public static void main(String[] args) {\n        System.out.println(\"Hello World!\");\n    }\n}"
+)
 
-func TestMain(m *testing.M) {
-	setup()
-	defer teardown()
-	m.Run()
-}
-
-func setup() {
-	writeFile(unitTestFilePath, unitTestCode)
-	writeFile(filePath, code)
-}
-
-func teardown() {
-	removeFile(unitTestFilePath)
-	removeFile(filePath)
-}
-
-func removeFile(path string) {
-	err := os.Remove(path)
-	if err != nil {
-		panic(fmt.Errorf("error during test teardown: %s", err.Error()))
-	}
-}
-
-func writeFile(path string, code string) {
-	err := os.WriteFile(path, []byte(code), 0600)
-	if err != nil {
-		panic(fmt.Errorf("error during test setup: %s", err.Error()))
-	}
-}
-
-func TestCheckIsUnitTests(t *testing.T) {
-	testValidatorArgs := make([]interface{}, 1)
+func TestCheckPipelineType(t *testing.T) {
+	testValidatorArgs := make([]interface{}, 3)
 	testValidatorArgs[0] = unitTestFilePath
+	testValidatorArgs[2] = javaUnitTestPattern
 
-	validatorArgs := make([]interface{}, 1)
+	validatorArgs := make([]interface{}, 3)
 	validatorArgs[0] = filePath
+	validatorArgs[2] = javaUnitTestPattern
 
 	type args struct {
 		args []interface{}
@@ -93,13 +65,13 @@ func TestCheckIsUnitTests(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CheckIsUnitTests(tt.args.args...)
+			got, err := CheckPipelineType(tt.args.args...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("CheckIsUnitTests() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("CheckPipelineType() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("CheckIsUnitTests() got = %v, want %v", got, tt.want)
+				t.Errorf("CheckPipelineType() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

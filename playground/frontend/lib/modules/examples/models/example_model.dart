@@ -45,6 +45,7 @@ class ExampleModel {
   final String description;
   String? source;
   String? outputs;
+  String? logs;
   String? pipelineOptions;
 
   ExampleModel({
@@ -54,6 +55,7 @@ class ExampleModel {
     required this.type,
     this.source,
     this.outputs,
+    this.logs,
     this.pipelineOptions,
   });
 
@@ -64,4 +66,20 @@ class ExampleModel {
   setOutputs(String outputs) {
     this.outputs = outputs;
   }
+
+  setLogs(String logs) {
+    this.logs = logs;
+  }
+
+  @override
+  String toString() {
+    return 'ExampleModel{type: $type, name: $name, path: $path, description: $description, source: $source, outputs: $outputs, logs: $logs, pipelineOptions: $pipelineOptions}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is ExampleModel && path == other.path;
+
+  @override
+  int get hashCode => path.hashCode;
 }
