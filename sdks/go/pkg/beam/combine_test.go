@@ -13,6 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// beam-playground:
+//  name: Combine Test
+//  description: combine unit-test  for go code
+//  multifile: false
+//  pipeline_options:
+//  categories:
+//    - Transforms
+
 package beam_test
 
 import (

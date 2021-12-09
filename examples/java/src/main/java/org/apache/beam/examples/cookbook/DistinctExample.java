@@ -27,6 +27,15 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Distinct;
 
+// beam-playground:
+//   name: DistinctExample
+//   description: An example that uses Shakespeare's plays as plain text files, and removes duplicate lines across all the files.
+//   multifile: false
+//   pipeline_options: --output outputtxt
+//   categories:
+//     - IO
+//     - Options
+
 /**
  * This example uses as input Shakespeare's plays as plaintext files, and will remove any duplicate
  * lines across all the files. (The output does not preserve any input order).
@@ -58,7 +67,7 @@ public class DistinctExample {
    */
   public interface Options extends PipelineOptions {
     @Description("Path to the directory or GCS prefix containing files to read from")
-    @Default.String("gs://apache-beam-samples/shakespeare/*")
+    @Default.String("gs://apache-beam-samples/shakespeare/kinglear.txt")
     String getInput();
 
     void setInput(String value);
