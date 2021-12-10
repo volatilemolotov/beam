@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: CombineFn
-#   description: Task from katas to implement the average of numbers using.
+#   description: Task from katas averaging.
 #   multifile: false
 #   pipeline_options:
 #   categories:

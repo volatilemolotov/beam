@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: Filter
-#   description: Task from katas to implements a filter function that filters out the odd numbers.
+#   description: Task from katas to implement a filter function that filters out odd numbers.
 #   multifile: false
 #   pipeline_options:
 #   categories:

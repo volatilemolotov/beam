@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: AggregationSmallest
-#   description: Task from katas to compute the smallest of the elements from an input.
+#   description: Task from katas to compute the smallest of elements.
 #   multifile: false
 #   pipeline_options:
 #   categories:

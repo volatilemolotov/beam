@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: Flatten
-#   description: Task from katas that merges two PCollection of words into a single PCollection.
+#   description: Task from katas that merges two PCollections of words into a single PCollection.
 #   multifile: false
 #   pipeline_options:
 #   categories:

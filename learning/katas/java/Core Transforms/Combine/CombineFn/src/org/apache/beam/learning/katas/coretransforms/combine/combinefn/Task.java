@@ -20,7 +20,7 @@ package org.apache.beam.learning.katas.coretransforms.combine.combinefn;
 
 // beam-playground:
 //   name: CombineFn
-//   description: Task from katas to implements the average of numbers.
+//   description: Task from katas averaging.
 //   multifile: false
 //   pipeline_options:
 //   categories:

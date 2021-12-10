@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: AggregationLargest
-#   description: Task from katas to compute a list of the two largest elements from an input.
+#   description: Task from katas to compute a list of the two largest elements.
 #   multifile: false
 #   pipeline_options:
 #   categories:

@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: CombineSimpleFunction
-#   description: Task from katas to implements the summation of numbers.
+#   description: Task from katas to implement the summation of numbers.
 #   multifile: false
 #   pipeline_options:
 #   categories:

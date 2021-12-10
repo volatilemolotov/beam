@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: AggregationCount
-#   description: Task from katas to count the number of elements from an input.
+#   description: Task from katas to count the number of elements.
 #   multifile: false
 #   pipeline_options:
 #   categories:

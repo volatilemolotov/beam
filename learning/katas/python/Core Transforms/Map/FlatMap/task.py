@@ -17,7 +17,7 @@
 # beam-playground:
 #   name: FlatMap
 #   description: Task from katas to implement a function that maps each input sentence
-#       into words tokenized by whitespace (" ").
+#       into splitted whitespace (" ").
 #   multifile: false
 #   pipeline_options:
 #   categories:

@@ -16,7 +16,7 @@
 
 # beam-playground:
 #   name: MapParDoOneToMany
-#   description: Task from katas is a ParDo that maps each input sentence into words tokenized by whitespace (" ").
+#   description: Task from katas is a ParDo that maps each input sentence into splitted whitespace (" ").
 #   multifile: false
 #   pipeline_options:
 #   categories:

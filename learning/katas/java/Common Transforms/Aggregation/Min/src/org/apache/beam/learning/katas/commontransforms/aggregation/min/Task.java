@@ -20,7 +20,7 @@ package org.apache.beam.learning.katas.commontransforms.aggregation.min;
 
 // beam-playground:
 //   name: AggregationMin
-//   description: Task from katas to compute the minimum of the elements from an input.
+//   description: Task from katas to compute the minimum of elements.
 //   multifile: false
 //   pipeline_options:
 //   categories:

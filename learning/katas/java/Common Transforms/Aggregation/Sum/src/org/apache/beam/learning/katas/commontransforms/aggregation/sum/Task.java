@@ -20,7 +20,7 @@ package org.apache.beam.learning.katas.commontransforms.aggregation.sum;
 
 // beam-playground:
 //   name: AggregationSum
-//   description: Task from katas to compute the sum of all elements from an input.
+//   description: Task from katas to compute the sum of all elements.
 //   multifile: false
 //   pipeline_options:
 //   categories:
