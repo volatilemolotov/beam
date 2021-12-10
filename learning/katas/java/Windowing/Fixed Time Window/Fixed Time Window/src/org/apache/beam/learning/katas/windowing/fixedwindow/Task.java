@@ -24,6 +24,7 @@ package org.apache.beam.learning.katas.windowing.fixedwindow;
 //   multifile: false
 //   pipeline_options:
 //   categories:
+//     - Combiners
 //     - Testing
 
 import org.apache.beam.learning.katas.util.Log;

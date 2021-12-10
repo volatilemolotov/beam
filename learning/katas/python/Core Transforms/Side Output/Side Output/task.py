@@ -22,6 +22,7 @@
 #   categories:
 #     - Combiners
 #     - Testing
+#     - Multiple Outputs
 
 import apache_beam as beam
 from apache_beam import pvalue
