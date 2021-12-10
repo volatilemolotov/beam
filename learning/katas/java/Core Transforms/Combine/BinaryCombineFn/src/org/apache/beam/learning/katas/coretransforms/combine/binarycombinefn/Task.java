@@ -18,6 +18,15 @@
 
 package org.apache.beam.learning.katas.coretransforms.combine.binarycombinefn;
 
+// beam-playground:
+//   name: BinaryCombineFn
+//   description: Task from katas to implements the summation of BigInteger.
+//   multifile: false
+//   pipeline_options:
+//   categories:
+//     - Combiners
+//     - Testing
+
 import java.math.BigInteger;
 import org.apache.beam.learning.katas.util.Log;
 import org.apache.beam.sdk.Pipeline;
