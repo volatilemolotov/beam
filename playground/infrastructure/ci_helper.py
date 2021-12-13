@@ -64,28 +64,31 @@ class CIHelper:
     """
     client = GRPCClient()
     verify_failed = False
+    c = 0
     for example in examples:
       if example.status not in Config.ERROR_STATUSES:
+        c +=1
         continue
       if example.status == STATUS_VALIDATION_ERROR:
-        logging.error("Example: %s has validation error", example.pipeline_id)
+        logging.error("Example: %s has validation error", example.filepath)
       elif example.status == STATUS_PREPARATION_ERROR:
-        logging.error("Example: %s has preparation error", example.pipeline_id)
+        logging.error("Example: %s has preparation error", example.filepath)
       elif example.status == STATUS_ERROR:
         logging.error(
             "Example: %s has error during setup run builder",
             example.pipeline_id)
       elif example.status == STATUS_RUN_TIMEOUT:
         logging.error(
-            "Example: %s failed because of timeout", example.pipeline_id)
+            "Example: %s failed because of timeout", example.filepath)
       elif example.status == STATUS_COMPILE_ERROR:
         err = await client.get_compile_output(example.pipeline_id)
         logging.error(
-            "Example: %s has compilation error: %s", example.pipeline_id, err)
+            "Example: %s has compilation error: %s", example.filepath, err)
       elif example.status == STATUS_RUN_ERROR:
         err = await client.get_run_error(example.pipeline_id)
         logging.error(
-            "Example: %s has execution error: %s", example.pipeline_id, err)
+            "Example: %s has execution error: %s", example.filepath, err)
       verify_failed = True
+    logging.info(f"Success examples: {c}")
     if verify_failed:
       raise Exception("CI step failed due to errors in the examples")

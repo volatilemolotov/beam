@@ -36,7 +36,7 @@ parser.add_argument(
     dest="step",
     required=True,
     help="CI step to verify all beam examples/tests/katas. CD step to save all "
-    "beam examples/tests/katas and their outputs on the GCS",
+         "beam examples/tests/katas and their outputs on the GCS",
     choices=[config.Config.CI_STEP_NAME, config.Config.CD_STEP_NAME])
 parser.add_argument(
     "--sdk",
@@ -50,46 +50,50 @@ categories_file = os.getenv("BEAM_EXAMPLE_CATEGORIES")
 
 
 def _ci_step(examples: List[Example]):
-  """
-  CI step to verify all beam examples/tests/katas
-  """
+    """
+    CI step to verify all beam examples/tests/katas
+    """
 
-  ci_helper = CIHelper()
-  asyncio.run(ci_helper.verify_examples(examples))
+    ci_helper = CIHelper()
+    asyncio.run(ci_helper.verify_examples(examples))
 
 
 def _cd_step(examples: List[Example]):
-  """
-  CD step to save all beam examples/tests/katas and their outputs on the GCS
-  """
-  cd_helper = CDHelper()
-  cd_helper.store_examples(examples)
+    """
+    CD step to save all beam examples/tests/katas and their outputs on the GCS
+    """
+    cd_helper = CDHelper()
+    cd_helper.store_examples(examples)
 
 
 def _check_envs():
-  if root_dir is None:
-    raise KeyError(
-        "BEAM_ROOT_DIR environment variable should be specified in os")
-  if categories_file is None:
-    raise KeyError(
-        "BEAM_EXAMPLE_CATEGORIES environment variable should be specified in os"
-    )
+    if root_dir is None:
+        raise KeyError(
+            "BEAM_ROOT_DIR environment variable should be specified in os")
+    if categories_file is None:
+        raise KeyError(
+            "BEAM_EXAMPLE_CATEGORIES environment variable should be specified in os"
+        )
 
 
 def _run_ci_cd(step: config.Config.CI_CD_LITERAL, sdk: Sdk):
-  supported_categories = get_supported_categories(categories_file)
-  examples = find_examples(root_dir, supported_categories, sdk)
-  log = logging.getLogger()
-  log.info(f"found {len(examples)} objects")
-  log.info(f"Examples: {[example.filepath for example in examples]}")
-  if step == config.Config.CI_STEP_NAME:
-    _ci_step(examples=examples)
-  if step == config.Config.CD_STEP_NAME:
-    _cd_step(examples=examples)
+    supported_categories = get_supported_categories(categories_file)
+    examples = find_examples(root_dir, supported_categories, sdk)
+    log = logging.getLogger()
+    log.info(f"found {len(examples)} objects")
+    log.info(f"Examples: {[example.filepath for example in examples]}")
+    i = 1
+    for ex in examples:
+        log.info(f"{i} : {ex.filepath}")
+        i += 1
+    if step == config.Config.CI_STEP_NAME:
+        _ci_step(examples=examples)
+    if step == config.Config.CD_STEP_NAME:
+        _cd_step(examples=examples)
 
 
 if __name__ == "__main__":
-  parser = parser.parse_args()
-  _check_envs()
-  setup_logger()
-  _run_ci_cd(parser.step, Sdk.Value(parser.sdk))
+    parser = parser.parse_args()
+    _check_envs()
+    setup_logger()
+    _run_ci_cd(parser.step, Sdk.Value(parser.sdk))

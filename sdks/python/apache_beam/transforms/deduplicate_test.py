@@ -23,7 +23,6 @@
 #  multifile: false
 #  pipeline_options:
 #  categories:
-#    - Transforms
 
 """Unit tests for deduplicate transform by using TestStream."""
 
