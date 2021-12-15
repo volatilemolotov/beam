@@ -25,8 +25,13 @@ import 'package:provider/provider.dart';
 
 class ExpansionPanelItem extends StatelessWidget {
   final ExampleModel example;
+  final ExampleModel selectedExample;
 
-  const ExpansionPanelItem({Key? key, required this.example}) : super(key: key);
+  const ExpansionPanelItem({
+    Key? key,
+    required this.example,
+    required this.selectedExample,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +55,12 @@ class ExpansionPanelItem extends StatelessWidget {
             child: Row(
               children: [
                 // Wrapped with Row for better user interaction and positioning
-                Text(example.name),
+                Text(
+                  example.name,
+                  style: example == selectedExample
+                      ? const TextStyle(fontWeight: FontWeight.bold)
+                      : const TextStyle(),
+                ),
               ],
             ),
           ),
