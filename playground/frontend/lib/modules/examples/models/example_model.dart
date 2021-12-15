@@ -45,6 +45,7 @@ class ExampleModel {
   final String description;
   String? source;
   String? outputs;
+  String? logs;
   String? pipelineOptions;
 
   ExampleModel({
@@ -54,6 +55,7 @@ class ExampleModel {
     required this.type,
     this.source,
     this.outputs,
+    this.logs,
     this.pipelineOptions,
   });
 
@@ -71,4 +73,8 @@ class ExampleModel {
 
   @override
   int get hashCode => path.hashCode;
+
+  setLogs(String logs) {
+    this.logs = logs;
+  }
 }
