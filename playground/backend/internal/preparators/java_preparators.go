@@ -17,12 +17,14 @@ package preparators
 
 import (
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/validators"
 	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 const (
@@ -37,15 +39,41 @@ const (
 
 // GetJavaPreparators returns preparation methods that should be applied to Java code
 func GetJavaPreparators(filePath string) *[]Preparator {
-	publicClassModification := Preparator{
+	removePublicClassPreparator := Preparator{
 		Prepare: replace,
 		Args:    []interface{}{filePath, classWithPublicModifierPattern, classWithoutPublicModifierPattern},
 	}
-	additionalPackage := Preparator{
-		Prepare: replace,
+	changePackagePreparator := Preparator{
+		Prepare: changePackage,
 		Args:    []interface{}{filePath, packagePattern, importStringPattern},
 	}
-	return &[]Preparator{publicClassModification, additionalPackage}
+	removePackagePreparator := Preparator{
+		Prepare: removePackage,
+		Args:    []interface{}{filePath, packagePattern, newLinePattern},
+	}
+	return &[]Preparator{removePublicClassPreparator, changePackagePreparator, removePackagePreparator}
+}
+
+//changePackage changes the 'package' to 'import' and the last directory in the package value to '*'
+func changePackage(args ...interface{}) error {
+	validationResults := args[3].(*sync.Map)
+	isKata, ok := validationResults.Load(validators.KatasValidatorName)
+	if ok && isKata.(bool) {
+		return nil
+	}
+	err := replace(args...)
+	return err
+}
+
+//removePackage remove the package line in the katas.
+func removePackage(args ...interface{}) error {
+	validationResults := args[3].(*sync.Map)
+	isKata, ok := validationResults.Load(validators.KatasValidatorName)
+	if ok && isKata.(bool) {
+		err := replace(args...)
+		return err
+	}
+	return nil
 }
 
 // replace processes file by filePath and replaces all patterns to newPattern
