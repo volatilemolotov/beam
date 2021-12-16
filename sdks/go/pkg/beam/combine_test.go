@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// beam-playground:
+// beam-playground1:
 //  name: Combine Test
 //  description: combine unit-test  for go code
 //  multifile: false

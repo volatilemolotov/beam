@@ -17,11 +17,12 @@ package fs_tool
 
 import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"io"
 	"io/fs"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -115,6 +116,8 @@ func (l *LifeCycle) GetAbsoluteSourceFilePath() string {
 	return absoluteFilePath
 }
 
+const mvCp = "cp"
+
 // CopyFile copies a file with fileName from sourceDir to destinationDir.
 func (l *LifeCycle) CopyFile(fileName, sourceDir, destinationDir string) error {
 	absSourcePath := filepath.Join(sourceDir, fileName)
@@ -128,21 +131,12 @@ func (l *LifeCycle) CopyFile(fileName, sourceDir, destinationDir string) error {
 		return fmt.Errorf("%s is not a regular file", fileName)
 	}
 
-	sourceFile, err := os.Open(absSourcePath)
+	cmd := exec.Command(mvCp, absSourcePath, absDestinationPath)
+	stdout, err := cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return errors.New(string(stdout))
 	}
-	defer sourceFile.Close()
 
-	destinationFile, err := os.Create(absDestinationPath)
-	if err != nil {
-		return err
-	}
-	defer destinationFile.Close()
-	_, err = io.Copy(destinationFile, sourceFile)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 

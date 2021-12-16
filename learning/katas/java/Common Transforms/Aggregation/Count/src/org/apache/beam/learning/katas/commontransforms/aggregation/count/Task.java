@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-// beam-playground:
+// beam-playground1:
 //   name: Count
 //   description: An kata count the number of elements from an input.
 //   multifile: false
@@ -25,15 +25,6 @@
 //    - Transforms
 
 package org.apache.beam.learning.katas.commontransforms.aggregation.count;
-
-// beam-playground:
-//   name: AggregationCount
-//   description: Task from katas to count the number of elements.
-//   multifile: false
-//   pipeline_options:
-//   categories:
-//     - Combiners
-//     - Testing
 
 import org.apache.beam.learning.katas.util.Log;
 import org.apache.beam.sdk.Pipeline;

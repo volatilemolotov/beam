@@ -17,12 +17,13 @@
 
 # pytype: skip-file
 
-# beam-playground:
+# beam-playground1:
 #  name: Deduplicate Test
 #  description: Unit tests for deduplicate transform by using TestStream
 #  multifile: false
 #  pipeline_options:
 #  categories:
+#    - Transforms
 
 """Unit tests for deduplicate transform by using TestStream."""
 

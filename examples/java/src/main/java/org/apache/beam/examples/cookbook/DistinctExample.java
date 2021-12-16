@@ -17,16 +17,6 @@
  */
 package org.apache.beam.examples.cookbook;
 
-/* beam-playground:
- *   name: DistinctExample
- *   description: An example that uses Shakespeare's plays as plain text files, and removes duplicate lines across all the files.
- *   multifile: false
- *   pipeline_options: --output output.txt
- *   categories:
- *     - IO
- *     - Options
- */
-
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.extensions.gcp.util.gcsfs.GcsPath;
 import org.apache.beam.sdk.io.TextIO;
@@ -37,7 +27,7 @@ import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Distinct;
 
-// beam-playground:
+// beam-playground1:
 //   name: DistinctExample
 //   description: An example that uses Shakespeare's plays as plain text files, and removes duplicate lines across all the files.
 //   multifile: false

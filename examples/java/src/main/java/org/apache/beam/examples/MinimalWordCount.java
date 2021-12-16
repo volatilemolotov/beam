@@ -38,12 +38,13 @@ import org.apache.beam.sdk.transforms.FlatMapElements;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.TypeDescriptors;
+import java.time.*;
 
 // beam-playground:
 //   name: MinimalWordCount
 //   description: An example that counts words in Shakespeare/kinglear.txt and includes Beam best practices.
 //   multifile: false
-//   pipeline_options:
+//   pipeline_options: --targetParallelism 8
 //   categories:
 //     - IO
 
@@ -76,12 +77,14 @@ import org.apache.beam.sdk.values.TypeDescriptors;
 public class MinimalWordCount {
 
   public static void main(String[] args) {
+     Instant start = Instant.now();
+
 
     // Create a PipelineOptions object. This object lets us set various execution
     // options for our pipeline, such as the runner you wish to use. This example
     // will run with the DirectRunner by default, based on the class path configured
     // in its dependencies.
-    PipelineOptions options = PipelineOptionsFactory.create();
+    PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
 
     // In order to run your pipeline, you need to make following runner specific changes:
     //
@@ -135,5 +138,9 @@ public class MinimalWordCount {
         .apply(TextIO.write().to("wordcounts"));
 
     p.run().waitUntilFinish();
+     // time passes
+ Instant end = Instant.now();
+ Duration timeElapsed = Duration.between(start, end);
+ System.out.println(timeElapsed);
   }
 }
