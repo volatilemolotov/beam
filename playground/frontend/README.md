@@ -32,15 +32,21 @@ Apache Beam project.
 
 ## Getting Started
 
+### Run
+
 See [playground/README.md](../README.md) for details on requirements and setup.
 
 The following command is used to build and serve the website locally:
 
 `$ flutter run`
 
+### Build
+
 Run the following command to generate a release build:
 
-`$flutter build web`
+`$ flutter build web`
+
+### Tests
 
 Playground tests may be run using next commands:
 
@@ -48,8 +54,34 @@ Playground tests may be run using next commands:
 
 `$ flutter test`
 
-Dart code should follow next [code style](https://dart-lang.github.io/linter/lints/index.html). Code may be analyzed using this command:
+### Code style
+
+Dart code should follow next [code style](https://dart-lang.github.io/linter/lints/index.html). Code
+may be analyzed using this command:
 
 `$ flutter analyze`
 
+Code can be automatically reformatted using:
+
+`$ flutter format ./lib`
+
+### Configuration
+
+The app could be configured using gradle task (e.g. api url)
+
+```
+cd beam
+./gradlew :playground:frontend:createConfig
+```
+
+For more information see See [CONTRIBUTE.md](CONTRIBUTE.md)
+
+### Additional
+
 The full list of command can be found [here](https://flutter.dev/docs/reference/flutter-cli)
+
+## Contribution guide
+
+If you'd like to contribute to the Apache Beam Playground website, read
+our [contribution guide](CONTRIBUTE.md) where you can find detailed instructions on how to work with
+the website.
