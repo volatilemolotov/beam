@@ -320,6 +320,8 @@ Note that the `run` method is asynchronous. For a blocking execution, call the
 returned by the call to `run`.
 {{< /paragraph >}}
 
+{{< playground "SDK_JAVA/MinimalWordCount" >}}
+
 ## WordCount example
 
 This WordCount example introduces a few recommended programming practices that
