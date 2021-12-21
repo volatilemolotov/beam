@@ -18,7 +18,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:playground/constants/assets.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/pages/playground/components/feedback/feedback_dropdown_icon_button.dart';
@@ -35,11 +34,11 @@ class PlaygroundFeedback extends StatelessWidget {
           AppLocalizations.of(context)!.enjoyingPlayground,
           style: const TextStyle(fontWeight: kBoldWeight),
         ),
-        FeedbackDropdownIconButton(
+        const FeedbackDropdownIconButton(
           iconAsset: kThumbUpIconAsset,
           isEnjoying: true,
         ),
-        FeedbackDropdownIconButton(
+        const FeedbackDropdownIconButton(
           iconAsset: kThumbDownIconAsset,
           isEnjoying: false,
         ),
