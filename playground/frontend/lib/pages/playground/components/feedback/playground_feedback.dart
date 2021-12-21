@@ -17,11 +17,11 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:playground/constants/assets.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/pages/playground/components/feedback/feedback_dropdown_icon_button.dart';
-
-const kFeedbackText = 'Enjoying Playground?';
 
 class PlaygroundFeedback extends StatelessWidget {
   const PlaygroundFeedback({Key? key}) : super(key: key);
@@ -30,10 +30,10 @@ class PlaygroundFeedback extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: const [
+      children: [
         Text(
-          kFeedbackText,
-          style: TextStyle(fontWeight: kBoldWeight),
+          AppLocalizations.of(context)!.enjoyingPlayground,
+          style: const TextStyle(fontWeight: kBoldWeight),
         ),
         FeedbackDropdownIconButton(
           iconAsset: kThumbUpIconAsset,
