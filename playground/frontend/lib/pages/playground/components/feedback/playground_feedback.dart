@@ -34,17 +34,17 @@ class PlaygroundFeedback extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Text(
+        Text(
           AppLocalizations.of(context)!.enjoyingPlayground,
           style: const TextStyle(fontWeight: kBoldWeight),
         ),
-        const FeedbackDropdownIconButton(
+        FeedbackDropdownIconButton(
           iconAsset: kThumbUpIconAsset,
           filledIconAsset: kThumbUpIconAssetFilled,
           onClick: _setEnjoying(context, true),
           isSelected: isEnjoying != null && isEnjoying,
         ),
-        const FeedbackDropdownIconButton(
+        FeedbackDropdownIconButton(
           iconAsset: kThumbDownIconAsset,
           filledIconAsset: kThumbDownIconAssetFilled,
           onClick: _setEnjoying(context, false),
