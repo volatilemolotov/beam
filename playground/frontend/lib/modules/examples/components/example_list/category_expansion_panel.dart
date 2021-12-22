@@ -27,12 +27,16 @@ import 'package:playground/modules/examples/models/example_model.dart';
 class CategoryExpansionPanel extends StatelessWidget {
   final String categoryName;
   final List examples;
+  final AnimationController animationController;
+  final OverlayEntry? dropdown;
   final ExampleModel selectedExample;
 
   const CategoryExpansionPanel({
     Key? key,
     required this.categoryName,
     required this.examples,
+    required this.animationController,
+    required this.dropdown,
     required this.selectedExample,
   }) : super(key: key);
 
@@ -76,6 +80,8 @@ class CategoryExpansionPanel extends StatelessWidget {
       items.add(
         ExpansionPanelItem(
           example: example,
+          animationController: animationController,
+          dropdown: dropdown,
           selectedExample: selectedExample,
         ),
       );
