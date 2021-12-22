@@ -80,7 +80,7 @@ class GrpcExampleClient implements ExampleClient {
   @override
   Future<OutputResponse> getExampleLogs(GetExampleRequestWrapper request) {
     return _runSafely(
-      () => createClient(request.sdk)
+      () => _defaultClient
           .getPrecompiledObjectLogs(_getExampleLogRequestToGrpcRequest(request))
           .then((response) =>
               OutputResponse(replaceIncorrectSymbols(response.output)))
