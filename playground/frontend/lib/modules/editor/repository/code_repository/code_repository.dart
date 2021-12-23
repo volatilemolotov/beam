@@ -148,7 +148,7 @@ class CodeRepository {
           log: prevLog + log.output,
         );
       default:
-        return RunCodeResult(status: status);
+        return RunCodeResult(status: status, log: prevLog);
     }
   }
 }

@@ -155,6 +155,7 @@ class PlaygroundState with ChangeNotifier {
     _result = RunCodeResult(
       status: RunCodeStatus.finished,
       output: _selectedExample!.outputs,
+      log: _selectedExample!.logs,
     );
     notifyListeners();
   }
