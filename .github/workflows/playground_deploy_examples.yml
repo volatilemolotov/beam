@@ -18,6 +18,7 @@ name: Collect And Deploy Playground Examples
 on:
   push:
     tags: 'v*'
+    branch: 'beta-version'
   workflow_dispatch:
 
 jobs:
