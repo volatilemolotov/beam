@@ -78,6 +78,11 @@ class ExampleModel with Comparable<ExampleModel> {
   @override
   int get hashCode => path.hashCode;
 
+  bool isInfoFetched() {
+    // checking only source, because outputs/logs can be empty
+    return source?.isNotEmpty ?? false;
+  }
+
   @override
   int compareTo(ExampleModel other) {
     return name.toLowerCase().compareTo(other.name.toLowerCase());

@@ -18,25 +18,45 @@
 #
 
 resource "google_app_engine_flexible_app_version" "backend_app" {
-  version_id = "v1"
-  project    = "${var.project_id}"
-  service    = "backend"
-  runtime    = "custom"
+  version_id     = "v1"
+  project        = "${var.project_id}"
+  service        = "${var.service_name}"
+  runtime        = "custom"
+  
+#  instance_class = "F4"
 
+ 
+ 
  liveness_check {
-    path = ""
+    path              = "/liveness"
+    initial_delay     = "40s" 
   }
 
   readiness_check {
-    path = ""
+    path = "/readiness"
   }
 
-  manual_scaling {
-    instances = 1
+  automatic_scaling {
+    max_total_instances = 7
+    min_total_instances = 2
+    cool_down_period    = "120s"
+    cpu_utilization {
+      target_utilization = 0.7
+    }
   }
+
+  env_variables = {
+     CACHE_TYPE="${var.cache_type}"
+     CACHE_ADDRESS="${var.cache_address}:6379"
+     NUM_PARALLEL_JOBS=10
+  }
+#  manual_scaling {
+#    instances = 2
+#  }
 
   resources {
-    memory_gb = var.memory_size
+    memory_gb = 16
+    cpu = 8
     volumes {
       name        = "inmemory"
       size_gb     = var.volume_size

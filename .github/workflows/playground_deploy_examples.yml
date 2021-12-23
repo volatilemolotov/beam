@@ -18,6 +18,7 @@ name: Collect And Deploy Playground Examples
 on:
   push:
     tags: 'v*'
+    branch: 'beta-version'
   workflow_dispatch:
 
 jobs:
@@ -61,26 +62,28 @@ jobs:
              echo "${{ secrets.GCP_ACCESS_KEY }}" | base64 -d > /tmp/gcp_access.json
              gcloud auth activate-service-account --project=datatokenization --key-file=/tmp/gcp_access.json
       - name: Get K8s Config
-        run: gcloud container clusters get-credentials --region     us-central1-a playground-examples
-      - name: Login to Docker Registry
-        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.REGISTRY_NAME }}
-      - name: Build And Push Java Backend
-        run: ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.REGISTRY_NAME}}/${{ secrets.PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag="$GITHUB_SHA"
-      - name: Build And Push Go Backend
-        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.REGISTRY_NAME}}/${{ secrets.PROJECT_ID }}/playground-repository' -Pdocker-tag="$GITHUB_SHA"
-      - name: Build And Push Python Backend
-        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.REGISTRY_NAME}}/${{ secrets.PROJECT_ID }}/playground-repository' -Pdocker-tag="$GITHUB_SHA"
-      - name: Install helm chart
-        run: |
-             kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f - &&\
-             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.REGISTRY_NAME }}/${{ secrets.PROJECT_ID }}/playground-repository" --set global.tag="$GITHUB_SHA" &&\
-             sleep 120
-        working-directory: playground/infrastructure/helm
+        run: mkdir ~/.kube && cp config ~/.kube && which gcloud && kubectl get pods -A
+#        run: gcloud container clusters get-credentials --region     us-central1-a playground-examples
+#      - name: Login to Docker Registry
+#        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.REGISTRY_NAME }}
+#      - name: Build And Push Java Backend
+#        run: ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.REGISTRY_NAME}}/${{ secrets.PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag="$GITHUB_SHA"
+#      - name: Build And Push Go Backend
+#        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.REGISTRY_NAME}}/${{ secrets.PROJECT_ID }}/playground-repository' -Pdocker-tag="$GITHUB_SHA"
+#      - name: Build And Push Python Backend
+#        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.REGISTRY_NAME}}/${{ secrets.PROJECT_ID }}/playground-repository' -Pdocker-tag="$GITHUB_SHA"
+#      - name: Install helm chart
+#        run: |
+#             kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f - &&\
+#             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.REGISTRY_NAME }}/${{ secrets.PROJECT_ID }}/playground-repository" --set global.tag="$GITHUB_SHA" &&\
+#             sleep 120
+#        working-directory: playground/infrastructure/helm
       - name: Run Python Examples CI
         run: |
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-python" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
              BEAM_ROOT_DIR="../../"
              BEAM_EXAMPLE_CATEGORIES="../../playground/categories.yaml"
+             echo $K8S_SERVER_ADDRESS
              export SERVER_ADDRESS="$K8S_SERVER_ADDRESS:8081" && python3 ci_cd.py --step CI --sdk SDK_PYTHON
         working-directory: playground/infrastructure
       - name: Run Python Examples CD
