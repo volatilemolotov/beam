@@ -62,14 +62,13 @@ class ExampleState with ChangeNotifier {
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {
-    final exampleData = await Future.wait([
-      getExampleSource(example.path, sdk),
-      getExampleOutput(example.path, sdk),
-      getExampleLogs(example.path, sdk)
-    ]);
-    example.setSource(exampleData[0]);
-    example.setOutputs(exampleData[1]);
-    example.setLogs(exampleData[2]);
+    if (example.isInfoFetched()) {
+      return example;
+    }
+    String source = await getExampleSource(example.path, sdk);
+    example.setSource(source);
+    final outputs = await getExampleOutput(example.path, sdk);
+    example.setOutputs(outputs);
     return example;
   }
 
