@@ -31,12 +31,13 @@ func listenHttp(ctx context.Context, errChan chan error, envs *environment.Envir
 	mux.Handle("/", handler)
 	mux.HandleFunc("/readiness", utils.GetReadinessFunction(envs))
 
+	mux.Handle("/", handler)
+	mux.HandleFunc("/liveness", utils.GetLivenessFunction())
+
+	logger.Infof("listening HTTP at %s\n", address)
+
 	if err := http.ListenAndServe(address, mux); err != nil {
 		errChan <- err
-		return
-	}
-	for {
-		<-ctx.Done()
 		return
 	}
 }

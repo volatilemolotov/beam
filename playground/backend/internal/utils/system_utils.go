@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"net/http"
 	"reflect"
 	"runtime"
 	"strings"
@@ -71,4 +72,11 @@ func checkNumOfTheParallelJobs(workingDir string, numOfParallelJobs int) bool {
 		return false
 	}
 	return true
+}
+
+// GetLivenessFunction returns the function that checks the liveness of the server
+func GetLivenessFunction() func(writer http.ResponseWriter, request *http.Request) {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		writer.WriteHeader(http.StatusOK)
+	}
 }
