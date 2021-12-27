@@ -52,14 +52,14 @@ class RunButton extends StatelessWidget {
         label: StreamBuilder(
             stream: Provider.of<PlaygroundState>(context).executionTime,
             builder: (context, AsyncSnapshot<int> state) {
-              final runText = AppLocalizations.of(context)!.run
+              final runText = AppLocalizations.of(context)!.run;
               final seconds = (state.data ?? 0) / kMsToSec;
               if (seconds > 0) {
                 return Text(
                   '$runText (${seconds.toStringAsFixed(kSecondsFractions)} s)',
                 );
               }
-              return const Text(runText);
+              return Text(runText);
             }),
         onPressed: !isRunning ? runCode : null,
       ),
