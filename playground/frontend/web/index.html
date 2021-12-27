@@ -68,7 +68,7 @@
     const isSafari = userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') <= -1;
     const useHtml = isSafari;
     if(useHtml) {
-      window.flutterWebRenderer = html';
+      window.flutterWebRenderer = 'html';
     } else {
       window.flutterWebRenderer = 'canvaskit';
     }
