@@ -47,11 +47,12 @@ class OutputTabs extends StatelessWidget {
               isSelected: tabController.index == 1,
               value: state.result?.log ?? '',
             ),
-            OutputTab(
-              name: appLocale.graph,
-              isSelected: tabController.index == 2,
-              value: '',
-            ),
+            // Not supported yet
+            // OutputTab(
+            //   name: appLocale.graph,
+            //   isSelected: tabController.index == 2,
+            //   value: '',
+            // ),
           ],
         ),
       );
