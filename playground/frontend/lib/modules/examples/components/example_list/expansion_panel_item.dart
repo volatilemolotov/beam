@@ -29,7 +29,6 @@ class ExpansionPanelItem extends StatelessWidget {
   final ExampleModel selectedExample;
   final AnimationController animationController;
   final OverlayEntry? dropdown;
-  final ExampleModel selectedExample;
 
   const ExpansionPanelItem({
     Key? key,
@@ -37,7 +36,6 @@ class ExpansionPanelItem extends StatelessWidget {
     required this.selectedExample,
     required this.animationController,
     required this.dropdown,
-    required this.selectedExample,
   }) : super(key: key);
 
   @override

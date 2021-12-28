@@ -34,7 +34,6 @@ class ExampleList extends StatelessWidget {
     required this.selectedExample,
     required this.animationController,
     required this.dropdown,
-    required this.selectedExample,
   }) : super(key: key);
 
   @override

@@ -71,13 +71,6 @@ class ExampleModel with Comparable<ExampleModel> {
     this.logs = logs;
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) || other is ExampleModel && path == other.path;
-
-  @override
-  int get hashCode => path.hashCode;
-
   bool isInfoFetched() {
     // checking only source, because outputs/logs can be empty
     return source?.isNotEmpty ?? false;

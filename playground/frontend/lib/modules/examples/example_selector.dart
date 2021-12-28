@@ -160,7 +160,6 @@ class _ExampleSelectorState extends State<ExampleSelector>
                               selectedExample: playgroundState.selectedExample!,
                               animationController: animationController,
                               dropdown: examplesDropdown,
-                              selectedExample: playgroundState.selectedExample!,
                             ),
                           ],
                         ),
