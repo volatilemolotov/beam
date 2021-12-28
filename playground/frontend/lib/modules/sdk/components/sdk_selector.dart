@@ -77,7 +77,6 @@ class SDKSelector extends StatelessWidget {
                               type: ExampleType.example,
                             ),
                       );
-                      //setExample(state.defaultExamplesMap![value]!);
                     },
                   ),
                 ),

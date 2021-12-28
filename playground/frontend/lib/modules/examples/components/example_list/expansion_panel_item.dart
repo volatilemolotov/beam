@@ -26,6 +26,7 @@ import 'package:provider/provider.dart';
 
 class ExpansionPanelItem extends StatelessWidget {
   final ExampleModel example;
+  final ExampleModel selectedExample;
   final AnimationController animationController;
   final OverlayEntry? dropdown;
   final ExampleModel selectedExample;
@@ -33,6 +34,7 @@ class ExpansionPanelItem extends StatelessWidget {
   const ExpansionPanelItem({
     Key? key,
     required this.example,
+    required this.selectedExample,
     required this.animationController,
     required this.dropdown,
     required this.selectedExample,

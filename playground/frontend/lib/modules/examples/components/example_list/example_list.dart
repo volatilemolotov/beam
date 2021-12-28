@@ -31,6 +31,7 @@ class ExampleList extends StatelessWidget {
   const ExampleList({
     Key? key,
     required this.controller,
+    required this.selectedExample,
     required this.animationController,
     required this.dropdown,
     required this.selectedExample,
