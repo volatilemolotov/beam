@@ -80,6 +80,7 @@ class PlaygroundState with ChangeNotifier {
     _pipelineOptions = example.pipelineOptions ?? '';
     _source = example.source ?? '';
     _result = null;
+    _executionTime = null;
     notifyListeners();
   }
 
@@ -101,6 +102,7 @@ class PlaygroundState with ChangeNotifier {
     _source = _selectedExample?.source ?? '';
     _pipelineOptions = selectedExample?.pipelineOptions ?? '';
     resetKey = DateTime.now();
+    _executionTime = null;
     notifyListeners();
   }
 

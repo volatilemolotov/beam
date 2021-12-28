@@ -23,7 +23,9 @@ import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
 
 class OutputArea extends StatelessWidget {
-  const OutputArea({Key? key}) : super(key: key);
+  final TabController tabController;
+
+  const OutputArea({Key? key, required this.tabController}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +34,19 @@ class OutputArea extends StatelessWidget {
       child: Consumer<PlaygroundState>(
         builder: (context, state, child) {
           return TabBarView(
+            controller: tabController,
             physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
-              OutputResult(text: state.result?.output ?? ''),
-              OutputResult(text: state.result?.log ?? ''),
+              OutputResult(
+                key: const ValueKey(0),
+                text: state.result?.output ?? '',
+                isSelected: tabController.index == 0,
+              ),
+              OutputResult(
+                key: const ValueKey(1),
+                text: state.result?.log ?? '',
+                isSelected: tabController.index == 1,
+              ),
               Center(child: Text(AppLocalizations.of(context)!.graph)),
             ],
           );
