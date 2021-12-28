@@ -62,8 +62,8 @@ jobs:
              echo "${{ secrets.GCP_ACCESS_KEY }}" | base64 -d > /tmp/gcp_access.json
              gcloud auth activate-service-account --project=datatokenization --key-file=/tmp/gcp_access.json
       - name: Get K8s Config
-        run: mkdir ~/.kube && cp config ~/.kube && which gcloud && kubectl get pods -A
-#        run: gcloud container clusters get-credentials --region     us-central1-a playground-examples
+#        run: mkdir ~/.kube && cp config ~/.kube && which gcloud && kubectl get pods -A
+        run: gcloud container clusters get-credentials --region     us-central1-a playground-examples
 #      - name: Login to Docker Registry
 #        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.REGISTRY_NAME }}
 #      - name: Build And Push Java Backend
