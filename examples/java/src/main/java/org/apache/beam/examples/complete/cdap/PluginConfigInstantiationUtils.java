@@ -83,7 +83,6 @@ public class PluginConfigInstantiationUtils {
    */
   private static <T> T getEmptyObjectOf(Class<T> tClass) {
     for (Constructor<?> constructor : tClass.getDeclaredConstructors()) {
-
       constructor.setAccessible(true);
       Class<?>[] parameterTypes = constructor.getParameterTypes();
       Object[] parameters = Arrays.stream(parameterTypes).map(type ->

@@ -52,7 +52,7 @@ public class ConfigWrapper<T extends PluginConfig> {
   }
 
   public ConfigWrapper<T> withParams(Map<String, Object> paramsMap) {
-    this.paramsMap = paramsMap;
+    this.paramsMap = new HashMap<>(paramsMap);
     return this;
   }
 
