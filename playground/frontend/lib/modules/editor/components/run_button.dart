@@ -58,8 +58,8 @@ class RunButton extends StatelessWidget {
             stream: Provider.of<PlaygroundState>(context).executionTime,
             builder: (context, AsyncSnapshot<int> state) {
               final runText = AppLocalizations.of(context)!.run;
-              final cancelText = AppLocalizations.of(context)!.run;
-              final text = !isRunning ? runText : cancelText
+              final cancelText = AppLocalizations.of(context)!.cancel;
+              final text = !isRunning ? runText : cancelText;
               final seconds = (state.data ?? 0) / kMsToSec;
               if (seconds > 0) {
                 return Text(

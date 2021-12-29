@@ -19,6 +19,10 @@
   "@run": {
     "description": "Title for the run button"
   },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Title for the cancel button"
+  },
   "log": "Log",
   "@log": {
     "description": "Title for the log section"

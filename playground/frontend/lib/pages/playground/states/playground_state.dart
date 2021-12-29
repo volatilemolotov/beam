@@ -156,11 +156,13 @@ class PlaygroundState with ChangeNotifier {
     if (_runSubscription != null) {
       _runSubscription?.cancel();
     }
+    _result = null;
+    _executionTime?.close();
+    _executionTime = null;
     final pipelineUuid = result?.pipelineUuid ?? '';
     if (pipelineUuid.isNotEmpty) {
       await _codeRepository?.cancelExecution(pipelineUuid);
     }
-    _result = null;
     notifyListeners();
   }
 
