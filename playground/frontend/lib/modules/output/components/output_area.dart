@@ -37,12 +37,10 @@ class OutputArea extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             children: <Widget>[
               OutputResult(
-                key: const ValueKey(0),
                 text: state.result?.output ?? '',
                 isSelected: tabController.index == 0,
               ),
               OutputResult(
-                key: const ValueKey(1),
                 text: state.result?.log ?? '',
                 isSelected: tabController.index == 1,
               ),
