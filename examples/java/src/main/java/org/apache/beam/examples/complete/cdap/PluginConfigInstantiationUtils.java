@@ -85,8 +85,8 @@ public class PluginConfigInstantiationUtils {
     for (Constructor<?> constructor : tClass.getDeclaredConstructors()) {
       constructor.setAccessible(true);
       Class<?>[] parameterTypes = constructor.getParameterTypes();
-      Object[] parameters = Arrays.stream(parameterTypes).map(type ->
-          type.isPrimitive() ? getEmptyPrimitive(type) : null).toArray();
+      Object[] parameters = Arrays.stream(parameterTypes)
+          .map(PluginConfigInstantiationUtils::getDefaultValue).toArray();
       try {
         return (T) constructor.newInstance(parameters);
       } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -97,31 +97,31 @@ public class PluginConfigInstantiationUtils {
   }
 
   /**
-   * @return empty primitive {@link Object} of {@param tClass}
+   * @return default value for given {@param tClass}
    */
-  private static Object getEmptyPrimitive(Class<?> tClass) {
-    if (tClass.equals(Boolean.TYPE)) {
+  private static Object getDefaultValue(Class<?> tClass) {
+    if (Boolean.TYPE.equals(tClass)) {
       return false;
     }
-    if (tClass.equals(Character.TYPE)) {
+    if (Character.TYPE.equals(tClass)) {
       return Character.MIN_VALUE;
     }
-    if (tClass.equals(Byte.TYPE)) {
+    if (Byte.TYPE.equals(tClass)) {
       return Byte.MIN_VALUE;
     }
-    if (tClass.equals(Short.TYPE)) {
+    if (Short.TYPE.equals(tClass)) {
       return Short.MIN_VALUE;
     }
-    if (tClass.equals(Double.TYPE)) {
+    if (Double.TYPE.equals(tClass)) {
       return Double.MIN_VALUE;
     }
-    if (tClass.equals(Integer.TYPE)) {
+    if (Integer.TYPE.equals(tClass)) {
       return Integer.MIN_VALUE;
     }
-    if (tClass.equals(Float.TYPE)) {
+    if (Float.TYPE.equals(tClass)) {
       return Float.MIN_VALUE;
     }
-    if (tClass.equals(Long.TYPE)) {
+    if (Long.TYPE.equals(tClass)) {
       return Long.MIN_VALUE;
     }
     return null;

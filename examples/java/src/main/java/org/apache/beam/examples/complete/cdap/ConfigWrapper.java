@@ -57,14 +57,18 @@ public class ConfigWrapper<T extends PluginConfig> {
   }
 
   public ConfigWrapper<T> setParam(String paramName, Object param) {
-    if (paramsMap == null) {
-      paramsMap = new HashMap<>();
-    }
-    paramsMap.put(paramName, param);
+    getParamsMap().put(paramName, param);
     return this;
   }
 
   public T build() {
-    return PluginConfigInstantiationUtils.getPluginConfig(paramsMap, configClass);
+    return PluginConfigInstantiationUtils.getPluginConfig(getParamsMap(), configClass);
+  }
+
+  private Map<String, Object> getParamsMap() {
+    if (paramsMap == null) {
+      paramsMap = new HashMap<>();
+    }
+    return paramsMap;
   }
 }
