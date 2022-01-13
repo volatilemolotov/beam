@@ -28,6 +28,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class for building {@link PluginConfig} object of the specific class {@param <T>}.
+ */
 public class ConfigWrapper<T extends PluginConfig> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigWrapper.class);
@@ -47,6 +50,18 @@ public class ConfigWrapper<T extends PluginConfig> {
           .readValue(jsonFile, typeRef);
     } catch (IOException e) {
       LOG.error("Can not read json file to params map", e);
+    }
+    return this;
+  }
+
+  public ConfigWrapper<T> fromJsonString(String jsonString) {
+    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+    };
+    try {
+      paramsMap = new ObjectMapper()
+          .readValue(jsonString, typeRef);
+    } catch (IOException e) {
+      LOG.error("Can not read json string to params map", e);
     }
     return this;
   }

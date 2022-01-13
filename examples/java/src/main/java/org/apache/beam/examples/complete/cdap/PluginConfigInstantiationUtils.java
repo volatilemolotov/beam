@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Class for getting any filled {@link io.cdap.cdap.api.plugin.PluginConfig} configuration object
+ * Class for getting any filled {@link io.cdap.cdap.api.plugin.PluginConfig} configuration object.
  */
 public class PluginConfigInstantiationUtils {
 
