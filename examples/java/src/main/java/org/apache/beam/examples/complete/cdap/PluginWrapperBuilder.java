@@ -22,11 +22,11 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 /**
  * Class for building {@link PluginWrapper} object.
  */
-public abstract class PluginWrapperBuilder {
-    private PluginWrapper pluginWrapper;
-    private PluginConfig pluginConfig;
+public abstract class PluginWrapperBuilder<F, FP> {
+    protected PluginWrapper<F, FP> pluginWrapper;
+    protected PluginConfig pluginConfig;
 
-    public PluginWrapperBuilder withConfig(PluginWrapper pluginWrapper, PluginConfig pluginConfig) {
+    public PluginWrapperBuilder<F, FP> withConfig(PluginWrapper<F, FP> pluginWrapper, PluginConfig pluginConfig) {
         this.pluginWrapper = pluginWrapper;
         this.pluginConfig = pluginConfig;
         return this;

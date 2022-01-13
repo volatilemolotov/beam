@@ -23,12 +23,12 @@ import org.apache.hadoop.mapreduce.InputFormat;
 /**
  * Class wrapper for a source plugin.
  */
-public class SourcePluginWrapper extends PluginWrapper<InputFormat, InputFormatProvider> {
-    public SourcePluginWrapper(InputFormat inputFormat, InputFormatProvider inputFormatProvider) {
+public class SourcePluginWrapper<K, V> extends PluginWrapper<InputFormat<K, V>, InputFormatProvider> {
+    public SourcePluginWrapper(InputFormat<K, V> inputFormat, InputFormatProvider inputFormatProvider) {
         super(inputFormat, inputFormatProvider);
     }
 
-    public SourcePluginWrapper(InputFormat inputFormat) {
+    public SourcePluginWrapper(InputFormat<K, V> inputFormat) {
         super(inputFormat);
     }
 }

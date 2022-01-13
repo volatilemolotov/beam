@@ -23,12 +23,12 @@ import org.apache.hadoop.mapreduce.OutputFormat;
 /**
  * Class wrapper for a sink plugin.
  */
-public class SinkPluginWrapper extends PluginWrapper<OutputFormat, OutputFormatProvider> {
-    public SinkPluginWrapper(OutputFormat outputFormat, OutputFormatProvider outputFormatProvider) {
+public class SinkPluginWrapper<K, V> extends PluginWrapper<OutputFormat<K, V>, OutputFormatProvider> {
+    public SinkPluginWrapper(OutputFormat<K, V> outputFormat, OutputFormatProvider outputFormatProvider) {
         super(outputFormat, outputFormatProvider);
     }
 
-    public SinkPluginWrapper(OutputFormat outputFormat) {
+    public SinkPluginWrapper(OutputFormat<K, V> outputFormat) {
         super(outputFormat);
     }
 }
