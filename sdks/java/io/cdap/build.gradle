@@ -44,28 +44,27 @@ allprojects {
 }
 
 dependencies {
-    compile project(path: ":sdks:java:core", configuration: "shadow")
-    compile library.java.vendored_guava_26_0_jre
-    compile library.java.slf4j_api
-    compile "org.apache.commons:commons-lang3:3.9"
-    compile "org.apache.httpcomponents:httpclient:4.5.13"
-    compile "org.apache.httpcomponents:httpcore:4.4.13"
-    compile "io.cdap.cdap:cdap-api:6.5.1"
-    compile "io.cdap.cdap:cdap-etl-api:6.5.1"
-    compile "com.github.data-integrations:salesforce:v1.3.9"
-    testCompile project(path: ":sdks:java:core", configuration: "shadowTest")
-    testCompile project(path: ":sdks:java:io:common", configuration: "testRuntime")
-    testCompile project(path: ":sdks:java:testing:test-utils", configuration: "testRuntime")
-    testCompile project(":sdks:java:io:jdbc")
-    testCompile project(path: ":examples:java", configuration: "testRuntime")
-    testCompile project(path: ":runners:direct-java", configuration: "shadow")
-    testCompile project(":sdks:java:io:google-cloud-platform")
-    testCompile project(":sdks:java:extensions:ml")
-    testCompile library.java.google_cloud_bigquery
-    testCompile library.java.hamcrest_core
-    testCompile library.java.hamcrest_library
-    testCompile library.java.junit
-    testCompile library.java.mockito_core
-    testCompile library.java.testcontainers_kafka
-    testCompile library.java.testcontainers_gcloud
+    implementation project(path: ":sdks:java:core", configuration: "shadow")
+    implementation library.java.vendored_guava_26_0_jre
+    implementation library.java.slf4j_api
+    implementation "org.apache.commons:commons-lang3:3.9"
+    implementation "org.apache.httpcomponents:httpclient:4.5.13"
+    implementation "org.apache.httpcomponents:httpcore:4.4.13"
+    implementation "io.cdap.cdap:cdap-api:6.5.1"
+    implementation "io.cdap.cdap:cdap-etl-api:6.5.1"
+    implementation "com.github.data-integrations:salesforce:v1.3.9"
+    testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
+    testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntime")
+    testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntime")
+    testImplementation project(":sdks:java:io:jdbc")
+    testImplementation project(path: ":examples:java", configuration: "testRuntime")
+    testImplementation project(path: ":runners:direct-java", configuration: "shadow")
+    testImplementation project(":sdks:java:io:google-cloud-platform")
+    testImplementation project(":sdks:java:extensions:ml")
+    testImplementation library.java.google_cloud_bigquery
+    testImplementation library.java.hamcrest
+    testImplementation library.java.junit
+    testImplementation library.java.mockito_core
+    testImplementation library.java.testcontainers_kafka
+    testImplementation library.java.testcontainers_gcloud
 }
