@@ -82,6 +82,10 @@ jobs:
         run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
 #       Need to uncomment line below to allow deploy only in case of push into version branch
 #        if: startsWith(github.ref, 'ref/tags/')
+      - name: Create config
+        run: ./gradlew playground:frontend:createConfig -PplaygroundBackendJavaRouteUrl="https://backend-java-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendGoRouteUrl="https://backend-go-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendPythonRouteUrl="${https://backend-python-beta-dot-apache-beam-testing.appspot.com/}" -PplaygroundBackendUrl="https://backend-router-beta-dot-apache-beam-testing.appspot.com/"
+#       Need to uncomment line below to allow deploy only in case of push into version branch
+#        if: startsWith(github.ref, 'refs/tags/')
       - name: Preapre Build
         run: ./gradlew playground:frontend:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{env.DOCKERTAG}}
 #       Need to uncomment line below to allow deploy only in case of push into version branch
