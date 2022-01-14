@@ -105,4 +105,3 @@ One more way to run the server is to run it locally how it is described above.
 To call the server from another client – models and client code should be generated using the
 `playground/api/v1/api.proto` file. More information about generating models and client's code using `.proto`
 files for each language can be found [here](https://grpc.io/docs/languages/).
-
