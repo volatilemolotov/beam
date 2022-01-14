@@ -57,7 +57,7 @@ resource "google_app_engine_flexible_app_version" "backend_app" {
      NUM_PARALLEL_JOBS=10
      LAUNCH_SITE = "app_engine"
      PIPELINE_EXPIRATION_TIMEOUT = "5m"
-     KEY_EXPIRATION_TIME = 7m"
+     KEY_EXPIRATION_TIME = "7m"
   }
 
   resources {
