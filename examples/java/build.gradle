@@ -154,7 +154,7 @@ task preCommit() {
   }
 }
 
-task executeExample (type:JavaExec) {
+task execute (type:JavaExec) {
   mainClass = System.getProperty("mainClass")
   classpath = sourceSets.main.runtimeClasspath
   systemProperties System.getProperties()
