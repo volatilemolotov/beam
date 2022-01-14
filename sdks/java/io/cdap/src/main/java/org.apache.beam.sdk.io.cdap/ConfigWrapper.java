@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.examples.complete.cdap;
+package org.apache.beam.sdk.io.cdap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,18 +42,6 @@ public class ConfigWrapper<T extends PluginConfig> {
     this.configClass = configClass;
   }
 
-  public ConfigWrapper<T> fromJsonFile(File jsonFile) {
-    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-    };
-    try {
-      paramsMap = new ObjectMapper()
-          .readValue(jsonFile, typeRef);
-    } catch (IOException e) {
-      LOG.error("Can not read json file to params map", e);
-    }
-    return this;
-  }
-
   public ConfigWrapper<T> fromJsonString(String jsonString) {
     TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
     };
@@ -62,6 +50,18 @@ public class ConfigWrapper<T extends PluginConfig> {
           .readValue(jsonString, typeRef);
     } catch (IOException e) {
       LOG.error("Can not read json string to params map", e);
+    }
+    return this;
+  }
+
+  public ConfigWrapper<T> fromJsonFile(File jsonFile) {
+    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
+    };
+    try {
+      paramsMap = new ObjectMapper()
+          .readValue(jsonFile, typeRef);
+    } catch (IOException e) {
+      LOG.error("Can not read json file to params map", e);
     }
     return this;
   }
