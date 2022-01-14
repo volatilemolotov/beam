@@ -54,10 +54,10 @@ dependencies {
     implementation "io.cdap.cdap:cdap-etl-api:6.5.1"
     implementation "com.github.data-integrations:salesforce:v1.3.9"
     testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
-    testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntime")
-    testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntime")
+    testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")
+    testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntimeMigration")
     testImplementation project(":sdks:java:io:jdbc")
-    testImplementation project(path: ":examples:java", configuration: "testRuntime")
+    testImplementation project(path: ":examples:java", configuration: "testRuntimeMigration")
     testImplementation project(path: ":runners:direct-java", configuration: "shadow")
     testImplementation project(":sdks:java:io:google-cloud-platform")
     testImplementation project(":sdks:java:extensions:ml")
