@@ -69,7 +69,8 @@ jobs:
 #       Need to uncomment line below to allow deploy only in case of push into version branch
 #        if: startsWith(github.ref, 'ref/tags/')
       - name: Set Docker Tag
-        run: echo "::set-env name=DOCKERTAG::$GITHUB_SHA"
+#        run: echo "::set-env name=DOCKERTAG::$GITHUB_SHA"
+        run: echo '$GITHUB_SHA' >> $DOCKERTAG
       - name: Set Docker Tag If
         run: echo "::set-env name=DOCKERTAG::${GITHUB_REF#refs/*/}"
         if: startsWith(github.ref, 'refs/tags/')
