@@ -17,8 +17,9 @@ name: Build And Deploy Playground Frontend Application
 
 on:
   push:
-# Uncomment line below before 
+# Uncomment line below before merging to master
 #    tags: 'v*'
+# Remove lime below before merging to master
     paths: ['playground/frontend/**']
   pull_request:
     paths: ['playground/frontend/**']

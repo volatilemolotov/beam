@@ -17,8 +17,9 @@ name: Build And Deploy Playground Backend Application
 
 on:
   push:
+# Uncomment line below before merging to master
 #    tags: 'v*'
-# Before merging replace line below with line above
+# Remove lime below before merging to master
     paths: ['playground/backend/**']
   pull_request:
     paths: ['playground/backend/**']
