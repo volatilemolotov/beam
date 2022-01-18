@@ -17,16 +17,12 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.plugin.gcp.publisher.source.PubSubMessage;
-import io.cdap.plugin.gcp.publisher.source.PubSubReceiver;
-import io.cdap.plugin.gcp.publisher.source.PubSubSubscriberConfig;
 import java.lang.reflect.Constructor;
 import java.nio.ByteBuffer;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +43,14 @@ public class ProxyBuilder<X, T extends Receiver<X>> {
   }
 
   public ProxyBuilder<X, T> withConstructorArgs(Object... args) {
-    for (Constructor<?> constructor : sparkReceiverClass.getConstructors()) {
+    for (Constructor<?> constructor : sparkReceiverClass.getDeclaredConstructors()) {
       if (constructor.getParameterCount() == args.length) {
         boolean matches = true;
         for (int i = 0; i < args.length; i++) {
           Object arg = args[i];
+          if (arg == null) {
+            throw new IllegalArgumentException("All args must be not null!");
+          }
           Class<?> currArgClass = constructor.getParameterTypes()[i];
           if (currArgClass.isPrimitive()) {
             currArgClass = ClassUtils.primitiveToWrapper(currArgClass);
@@ -77,6 +76,7 @@ public class ProxyBuilder<X, T extends Receiver<X>> {
    */
   public T build() throws Exception {
 
+    currentConstructor.setAccessible(true);
     T receiver = (T) currentConstructor.newInstance(constructorArgs);
 
     WrappedSupervisor wrappedSupervisor = new WrappedSupervisor(receiver, new SparkConf());
@@ -114,32 +114,5 @@ public class ProxyBuilder<X, T extends Receiver<X>> {
     enhancer.setSuperclass(sparkReceiverClass);
     enhancer.setCallback(handler);
     return (T) enhancer.create(currentConstructor.getParameterTypes(), constructorArgs);
-  }
-
-  private static final String PUBSUB_CONFIG_JSON_STRING =
-      "{\n"
-          + " \"project\": \"datatokenization\",\n"
-          + " \"serviceAccountType\": \"JSON\",\n"
-          + " \"serviceFilePath\": \"/something.json\",\n"
-          + " \"subscription\": \"cdap-sub\",\n"
-          + " \"topic\": \"cdap\",\n"
-          + " \"numberOfReaders\": 1\n"
-          + "}";
-
-  public static void main(String[] args) {
-    try {
-      PubSubSubscriberConfig pubsubConfig =
-          new ConfigWrapper<>(PubSubSubscriberConfig.class)
-              .fromJsonString(PUBSUB_CONFIG_JSON_STRING)
-              .build();
-      ProxyBuilder<PubSubMessage, PubSubReceiver> builder =
-          new ProxyBuilder<>(PubSubReceiver.class);
-
-      PubSubReceiver proxyReciever =
-          builder.withConstructorArgs(pubsubConfig, false, StorageLevel.DISK_ONLY()).build();
-      proxyReciever.onStart();
-    } catch (Exception e) {
-      LOG.error("Can not get proxy", e);
-    }
   }
 }

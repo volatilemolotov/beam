@@ -23,52 +23,52 @@ import org.apache.spark.storage.StreamBlockId;
 import org.apache.spark.streaming.receiver.BlockGenerator;
 import org.apache.spark.streaming.receiver.BlockGeneratorListener;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.apache.spark.streaming.receiver.ReceiverSupervisor;
 import scala.Option;
 import scala.collection.Iterator;
 import scala.collection.mutable.ArrayBuffer;
 
-public class WrappedSupervisor {
+public class WrappedSupervisor extends ReceiverSupervisor {
 
   public WrappedSupervisor(Receiver<?> receiver, SparkConf conf) {
-    // super(receiver, conf);
+    super(receiver, conf);
   }
 
-  // @Override
+  @Override
   public void pushSingle(Object o) {}
 
-  // @Override
+  @Override
   public void pushBytes(
       ByteBuffer byteBuffer, Option<Object> option, Option<StreamBlockId> option1) {}
 
-  // @Override
+  @Override
   public void pushIterator(
       Iterator<?> iterator, Option<Object> option, Option<StreamBlockId> option1) {}
 
-  // @Override
+  @Override
   public void pushArrayBuffer(
       ArrayBuffer<?> arrayBuffer, Option<Object> option, Option<StreamBlockId> option1) {}
 
-  // @Override
+  @Override
   public BlockGenerator createBlockGenerator(BlockGeneratorListener blockGeneratorListener) {
     return null;
   }
 
-  // @Override
+  @Override
   public void reportError(String s, Throwable throwable) {}
 
-  // @Override
+  @Override
   public boolean onReceiverStart() {
     return false;
   }
 
-  // @Override
+  @Override
   public long getCurrentRateLimit() {
     return Integer.MAX_VALUE;
   }
 
-  // @Override
+  @Override
   public boolean isReceiverStopped() {
-    return false;
-    // return super.isReceiverStopped();
+    return super.isReceiverStopped();
   }
 }
