@@ -27,12 +27,12 @@ import java.sql.Timestamp;
  */
 public class OperationContext implements Context {
 
-    private final FailureCollectorWrapper failureCollectorWrapper;
+    private final FailureCollectorWrapper failureCollector;
 
     private final Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
     OperationContext() {
-        this.failureCollectorWrapper = new FailureCollectorWrapper();
+        this.failureCollector = new FailureCollectorWrapper();
     }
 
     @Override
@@ -42,6 +42,6 @@ public class OperationContext implements Context {
 
     @Override
     public FailureCollector getFailureCollector() {
-        return this.failureCollectorWrapper;
+        return this.failureCollector;
     }
 }
