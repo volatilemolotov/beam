@@ -41,10 +41,10 @@ import java.util.Map;
 
 @SuppressWarnings("TypeParameterUnusedInFormals")
 public class StreamingSourceContextWrapper implements StreamingSourceContext {
-    private OperationContext context;
+    private Context context;
 
-    StreamingSourceContextWrapper() {
-        this.context = new OperationContext();
+    StreamingSourceContextWrapper(Context context) {
+        this.context = context;
     }
 
     @Override

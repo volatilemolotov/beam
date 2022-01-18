@@ -27,13 +27,9 @@ import java.sql.Timestamp;
  */
 public class OperationContext implements Context {
 
-    private final FailureCollectorWrapper failureCollector;
+    private final FailureCollectorWrapper failureCollector = new FailureCollectorWrapper();
 
     private final Timestamp startTime = new Timestamp(System.currentTimeMillis());
-
-    OperationContext() {
-        this.failureCollector = new FailureCollectorWrapper();
-    }
 
     @Override
     public long getLogicalStartTime() {

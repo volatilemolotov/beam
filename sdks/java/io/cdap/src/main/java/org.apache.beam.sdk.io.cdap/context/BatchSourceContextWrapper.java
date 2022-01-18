@@ -43,10 +43,10 @@ import java.util.Map;
 @SuppressWarnings("TypeParameterUnusedInFormals")
 public class BatchSourceContextWrapper implements BatchSourceContext {
 
-    private OperationContext context;
+    private Context context;
 
-    BatchSourceContextWrapper() {
-        this.context = new OperationContext();
+    BatchSourceContextWrapper(Context context) {
+        this.context = context;
     }
 
     @Override
