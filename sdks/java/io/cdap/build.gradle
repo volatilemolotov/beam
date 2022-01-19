@@ -52,6 +52,7 @@ dependencies {
     implementation "org.apache.httpcomponents:httpcore:4.4.13"
     implementation "io.cdap.cdap:cdap-api:6.5.1"
     implementation "io.cdap.cdap:cdap-etl-api:6.5.1"
+    implementation "org.apache.hadoop:hadoop-mapred:0.22.0"
     implementation "com.github.data-integrations:salesforce:v1.3.9"
     testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
     testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")

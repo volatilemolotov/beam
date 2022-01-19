@@ -15,20 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.examples.complete.cdap;
+package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.data.batch.OutputFormatProvider;
-import org.apache.hadoop.mapreduce.OutputFormat;
+import io.cdap.cdap.api.data.batch.InputFormatProvider;
+import org.apache.hadoop.mapreduce.InputFormat;
 
 /**
- * Class wrapper for a sink plugin.
+ * Class wrapper for a source plugin.
  */
-public class SinkPluginWrapper<K, V> extends PluginWrapper<OutputFormat<K, V>, OutputFormatProvider> {
-    public SinkPluginWrapper(OutputFormat<K, V> outputFormat, OutputFormatProvider outputFormatProvider) {
-        super(outputFormat, outputFormatProvider);
+public class SourcePluginWrapper<K, V> extends PluginWrapper<InputFormat<K, V>, InputFormatProvider> {
+    public SourcePluginWrapper(InputFormat<K, V> inputFormat, InputFormatProvider inputFormatProvider) {
+        super(inputFormat, inputFormatProvider);
     }
 
-    public SinkPluginWrapper(OutputFormat<K, V> outputFormat) {
-        super(outputFormat);
+    public SourcePluginWrapper(InputFormat<K, V> inputFormat) {
+        super(inputFormat);
     }
 }

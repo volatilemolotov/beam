@@ -15,29 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.examples.complete.cdap;
+package org.apache.beam.sdk.io.cdap;
+
+import io.cdap.cdap.api.plugin.PluginConfig;
 
 /**
- * Class wrapper for a plugin.
+ * Class for building {@link PluginWrapper} object.
  */
-public abstract class PluginWrapper<F, FP> {
-    protected F format;
-    protected FP formatProvider;
+public abstract class PluginWrapperBuilder<F, FP> {
+    protected PluginWrapper<F, FP> pluginWrapper;
+    protected PluginConfig pluginConfig;
 
-    public PluginWrapper(F format, FP formatProvider) {
-        this.format = format;
-        this.formatProvider = formatProvider;
+    public PluginWrapperBuilder(PluginWrapper<F, FP> pluginWrapper) {
+        this.pluginWrapper = pluginWrapper;
     }
 
-    public PluginWrapper(F format) {
-        this(format, null);
+    public PluginWrapperBuilder<F, FP> withConfig(PluginConfig pluginConfig) {
+        this.pluginConfig = pluginConfig;
+        return this;
     }
 
-    public F getFormat() {
-        return this.format;
-    }
-
-    public FP getFormatProvider() {
-        return this.formatProvider;
-    }
+    public abstract PluginWrapper<F, FP> build();
 }
