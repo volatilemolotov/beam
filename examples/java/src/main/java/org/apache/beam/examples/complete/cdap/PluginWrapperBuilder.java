@@ -26,11 +26,14 @@ public abstract class PluginWrapperBuilder<F, FP> {
     protected PluginWrapper<F, FP> pluginWrapper;
     protected PluginConfig pluginConfig;
 
-    public PluginWrapperBuilder<F, FP> withConfig(PluginWrapper<F, FP> pluginWrapper, PluginConfig pluginConfig) {
+    public PluginWrapperBuilder(PluginWrapper<F, FP> pluginWrapper) {
         this.pluginWrapper = pluginWrapper;
+    }
+
+    public PluginWrapperBuilder<F, FP> withConfig(PluginConfig pluginConfig) {
         this.pluginConfig = pluginConfig;
         return this;
     }
 
-    public abstract void build();
+    public abstract PluginWrapper<F, FP> build();
 }
