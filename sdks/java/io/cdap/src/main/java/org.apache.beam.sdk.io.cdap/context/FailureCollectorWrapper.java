@@ -24,6 +24,9 @@ import io.cdap.cdap.etl.api.validation.ValidationFailure;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 
+/**
+ * Class FailureCollectorWrapper is a class for collecting ValidationFailure.
+ */
 public class FailureCollectorWrapper implements FailureCollector {
     private ArrayList<ValidationFailure> failuresCollection;
 

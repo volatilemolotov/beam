@@ -40,6 +40,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class BatchSinkContextWrapper is a class for creating context object
+ * of different CDAP classes with batch sink type.
+ */
 @SuppressWarnings("TypeParameterUnusedInFormals")
 public class BatchSinkContextWrapper implements BatchSinkContext {
 

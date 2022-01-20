@@ -23,7 +23,7 @@ import java.sql.Timestamp;
 
 /**
  * Class OperationContext is a common class for Batch, Sink
- * and Stream CDAP classes that use it to provide common details.
+ * and Stream CDAP wrapper classes that use it to provide common details.
  */
 public class OperationContext implements Context {
 

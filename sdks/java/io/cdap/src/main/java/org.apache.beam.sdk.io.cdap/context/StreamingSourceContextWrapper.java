@@ -39,6 +39,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class StreamingSourceContextWrapper is a class for creating context object
+ * of different CDAP classes with stream source type.
+ */
 @SuppressWarnings("TypeParameterUnusedInFormals")
 public class StreamingSourceContextWrapper implements StreamingSourceContext {
     private Context context;

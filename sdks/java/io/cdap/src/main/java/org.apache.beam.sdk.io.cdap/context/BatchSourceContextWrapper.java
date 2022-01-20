@@ -40,6 +40,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Class BatchSourceContextWrapper is a class for creating context object
+ * of different CDAP classes with batch source type.
+ */
 @SuppressWarnings("TypeParameterUnusedInFormals")
 public class BatchSourceContextWrapper implements BatchSourceContext {
 

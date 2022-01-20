@@ -19,8 +19,17 @@ package org.apache.beam.sdk.io.cdap.context;
 
 import io.cdap.cdap.etl.api.FailureCollector;
 
+/**
+ * The context interface collects common methods for wrappers of CDAP context classes.
+ */
 public interface Context {
+    /**
+     * @return a failure collector for the stage
+     */
     FailureCollector getFailureCollector();
 
+    /**
+     * @return Logical time in milliseconds since the context is created.
+     */
     long getLogicalStartTime();
 }
