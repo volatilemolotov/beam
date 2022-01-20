@@ -25,62 +25,70 @@ import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import java.util.*;
 
 public class PluginWrapperTest {
-    public static class SalesforcePluginWrapperBuilder<F, FP> extends PluginWrapperBuilder<F, FP> {
-        public SalesforcePluginWrapperBuilder(PluginWrapper<F, FP> pluginWrapper) {
+    public static class SalesforcePluginWrapperBuilder<F, FP> extends PluginWrapperBuilder<F, FP, SalesforcePluginWrapper> {
+        public SalesforcePluginWrapperBuilder(SalesforcePluginWrapper pluginWrapper) {
             super(pluginWrapper);
         }
 
-        public PluginWrapper<F, FP> build() {
+        public SalesforcePluginWrapper build() {
             return pluginWrapper;
         }
     }
 
-    public static class SalesforcePluginWrapper<K, V> extends SourcePluginWrapper<K, V> {
+    public static class SalesforcePluginWrapper extends SourcePluginWrapper {
         public SalesforcePluginWrapper (
                 SalesforceInputFormat salesforceInputFormat,
                 SalesforceInputFormatProvider salesforceInputFormatProvider
         ) {
             super(salesforceInputFormat, salesforceInputFormatProvider);
         }
+
+        public void read() {
+
+        }
     }
 
-    private final ImmutableMap<String, String> TEST_SALESFORCE_PARAMS_MAP =
-            ImmutableMap.<String, String>builder()
-                    .put("sObjectName", "sObject")
-                    .put("datetimeAfter", "datetime")
-                    .put("consumerKey", "key")
-                    .put("consumerSecret", "secret")
-                    .put("username", "user")
-                    .put("password", "password")
-                    .put("loginUrl", "https://www.google.com")
-                    .put("referenceName", "some reference name")
-                    .build();
+    public void test() {
+        final ImmutableMap<String, String> TEST_SALESFORCE_PARAMS_MAP =
+                ImmutableMap.<String, String>builder()
+                        .put("sObjectName", "sObject")
+                        .put("datetimeAfter", "datetime")
+                        .put("consumerKey", "key")
+                        .put("consumerSecret", "secret")
+                        .put("username", "user")
+                        .put("password", "password")
+                        .put("loginUrl", "https://www.google.com")
+                        .put("referenceName", "some reference name")
+                        .build();
 
-    private final HashMap<String, Object> TEST_SALESFORCE_PARAMS_MAP_OBJ =
-            new HashMap<>(TEST_SALESFORCE_PARAMS_MAP);
+        final HashMap<String, Object> TEST_SALESFORCE_PARAMS_MAP_OBJ =
+                new HashMap<>(TEST_SALESFORCE_PARAMS_MAP);
 
-    private final String REFERENCE_NAME_PARAM_NAME = "referenceName";
+        final String REFERENCE_NAME_PARAM_NAME = "referenceName";
 
-    public SalesforceSourceConfig salesforceSourceConfig =
-            new ConfigWrapper<>(SalesforceSourceConfig.class)
-            .withParams(TEST_SALESFORCE_PARAMS_MAP_OBJ)
-            .setParam(REFERENCE_NAME_PARAM_NAME, "some reference name")
-            .build();
-
-
-    private final List<String> queries = Arrays.asList("q1", "q2", "q3");
-
-    public SalesforceInputFormat salesforceInputFormat = new SalesforceInputFormat();
-    public SalesforceInputFormatProvider salesforceInputFormatProvider =
-            new SalesforceInputFormatProvider(salesforceSourceConfig, queries,
-                    TEST_SALESFORCE_PARAMS_MAP, null);
-
-    public PluginWrapper<SalesforceInputFormat, SalesforceInputFormatProvider> salesforcePluginWrapper =
-            new SalesforcePluginWrapper(salesforceInputFormat, salesforceInputFormatProvider);
+        SalesforceSourceConfig salesforceSourceConfig =
+                new ConfigWrapper<>(SalesforceSourceConfig.class)
+                        .withParams(TEST_SALESFORCE_PARAMS_MAP_OBJ)
+                        .setParam(REFERENCE_NAME_PARAM_NAME, "some reference name")
+                        .build();
 
 
-    public PluginWrapper<SalesforceInputFormat, SalesforceInputFormatProvider> pluginWrapper =
-            new SalesforcePluginWrapperBuilder<>(salesforcePluginWrapper)
-                    .withConfig(salesforceSourceConfig)
-                    .build();
+        final List<String> queries = Arrays.asList("q1", "q2", "q3");
+
+        SalesforceInputFormat salesforceInputFormat = new SalesforceInputFormat();
+        SalesforceInputFormatProvider salesforceInputFormatProvider =
+                new SalesforceInputFormatProvider(salesforceSourceConfig, queries,
+                        TEST_SALESFORCE_PARAMS_MAP, null);
+
+        SalesforcePluginWrapper salesforcePluginWrapper =
+                new SalesforcePluginWrapper(salesforceInputFormat, salesforceInputFormatProvider);
+
+
+        SalesforcePluginWrapper pluginWrapper =
+                new SalesforcePluginWrapperBuilder<SalesforceInputFormat, SalesforceInputFormatProvider>(salesforcePluginWrapper)
+                        .withConfig(salesforceSourceConfig)
+                        .build();
+
+        pluginWrapper.read();
+    }
 }

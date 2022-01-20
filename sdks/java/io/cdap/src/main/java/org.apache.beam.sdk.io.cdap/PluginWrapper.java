@@ -20,7 +20,7 @@ package org.apache.beam.sdk.io.cdap;
 /**
  * Class wrapper for a plugin.
  */
-public abstract class PluginWrapper<F, FP> {
+public abstract class PluginWrapper<F, FP> implements IPluginWrapper {
     protected F format;
     protected FP formatProvider;
 

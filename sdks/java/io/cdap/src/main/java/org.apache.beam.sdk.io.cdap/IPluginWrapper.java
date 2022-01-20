@@ -17,25 +17,4 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.plugin.PluginConfig;
-
-/**
- * Class for building {@link PluginWrapper} object.
- */
-public abstract class PluginWrapperBuilder<F, FP, PW extends IPluginWrapper> {
-    protected PW pluginWrapper;
-    protected PluginConfig pluginConfig;
-
-    public PluginWrapperBuilder(PW pluginWrapper) {
-        this.pluginWrapper = pluginWrapper;
-    }
-
-    public PluginWrapperBuilder<F, FP, PW> withConfig(PluginConfig pluginConfig) {
-        this.pluginConfig = pluginConfig;
-        return this;
-    }
-
-    public PW build() {
-        return pluginWrapper;
-    }
-}
+public interface IPluginWrapper { }
