@@ -28,6 +28,7 @@ import scala.Option;
 import scala.collection.Iterator;
 import scala.collection.mutable.ArrayBuffer;
 
+/** Wrapper class for {@link ReceiverSupervisor} that doesn't use Spark Environment. */
 public class WrappedSupervisor extends ReceiverSupervisor {
 
   public WrappedSupervisor(Receiver<?> receiver, SparkConf conf) {
