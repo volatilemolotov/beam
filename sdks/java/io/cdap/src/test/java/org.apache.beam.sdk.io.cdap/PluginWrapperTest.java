@@ -46,15 +46,15 @@ public class PluginWrapperTest {
 
     private final ImmutableMap<String, String> TEST_SALESFORCE_PARAMS_MAP =
             ImmutableMap.<String, String>builder()
-            .put("sObjectName", "sObject")
-            .put("datetimeAfter", "datetime")
-            .put("consumerKey", "key")
-            .put("consumerSecret", "secret")
-            .put("username", "user")
-            .put("password", "password")
-            .put("loginUrl", "https://www.google.com")
-            .put("referenceName", "some reference name")
-            .build();
+                    .put("sObjectName", "sObject")
+                    .put("datetimeAfter", "datetime")
+                    .put("consumerKey", "key")
+                    .put("consumerSecret", "secret")
+                    .put("username", "user")
+                    .put("password", "password")
+                    .put("loginUrl", "https://www.google.com")
+                    .put("referenceName", "some reference name")
+                    .build();
 
     private final HashMap<String, Object> TEST_SALESFORCE_PARAMS_MAP_OBJ =
             new HashMap<>(TEST_SALESFORCE_PARAMS_MAP);
@@ -71,7 +71,7 @@ public class PluginWrapperTest {
     private final List<String> queries = Arrays.asList("q1", "q2", "q3");
 
     public SalesforceInputFormat salesforceInputFormat = new SalesforceInputFormat();
-    SalesforceInputFormatProvider salesforceInputFormatProvider =
+    public SalesforceInputFormatProvider salesforceInputFormatProvider =
             new SalesforceInputFormatProvider(salesforceSourceConfig, queries,
                     TEST_SALESFORCE_PARAMS_MAP, null);
 
