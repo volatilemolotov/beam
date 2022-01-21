@@ -25,7 +25,7 @@ data "terraform_remote_state" "remote_state_memorystore" {
   }
 }
 
-resource "google_app_engine_flexible_app_version" "backend_app_go" {
+resource "google_app_engine_flexible_app_version" "backend_app_router" {
   version_id = "v1"
   project    = "${var.project_id}"
   service    = "${var.service_name}"
