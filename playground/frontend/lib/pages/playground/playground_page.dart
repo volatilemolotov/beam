@@ -72,6 +72,10 @@ class PlaygroundPage extends StatelessWidget {
                       },
                       setExample: state.setExample,
                     ),
+                    PipelineOptionsDropdown(
+                      pipelineOptions: state.pipelineOptions,
+                      setPipelineOptions: state.setPipelineOptions,
+                    ),
                     const NewExampleAction(),
                     ResetAction(reset: state.reset),
                   ],
@@ -87,7 +91,7 @@ class PlaygroundPage extends StatelessWidget {
             ],
           ),
         ),
-      ),
+      )
     );
   }
 }
