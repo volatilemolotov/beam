@@ -33,7 +33,8 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
   delete_service_on_destroy = true
 
   liveness_check {
-    path = ""
+    path          = ""
+    initial_delay = "600s"
   }
 
   readiness_check {
