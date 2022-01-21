@@ -78,7 +78,7 @@ jobs:
         run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
         if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Create config
-        run: ./gradlew playground:frontend:createConfig -PplaygroundBackendJavaRouteUrl="https://backend-java-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendGoRouteUrl="https://backend-go-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendPythonRouteUrl="https://backend-python-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendUrl="https://backend-router-beta-dot-apache-beam-testing.appspot.com/"
+        run: ./gradlew playground:frontend:createConfig -PplaygroundBackendJavaRouteUrl="https://backend-java-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendGoRouteUrl="https://backend-go-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendPythonRouteUrl="https://backend-python-beta-dot-apache-beam-testing.appspot.com/" -PplaygroundBackendUrl="https://backend-python-beta-dot-apache-beam-testing.appspot.com/"
         if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Preapre Build
         run: ./gradlew playground:frontend:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{env.DOCKERTAG}}
