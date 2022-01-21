@@ -27,7 +27,7 @@
 #   categories:
 #     - Combiners
 #     - Options
-#     - Quick Start
+#     - Quickstart
 
 import argparse
 import logging
@@ -85,7 +85,7 @@ def run(argv=None, save_main_session=True):
     counts = (
         lines
         | 'Split' >> (beam.ParDo(WordExtractingDoFn()).with_output_types(str))
-        | 'PairWIthOne' >> beam.Map(lambda x: (x, 1))
+        | 'PairWithOne' >> beam.Map(lambda x: (x, 1))
         | 'GroupAndSum' >> beam.CombinePerKey(sum))
 
     # Format the counts into a PCollection of strings.
