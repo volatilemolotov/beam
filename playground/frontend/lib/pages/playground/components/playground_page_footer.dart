@@ -62,11 +62,7 @@ class PlaygroundPageFooter extends StatelessWidget {
                 textStyle: const TextStyle(fontWeight: kNormalWeight),
               ),
               onPressed: () {
-                showDialog<void>(
-                  context: context,
-                  builder: (BuildContext context) =>
-                      const PlaygroundPrivacyPolicy(),
-                );
+                launch(kApacheBeamPrivacyPolicyLink);
               },
               child: Text(appLocale.privacyPolicy),
             ),
