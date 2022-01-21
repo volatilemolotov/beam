@@ -36,6 +36,9 @@ const (
 	pathSeparatorPattern              = os.PathSeparator
 	tmpFileSuffix                     = "tmp"
 	publicClassNamePattern            = "public class (.*?) [{|implements(.*)]"
+	pipelineNamePattern               = `Pipeline\s([A-z|0-9_]*)\s=\sPipeline\.create`
+	findImportsPattern                = `import.*\;`
+	graphExtractionImport             = "import org.apache.beam.runners.core.construction.renderer.PipelineDotRenderer;"
 )
 
 //JavaPreparersBuilder facet of PreparersBuilder
@@ -88,6 +91,20 @@ func (builder *JavaPreparersBuilder) WithFileNameChanger() *JavaPreparersBuilder
 	return builder
 }
 
+func (builder *JavaPreparersBuilder) withGraphExtractor() *JavaPreparersBuilder {
+	imports, err := findImports(builder.filePath)
+	if err != nil || len(imports) == 0 {
+		logger.Error("Can't add graph extractor. Can't add import")
+		return builder
+	}
+	importForGraphExtrationChanger := Preparer{
+		Prepare: replace,
+		Args:    []interface{}{builder.filePath, imports[0], fmt.Sprintf("%s\n%s\n", imports[0], graphExtractionImport)},
+	}
+
+	return builder
+}
+
 // GetJavaPreparers returns preparation methods that should be applied to Java code
 func GetJavaPreparers(builder *PreparersBuilder, isUnitTest bool, isKata bool) {
 	if !isUnitTest && !isKata {
@@ -105,6 +122,34 @@ func GetJavaPreparers(builder *PreparersBuilder, isUnitTest bool, isKata bool) {
 			WithPublicClassRemover().
 			WithPackageRemover()
 	}
+}
+
+// findPipelineObjectName finds name of pipeline in JAVA code when pipeline creates
+func findPipelineObjectName(filepath string) (string, error) {
+
+	reg := regexp.MustCompile(pipelineNamePattern)
+	b, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", err
+	}
+	matches := reg.FindStringSubmatch(string(b))
+	if len(matches) > 0 {
+		return matches[1], nil
+	} else {
+		return "", nil
+	}
+
+}
+
+func findImports(filepath string) ([]string, error) {
+	reg := regexp.MustCompile(findImportsPattern)
+	b, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+	imports := reg.FindAllString(string(b), -1)
+
+	return imports, nil
 }
 
 // replace processes file by filePath and replaces all patterns to newPattern
