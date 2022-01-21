@@ -37,8 +37,8 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
   }
 
   readiness_check {
-    path                  = ""
-    app_start_timeout_sec = "600s"
+    path              = ""
+    app_start_timeout = "600s"
   }
 
   automatic_scaling {
