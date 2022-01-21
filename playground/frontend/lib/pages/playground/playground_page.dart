@@ -23,6 +23,7 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/actions/components/new_example_action.dart';
 import 'package:playground/modules/actions/components/reset_action.dart';
 import 'package:playground/modules/analytics/analytics_service.dart';
+import 'package:playground/modules/editor/components/pipeline_options_dropdown/pipeline_options_dropdown.dart';
 import 'package:playground/modules/examples/example_selector.dart';
 import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/modules/shortcuts/components/shortcuts_manager.dart';
