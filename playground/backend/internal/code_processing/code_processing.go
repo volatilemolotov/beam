@@ -64,7 +64,7 @@ func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycl
 
 	var validationResults sync.Map
 
-	go cancelCheck(pipelineLifeCycleCtx, ctx, pipelineId, cancelChannel, cacheService)
+	go cancelCheck(pipelineLifeCycleCtx, pipelineId, cancelChannel, cacheService)
 
 	executor := validateStep(ctx, cacheService, &lc.Paths, pipelineId, sdkEnv, pipelineLifeCycleCtx, &validationResults, cancelChannel)
 	if executor == nil {
@@ -386,11 +386,11 @@ func reconcileBackgroundTask(pipelineLifeCycleCtx, backgroundCtx context.Context
 // If cancel flag doesn't exist in cache continue working.
 // If context is done it means that the code processing was finished (successfully/with error/timeout). Return.
 // If cancel flag exists, and it is true it means that the code processing was canceled. Set true to cancelChannel and return.
-func cancelCheck(pipelineCtx, ctx context.Context, pipelineId uuid.UUID, cancelChannel chan bool, cacheService cache.Cache) {
+func cancelCheck(ctx context.Context, pipelineId uuid.UUID, cancelChannel chan bool, cacheService cache.Cache) {
 	ticker := time.NewTicker(pauseDuration)
 	for {
 		select {
-		case <-pipelineCtx.Done():
+		case <-ctx.Done():
 			ticker.Stop()
 			return
 		case <-ticker.C:
