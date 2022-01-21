@@ -84,7 +84,7 @@ jobs:
       # - name: Preapre Build Router
       #   run: ./gradlew playground:backend:containers:router:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
       #   if: "'refs/heads/beta-version-v1' == github.ref"
-      # - name: Deploy Backend Application Java
+      - name: Deploy Backend Application Java
         env: 
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
         run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-java-beta"
