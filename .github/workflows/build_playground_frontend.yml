@@ -86,6 +86,6 @@ jobs:
       - name: Deploy Frontend Application
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }} -var="service_name=frontend-beta""
+        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=frontend-beta"
         working-directory: playground/terraform/applications/frontend
         if: "'refs/heads/beta-version-v1' == github.ref"
