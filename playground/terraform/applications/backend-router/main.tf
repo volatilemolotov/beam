@@ -26,10 +26,10 @@ data "terraform_remote_state" "remote_state_memorystore" {
 }
 
 resource "google_app_engine_flexible_app_version" "backend_app_router" {
-  version_id = "v1"
-  project    = "${var.project_id}"
-  service    = "${var.service_name}"
-  runtime    = "custom"
+  version_id                = "v1"
+  project                   = var.project_id
+  service                   = var.service_name
+  runtime                   = "custom"
   delete_service_on_destroy = true
 
   liveness_check {
@@ -37,7 +37,8 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
   }
 
   readiness_check {
-    path = ""
+    path                  = ""
+    app_start_timeout_sec = "600s"
   }
 
   automatic_scaling {
@@ -55,9 +56,9 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
   }
 
   env_variables = {
-     CACHE_TYPE="${var.cache_type}"
-     CACHE_ADDRESS="${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
-     NUM_PARALLEL_JOBS=30
+    CACHE_TYPE         = var.cache_type
+    CACHE_ADDRESS      = "${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
+     NUM_PARALLEL_JOBS =30
   }
 
   deployment {
