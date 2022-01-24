@@ -52,8 +52,7 @@ public class BatchSinkContextWrapperTest {
     @Test
     public void getFailureCollector() throws ConnectionException {
         /** arrange */
-        Context operationContext = new OperationContext();
-        BatchSinkContext context = new BatchSinkContextWrapper(operationContext);
+        BatchSinkContext context = new BatchSinkContextWrapper();
 
         String newReferenceName = "new reference name";
         SalesforceSinkConfig config = new ConfigWrapper<>(SalesforceSinkConfig.class)
@@ -73,8 +72,7 @@ public class BatchSinkContextWrapperTest {
     @Test
     public void getLogicalStartTime() {
         /** arrange */
-        Context operationContext = new OperationContext();
-        BatchSinkContext context = new BatchSinkContextWrapper(operationContext);
+        BatchSinkContext context = new BatchSinkContextWrapper();
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
         /** act && assert */

@@ -32,8 +32,7 @@ public class StreamingSourceContextWrapperTest {
     @Test
     public void getLogicalStartTime() {
         /** arrange */
-        Context operationContext = new OperationContext();
-        StreamingSourceContext context = new StreamingSourceContextWrapper(operationContext);
+        StreamingSourceContext context = new StreamingSourceContextWrapper();
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
         /** assert */

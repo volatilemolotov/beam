@@ -26,15 +26,15 @@ import java.sql.Timestamp;
 import static org.junit.Assert.*;
 
 /**
- * Test class for {@link OperationContext}.
+ * Test class for {@link BatchContextImpl}.
  */
-public class OperationContextTest {
+public class BatchContextImplTest {
 
     @Test
     public void getLogicalStartTime() {
         /** arrange */
         Timestamp expectedStartTime = new Timestamp(System.currentTimeMillis());
-        OperationContext context = new OperationContext();
+        BatchContextImpl context = new BatchContextImpl();
 
         /** act */
         long actualStartTime = context.getLogicalStartTime();
@@ -47,7 +47,7 @@ public class OperationContextTest {
     @Test
     public void getFailureCollector() {
         /** arrange */
-        OperationContext context = new OperationContext();
+        BatchContextImpl context = new BatchContextImpl();
 
         /** act */
         FailureCollector failureCollector = context.getFailureCollector();

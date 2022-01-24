@@ -51,8 +51,7 @@ public class BatchSourceContextWrapperTest {
     @Test
     public void getFailureCollector() {
         /** arrange */
-        Context operationContext = new OperationContext();
-        BatchSourceContext context = new BatchSourceContextWrapper(operationContext);
+        BatchSourceContext context = new BatchSourceContextWrapper();
 
         String newReferenceName = "new reference name";
         SalesforceSourceConfig config = new ConfigWrapper<>(SalesforceSourceConfig.class)
@@ -72,8 +71,7 @@ public class BatchSourceContextWrapperTest {
     @Test
     public void getLogicalStartTime() {
         /** arrange */
-        Context operationContext = new OperationContext();
-        BatchSourceContext context = new BatchSourceContextWrapper(operationContext);
+        BatchSourceContext context = new BatchSourceContextWrapper();
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
         /** act && assert */
