@@ -39,7 +39,8 @@ const (
 func GetPythonPreparers(builder *PreparersBuilder) {
 	builder.
 		PythonPreparers().
-		WithLogHandler()
+		WithLogHandler().
+		WithGraph()
 }
 
 //PythonPreparersBuilder facet of PreparersBuilder
