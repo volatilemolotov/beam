@@ -56,5 +56,6 @@ ENV APP_WORK_DIR=/opt/playground/backend/
 ENV BEAM_SDK="SDK_GO"
 ## Copy build result
 COPY src/configs /opt/playground/backend/configs/
+COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
