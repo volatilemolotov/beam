@@ -17,26 +17,27 @@
  */
 package org.apache.beam.sdk.io.cdap.context;
 
-import io.cdap.cdap.etl.api.streaming.StreamingSourceContext;
-import org.junit.Test;
-
-import java.sql.Timestamp;
-
-import static org.junit.Assert.*;
+import io.cdap.cdap.api.data.batch.Input;
+import io.cdap.cdap.etl.api.batch.BatchSourceContext;
 
 /**
- * Test class for {@link StreamingSourceContextWrapper}.
+ * Class BatchSourceContextWrapper is a class for creating context object
+ * of different CDAP classes with batch source type.
  */
-public class StreamingSourceContextWrapperTest {
+public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
 
-    @Test
-    public void getLogicalStartTime() {
-        /** arrange */
-        StreamingSourceContext context = new StreamingSourceContextWrapper();
-        Timestamp startTime = new Timestamp(System.currentTimeMillis());
+    @Override
+    public void setInput(Input input) {
 
-        /** assert */
-        // Using a range of 100 milliseconds to check the correct work of the method
-        assertTrue(startTime.getTime() - context.getLogicalStartTime() <= 100);
+    }
+
+    @Override
+    public boolean isPreviewEnabled() {
+        return false;
+    }
+
+    @Override
+    public int getMaxPreviewRecords() {
+        return 0;
     }
 }

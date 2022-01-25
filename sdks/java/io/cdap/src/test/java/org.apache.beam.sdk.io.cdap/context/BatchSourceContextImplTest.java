@@ -17,12 +17,11 @@
  */
 package org.apache.beam.sdk.io.cdap.context;
 
-import com.sforce.ws.ConnectionException;
-import io.cdap.cdap.etl.api.batch.BatchSinkContext;
+import io.cdap.cdap.etl.api.batch.BatchSourceContext;
 import io.cdap.cdap.etl.api.validation.ValidationException;
 import io.cdap.cdap.etl.api.validation.ValidationFailure;
-import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceBatchSink;
-import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConfig;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
@@ -33,10 +32,9 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * Test class for {@link BatchSinkContextWrapper}.
+ * Test class for {@link BatchSourceContextImpl}.
  */
-public class BatchSinkContextWrapperTest {
-
+public class BatchSourceContextImplTest {
     private static final ImmutableMap<String, Object> TEST_SALESFORCE_PARAMS_MAP =
             ImmutableMap.<String, java.lang.Object>builder()
                     .put("sObjectName", "sObject")
@@ -49,21 +47,22 @@ public class BatchSinkContextWrapperTest {
                     .put("referenceName", "oldReference")
                     .build();
 
+
     @Test
-    public void getFailureCollector() throws ConnectionException {
+    public void getFailureCollector() {
         /** arrange */
-        BatchSinkContext context = new BatchSinkContextWrapper();
+        BatchSourceContext context = new BatchSourceContextImpl();
 
         String newReferenceName = "new reference name";
-        SalesforceSinkConfig config = new ConfigWrapper<>(SalesforceSinkConfig.class)
+        SalesforceSourceConfig config = new ConfigWrapper<>(SalesforceSourceConfig.class)
                 .withParams(TEST_SALESFORCE_PARAMS_MAP)
                 .setParam("referenceName", newReferenceName)
                 .build();
 
-        SalesforceBatchSink salesforceBatchSink = new SalesforceBatchSink(config);
+        SalesforceBatchSource salesforceBatchSource = new SalesforceBatchSource(config);
 
         /** act && assert */
-        ValidationException e = assertThrows(ValidationException.class, () -> salesforceBatchSink.prepareRun(context));
+        ValidationException e = assertThrows(ValidationException.class, () -> salesforceBatchSource.prepareRun(context));
         List<ValidationFailure> failures = e.getFailures();
         assertEquals(1, failures.size());
         assertEquals("Error encountered while establishing connection: Connection to salesforce with plugin configurations failed", failures.get(0).getMessage());
@@ -72,11 +71,11 @@ public class BatchSinkContextWrapperTest {
     @Test
     public void getLogicalStartTime() {
         /** arrange */
-        BatchSinkContext context = new BatchSinkContextWrapper();
+        BatchSourceContext context = new BatchSourceContextImpl();
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
         /** act && assert */
-        // Using a range of 100 milliseconds to check the correct work of the method
+        // Using a range of 100 milliseconds between the creation of 2 objects  to check the correct work of the method
         assertTrue(startTime.getTime() - context.getLogicalStartTime() <= 100);
     }
 }

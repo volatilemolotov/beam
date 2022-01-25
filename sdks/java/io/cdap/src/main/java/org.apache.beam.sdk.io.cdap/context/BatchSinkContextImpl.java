@@ -17,21 +17,28 @@
  */
 package org.apache.beam.sdk.io.cdap.context;
 
-import io.cdap.cdap.api.data.schema.Schema;
-import io.cdap.cdap.api.dataset.DatasetManagementException;
-import io.cdap.cdap.etl.api.streaming.StreamingSourceContext;
-import org.apache.tephra.TransactionFailureException;
-
-import javax.annotation.Nullable;
+import io.cdap.cdap.api.data.batch.Output;
+import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 
 /**
- * Class StreamingSourceContextWrapper is a class for creating context object
- * of different CDAP classes with stream source type.
+ * Class BatchSinkContextWrapper is a class for creating context object
+ * of different CDAP classes with batch sink type.
  */
-public class StreamingSourceContextWrapper extends BatchContextImpl implements StreamingSourceContext  {
+public class BatchSinkContextImpl extends BatchContextImpl implements BatchSinkContext {
 
     @Override
-    public void registerLineage(String referenceName, @Nullable Schema schema) throws DatasetManagementException, TransactionFailureException {
+    public void addOutput(Output output) {
 
     }
+
+    @Override
+    public boolean isPreviewEnabled() {
+        return false;
+    }
+
+    @Override
+    public String getStageName() {
+        return null;
+    }
+
 }
