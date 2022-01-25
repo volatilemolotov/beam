@@ -140,7 +140,7 @@ message GetGraphRequest {
   string pipeline_uuid = 1;
 }
 
-// GetGraphResponse represents the graph of the executed code.
+// GetGraphResponse represents the string representation of pipeline execution graph in DOT format.
 message GetGraphResponse {
   string graph = 1;
 }
@@ -196,7 +196,12 @@ message GetPrecompiledObjectLogsRequest{
   string cloud_path = 1;
 }
 
-// GetListOfPrecompiledObjectsResponse represent the map between sdk and categories for the sdk.
+// GetDefaultPrecompiledObjectRequest contains information of the needed PrecompiledObject sdk.
+message GetDefaultPrecompiledObjectRequest {
+  Sdk sdk = 1;
+}
+
+// GetPrecompiledObjectsResponse represent the map between sdk and categories for the sdk.
 message GetPrecompiledObjectsResponse{
   repeated Categories sdk_categories = 1;
 }
@@ -216,6 +221,11 @@ message GetPrecompiledObjectLogsResponse {
   string output = 1;
 }
 
+// GetDefaultPrecompiledObjectResponse represents the default PrecompiledObject and his category for the sdk.
+message GetDefaultPrecompiledObjectResponse {
+  PrecompiledObject precompiled_object = 1;
+}
+
 service PlaygroundService {
 
   // Submit the job for an execution and get the pipeline uuid.
@@ -230,7 +240,7 @@ service PlaygroundService {
   // Get the logs of pipeline execution.
   rpc GetLogs(GetLogsRequest) returns (GetLogsResponse);
 
-  // Get the graph of pipeline execution.
+  // Get the string representation of the pipeline execution graph in DOT format.
   rpc GetGraph(GetGraphRequest) returns (GetGraphResponse);
 
   // Get the error of pipeline execution.
@@ -259,4 +269,7 @@ service PlaygroundService {
 
   // Get the logs of an PrecompiledObject.
   rpc GetPrecompiledObjectLogs(GetPrecompiledObjectLogsRequest) returns (GetPrecompiledObjectLogsResponse);
+
+  // Get the default precompile object for the sdk.
+  rpc GetDefaultPrecompiledObject(GetDefaultPrecompiledObjectRequest) returns (GetDefaultPrecompiledObjectResponse);
 }
