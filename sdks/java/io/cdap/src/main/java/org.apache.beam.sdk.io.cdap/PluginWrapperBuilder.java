@@ -22,18 +22,54 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 /**
  * Class for building {@link PluginWrapper} object.
  */
-public abstract class PluginWrapperBuilder<F, FP> {
-    protected PluginWrapper<F, FP> pluginWrapper;
-    protected PluginConfig pluginConfig;
+public class PluginWrapperBuilder {
+    private PluginInfo pluginInfo;
 
-    public PluginWrapperBuilder(PluginWrapper<F, FP> pluginWrapper) {
-        this.pluginWrapper = pluginWrapper;
+    /**
+     * Constructor for a plugin wrapper builder.
+     * @param pluginClass The main class of a plugin.
+     */
+    public PluginWrapperBuilder(Class pluginClass) {
+        this.pluginInfo = new PluginInfo();
+        this.pluginInfo.pluginClass = pluginClass;
     }
 
-    public PluginWrapperBuilder<F, FP> withConfig(PluginConfig pluginConfig) {
-        this.pluginConfig = pluginConfig;
+    protected PluginWrapperBuilder withFormat(Class formatClass) {
+        this.pluginInfo.formatClass = formatClass;
         return this;
     }
 
-    public abstract PluginWrapper<F, FP> build();
+    protected PluginWrapperBuilder withFormatProvider(Class formatProviderClass) {
+        this.pluginInfo.formatProviderClass = formatProviderClass;
+        return this;
+    }
+
+    /**
+     * Class for building {@link PluginWrapper} object.
+     */
+    public PluginWrapperBuilder withConfig(PluginConfig pluginConfig) {
+        this.pluginInfo.pluginConfig = pluginConfig;
+        return this;
+    }
+
+    /**
+     * Builds plugin wrapper instance.
+     */
+    public PluginWrapper build() {
+        PluginWrapper pw = new PluginWrapper(pluginInfo.pluginClass);
+
+        if (pluginInfo.formatClass != null) {
+            pw.setFormatClass(pluginInfo.formatClass);
+        }
+
+        if (pluginInfo.formatProviderClass != null) {
+            pw.setFormatProviderClass(pluginInfo.formatProviderClass);
+        }
+
+        if (pluginInfo.pluginConfig != null) {
+            pw.setPluginConfig(pluginInfo.pluginConfig);
+        }
+
+        return pw;
+    }
 }

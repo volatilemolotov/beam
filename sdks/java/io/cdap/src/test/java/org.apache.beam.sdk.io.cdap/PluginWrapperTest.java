@@ -21,26 +21,44 @@ import com.google.common.collect.ImmutableMap;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormat;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormatProvider;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 
 import java.util.*;
 
+/**
+ * Class providing an example of plugin wrapper usage.
+ */
 public class PluginWrapperTest {
-    public static class SalesforcePluginWrapperBuilder<F, FP> extends PluginWrapperBuilder<F, FP> {
-        public SalesforcePluginWrapperBuilder(PluginWrapper<F, FP> pluginWrapper) {
-            super(pluginWrapper);
-        }
-
-        public PluginWrapper<F, FP> build() {
-            return pluginWrapper;
+    /**
+     * Wrapper builder for Salesforce Batch Source plugin.
+     */
+    public static class SalesforcePluginWrapperBuilder extends PluginWrapperBuilder {
+        /**
+         * Constructor for Salesforce Batch Source plugin wrapper builder.
+         */
+        public SalesforcePluginWrapperBuilder() {
+            super(SalesforceBatchSource.class);
+            this.withFormat(SalesforceInputFormat.class)
+                .withFormatProvider(SalesforceInputFormatProvider.class);
         }
     }
 
-    public static class SalesforcePluginWrapper<K, V> extends SourcePluginWrapper<K, V> {
-        public SalesforcePluginWrapper (
-                SalesforceInputFormat salesforceInputFormat,
-                SalesforceInputFormatProvider salesforceInputFormatProvider
-        ) {
-            super(salesforceInputFormat, salesforceInputFormatProvider);
+    /**
+     * Wrapper for Salesforce Batch Source plugin.
+     */
+    public static class SalesforcePluginWrapper extends PluginWrapper {
+        /**
+         * Constructor for creating Salesforce Batch Source plugin wrapper instance.
+         */
+        public SalesforcePluginWrapper() {
+            super(SalesforceBatchSource.class);
+        }
+
+        /**
+         * Reads data from Salesforce.
+         */
+        public Object read() {
+            return new Object();
         }
     }
 
@@ -61,26 +79,25 @@ public class PluginWrapperTest {
 
     private final String REFERENCE_NAME_PARAM_NAME = "referenceName";
 
+    /**
+     * Config for Salesforce Batch Source plugin.
+     */
     public SalesforceSourceConfig salesforceSourceConfig =
             new ConfigWrapper<>(SalesforceSourceConfig.class)
             .withParams(TEST_SALESFORCE_PARAMS_MAP_OBJ)
             .setParam(REFERENCE_NAME_PARAM_NAME, "some reference name")
             .build();
 
-
-    private final List<String> queries = Arrays.asList("q1", "q2", "q3");
-
-    public SalesforceInputFormat salesforceInputFormat = new SalesforceInputFormat();
-    public SalesforceInputFormatProvider salesforceInputFormatProvider =
-            new SalesforceInputFormatProvider(salesforceSourceConfig, queries,
-                    TEST_SALESFORCE_PARAMS_MAP, null);
-
-    public PluginWrapper<SalesforceInputFormat, SalesforceInputFormatProvider> salesforcePluginWrapper =
-            new SalesforcePluginWrapper(salesforceInputFormat, salesforceInputFormatProvider);
-
-
-    public PluginWrapper<SalesforceInputFormat, SalesforceInputFormatProvider> pluginWrapper =
-            new SalesforcePluginWrapperBuilder<>(salesforcePluginWrapper)
+    /**
+     * Salesforce plugin wrapper instance.
+     */
+    public SalesforcePluginWrapper pluginWrapper =
+            (SalesforcePluginWrapper) new SalesforcePluginWrapperBuilder()
                     .withConfig(salesforceSourceConfig)
                     .build();
+
+    /**
+     * Example of reading data using plugin wrapper.
+     */
+    Object obj = pluginWrapper.read();
 }

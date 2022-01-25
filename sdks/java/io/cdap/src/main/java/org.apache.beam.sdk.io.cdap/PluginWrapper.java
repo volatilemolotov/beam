@@ -17,27 +17,67 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
+import io.cdap.cdap.api.plugin.PluginConfig;
+
 /**
  * Class wrapper for a plugin.
  */
-public abstract class PluginWrapper<F, FP> {
-    protected F format;
-    protected FP formatProvider;
+public class PluginWrapper {
+    protected PluginInfo pluginInfo;
 
-    public PluginWrapper(F format, FP formatProvider) {
-        this.format = format;
-        this.formatProvider = formatProvider;
+    /**
+     * Constructor for a plugin wrapper.
+     * @param pluginClass The main class of a plugin.
+     */
+    public PluginWrapper(Class pluginClass) {
+        this.pluginInfo = new PluginInfo();
+        this.pluginInfo.pluginClass = pluginClass;
     }
 
-    public PluginWrapper(F format) {
-        this(format, null);
+    /**
+     * Gets the main class of a plugin.
+     */
+    public Class getPluginClass() { return pluginInfo.pluginClass; }
+
+    /**
+     * Gets InputFormat or OutputFormat class for a plugin.
+     */
+    public Class getFormatClass() {
+        return pluginInfo.formatClass;
     }
 
-    public F getFormat() {
-        return this.format;
+    /**
+     * Sets InputFormat or OutputFormat class for a plugin.
+     */
+    public void setFormatClass(Class formatClass) {
+        this.pluginInfo.formatClass = formatClass;
     }
 
-    public FP getFormatProvider() {
-        return this.formatProvider;
+    /**
+     * Gets InputFormatProvider or OutputFormatProvider class for a plugin.
+     */
+    public Class getFormatProviderClass() {
+        return pluginInfo.formatProviderClass;
+    }
+
+    /**
+     * Sets InputFormatProvider or OutputFormatProvider class for a plugin.
+     */
+    public void setFormatProviderClass(Class formatProviderClass) {
+        this.pluginInfo.formatProviderClass = formatProviderClass;
+    }
+
+    /**
+     * Gets config for a plugin.
+     */
+    public PluginConfig getPluginConfig() {
+        return pluginInfo.pluginConfig;
+    }
+
+    /**
+     * Sets config for a plugin.
+     */
+    public void setPluginConfig(PluginConfig pluginConfig) {
+        this.pluginInfo.pluginConfig = pluginConfig;
     }
 }
