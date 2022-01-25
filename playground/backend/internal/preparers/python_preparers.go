@@ -32,7 +32,8 @@ const (
 	indentationReplacement = "$0"
 	findPipelinePattern    = `(\s+)with.+Pipeline.+as (.+):`
 	indentationPattern     = `^(%s){0,1}\w+`
-	graphCodePattern       = "$0# Write graph to file\n$0from apache_beam.runners.interactive.display import pipeline_graph\n$0dot = pipeline_graph.PipelineGraph(%s).get_dot()\n$0with open('pipeline.dot', 'w') as file:\n$0  file.write(dot)\n"
+	GraphFileName          = "graph.dot"
+	graphCodePattern       = "$0# Write graph to file\n$0from apache_beam.runners.interactive.display import pipeline_graph\n$0dot = pipeline_graph.PipelineGraph(%s).get_dot()\n$0with open('%s', 'w') as file:\n$0  file.write(dot)\n"
 )
 
 // GetPythonPreparers returns preparation methods that should be applied to Python code
@@ -67,7 +68,7 @@ func (builder *PythonPreparersBuilder) WithLogHandler() *PythonPreparersBuilder 
 func (builder *PythonPreparersBuilder) WithGraph() *PythonPreparersBuilder {
 	addLogHandler := Preparer{
 		Prepare: addCodeToFile,
-		Args:    []interface{}{builder.filePath, addGraphCode},
+		Args:    []interface{}{builder.filePath, saveGraph},
 	}
 	builder.AddPreparer(addLogHandler)
 	return builder
@@ -131,7 +132,8 @@ func writeToFile(to *os.File, str string) error {
 	return nil
 }
 
-func addGraphCode(from *os.File, to *os.File) error {
+// saveGraph add code to pipeline to save the pipeline's graph to the file graph.dot
+func saveGraph(from *os.File, to *os.File) error {
 	newLine := false
 	reg := regexp.MustCompile(findPipelinePattern)
 	scanner := bufio.NewScanner(from)
@@ -176,7 +178,7 @@ func addCodeForGraph(line, spaces, pipelineName *string, reg **regexp.Regexp) {
 	found := (*reg).FindAllStringSubmatch(*line, -1)
 	if found != nil {
 		indentation := *spaces + oneIndentation
-		graphCode := fmt.Sprintf(graphCodePattern, *pipelineName)
+		graphCode := fmt.Sprintf(graphCodePattern, *pipelineName, GraphFileName)
 		graphCodeWithIndentation := strings.ReplaceAll(graphCode, indentationReplacement, indentation)
 		*line = graphCodeWithIndentation + *line
 		*reg = nil
@@ -186,6 +188,7 @@ func addCodeForGraph(line, spaces, pipelineName *string, reg **regexp.Regexp) {
 type GetLine func(line, spaces, pipelineName *string, reg **regexp.Regexp)
 type Decorated func(newLine bool, to *os.File, line, spaces, pipelineName *string, reg **regexp.Regexp) error
 
+// writeLineToFile decorator that writes new line to temp file and a line received from "getLine" method.
 func writeLineToFile(getLine GetLine) Decorated {
 	return func(newLine bool, to *os.File, line, spaces, pipelineName *string, reg **regexp.Regexp) error {
 		err := addNewLine(newLine, to)
