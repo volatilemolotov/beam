@@ -94,7 +94,7 @@ func runStep(ctx context.Context, cacheService cache.Cache, paths *fs_tool.LifeC
 	stopReadLogsChannel := make(chan bool, 1)
 	finishReadLogsChannel := make(chan bool, 1)
 
-	executorBuilder := executors.NewExecutorBuilder()
+	var executorBuilder *executors.ExecutorBuilder
 	err := error(nil)
 	if isUnitTest {
 		executorBuilder, err = builder.TestRunner(paths, sdkEnv)
@@ -156,7 +156,7 @@ func runStep(ctx context.Context, cacheService cache.Cache, paths *fs_tool.LifeC
 		return
 	}
 	// Run step is finished and code is executed
-	_ = processRunSuccess(pipelineLifeCycleCtx, pipelineId, cacheService, stopReadLogsChannel, finishReadLogsChannel)
+	_ = processRunSuccess(pipelineLifeCycleCtx, pipelineId, cacheService, stopReadLogsChannel, finishReadLogsChannel, paths.AbsoluteBaseFolderPath)
 }
 
 func compileStep(ctx context.Context, cacheService cache.Cache, paths *fs_tool.LifeCyclePaths, pipelineId uuid.UUID, sdkEnv *environment.BeamEnvs, isUnitTest bool, pipelineLifeCycleCtx context.Context, cancelChannel chan bool) *executors.Executor {
@@ -329,6 +329,23 @@ func GetLastIndex(ctx context.Context, cacheService cache.Cache, key uuid.UUID, 
 		return 0, errors.InternalError(errorTitle, "Error during getting pagination value")
 	}
 	return int(convertedValue), nil
+}
+
+// GetGraph gets graph from cache by key.
+// In case key doesn't exist in cache - returns an errors.NotFoundError.
+// In case value from cache by key couldn't be converted to []byte - returns an errors.InternalError.
+func GetGraph(ctx context.Context, cacheService cache.Cache, key uuid.UUID, errorTitle string) (string, error) {
+	value, err := cacheService.GetValue(ctx, key, cache.Graph)
+	if err != nil {
+		logger.Errorf("%s: GetGraph(): cache.GetValue: error: %s", key, err.Error())
+		return "", errors.NotFoundError(errorTitle, "Error during getting graph")
+	}
+	stringValue, converted := value.(string)
+	if !converted {
+		logger.Errorf("%s: couldn't convert value to string. value: %s type %s", key, value, reflect.TypeOf(value))
+		return "", errors.InternalError(errorTitle, "Error during getting graph")
+	}
+	return stringValue, nil
 }
 
 // runCmdWithOutput runs command with keeping stdOut and stdErr
@@ -505,6 +522,9 @@ func processCompileSuccess(ctx context.Context, output []byte, pipelineId uuid.U
 	if err := utils.SetToCache(ctx, cacheService, pipelineId, cache.RunOutput, ""); err != nil {
 		return err
 	}
+	if err := utils.SetToCache(ctx, cacheService, pipelineId, cache.RunError, ""); err != nil {
+		return err
+	}
 	if err := utils.SetToCache(ctx, cacheService, pipelineId, cache.Logs, ""); err != nil {
 		return err
 	}
@@ -515,11 +535,13 @@ func processCompileSuccess(ctx context.Context, output []byte, pipelineId uuid.U
 // This method sets value to channel to stop goroutine which writes logs.
 //	After receiving a signal that goroutine was finished (read value from finishReadLogsChannel) this method
 //	sets corresponding status to the cache.
-func processRunSuccess(ctx context.Context, pipelineId uuid.UUID, cacheService cache.Cache, stopReadLogsChannel, finishReadLogsChannel chan bool) error {
+func processRunSuccess(ctx context.Context, pipelineId uuid.UUID, cacheService cache.Cache, stopReadLogsChannel, finishReadLogsChannel chan bool, graphFolder string) error {
 	logger.Infof("%s: Run() finish\n", pipelineId)
 
 	stopReadLogsChannel <- true
 	<-finishReadLogsChannel
+
+	utils.ReadAndSetToCacheGraph(ctx, cacheService, pipelineId, graphFolder)
 
 	return utils.SetToCache(ctx, cacheService, pipelineId, cache.Status, pb.Status_STATUS_FINISHED)
 }
