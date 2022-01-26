@@ -39,6 +39,13 @@ const (
 	pipelineNamePattern               = `Pipeline\s([A-z|0-9_]*)\s=\sPipeline\.create`
 	findImportsPattern                = `import.*\;`
 	graphExtractionImport             = "import org.apache.beam.runners.core.construction.renderer.PipelineDotRenderer;"
+	graphSavePattern                  = "String dotString = PipelineDotRenderer.toDotString(%s);\n" +
+		"    try (java.io.PrintWriter out = new java.io.PrintWriter(\"Graph.dot\")) {\n      " +
+		"		out.println(dotString);\n    " +
+		"	} catch (java.io.FileNotFoundException e) {\n" +
+		"      e.printStackTrace();\n    " +
+		"\n}\n" +
+		"%s.run"
 )
 
 //JavaPreparersBuilder facet of PreparersBuilder
@@ -91,22 +98,32 @@ func (builder *JavaPreparersBuilder) WithFileNameChanger() *JavaPreparersBuilder
 	return builder
 }
 
-func (builder *JavaPreparersBuilder) withGraphExtractor() *JavaPreparersBuilder {
-	imports, err := findImports(builder.filePath)
-	if err != nil || len(imports) == 0 {
-		logger.Error("Can't add graph extractor. Can't add import")
-		return builder
+func (builder *JavaPreparersBuilder) WithGraphExtractor() *JavaPreparersBuilder {
+	graphImportAdder := Preparer{
+		Prepare: addImportForGraph,
+		Args:    []interface{}{builder.filePath},
 	}
-	importForGraphExtractionChanger := Preparer{
-		Prepare: replace,
-		Args:    []interface{}{builder.filePath, imports[0], fmt.Sprintf("%s\n%s\n", imports[0], graphExtractionImport)},
+	builder.AddPreparer(graphImportAdder)
+
+	graphCodeAdder := Preparer{
+		Prepare: addCodeToSaveGraph,
+		Args:    []interface{}{builder.filePath},
 	}
-	builder.AddPreparer(importForGraphExtractionChanger)
-	pipelineObjectName := findPipelineObjectName()
-
-	// new preparer replace pipelineObjectName + ".run()" -> String dotString = PipelineDotRenderer.toDotString(pipelineObjectName); + writeToFile(dotString) + /n + pipelineObjectName + ".run()"
-
+	builder.AddPreparer(graphCodeAdder)
 	return builder
+}
+
+func addCodeToSaveGraph(args ...interface{}) error {
+	filePath := args[0].(string)
+	pipelineObjectName, _ := findPipelineObjectName(filePath)
+	graphSaveCode := fmt.Sprintf(graphSavePattern, pipelineObjectName, pipelineObjectName)
+
+	err := replace(filePath, fmt.Sprintf("%s.run", pipelineObjectName), graphSaveCode)
+	if err != nil {
+		logger.Error("Can't add graph extractor. Can't add new import")
+		return err
+	}
+	return nil
 }
 
 // GetJavaPreparers returns preparation methods that should be applied to Java code
@@ -114,7 +131,8 @@ func GetJavaPreparers(builder *PreparersBuilder, isUnitTest bool, isKata bool) {
 	if !isUnitTest && !isKata {
 		builder.JavaPreparers().
 			WithPublicClassRemover().
-			WithPackageChanger()
+			WithPackageChanger().
+			WithGraphExtractor()
 	}
 	if isUnitTest {
 		builder.JavaPreparers().
@@ -130,7 +148,6 @@ func GetJavaPreparers(builder *PreparersBuilder, isUnitTest bool, isKata bool) {
 
 // findPipelineObjectName finds name of pipeline in JAVA code when pipeline creates
 func findPipelineObjectName(filepath string) (string, error) {
-
 	reg := regexp.MustCompile(pipelineNamePattern)
 	b, err := ioutil.ReadFile(filepath)
 	if err != nil {
@@ -154,6 +171,22 @@ func findImports(filepath string) ([]string, error) {
 	imports := reg.FindAllString(string(b), -1)
 
 	return imports, nil
+}
+
+func addImportForGraph(args ...interface{}) error {
+	filePath := args[0].(string)
+	imports, err := findImports(filePath)
+	if err != nil || len(imports) == 0 {
+		logger.Error("Can't add graph extractor. Can't find imports in a file")
+		return err
+	}
+	newImport := fmt.Sprintf("%s\n%s\n", imports[0], graphExtractionImport)
+	err = replace(filePath, imports[0], newImport)
+	if err != nil {
+		logger.Error("Can't add graph extractor. Can't add new import")
+		return err
+	}
+	return nil
 }
 
 // replace processes file by filePath and replaces all patterns to newPattern
