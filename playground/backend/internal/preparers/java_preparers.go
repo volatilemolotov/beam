@@ -97,10 +97,14 @@ func (builder *JavaPreparersBuilder) withGraphExtractor() *JavaPreparersBuilder 
 		logger.Error("Can't add graph extractor. Can't add import")
 		return builder
 	}
-	importForGraphExtrationChanger := Preparer{
+	importForGraphExtractionChanger := Preparer{
 		Prepare: replace,
 		Args:    []interface{}{builder.filePath, imports[0], fmt.Sprintf("%s\n%s\n", imports[0], graphExtractionImport)},
 	}
+	builder.AddPreparer(importForGraphExtractionChanger)
+	pipelineObjectName := findPipelineObjectName()
+
+	// new preparer replace pipelineObjectName + ".run()" -> String dotString = PipelineDotRenderer.toDotString(pipelineObjectName); + writeToFile(dotString) + /n + pipelineObjectName + ".run()"
 
 	return builder
 }
