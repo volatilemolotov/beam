@@ -72,7 +72,7 @@ public class ConfigWrapperTest {
       SalesforceSourceConfig firstConfig =
           new ConfigWrapper<>(SalesforceSourceConfig.class)
               .withParams(TEST_SALESFORCE_PARAMS_MAP)
-              .setParam("referenceName", newReferenceName)
+              .setParam(REFERENCE_NAME_PARAM_NAME, newReferenceName)
               .build();
       validateSalesforceConfigObject(TEST_SALESFORCE_PARAMS_MAP, firstConfig);
       assertEquals(newReferenceName, firstConfig.referenceName);

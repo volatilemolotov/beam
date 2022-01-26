@@ -53,27 +53,29 @@ public class ProxyBuilder<X, T extends Receiver<X>> {
   /** Method for specifying constructor arguments for corresponding {@link #sparkReceiverClass} */
   public ProxyBuilder<X, T> withConstructorArgs(Object... args) {
     for (Constructor<?> constructor : sparkReceiverClass.getDeclaredConstructors()) {
-      if (constructor.getParameterCount() == args.length) {
-        boolean matches = true;
-        for (int i = 0; i < args.length; i++) {
-          Object arg = args[i];
-          if (arg == null) {
-            throw new IllegalArgumentException("All args must be not null!");
-          }
-          Class<?> currArgClass = constructor.getParameterTypes()[i];
-          if (currArgClass.isPrimitive()) {
-            currArgClass = ClassUtils.primitiveToWrapper(currArgClass);
-          }
-          if (!currArgClass.equals(arg.getClass())) {
-            matches = false;
-            break;
-          }
+      Class<?>[] paramTypes = constructor.getParameterTypes();
+      if (paramTypes.length != args.length) {
+        continue;
+      }
+      boolean matches = true;
+      for (int i = 0; i < args.length; i++) {
+        Object arg = args[i];
+        if (arg == null) {
+          throw new IllegalArgumentException("All args must be not null!");
         }
-        if (matches) {
-          currentConstructor = constructor;
-          this.constructorArgs = args;
-          return this;
+        Class<?> currArgClass = paramTypes[i];
+        if (currArgClass.isPrimitive()) {
+          currArgClass = ClassUtils.primitiveToWrapper(currArgClass);
         }
+        if (!currArgClass.equals(arg.getClass())) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        currentConstructor = constructor;
+        this.constructorArgs = args;
+        return this;
       }
     }
     throw new IllegalArgumentException("Can not find appropriate constructor for given args");
@@ -109,17 +111,16 @@ public class ProxyBuilder<X, T extends Receiver<X>> {
 
     MethodInterceptor handler =
         (obj, method, args, proxy) -> {
-          if (method.getName().equals("supervisor")) {
+          String methodName = method.getName();
+          if (methodName.equals("supervisor") || methodName.equals("_supervisor")) {
             return getWrappedSupervisor();
-          } else if (method.getName().equals("_supervisor")) {
-            return getWrappedSupervisor();
-          } else if (method.getName().equals("onStart")) {
+          } else if (methodName.equals("onStart")) {
             LOG.info("Custom Receiver was started");
             return null;
-          } else if (method.getName().equals("stop")) {
+          } else if (methodName.equals("stop")) {
             LOG.info("Custom Receiver was stopped. Message = {}", args[0]);
             return null;
-          } else if (method.getName().equals("store")) {
+          } else if (methodName.equals("store")) {
             storeConsumer.accept(args);
             return null;
           }
