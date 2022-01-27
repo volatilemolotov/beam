@@ -29,6 +29,10 @@ import static org.junit.Assert.*;
  */
 public class StreamingSourceContextImplTest {
 
+    /**
+     * TODO: Remove tests(getFailureCollector, getLogicalStartTime) if these methods weren't override and
+     * were implemented own methods of StreamingSourceContextImplTest class.
+     */
     @Test
     public void getLogicalStartTime() {
         /** arrange */

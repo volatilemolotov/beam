@@ -49,6 +49,10 @@ public class BatchSinkContextImplTest {
                     .put("referenceName", "oldReference")
                     .build();
 
+    /**
+     * TODO: Remove tests(getFailureCollector, getLogicalStartTime) if these methods weren't override and
+     * were implemented own methods of BatchSinkContextImpl class.
+     */
     @Test
     public void getFailureCollector() throws ConnectionException {
         /** arrange */

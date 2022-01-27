@@ -48,6 +48,10 @@ public class BatchSourceContextImplTest {
                     .build();
 
 
+    /**
+     * TODO: Remove tests(getFailureCollector, getLogicalStartTime) if these methods weren't override and
+     * were implemented own methods of BatchSourceContextImpl class.
+     */
     @Test
     public void getFailureCollector() {
         /** arrange */
