@@ -854,13 +854,13 @@ class GetGraphRequest extends $pb.GeneratedMessage {
 
 class GetGraphResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetGraphResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..a<$core.List<$core.int>>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'graph', $pb.PbFieldType.OY)
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'graph')
     ..hasRequiredFields = false
   ;
 
   GetGraphResponse._() : super();
   factory GetGraphResponse({
-    $core.List<$core.int>? graph,
+    $core.String? graph,
   }) {
     final _result = create();
     if (graph != null) {
@@ -890,9 +890,9 @@ class GetGraphResponse extends $pb.GeneratedMessage {
   static GetGraphResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$core.int> get graph => $_getN(0);
+  $core.String get graph => $_getSZ(0);
   @$pb.TagNumber(1)
-  set graph($core.List<$core.int> v) { $_setBytes(0, v); }
+  set graph($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
   $core.bool hasGraph() => $_has(0);
   @$pb.TagNumber(1)

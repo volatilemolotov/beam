@@ -245,12 +245,12 @@ final $typed_data.Uint8List getGraphRequestDescriptor = $convert.base64Decode('C
 const GetGraphResponse$json = const {
   '1': 'GetGraphResponse',
   '2': const [
-    const {'1': 'graph', '3': 1, '4': 1, '5': 12, '10': 'graph'},
+    const {'1': 'graph', '3': 1, '4': 1, '5': 9, '10': 'graph'},
   ],
 };
 
 /// Descriptor for `GetGraphResponse`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List getGraphResponseDescriptor = $convert.base64Decode('ChBHZXRHcmFwaFJlc3BvbnNlEhQKBWdyYXBoGAEgASgMUgVncmFwaA==');
+final $typed_data.Uint8List getGraphResponseDescriptor = $convert.base64Decode('ChBHZXRHcmFwaFJlc3BvbnNlEhQKBWdyYXBoGAEgASgJUgVncmFwaA==');
 @$core.Deprecated('Use cancelRequestDescriptor instead')
 const CancelRequest$json = const {
   '1': 'CancelRequest',
