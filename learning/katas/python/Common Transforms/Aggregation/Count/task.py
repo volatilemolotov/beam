@@ -20,7 +20,7 @@
 #   multifile: false
 #   categories:
 #     - Combiners
-#     - Quick Start
+#     - Quickstart
 
 import apache_beam as beam
 

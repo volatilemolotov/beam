@@ -21,7 +21,7 @@
 #   multifile: false
 #   categories:
 #     - Core Transforms
-#     - Quick Start
+#     - Quickstart
 
 import apache_beam as beam
 
