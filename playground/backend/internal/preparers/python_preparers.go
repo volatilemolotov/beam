@@ -41,7 +41,7 @@ func GetPythonPreparers(builder *PreparersBuilder) {
 	builder.
 		PythonPreparers().
 		WithLogHandler().
-		WithGraph()
+		WithGraphHandler()
 }
 
 //PythonPreparersBuilder facet of PreparersBuilder
@@ -64,8 +64,8 @@ func (builder *PythonPreparersBuilder) WithLogHandler() *PythonPreparersBuilder 
 	return builder
 }
 
-//WithGraph adds code to save the graph
-func (builder *PythonPreparersBuilder) WithGraph() *PythonPreparersBuilder {
+//WithGraphHandler adds code to save the graph
+func (builder *PythonPreparersBuilder) WithGraphHandler() *PythonPreparersBuilder {
 	addLogHandler := Preparer{
 		Prepare: addCodeToFile,
 		Args:    []interface{}{builder.filePath, saveGraph},
@@ -77,7 +77,7 @@ func (builder *PythonPreparersBuilder) WithGraph() *PythonPreparersBuilder {
 // addCodeToFile processes file by filePath and adds additional code
 func addCodeToFile(args ...interface{}) error {
 	filePath := args[0].(string)
-	addCode := args[1].(func(*os.File, *os.File) error)
+	addCodeMethod := args[1].(func(*os.File, *os.File) error)
 
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -93,7 +93,7 @@ func addCodeToFile(args ...interface{}) error {
 	}
 	defer tmp.Close()
 
-	err = addCode(file, tmp)
+	err = addCodeMethod(file, tmp)
 	if err != nil {
 		logger.Errorf("Preparation: Error during write data to tmp file, err: %s\n", err.Error())
 		return err
