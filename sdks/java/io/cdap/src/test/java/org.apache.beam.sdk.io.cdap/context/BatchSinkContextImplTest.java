@@ -80,7 +80,6 @@ public class BatchSinkContextImplTest {
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
         /** act && assert */
-        // Using a range of 100 milliseconds to check the correct work of the method
         assertTrue(startTime.getTime() - context.getLogicalStartTime() <= 100);
     }
 }

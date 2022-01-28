@@ -40,7 +40,6 @@ public class BatchContextImplTest {
         long actualStartTime = context.getLogicalStartTime();
 
         /** assert */
-        // Using a range of 100 milliseconds to check the correct work of the method
         assertTrue((expectedStartTime.getTime() - actualStartTime) <= 100);
     }
 

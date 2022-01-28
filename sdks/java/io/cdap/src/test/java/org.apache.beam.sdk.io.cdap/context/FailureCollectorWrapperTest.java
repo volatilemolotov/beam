@@ -48,12 +48,12 @@ public class FailureCollectorWrapperTest {
     public void getOrThrowException() {
         /** arrange */
         FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
-        String message = "An error has occurred";
+        String errorMessage = "An error has occurred";
         String expectedMessage = "Errors were encountered during validation. An error has occurred";
 
         FailureCollectorWrapper emptyFailureCollectorWrapper = new FailureCollectorWrapper();
 
-        RuntimeException error = new RuntimeException(message);
+        RuntimeException error = new RuntimeException(errorMessage);
         failureCollectorWrapper.addFailure(error.getMessage(), null);
 
         /** act && assert */
@@ -69,11 +69,11 @@ public class FailureCollectorWrapperTest {
     public void getValidationFailures() {
         /** arrange */
         FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
-        String message = "An error has occurred";
+        String errorMessage = "An error has occurred";
 
         FailureCollectorWrapper emptyFailureCollectorWrapper = new FailureCollectorWrapper();
 
-        RuntimeException error = new RuntimeException(message);
+        RuntimeException error = new RuntimeException(errorMessage);
         failureCollectorWrapper.addFailure(error.getMessage(), null);
 
         /** act */
@@ -84,7 +84,7 @@ public class FailureCollectorWrapperTest {
         /** assert */
         assertEquals(1, exceptionCollector.size());
         String actualMessage = exceptionCollector.get(0).getMessage();
-        assertEquals(message, actualMessage);
+        assertEquals(errorMessage, actualMessage);
 
         assertEquals(0, emptyExceptionCollector.size());
     }

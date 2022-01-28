@@ -79,7 +79,6 @@ public class BatchSourceContextImplTest {
         Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
         /** act && assert */
-        // Using a range of 100 milliseconds between the creation of 2 objects  to check the correct work of the method
         assertTrue(startTime.getTime() - context.getLogicalStartTime() <= 100);
     }
 }
