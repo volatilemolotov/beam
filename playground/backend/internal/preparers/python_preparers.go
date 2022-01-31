@@ -37,11 +37,13 @@ const (
 )
 
 // GetPythonPreparers returns preparation methods that should be applied to Python code
-func GetPythonPreparers(builder *PreparersBuilder) {
+func GetPythonPreparers(builder *PreparersBuilder, isUnitTest bool) {
 	builder.
 		PythonPreparers().
-		WithLogHandler().
-		WithGraphHandler()
+		WithLogHandler()
+	if !isUnitTest {
+		builder.PythonPreparers().WithGraphHandler()
+	}
 }
 
 //PythonPreparersBuilder facet of PreparersBuilder
