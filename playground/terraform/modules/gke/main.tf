@@ -20,7 +20,7 @@
 
 terraform {
   backend "gcs" {
-    bucket  = "playground_terraform"
+    bucket  = "beam_playground_terraform"
   }
 }
 
@@ -31,7 +31,6 @@ resource "google_container_cluster" "playground-gke" {
   initial_node_count = "${var.node_count}"
   node_config {
     machine_type     = "${var.machine_type}"
-    service_account  = "${var.service_account}"
 
     oauth_scopes    = [
       "https://www.googleapis.com/auth/cloud-platform"

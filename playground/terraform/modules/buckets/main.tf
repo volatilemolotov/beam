@@ -28,7 +28,7 @@ resource "google_storage_bucket" "examples_bucket" {
 
 resource "google_storage_bucket_access_control" "public_rule" {
   bucket = google_storage_bucket.examples_bucket.name
-  role   = "VIEWER"
+  role   = "READER"
   entity = "allUsers"
 }
 

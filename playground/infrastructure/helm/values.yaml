@@ -16,7 +16,7 @@
 replicaCount: 1
 
 image:
-  repository_java: beam_playground-backend
+  repository_java: beam_playground-backend-java
   repository_go: beam_playground-backend-go
   repository_python: beam_playground-backend-python
   pullPolicy: Always
