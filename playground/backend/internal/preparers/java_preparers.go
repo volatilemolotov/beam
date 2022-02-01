@@ -38,8 +38,7 @@ const (
 	publicClassNamePattern            = "public class (.*?) [{|implements(.*)]"
 	pipelineNamePattern               = `Pipeline\s([A-z|0-9_]*)\s=\sPipeline\.create`
 	findImportsPattern                = `import.*\;`
-	graphExtractionImport             = "import org.apache.beam.runners.core.construction.renderer.PipelineDotRenderer;"
-	graphSavePattern                  = "String dotString = PipelineDotRenderer.toDotString(%s);\n" +
+	graphSavePattern                  = "String dotString = org.apache.beam.runners.core.construction.renderer.PipelineDotRenderer.toDotString(%s);\n" +
 		"    try (java.io.PrintWriter out = new java.io.PrintWriter(\"Graph.dot\")) {\n      " +
 		"		out.println(dotString);\n    " +
 		"	} catch (java.io.FileNotFoundException e) {\n" +
@@ -99,12 +98,6 @@ func (builder *JavaPreparersBuilder) WithFileNameChanger() *JavaPreparersBuilder
 }
 
 func (builder *JavaPreparersBuilder) WithGraphExtractor() *JavaPreparersBuilder {
-	graphImportAdder := Preparer{
-		Prepare: addImportForGraph,
-		Args:    []interface{}{builder.filePath},
-	}
-	builder.AddPreparer(graphImportAdder)
-
 	graphCodeAdder := Preparer{
 		Prepare: addCodeToSaveGraph,
 		Args:    []interface{}{builder.filePath},
@@ -171,22 +164,6 @@ func findImports(filepath string) ([]string, error) {
 	imports := reg.FindAllString(string(b), -1)
 
 	return imports, nil
-}
-
-func addImportForGraph(args ...interface{}) error {
-	filePath := args[0].(string)
-	imports, err := findImports(filePath)
-	if err != nil || len(imports) == 0 {
-		logger.Error("Can't add graph extractor. Can't find imports in a file")
-		return err
-	}
-	newImport := fmt.Sprintf("%s\n%s\n", imports[0], graphExtractionImport)
-	err = replace(filePath, imports[0], newImport)
-	if err != nil {
-		logger.Error("Can't add graph extractor. Can't add new import")
-		return err
-	}
-	return nil
 }
 
 // replace processes file by filePath and replaces all patterns to newPattern
