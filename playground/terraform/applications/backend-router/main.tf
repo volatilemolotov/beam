@@ -53,10 +53,7 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
   env_variables = {
     CACHE_TYPE                  = var.cache_type
     CACHE_ADDRESS               = "${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
-    NUM_PARALLEL_JOBS           = 30
     LAUNCH_SITE                 = "app_engine"
-    PIPELINE_EXPIRATION_TIMEOUT = "5m"
-    KEY_EXPIRATION_TIME         = "7m"
   }
 
   resources {
