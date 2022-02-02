@@ -17,7 +17,8 @@
 ###############################################################################
 #Dokerfile to set up the Beam Go SDK
 ARG BASE_IMAGE=golang:1.16-bullseye
-FROM $BASE_IMAGE
+#Two-stage assembly
+FROM $BASE_IMAGE AS build
 
 # Setup Go Environment
 ENV GOPATH /go
@@ -48,25 +49,25 @@ RUN ls
 RUN go mod download &&\
     go mod tidy &&\
     cd cmd/server &&\
-    go build -o /opt/playground/backend/server_go_backend
+    go build -o /go/bin/server_go_backend
 
+# Null image
+FROM debian:stretch-slim
+
+RUN set -eux &&\
+	apt-get update &&\
+	apt-get install -y --no-install-recommends ca-certificates
+
+# Set Environment
 ENV SERVER_IP=0.0.0.0
 ENV SERVER_PORT=8080
 ENV APP_WORK_DIR=/opt/playground/backend/
 ENV BEAM_SDK="SDK_UNSPECIFIED"
-## Copy build result
-COPY src/configs /opt/playground/backend/configs/
 
-# Install mitmpoxy
-RUN mkdir /opt/mitmproxy &&\
-    cd /opt/mitmproxy &&\
-    wget https://snapshots.mitmproxy.org/7.0.4/mitmproxy-7.0.4-linux.tar.gz &&\
-    tar -zxvf mitmproxy-7.0.4-linux.tar.gz &&\
-    mkdir /usr/local/share/ca-certificates/extra
+# Copy build result
+COPY --from=build /go/bin/server_go_backend /opt/playground/backend/
+COPY --from=build /go/src/playground/backend/configs /opt/playground/backend/configs/
+
 COPY entrypoint.sh /
-COPY allow_list_proxy.py /opt/mitmproxy/
-COPY allow_list.py /opt/mitmproxy/
-#ENV HTTP_PROXY="http://127.0.0.1:8081"
-#ENV HTTPS_PROXY="http://127.0.0.1:8081"
-
 ENTRYPOINT ["/entrypoint.sh"]
+
