@@ -109,11 +109,11 @@ jobs:
         working-directory: playground/terraform/applications/backend-python
         if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Deploy Backend Application Router
-          env:
-            GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-          run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-router${{env.STAND_SUFFIX}}"
-          working-directory: playground/terraform/applications/backend-router
-          if: "'refs/heads/beta-version-v1' == github.ref"
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-router${{env.STAND_SUFFIX}}"
+        working-directory: playground/terraform/applications/backend-router
+        if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Deploy Backend Application SCIO
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
