@@ -18,7 +18,7 @@
 #
 data "terraform_remote_state" "remote_state_memorystore" {
   backend = "gcs"
-  config  = {
+  config = {
     bucket = "beam_playground_terraform"
     prefix = "memorystore"
   }
@@ -61,7 +61,7 @@ resource "google_app_engine_flexible_app_version" "backend_app_scio" {
 
   env_variables = {
     CACHE_TYPE        = var.cache_type
-    CACHE_ADDRESS               = "${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
+    CACHE_ADDRESS     = "${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
     NUM_PARALLEL_JOBS = 10
     LAUNCH_SITE       = "app_engine"
   }
