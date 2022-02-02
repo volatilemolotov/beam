@@ -75,7 +75,7 @@ jobs:
       - name: Setup GCP account
         run: |
              echo "${{ secrets.PLAYGROUND_GCP_ACCESS_KEY }}" | base64 -d > /tmp/gcp_access.json
-        if: startsWith(github.ref, 'ref/tags/')
+        if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Login to Docker Registry
         run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
         if: "'refs/heads/beta-version-v1' == github.ref"
