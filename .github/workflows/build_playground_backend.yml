@@ -84,6 +84,9 @@ jobs:
       - name: Prepare Build Router
         run: ./gradlew playground:backend:containers:router:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
         if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Clean All Build directories
+        run: ./gradlew clean
+        if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Deploy Backend Application Java
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
