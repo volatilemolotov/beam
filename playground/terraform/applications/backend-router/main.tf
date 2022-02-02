@@ -33,7 +33,8 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
   delete_service_on_destroy = true
 
   liveness_check {
-    path = ""
+    path          = "/liveness"
+    initial_delay = "40s"
   }
 
   readiness_check {
@@ -51,7 +52,12 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
 
   resources {
     memory_gb = 16
-    cpu = 8
+    cpu       = 8
+    volumes {
+      name        = "inmemory"
+      size_gb     = var.volume_size
+      volume_type = "tmpfs"
+    }
   }
 
   env_variables = {

@@ -21,6 +21,11 @@ variable "project_id" {
   description = "Project ID"
 }
 
+variable "volume_size" {
+  description = "Size of the in memory file system to be used by the application, in GB"
+  type        = number
+  default     = 1
+}
 variable "docker_registry_address" {
   description = "Docker registry address"
 }
