@@ -60,7 +60,7 @@ RUN set -eux &&\
 	apt-get install -y --no-install-recommends ca-certificates
 
 # copy the ca-certificate.crt from the build stage
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Set Environment
 ENV SERVER_IP=0.0.0.0
