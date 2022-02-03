@@ -54,10 +54,13 @@ RUN go mod download &&\
 # Null image
 FROM debian:stretch-slim
 
+# add certificate package
 RUN set -eux &&\
 	apt-get update &&\
-	apt-get install -y --no-install-recommends ca-certificates &&\
-    update-ca-certificates 2>/dev/null || true
+	apt-get install -y --no-install-recommends ca-certificates
+
+# copy the ca-certificate.crt from the build stage
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Set Environment
 ENV SERVER_IP=0.0.0.0
