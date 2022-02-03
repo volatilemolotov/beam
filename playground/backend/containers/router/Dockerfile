@@ -56,7 +56,8 @@ FROM debian:stretch-slim
 
 RUN set -eux &&\
 	apt-get update &&\
-	apt-get install -y --no-install-recommends ca-certificates
+	apt-get install -y --no-install-recommends ca-certificates &&\
+    update-ca-certificates 2>/dev/null || true
 
 # Set Environment
 ENV SERVER_IP=0.0.0.0
