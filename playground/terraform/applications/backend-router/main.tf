@@ -16,10 +16,9 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-
 data "terraform_remote_state" "remote_state_memorystore" {
   backend = "gcs"
-  config  = {
+  config = {
     bucket = "beam_playground_terraform"
     prefix = "memorystore"
   }
@@ -50,12 +49,6 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
     }
   }
 
-  env_variables = {
-    CACHE_TYPE                  = var.cache_type
-    CACHE_ADDRESS               = "${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
-    LAUNCH_SITE                 = "app_engine"
-  }
-
   resources {
     memory_gb = 16
     cpu       = 8
@@ -64,6 +57,13 @@ resource "google_app_engine_flexible_app_version" "backend_app_router" {
       size_gb     = var.volume_size
       volume_type = "tmpfs"
     }
+  }
+
+  env_variables = {
+    CACHE_TYPE=var.cache_type
+    CACHE_ADDRESS="${data.terraform_remote_state.remote_state_memorystore.outputs.memorystore_host}:6379"
+    NUM_PARALLEL_JOBS = 10
+    LAUNCH_SITE       = "app_engine"
   }
 
   deployment {

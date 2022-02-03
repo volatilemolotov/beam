@@ -70,13 +70,6 @@ ENV BEAM_SDK="SDK_UNSPECIFIED"
 COPY --from=build /go/bin/server_go_backend /opt/playground/backend/
 COPY --from=build /go/src/playground/backend/configs /opt/playground/backend/configs/
 
-## Install mitmpoxy
-RUN mkdir /opt/mitmproxy &&\
-    cd /opt/mitmproxy &&\
-    wget https://snapshots.mitmproxy.org/7.0.4/mitmproxy-7.0.4-linux.tar.gz &&\
-    tar -zxvf mitmproxy-7.0.4-linux.tar.gz &&\
-    mkdir /usr/local/share/ca-certificates/extra
-
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 
