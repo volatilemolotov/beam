@@ -89,4 +89,3 @@ class NodeElementPainter {
     return textWidth;
   }
 }
-

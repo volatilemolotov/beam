@@ -21,4 +21,3 @@ abstract class Extractor<T> {
 
   T? extract(String line);
 }
-
