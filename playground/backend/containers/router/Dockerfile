@@ -52,7 +52,13 @@ RUN go mod download &&\
     go build -o /go/bin/server_go_backend
 
 # Null image
-FROM openjdk:8
+FROM debian:bullseye
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        ca-certificates \
+        && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set Environment
 ENV SERVER_IP=0.0.0.0
@@ -63,6 +69,13 @@ ENV BEAM_SDK="SDK_UNSPECIFIED"
 # Copy build result
 COPY --from=build /go/bin/server_go_backend /opt/playground/backend/
 COPY --from=build /go/src/playground/backend/configs /opt/playground/backend/configs/
+
+## Install mitmpoxy
+RUN mkdir /opt/mitmproxy &&\
+    cd /opt/mitmproxy &&\
+    wget https://snapshots.mitmproxy.org/7.0.4/mitmproxy-7.0.4-linux.tar.gz &&\
+    tar -zxvf mitmproxy-7.0.4-linux.tar.gz &&\
+    mkdir /usr/local/share/ca-certificates/extra
 
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
