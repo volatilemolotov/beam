@@ -26,71 +26,39 @@ import 'package:playground/modules/graph/graph_builder/painters/graph_painter.da
 import 'package:playground/modules/graph/graph_builder/painters/node_painter.dart';
 import 'package:playground/modules/graph/models/graph.dart';
 import 'package:playground/modules/graph/models/table_cell.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
 final kGraphElementExtractor = GraphElementExtractor();
 final kLabelExtractor = LabelExtractor();
 final kEdgeExtractor = EdgeExtractor();
 
-class GraphBuilder {
+abstract class GraphBuilder {
   final List<GraphElement> elements = [];
   final List<Edge> edges = [];
-  final List<GraphElement> parentElements = [];
   final Map<String, GraphElement> elementsMap = {};
-  GraphElement? lastElement;
 
-  static GraphBuilder parseDot(String dot) {
+  static GraphBuilder? parseDot(String dot, SDK sdk) {
     LineSplitter ls = const LineSplitter();
     List<String> lines = ls.convert(dot);
-    GraphBuilder builder = GraphBuilder();
+    GraphBuilder builder;
+    switch (sdk) {
+      case SDK.java:
+        builder = JavaGraphBuilder();
+        break;
+      case SDK.python:
+        builder = PythonGraphBuilder();
+        break;
+      default:
+        return null;
+    }
     for (var line in lines) {
-      builder._parseNextLine(line);
+      builder.parseNextLine(line);
     }
     builder.finish();
     return builder;
   }
 
-  void _parseNextLine(String line) {
-    try {
-      if (kGraphElementExtractor.check(line)) {
-        final element = kGraphElementExtractor.extract(line);
-        if (element == null) {
-          return;
-        }
-        elements.add(element);
-        setParent(element);
-        if (element.type != NodeType.node) {
-          parentElements.add(element);
-          lastElement = element;
-        }
-        elementsMap[element.name] = element;
-      } else if (kLabelExtractor.check(line)) {
-        final label = kLabelExtractor.extract(line);
-        lastElement?.label = label ?? '';
-      } else if (kEdgeExtractor.check(line)) {
-        final edge = kEdgeExtractor.extract(line);
-        if (edge != null) {
-          edges.add(edge);
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  setParent(GraphElement element) {
-    final lastParent = parentElements.isNotEmpty ? parentElements.last : null;
-    if (lastParent != null) {
-      if (lastParent.depth >= element.depth) {
-        while (parentElements.isNotEmpty &&
-            parentElements.last.depth >= element.depth) {
-          parentElements.removeLast();
-        }
-      }
-      final prevParent = parentElements.isNotEmpty ? parentElements.last : null;
-      element.parent = prevParent;
-      prevParent?.child.add(element);
-    }
-  }
+  void parseNextLine(String line);
 
   GraphPainter getPainter() {
     final List<Node> nodeElements = elements
@@ -142,6 +110,7 @@ class GraphBuilder {
         }
       }
     }
+    return topologicalOrder;
   }
 
   Map<String, int> determineNodesColumns(List<Node> nodeElements,
@@ -192,5 +161,86 @@ class GraphBuilder {
       (elementsMap[edge.startId] as Node).outEdges.add(edge);
       (elementsMap[edge.endId] as Node).inEdges.add(edge);
     }
+  }
+}
+
+class JavaGraphBuilder extends GraphBuilder {
+  final List<GraphElement> parentElements = [];
+  GraphElement? lastElement;
+
+  @override
+  void parseNextLine(String line) {
+    try {
+      if (kGraphElementExtractor.check(line)) {
+        final element = kGraphElementExtractor.extract(line);
+        if (element == null) {
+          return;
+        }
+        elements.add(element);
+        setParent(element);
+        if (element.type != NodeType.node) {
+          parentElements.add(element);
+          lastElement = element;
+        }
+        elementsMap[element.name] = element;
+      } else if (kLabelExtractor.check(line)) {
+        final label = kLabelExtractor.extract(line);
+        lastElement?.label = label ?? '';
+      } else if (kEdgeExtractor.check(line)) {
+        final edge = kEdgeExtractor.extract(line);
+        if (edge != null) {
+          edges.add(edge);
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  setParent(GraphElement element) {
+    final lastParent = parentElements.isNotEmpty ? parentElements.last : null;
+    if (lastParent != null) {
+      if (lastParent.depth >= element.depth) {
+        while (parentElements.isNotEmpty &&
+            parentElements.last.depth >= element.depth) {
+          parentElements.removeLast();
+        }
+      }
+      final prevParent = parentElements.isNotEmpty ? parentElements.last : null;
+      element.parent = prevParent;
+      prevParent?.child.add(element);
+    }
+  }
+}
+
+const kPythonDefaultCollectionLabel = 'pcoll';
+const kPythonCollectionLabel = 'PCollection';
+
+class PythonGraphBuilder extends GraphBuilder {
+  @override
+  void parseNextLine(String line) {
+    if (kEdgeExtractor.check(line)) {
+      final edge = kEdgeExtractor.extract(line);
+      if (edge != null) {
+        createNodes(edge);
+        edges.add(edge);
+      }
+    }
+  }
+
+  createNodes(Edge edge) {
+    createNodeIfNotExists(edge.startId);
+    createNodeIfNotExists(edge.endId);
+  }
+
+  createNodeIfNotExists(String name) {
+    if (elementsMap[name] != null) {
+      return;
+    }
+    final label =
+        name.replaceFirst(kPythonDefaultCollectionLabel, kPythonCollectionLabel);
+    Node node = Node(label: label, depth: 1, name: name);
+    elementsMap[name] = node;
+    elements.add(node);
   }
 }
