@@ -19,21 +19,39 @@
 import 'package:playground/modules/graph/graph_builder/extractors/extractors.dart';
 import 'package:playground/modules/graph/models/graph.dart';
 
-final RegExp kEdgeRegExp = RegExp(r'''\d+ -> \d+ \[style=.+ label=".*"\]''');
+final RegExp kEdgeRegExp = RegExp(r'''.+ -> .+''');
 const kPrimaryEdgeStyle = 'solid';
 const kEdgeSeparator = ' -> ';
 const kStyleStart = '[';
+const kStyleString = 'style';
 
 class EdgeExtractor implements Extractor<Edge> {
   @override
   Edge? extract(String line) {
     final lineWithoutSpaces = line.trim();
-    final edgesString =
-    lineWithoutSpaces.substring(0, lineWithoutSpaces.indexOf(kStyleStart));
+    final styleStartIndex = lineWithoutSpaces.indexOf(kStyleStart);
+    final endOfEdges =
+    styleStartIndex > 0 ? styleStartIndex : lineWithoutSpaces.length;
+    var edgesString = lineWithoutSpaces.substring(0, endOfEdges);
+    if (edgesString.endsWith(';')) {
+      edgesString = edgesString.substring(0, edgesString.length - 1);
+    }
     final edges = edgesString.split(kEdgeSeparator);
-    final isPrimary = lineWithoutSpaces.contains(kPrimaryEdgeStyle);
+    final isPrimary = lineWithoutSpaces.contains(kPrimaryEdgeStyle) ||
+        !lineWithoutSpaces.contains(kStyleString);
     return Edge(
-        startId: edges[0].trim(), endId: edges[1].trim(), isPrimary: isPrimary);
+      startId: removeExtraSymbols(edges[0]),
+      endId: removeExtraSymbols(edges[1]),
+      isPrimary: isPrimary,
+    );
+  }
+
+  removeExtraSymbols(String name) {
+    final trimName = name.trim();
+    if (trimName.isNotEmpty && trimName.startsWith('"')) {
+      return trimName.substring(1, trimName.length - 1);
+    }
+    return trimName;
   }
 
   @override

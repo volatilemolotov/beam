@@ -21,6 +21,7 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/graph/graph_builder/canvas_drawer.dart';
 import 'package:playground/modules/graph/graph_builder/graph_builder.dart';
 import 'package:playground/modules/graph/graph_builder/painters/graph_painter.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
 class GraphCustomPainter extends CustomPainter {
   final GraphPainter graph;
@@ -40,8 +41,13 @@ class GraphCustomPainter extends CustomPainter {
 
 class GraphTab extends StatefulWidget {
   final String graph;
+  final SDK sdk;
 
-  const GraphTab({Key? key, required this.graph}) : super(key: key);
+  const GraphTab({
+    Key? key,
+    required this.graph,
+    required this.sdk,
+  }) : super(key: key);
 
   @override
   State<GraphTab> createState() => _GraphTabState();
@@ -53,8 +59,8 @@ class _GraphTabState extends State<GraphTab> {
   @override
   void initState() {
     if (widget.graph.isNotEmpty) {
-      print(widget.graph);
-      graphPainter = GraphBuilder.parseDot(widget.graph).getPainter();
+      graphPainter =
+          GraphBuilder.parseDot(widget.graph, widget.sdk)?.getPainter();
     }
     super.initState();
   }
@@ -64,8 +70,8 @@ class _GraphTabState extends State<GraphTab> {
     if (oldWidget.graph.isNotEmpty &&
         widget.graph.isNotEmpty &&
         oldWidget.graph != widget.graph) {
-      print(widget.graph);
-      graphPainter = GraphBuilder.parseDot(widget.graph).getPainter();
+      graphPainter =
+          GraphBuilder.parseDot(widget.graph, SDK.java)?.getPainter();
     }
     super.didUpdateWidget(oldWidget);
   }

@@ -47,6 +47,7 @@ class OutputArea extends StatelessWidget {
               ),
               GraphTab(
                 graph: state.result?.graph ?? '',
+                sdk: state.sdk,
               ),
             ],
           );
