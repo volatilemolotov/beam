@@ -38,6 +38,7 @@ const (
 	scioProjectName        = "y"
 	projectPath            = scioProjectName + "/src/main/scala/" + scioProjectName
 	logFileName            = "logs.log"
+	graphFileName          = "graph.dot"
 	defaultExampleInSbt    = "WordCount.scala"
 	shCmd                  = "sh"
 	scioProject            = "new_scio_project.sh"
@@ -170,6 +171,7 @@ func prepareSbtFiles(lc *fs_tool.LifeCycle, pipelineFolder string, workingDir st
 	absFileFolderPath, _ := filepath.Abs(sourceFileFolder)
 	absFilePath, _ := filepath.Abs(filepath.Join(absFileFolderPath, fileName))
 	absLogFilePath, _ := filepath.Abs(filepath.Join(absFileFolderPath, logFileName))
+	absGraphFilePath, _ := filepath.Abs(filepath.Join(absFileFolderPath, graphFileName))
 	projectFolder, _ := filepath.Abs(filepath.Join(pipelineFolder, scioProjectName))
 	executableName := lc.Paths.ExecutableName
 
@@ -192,6 +194,7 @@ func prepareSbtFiles(lc *fs_tool.LifeCycle, pipelineFolder string, workingDir st
 			AbsoluteExecutableFilePath:       absFilePath,
 			AbsoluteBaseFolderPath:           absFileFolderPath,
 			AbsoluteLogFilePath:              absLogFilePath,
+			AbsoluteGraphFilePath:            absGraphFilePath,
 			ProjectDir:                       projectFolder,
 		},
 	}

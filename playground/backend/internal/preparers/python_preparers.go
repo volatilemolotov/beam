@@ -32,7 +32,6 @@ const (
 	indentationReplacement = "$0"
 	findPipelinePattern    = `(\s+)with.+Pipeline.+as (.+):`
 	indentationPattern     = `^(%s){0,1}\w+`
-	GraphFileName          = "graph.dot"
 	graphCodePattern       = "$0# Write graph to file\n$0from apache_beam.runners.interactive.display import pipeline_graph\n$0dot = pipeline_graph.PipelineGraph(%s).get_dot()\n$0with open('%s', 'w') as file:\n$0  file.write(dot)\n"
 )
 
@@ -134,7 +133,7 @@ func writeToFile(to *os.File, str string) error {
 	return nil
 }
 
-// saveGraph add code to pipeline to save the pipeline's graph to the file graph.dot
+// saveGraph adds code to pipeline to save the pipeline's graph to the file GraphFileName
 func saveGraph(from *os.File, to *os.File) error {
 	newLine := false
 	reg := regexp.MustCompile(findPipelinePattern)
@@ -180,7 +179,7 @@ func addCodeForGraph(line, spaces, pipelineName *string, reg **regexp.Regexp) {
 	found := (*reg).FindAllStringSubmatch(*line, -1)
 	if found != nil {
 		indentation := *spaces + oneIndentation
-		graphCode := fmt.Sprintf(graphCodePattern, *pipelineName, GraphFileName)
+		graphCode := fmt.Sprintf(graphCodePattern, *pipelineName, graphFileName)
 		graphCodeWithIndentation := strings.ReplaceAll(graphCode, indentationReplacement, indentation)
 		*line = graphCodeWithIndentation + *line
 		*reg = nil
