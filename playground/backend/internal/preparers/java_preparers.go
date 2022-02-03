@@ -39,7 +39,7 @@ const (
 	pipelineNamePattern               = `Pipeline\s([A-z|0-9_]*)\s=\sPipeline\.create`
 	findImportsPattern                = `import.*\;`
 	graphSavePattern                  = "String dotString = org.apache.beam.runners.core.construction.renderer.PipelineDotRenderer.toDotString(%s);\n" +
-		"    try (java.io.PrintWriter out = new java.io.PrintWriter(\"Graph.dot\")) {\n      " +
+		"    try (java.io.PrintWriter out = new java.io.PrintWriter(\"%s\")) {\n      " +
 		"		out.println(dotString);\n    " +
 		"	} catch (java.io.FileNotFoundException e) {\n" +
 		"      e.printStackTrace();\n    " +
@@ -97,7 +97,8 @@ func (builder *JavaPreparersBuilder) WithFileNameChanger() *JavaPreparersBuilder
 	return builder
 }
 
-func (builder *JavaPreparersBuilder) WithGraphExtractor() *JavaPreparersBuilder {
+//WithGraphHandler adds code to save the graph
+func (builder *JavaPreparersBuilder) WithGraphHandler() *JavaPreparersBuilder {
 	graphCodeAdder := Preparer{
 		Prepare: addCodeToSaveGraph,
 		Args:    []interface{}{builder.filePath},
@@ -109,7 +110,7 @@ func (builder *JavaPreparersBuilder) WithGraphExtractor() *JavaPreparersBuilder 
 func addCodeToSaveGraph(args ...interface{}) error {
 	filePath := args[0].(string)
 	pipelineObjectName, _ := findPipelineObjectName(filePath)
-	graphSaveCode := fmt.Sprintf(graphSavePattern, pipelineObjectName, pipelineObjectName)
+	graphSaveCode := fmt.Sprintf(graphSavePattern, pipelineObjectName, graphFileName, pipelineObjectName)
 
 	err := replace(filePath, fmt.Sprintf("%s.run", pipelineObjectName), graphSaveCode)
 	if err != nil {
@@ -125,7 +126,7 @@ func GetJavaPreparers(builder *PreparersBuilder, isUnitTest bool, isKata bool) {
 		builder.JavaPreparers().
 			WithPublicClassRemover().
 			WithPackageChanger().
-			WithGraphExtractor()
+			WithGraphHandler()
 	}
 	if isUnitTest {
 		builder.JavaPreparers().
