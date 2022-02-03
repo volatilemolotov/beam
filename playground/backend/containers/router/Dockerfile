@@ -60,6 +60,9 @@ RUN apt-get update &&\
 
 # copy the ca-certificate.crt from the build stage
 COPY --from=build /etc/ssl/certs/*.* /etc/ssl/certs/
+COPY googleapis.pem /etc/ssl/certs/
+
+RUN update-ca-certificates
 
 # Set Environment
 ENV SERVER_IP=0.0.0.0
