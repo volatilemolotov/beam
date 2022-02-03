@@ -18,25 +18,25 @@
 package org.apache.beam.sdk.io.cdap;
 
 import com.google.common.collect.ImmutableMap;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormat;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormatProvider;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
-import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
+import org.apache.hadoop.io.MapWritable;
+import io.cdap.cdap.api.data.schema.Schema;
 
 import java.util.*;
 
-/**
- * Class providing an example of plugin wrapper usage.
- */
-public class PluginWrapperTest {
+public class PluginTest {
     /**
-     * Wrapper builder for Salesforce Batch Source plugin.
+     * Builder for Salesforce Batch Source plugin.
      */
-    public static class SalesforcePluginWrapperBuilder extends PluginWrapperBuilder {
+    public static class SalesforceSourcePluginBuilder extends
+            SourcePluginBuilder<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> {
         /**
          * Constructor for Salesforce Batch Source plugin wrapper builder.
          */
-        public SalesforcePluginWrapperBuilder() {
+        public SalesforceSourcePluginBuilder() {
             super(SalesforceBatchSource.class);
             this.withFormat(SalesforceInputFormat.class)
                 .withFormatProvider(SalesforceInputFormatProvider.class);
@@ -44,23 +44,10 @@ public class PluginWrapperTest {
     }
 
     /**
-     * Wrapper for Salesforce Batch Source plugin.
+     * Salesforce Batch Source plugin.
      */
-    public static class SalesforcePluginWrapper extends PluginWrapper {
-        /**
-         * Constructor for creating Salesforce Batch Source plugin wrapper instance.
-         */
-        public SalesforcePluginWrapper() {
-            super(SalesforceBatchSource.class);
-        }
-
-        /**
-         * Reads data from Salesforce.
-         */
-        public Object read() {
-            return new Object();
-        }
-    }
+    public static class SalesforceSourcePlugin extends
+            SourcePlugin<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> { }
 
     private final ImmutableMap<String, String> TEST_SALESFORCE_PARAMS_MAP =
             ImmutableMap.<String, String>builder()
@@ -88,16 +75,11 @@ public class PluginWrapperTest {
             .setParam(REFERENCE_NAME_PARAM_NAME, "some reference name")
             .build();
 
-    /**
-     * Salesforce plugin wrapper instance.
-     */
-    public SalesforcePluginWrapper pluginWrapper =
-            (SalesforcePluginWrapper) new SalesforcePluginWrapperBuilder()
-                    .withConfig(salesforceSourceConfig)
-                    .build();
+    public SalesforceSourcePlugin salesforceSourcePlugin
+            = (SalesforceSourcePlugin) new SalesforceSourcePluginBuilder().build();
 
-    /**
-     * Example of reading data using plugin wrapper.
-     */
-    Object obj = pluginWrapper.read();
+    public Object res = salesforceSourcePlugin
+            .withConfig(salesforceSourceConfig)
+            .withHadoopConfiguration(Schema.class, MapWritable.class);
+
 }

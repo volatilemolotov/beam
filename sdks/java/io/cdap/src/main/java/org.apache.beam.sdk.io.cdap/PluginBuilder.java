@@ -19,13 +19,30 @@ package org.apache.beam.sdk.io.cdap;
 
 import io.cdap.cdap.api.plugin.PluginConfig;
 
-/**
- * Class containing general info about a plugin.
- */
-public class PluginInfo {
-    public Class pluginClass;
-    public Class formatClass;
-    public Class formatProviderClass;
+public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
+    protected final Class<?> pluginClass;
 
-    public PluginConfig pluginConfig;
+    protected Class<F> format;
+    protected Class<FP> formatProvider;
+
+    public PluginBuilder(Class<?> pluginClass) {
+        this.pluginClass = pluginClass;
+    }
+
+    public Class<?> getPluginClass() {
+        return pluginClass;
+    }
+
+    public PluginBuilder<F, FP, PC> withFormat(Class<F> format) {
+        this.format = format;
+        return this;
+    }
+
+    public PluginBuilder<F, FP, PC> withFormatProvider(Class<FP> formatProvider) {
+        this.formatProvider = formatProvider;
+        return this;
+    }
+
+    public abstract void validatePluginClass();
+    public abstract Plugin<F, FP, PC> build();
 }
