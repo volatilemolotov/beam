@@ -59,8 +59,8 @@ RUN apt-get update &&\
 	apt-get install -y ca-certificates
 
 # copy the ca-certificate.crt from the build stage
-COPY --from=build /etc/ssl/certs/* /etc/ssl/certs/
-RUN update-ca-certificates
+COPY --from=build /etc/ssl/certs/*.* /etc/ssl/certs/
+
 # Set Environment
 ENV SERVER_IP=0.0.0.0
 ENV SERVER_PORT=8080
