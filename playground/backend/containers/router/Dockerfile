@@ -55,13 +55,13 @@ RUN go mod download &&\
 FROM debian:stretch-slim
 
 # add certificate package
-RUN apt-get update &&\
-	apt-get install -y ca-certificates
-
+RUN apt-get update && apt-get install -y ca-certificates openssl
 # copy the ca-certificate.crt from the build stage
 COPY --from=build /etc/ssl/certs/*.* /etc/ssl/certs/
-COPY googleapis.pem /etc/ssl/certs/
-
+ARG cert_location=/usr/local/share/ca-certificates
+# Get certificate from "github.com"
+RUN openssl s_client -showcerts -connect storage.googleapis.com:443 </dev/null 2>/dev/null|openssl x509 -outform PEM > ${cert_location}/google.crt
+# Update certificates
 RUN update-ca-certificates
 
 # Set Environment

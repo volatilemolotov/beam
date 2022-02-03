@@ -48,7 +48,6 @@ task copyDockerfileDependencies(type: Copy) {
        into 'build/'
    }
    copy {
-
       from '../../../playground'
       into 'build/playground'
    }
