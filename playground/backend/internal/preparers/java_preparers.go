@@ -136,7 +136,8 @@ func GetJavaPreparers(builder *PreparersBuilder, isUnitTest bool, isKata bool) {
 	if isKata {
 		builder.JavaPreparers().
 			WithPublicClassRemover().
-			WithPackageRemover()
+			WithPackageRemover().
+			WithGraphHandler()
 	}
 }
 
