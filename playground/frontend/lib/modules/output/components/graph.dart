@@ -71,7 +71,7 @@ class _GraphTabState extends State<GraphTab> {
         widget.graph.isNotEmpty &&
         oldWidget.graph != widget.graph) {
       graphPainter =
-          GraphBuilder.parseDot(widget.graph, SDK.java)?.getPainter();
+          GraphBuilder.parseDot(widget.graph, widget.sdk)?.getPainter();
     }
     super.didUpdateWidget(oldWidget);
   }
