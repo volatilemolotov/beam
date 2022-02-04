@@ -113,7 +113,7 @@ func TestGetJavaPreparers(t *testing.T) {
 		{
 			name: "Test number of preparers for kata",
 			args: args{"MOCK_FILEPATH", false, true},
-			want: 2,
+			want: 3,
 		},
 	}
 	for _, tt := range tests {
