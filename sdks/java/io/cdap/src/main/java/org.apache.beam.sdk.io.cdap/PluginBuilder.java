@@ -19,30 +19,53 @@ package org.apache.beam.sdk.io.cdap;
 
 import io.cdap.cdap.api.plugin.PluginConfig;
 
+/**
+ * Class for building {@link Plugin} object.
+ */
 public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
-    protected final Class<?> pluginClass;
+    protected Class<?> pluginClass;
 
-    protected Class<F> format;
-    protected Class<FP> formatProvider;
+    protected Class<F> formatClass;
+    protected Class<FP> formatProviderClass;
 
+    /**
+     * Constructor for a plugin builder.
+     * @param pluginClass The main class of a plugin.
+     */
     public PluginBuilder(Class<?> pluginClass) {
         this.pluginClass = pluginClass;
     }
 
+    /**
+     * Gets the main class of a plugin.
+     */
     public Class<?> getPluginClass() {
         return pluginClass;
     }
 
-    public PluginBuilder<F, FP, PC> withFormat(Class<F> format) {
-        this.format = format;
+    /**
+     * Sets InputFormat or OutputFormat class for a plugin.
+     */
+    public PluginBuilder<F, FP, PC> withFormat(Class<F> formatClass) {
+        this.formatClass = formatClass;
         return this;
     }
 
-    public PluginBuilder<F, FP, PC> withFormatProvider(Class<FP> formatProvider) {
-        this.formatProvider = formatProvider;
+    /**
+     * Sets InputFormatProvider or OutputFormatProvider class for a plugin.
+     */
+    public PluginBuilder<F, FP, PC> withFormatProvider(Class<FP> formatProviderClass) {
+        this.formatProviderClass = formatProviderClass;
         return this;
     }
 
-    public abstract void validatePluginClass();
-    public abstract Plugin<F, FP, PC> build();
+    /**
+     * Validates plugin fields.
+     */
+    protected abstract void validatePluginClass() throws IllegalArgumentException;
+
+    /**
+     * Builds instance of a plugin.
+     */
+    public abstract Plugin<F, FP, PC> build() throws IllegalArgumentException;
 }

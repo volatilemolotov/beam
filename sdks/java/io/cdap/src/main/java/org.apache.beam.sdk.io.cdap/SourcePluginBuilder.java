@@ -24,38 +24,52 @@ import io.cdap.cdap.api.data.batch.InputFormatProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class for building {@link SourcePlugin} object.
+ */
 public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormatProvider, PC extends PluginConfig>
         extends PluginBuilder<IF, IFP, PC> {
 
-    private static Logger LOG = LoggerFactory.getLogger(SourcePluginBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SourcePluginBuilder.class);
 
+    /**
+     * Constructor for a source plugin builder.
+     * @param pluginClass The main class of a plugin.
+     */
     public SourcePluginBuilder(Class<?> pluginClass) {
         super(pluginClass);
     }
 
-    public SourcePluginBuilder<IF, IFP, PC> withHadoopConfiguration() {
-        return null;
-    }
-
+    /**
+     * Validates source plugin fields.
+     */
     @Override
-    public void validatePluginClass() {
-        if (format == null) {
+    protected void validatePluginClass() throws IllegalArgumentException {
+        if (formatClass == null) {
             throw new IllegalArgumentException("InputFormat must be not null");
         }
-        if (formatProvider == null) {
+        if (formatProviderClass == null) {
             throw new IllegalArgumentException("InputFormatProvider must be not null");
         }
     }
 
+    /**
+     * Builds instance of a source plugin.
+     */
     @Override
-    public SourcePlugin build() {
+    public SourcePlugin<IF, IFP, PC> build() throws IllegalArgumentException {
         try {
             validatePluginClass();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             LOG.error("Validation error", e);
+            throw e;
         }
 
-        SourcePlugin sp = new SourcePlugin();
+        SourcePlugin<IF, IFP, PC> sp = new SourcePlugin<>();
+        sp.setPluginClass(pluginClass);
+        sp.setFormatClass(formatClass);
+        sp.setFormatProviderClass(formatProviderClass);
+
         return sp;
     }
 }

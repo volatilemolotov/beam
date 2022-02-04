@@ -24,38 +24,52 @@ import org.apache.hadoop.mapreduce.OutputFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class for building {@link SinkPlugin} object.
+ */
 public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormatProvider, PC extends PluginConfig>
         extends PluginBuilder<OF, OFP, PC> {
 
-    private static Logger LOG = LoggerFactory.getLogger(SinkPluginBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SinkPluginBuilder.class);
 
+    /**
+     * Constructor for a sink plugin builder.
+     * @param pluginClass The main class of a plugin.
+     */
     public SinkPluginBuilder(Class<?> pluginClass) {
         super(pluginClass);
     }
 
-    public SinkPluginBuilder<OF, OFP, PC> withHadoopConfiguration() {
-        return null;
-    }
-
+    /**
+     * Validates sink plugin fields.
+     */
     @Override
-    public void validatePluginClass() {
-        if (format == null) {
+    protected void validatePluginClass() throws IllegalArgumentException {
+        if (formatClass == null) {
             throw new IllegalArgumentException("OutputFormat must be not null");
         }
-        if (formatProvider == null) {
+        if (formatProviderClass == null) {
             throw new IllegalArgumentException("OutputFormatProvider must be not null");
         }
     }
 
+    /**
+     * Builds instance of a sink plugin.
+     */
     @Override
-    public SinkPlugin build() {
+    public SinkPlugin<OF, OFP, PC> build() throws IllegalArgumentException {
         try {
             validatePluginClass();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             LOG.error("Validation error", e);
+            throw e;
         }
 
-        SinkPlugin sp = new SinkPlugin();
+        SinkPlugin<OF, OFP, PC> sp = new SinkPlugin<>();
+        sp.setPluginClass(pluginClass);
+        sp.setFormatClass(formatClass);
+        sp.setFormatProviderClass(formatProviderClass);
+
         return sp;
     }
 }

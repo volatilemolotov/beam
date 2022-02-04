@@ -22,9 +22,15 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 
+/**
+ * Class wrapper for a CDAP Source plugin.
+ */
 public class SourcePlugin<IF extends InputFormat, IFP extends InputFormatProvider, PC extends PluginConfig>
         extends Plugin<IF, IFP, PC> {
 
+    /**
+     * Sets a plugin Hadoop configuration.
+     */
     @Override
     public SourcePlugin<IF, IFP, PC> withHadoopConfiguration(Class<?> InputFormatKeyClass,
                                                      Class<?> InputFormatValueClass) {
