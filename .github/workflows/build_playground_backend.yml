@@ -70,53 +70,52 @@ jobs:
       - name: Login to Docker Registry
         run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
         if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Prepare Build Java
-#        run: |
-#            export
-#            ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}'  -Pdocker-tag=${{ env.DOCKERTAG }}
-#        if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Prepare Build Python
-#        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository'  -Pdocker-tag=${{ env.DOCKERTAG }}
-#        if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Prepare Build Go
-#        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
-#        if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Prepare Build SCIO
-#        run: ./gradlew playground:backend:containers:scio:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
-#        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Prepare Build Java
+        run: |
+            export
+            ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}'  -Pdocker-tag=${{ env.DOCKERTAG }}
+        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Prepare Build Python
+        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository'  -Pdocker-tag=${{ env.DOCKERTAG }}
+        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Prepare Build Go
+        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Prepare Build SCIO
+        run: ./gradlew playground:backend:containers:scio:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+        if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Prepare Build Router
         run: ./gradlew playground:backend:containers:router:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
         if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Clean All Build directories
         run: ./gradlew clean
-#      - name: Deploy Backend Application Java
-#        env:
-#          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-#        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-java${{env.STAND_SUFFIX}}"
-#        working-directory: playground/terraform/applications/backend-java
-#        if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Deploy Backend Application Go
-#        env:
-#          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-#        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-go${{env.STAND_SUFFIX}}"
-#        working-directory: playground/terraform/applications/backend-go
-#        if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Deploy Backend Application Python
-#        env:
-#          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-#        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-python${{env.STAND_SUFFIX}}"
-#        working-directory: playground/terraform/applications/backend-python
-#        if: "'refs/heads/beta-version-v1' == github.ref"
-#      - name: Deploy Backend Application SCIO
-#        env:
-#          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-#        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-scio${{env.STAND_SUFFIX}}"
-#        working-directory: playground/terraform/applications/backend-scio
-#        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Deploy Backend Application Java
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-java${{env.STAND_SUFFIX}}"
+        working-directory: playground/terraform/applications/backend-java
+        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Deploy Backend Application Go
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-go${{env.STAND_SUFFIX}}"
+        working-directory: playground/terraform/applications/backend-go
+        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Deploy Backend Application Python
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-python${{env.STAND_SUFFIX}}"
+        working-directory: playground/terraform/applications/backend-python
+        if: "'refs/heads/beta-version-v1' == github.ref"
+      - name: Deploy Backend Application SCIO
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+        run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-scio${{env.STAND_SUFFIX}}"
+        working-directory: playground/terraform/applications/backend-scio
+        if: "'refs/heads/beta-version-v1' == github.ref"
       - name: Deploy Backend Application Router
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
         run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-router${{env.STAND_SUFFIX}}"
         working-directory: playground/terraform/applications/backend-router
         if: "'refs/heads/beta-version-v1' == github.ref"
-
