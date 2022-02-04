@@ -147,7 +147,7 @@ class GrpcCodeClient implements CodeClient {
   ) {
     return _runSafely(() => _defaultClient
             .getGraph(grpc.GetGraphRequest(pipelineUuid: pipelineUuid))
-            .then((response) => _toOutputResponse(response.graph))
+            .then((response) => OutputResponse(response.graph))
             .catchError((err) {
           print(err);
           return _toOutputResponse('');

@@ -133,7 +133,7 @@ abstract class GraphBuilder {
         }
       }
     }
-    for (var element in startNodes) {
+    for (var element in nodeElements) {
       final column = nodeToColumnsMap[element.name]!;
       if (column < 0) {
         nodeToColumnsMap[element.name] = 0;
