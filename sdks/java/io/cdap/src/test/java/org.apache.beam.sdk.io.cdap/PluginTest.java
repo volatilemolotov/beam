@@ -25,14 +25,28 @@ import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import org.apache.hadoop.io.MapWritable;
 import io.cdap.cdap.api.data.schema.Schema;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+@RunWith(JUnit4.class)
 public class PluginTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PluginTest.class);
+
     /**
      * Builder for Salesforce Batch Source plugin.
      */
     public static class SalesforceSourcePluginBuilder extends
             SourcePluginBuilder<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> {
+
         /**
          * Constructor for Salesforce Batch Source plugin wrapper builder.
          */
@@ -75,11 +89,23 @@ public class PluginTest {
             .setParam(REFERENCE_NAME_PARAM_NAME, "some reference name")
             .build();
 
-    public SalesforceSourcePlugin salesforceSourcePlugin
-            = (SalesforceSourcePlugin) new SalesforceSourcePluginBuilder().build();
+    @Test
+    public void testBuildingSourcePluginWithCDAPClasses() {
+        try {
+            SalesforceSourcePlugin salesforceSourcePlugin =
+                    (SalesforceSourcePlugin) new SalesforceSourcePluginBuilder()
+                    .build()
+                    .withConfig(salesforceSourceConfig)
+                    .withHadoopConfiguration(Schema.class, MapWritable.class);
 
-    public Object res = salesforceSourcePlugin
-            .withConfig(salesforceSourceConfig)
-            .withHadoopConfiguration(Schema.class, MapWritable.class);
+            assertEquals(salesforceSourcePlugin.getPluginClass(), SalesforceBatchSource.class);
+            assertEquals(salesforceSourcePlugin.getFormatClass(), SalesforceInputFormat.class);
+            assertEquals(salesforceSourcePlugin.getFormatProviderClass(), SalesforceInputFormatProvider.class);
+            assertEquals(salesforceSourcePlugin.getPluginConfig(), salesforceSourceConfig);
 
+        } catch (Exception e) {
+            LOG.error("Error occurred while building the Salesforce Source Plugin", e);
+            fail();
+        }
+    }
 }
