@@ -30,7 +30,7 @@ const (
 	addLogHandlerCode      = "import logging\nlogging.basicConfig(\n    level=logging.DEBUG,\n    format=\"%(asctime)s [%(levelname)s] %(message)s\",\n    handlers=[\n        logging.FileHandler(\"logs.log\"),\n    ]\n)\n"
 	oneIndentation         = "  "
 	indentationReplacement = "$0"
-	findPipelinePattern    = `(\s+)with.+Pipeline.+as (.+):`
+	findPipelinePattern    = `(\s*)with.+Pipeline.+as (.+):`
 	indentationPattern     = `^(%s){0,1}\w+`
 	graphCodePattern       = "$0# Write graph to file\n$0from apache_beam.runners.interactive.display import pipeline_graph\n$0dot = pipeline_graph.PipelineGraph(%s).get_dot()\n$0with open('%s', 'w') as file:\n$0  file.write(dot)\n"
 )
@@ -41,7 +41,9 @@ func GetPythonPreparers(builder *PreparersBuilder, isUnitTest bool) {
 		PythonPreparers().
 		WithLogHandler()
 	if !isUnitTest {
-		builder.PythonPreparers().WithGraphHandler()
+		builder.
+			PythonPreparers().
+			WithGraphHandler()
 	}
 }
 
@@ -161,6 +163,11 @@ func saveGraph(from *os.File, to *os.File) error {
 			return err
 		}
 		newLine = true
+	}
+	if spaces == "" {
+		line := ""
+		reg = regexp.MustCompile("^")
+		err = writeLineToFile(addCodeForGraph)(newLine, to, &line, &spaces, &pipelineName, &reg)
 	}
 	return scanner.Err()
 }
