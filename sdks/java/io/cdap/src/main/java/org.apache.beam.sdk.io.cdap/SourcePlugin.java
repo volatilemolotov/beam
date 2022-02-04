@@ -44,5 +44,12 @@ public class SourcePlugin<IF extends InputFormat, IFP extends InputFormatProvide
         return this;
     }
 
+    @Override
+    public SourcePlugin<IF, IFP, PC> withHadoopConfiguration(Configuration hadoopConfiguration) {
+        this.hadoopConfiguration = hadoopConfiguration;
+
+        return this;
+    }
+
 
 }

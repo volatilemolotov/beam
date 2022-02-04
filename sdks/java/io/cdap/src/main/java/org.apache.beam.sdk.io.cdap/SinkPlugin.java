@@ -47,4 +47,10 @@ public class SinkPlugin<OF extends OutputFormat, OFP extends OutputFormatProvide
         return this;
     }
 
+    @Override
+    public SinkPlugin<OF, OFP, PC> withHadoopConfiguration(Configuration hadoopConfiguration) {
+        this.hadoopConfiguration = hadoopConfiguration;
+
+        return this;
+    }
 }

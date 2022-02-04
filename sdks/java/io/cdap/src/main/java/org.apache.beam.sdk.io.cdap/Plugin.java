@@ -29,7 +29,7 @@ public abstract class Plugin<F, FP, PC extends PluginConfig> {
     protected Class<FP> formatProviderClass;
 
     public PC pluginConfig;
-    public Configuration hadoopConfiguration;
+    protected Configuration hadoopConfiguration;
 
     /**
      * Sets the main class of a plugin.
@@ -92,6 +92,12 @@ public abstract class Plugin<F, FP, PC extends PluginConfig> {
      * Sets a plugin Hadoop configuration.
      */
     public abstract Plugin<F, FP, PC> withHadoopConfiguration(Class<?> FormatKeyClass, Class<?> FormatValueClass);
+
+
+    /**
+     * Sets a plugin Hadoop configuration.
+     */
+    public abstract Plugin<F, FP, PC> withHadoopConfiguration(Configuration hadoopConfiguration);
 
     /**
      * Gets a plugin Hadoop configuration.
