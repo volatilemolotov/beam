@@ -24,12 +24,12 @@ kernelname=$(uname -s)
 
 # Running on Linux
 if [ "$kernelname" = "Linux" ]; then
-    curl -OL "https://github.com/dominikh/go-tools/releases/download/${GO_LINTER_VERSION}/staticcheck_linux_amd64.tar.gz" | tar -xf staticcheck_linux_amd64.tar.gz -C $(go env GOPATH)/bin
-    chmod 777 $(go env GOPATH)/bin/*
+    wget -c https://github.com/dominikh/go-tools/releases/download/${GO_LINTER_VERSION}/staticcheck_linux_amd64.tar.gz && tar -C $(go env GOPATH)/bin/ -xvf staticcheck_linux_amd64.tar.gz --transform='s/.*\///'
+    chmod +x $(go env GOPATH)/bin/staticcheck
 
 # Running on Mac
 elif [ "$kernelname" = "Darwin" ]; then
-     curl -OL "https://github.com/dominikh/go-tools/releases/download/${GO_LINTER_VERSION}/staticcheck_darwin_amd64.tar.gz" | tar -xf staticcheck_linux_amd64.tar.gz -C $(go env GOPATH)/bin
-     chmod 777 $(go env GOPATH)/bin/*
+     wget -c hhttps://github.com/dominikh/go-tools/releases/download/${GO_LINTER_VERSION}/staticcheck_darwin_amd64.tar.gz -O && tar -C $(go env GOPATH)/bin/ -xvf staticcheck_linux_amd64.tar.gz --transform='s/.*\///'
+     chmod +x $(go env GOPATH)/bin/staticcheck
 else echo "Unrecognized Kernel Name: $kernelname"
 fi
