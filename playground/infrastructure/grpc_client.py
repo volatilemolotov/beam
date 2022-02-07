@@ -25,6 +25,22 @@ from api.v1 import api_pb2_grpc, api_pb2
 from config import Config
 
 
+def _verify_pipeline_uuid(pipeline_uuid):
+  """
+  Verify the received pipeline_uuid format
+
+  Args:
+      pipeline_uuid: uuid of the pipeline
+
+  Returns:
+      If pipeline ID is not verified, will raise an exception
+  """
+  try:
+    uuid.UUID(pipeline_uuid)
+  except ValueError as ve:
+    raise ValueError(f"Incorrect pipeline uuid: '{pipeline_uuid}'") from ve
+
+
 class GRPCClient:
   """GRPCClient is gRPC client for sending a request to the backend."""
 
@@ -65,7 +81,7 @@ class GRPCClient:
     Returns:
         status: status of the pipeline
     """
-    self._verify_pipeline_uuid(pipeline_uuid)
+    _verify_pipeline_uuid(pipeline_uuid)
     request = api_pb2.CheckStatusRequest(pipeline_uuid=pipeline_uuid)
     response = await self._stub.CheckStatus(request)
     return response.status
@@ -80,7 +96,7 @@ class GRPCClient:
     Returns:
         output: contain an error of pipeline execution
     """
-    self._verify_pipeline_uuid(pipeline_uuid)
+    _verify_pipeline_uuid(pipeline_uuid)
     request = api_pb2.GetRunErrorRequest(pipeline_uuid=pipeline_uuid)
     response = await self._stub.GetRunError(request)
     return response.output
@@ -95,7 +111,7 @@ class GRPCClient:
     Returns:
         output: contain the result of pipeline execution
     """
-    self._verify_pipeline_uuid(pipeline_uuid)
+    _verify_pipeline_uuid(pipeline_uuid)
     request = api_pb2.GetRunOutputRequest(pipeline_uuid=pipeline_uuid)
     response = await self._stub.GetRunOutput(request)
     return response.output
@@ -110,7 +126,7 @@ class GRPCClient:
     Returns:
         output: contain the result of pipeline execution
     """
-    self._verify_pipeline_uuid(pipeline_uuid)
+    _verify_pipeline_uuid(pipeline_uuid)
     request = api_pb2.GetLogsRequest(pipeline_uuid=pipeline_uuid)
     response = await self._stub.GetLogs(request)
     return response.output
@@ -125,7 +141,7 @@ class GRPCClient:
     Returns:
         output: contain the result of pipeline compilation
     """
-    self._verify_pipeline_uuid(pipeline_uuid)
+    _verify_pipeline_uuid(pipeline_uuid)
     request = api_pb2.GetCompileOutputRequest(pipeline_uuid=pipeline_uuid)
     response = await self._stub.GetCompileOutput(request)
     return response.output
@@ -140,7 +156,7 @@ class GRPCClient:
     Returns:
         graph: contain the graph of pipeline execution as a string
     """
-    self._verify_pipeline_uuid(pipeline_uuid)
+    _verify_pipeline_uuid(pipeline_uuid)
     request = api_pb2.GetGraphRequest(pipeline_uuid=pipeline_uuid)
     try:
       response = await self._stub.GetGraph(request)
@@ -148,18 +164,3 @@ class GRPCClient:
     except grpc.RpcError as e:
       # Some examples doesn't have graph (katas)
       return ""
-
-  def _verify_pipeline_uuid(self, pipeline_uuid):
-    """
-    Verify the received pipeline_uuid format
-
-    Args:
-        pipeline_uuid: uuid of the pipeline
-
-    Returns:
-        If pipeline ID is not verified, will raise an exception
-    """
-    try:
-      uuid.UUID(pipeline_uuid)
-    except ValueError as ve:
-      raise ValueError(f"Incorrect pipeline uuid: '{pipeline_uuid}'") from ve

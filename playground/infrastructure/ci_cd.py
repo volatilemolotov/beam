@@ -25,7 +25,7 @@ from typing import List
 import config
 from api.v1.api_pb2 import Sdk
 from cd_helper import CDHelper
-from ci_helper import CIHelper
+from ci_helper import verify_examples
 from helper import find_examples, get_supported_categories, Example
 from logger import setup_logger
 
@@ -53,9 +53,7 @@ def _ci_step(examples: List[Example]):
   """
   CI step to verify single-file beam examples/tests/katas
   """
-
-  ci_helper = CIHelper()
-  asyncio.run(ci_helper.verify_examples(examples))
+  asyncio.run(verify_examples(examples))
 
 
 def _cd_step(examples: List[Example]):

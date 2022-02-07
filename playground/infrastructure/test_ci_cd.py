@@ -18,7 +18,7 @@ import mock
 from ci_cd import _ci_step, _cd_step
 
 
-@mock.patch("ci_helper.CIHelper.verify_examples")
+@mock.patch("ci_helper.verify_examples")
 def test_ci_step(mock_verify_examples):
   _ci_step([])
   mock_verify_examples.assert_called_once_with([])

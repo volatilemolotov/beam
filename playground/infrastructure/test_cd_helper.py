@@ -19,7 +19,7 @@ import shutil
 import pytest
 
 from api.v1.api_pb2 import SDK_JAVA, STATUS_UNSPECIFIED
-from cd_helper import CDHelper
+from cd_helper import CDHelper, _get_gcs_object_name, _write_to_local_fs
 from config import Config
 from helper import Example, Tag
 
@@ -49,9 +49,9 @@ def test__get_gcs_object_name():
   """
   expected_result = "SDK_JAVA/base_folder/file.java"
   expected_result_with_extension = "SDK_JAVA/base_folder/file.output"
-  assert CDHelper()._get_gcs_object_name(
+  assert _get_gcs_object_name(
       SDK_JAVA, "base_folder", "file") == expected_result
-  assert CDHelper()._get_gcs_object_name(
+  assert _get_gcs_object_name(
       SDK_JAVA, "base_folder", "file",
       "output") == expected_result_with_extension
 
@@ -87,7 +87,7 @@ def test__write_to_local_fs(delete_temp_folder):
       "SDK_JAVA/name/name.log": "temp/pipeline_id/SDK_JAVA/name/name.log",
       "SDK_JAVA/name/meta.info": "temp/pipeline_id/SDK_JAVA/name/meta.info"
   }
-  assert CDHelper()._write_to_local_fs(example) == expected_result
+  assert _write_to_local_fs(example) == expected_result
 
 
 def test__save_to_cloud_storage(mocker):
