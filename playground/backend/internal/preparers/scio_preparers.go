@@ -15,6 +15,8 @@
 
 package preparers
 
+import "beam.apache.org/playground/backend/internal/preparers/preparers_utils"
+
 const (
 	scioPublicClassNamePattern = "object (.*?) [{]"
 	scioPackagePattern         = `^package [\w]+`
@@ -57,11 +59,11 @@ func GetScioPreparers(builder *PreparersBuilder) {
 
 func changeScioFileName(args ...interface{}) error {
 	filePath := args[0].(string)
-	className, err := getPublicClassName(filePath, scioPublicClassNamePattern)
+	className, err := preparers_utils.GetPublicClassName(filePath, scioPublicClassNamePattern)
 	if err != nil {
 		return err
 	}
-	err = renameSourceCodeFile(filePath, className)
+	err = preparers_utils.RenameSourceCodeFile(filePath, className)
 	if err != nil {
 		return err
 	}
