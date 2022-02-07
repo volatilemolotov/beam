@@ -32,6 +32,12 @@ final kGraphElementExtractor = GraphElementExtractor();
 final kLabelExtractor = LabelExtractor();
 final kEdgeExtractor = EdgeExtractor();
 
+/// main class for parsing dot format of the graph
+/// each sdk creates different graph so we need to parse them differently
+///
+/// Useful links:
+/// DOT - https://en.wikipedia.org/wiki/DOT_(graph_description_language)
+/// Example for Java - https://github.com/mehmandarov/word-count-mini-beam/blob/master/pipeline_graph.dot
 abstract class GraphBuilder {
   final List<GraphElement> elements = [];
   final List<Edge> edges = [];
@@ -133,7 +139,7 @@ abstract class GraphBuilder {
         }
       }
     }
-    for (var element in startNodes) {
+    for (var element in nodeElements) {
       final column = nodeToColumnsMap[element.name]!;
       if (column < 0) {
         nodeToColumnsMap[element.name] = 0;
@@ -237,8 +243,8 @@ class PythonGraphBuilder extends GraphBuilder {
     if (elementsMap[name] != null) {
       return;
     }
-    final label =
-        name.replaceFirst(kPythonDefaultCollectionLabel, kPythonCollectionLabel);
+    final label = name.replaceFirst(
+        kPythonDefaultCollectionLabel, kPythonCollectionLabel);
     Node node = Node(label: label, depth: 1, name: name);
     elementsMap[name] = node;
     elements.add(node);

@@ -67,11 +67,12 @@ class _GraphTabState extends State<GraphTab> {
 
   @override
   void didUpdateWidget(GraphTab oldWidget) {
-    if (oldWidget.graph.isNotEmpty &&
-        widget.graph.isNotEmpty &&
-        oldWidget.graph != widget.graph) {
+    if (widget.graph.isNotEmpty && oldWidget.graph != widget.graph) {
       graphPainter =
-          GraphBuilder.parseDot(widget.graph, SDK.java)?.getPainter();
+          GraphBuilder.parseDot(widget.graph, widget.sdk)?.getPainter();
+    }
+    if (widget.graph.isEmpty) {
+      graphPainter = null;
     }
     super.didUpdateWidget(oldWidget);
   }

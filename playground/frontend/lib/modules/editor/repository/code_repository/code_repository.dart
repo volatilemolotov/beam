@@ -17,6 +17,7 @@
  */
 
 import 'package:playground/modules/editor/repository/code_repository/code_client/code_client.dart';
+import 'package:playground/modules/editor/repository/code_repository/code_client/output_response.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_error.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_request.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_result.dart';
@@ -171,7 +172,9 @@ class CodeRepository {
         final responses = await Future.wait([
           _client.getRunOutput(pipelineUuid, request),
           _client.getLogOutput(pipelineUuid, request),
-          _client.getGraphOutput(pipelineUuid, request),
+          prevGraph.isEmpty
+              ? _client.getGraphOutput(pipelineUuid, request)
+              : Future.value(OutputResponse(prevGraph)),
         ]);
         final output = responses[0];
         final log = responses[1];
@@ -188,12 +191,16 @@ class CodeRepository {
           _client.getRunOutput(pipelineUuid, request),
           _client.getLogOutput(pipelineUuid, request),
           _client.getRunErrorOutput(pipelineUuid, request),
-          _client.getGraphOutput(pipelineUuid, request)
+          prevGraph.isEmpty
+              ? _client.getGraphOutput(pipelineUuid, request)
+              : Future.value(OutputResponse(prevGraph)),
         ]);
         final output = responses[0];
         final log = responses[1];
         final error = responses[2];
         final graph = responses[3];
+        print('received graph');
+        print(graph.output);
         return RunCodeResult(
           pipelineUuid: pipelineUuid,
           status: status,
