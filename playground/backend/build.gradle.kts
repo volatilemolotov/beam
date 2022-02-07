@@ -92,9 +92,13 @@ task("runLint") {
   dependsOn(":playground:backend:installLinter")
   doLast {
     exec {
-      executable("golangci-lint")
-      args("run", "cmd/server/...")      
+      executable("staticcheck")
+      args("-tests=false", "cmd/server/...")
     }
+    exec {
+          executable("staticcheck")
+          args("-tests=false", "internal/...")
+        }
   }
 }
 

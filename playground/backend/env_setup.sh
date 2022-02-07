@@ -14,7 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-GO_LINTER_VERSION=1.42.1
+GO_LINTER_VERSION=2021.1.2
 
 # Install GO Linter
 #wget https://github.com/golangci/golangci-lint/releases/download/v1.42.1/golangci-lint-$GO_LINTER_VERSION-linux-amd64.deb
@@ -24,11 +24,12 @@ kernelname=$(uname -s)
 
 # Running on Linux
 if [ "$kernelname" = "Linux" ]; then
-    curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v$GO_LINTER_VERSION
+    curl -OL "https://github.com/dominikh/go-tools/releases/download/${GO_LINTER_VERSION}/staticcheck_linux_amd64.tar.gz" | tar -xf staticcheck_linux_amd64.tar.gz -C $(go env GOPATH)/bin
+    chmod 777 $(go env GOPATH)/bin/*
 
 # Running on Mac
 elif [ "$kernelname" = "Darwin" ]; then
-    brew tap golangci/tap
-    brew install golangci/tap/golangci-lint
+     curl -OL "https://github.com/dominikh/go-tools/releases/download/${GO_LINTER_VERSION}/staticcheck_darwin_amd64.tar.gz" | tar -xf staticcheck_linux_amd64.tar.gz -C $(go env GOPATH)/bin
+     chmod 777 $(go env GOPATH)/bin/*
 else echo "Unrecognized Kernel Name: $kernelname"
 fi
