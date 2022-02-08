@@ -34,12 +34,12 @@ resource "google_app_engine_flexible_app_version" "backend_app" {
  
  
   liveness_check {
-    path              = "/liveness"
-    initial_delay     = "40s" 
+    path              = ""
+
   }
 
   readiness_check {
-    path = "/readiness"
+    path = ""
   }
 
   automatic_scaling {
@@ -58,6 +58,7 @@ resource "google_app_engine_flexible_app_version" "backend_app" {
      LAUNCH_SITE = "app_engine"
      PIPELINE_EXPIRATION_TIMEOUT = "5m"
      KEY_EXPIRATION_TIME = "7m"
+     PROTOCOL_TYPE = "TCP"
   }
 
   resources {
