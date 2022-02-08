@@ -170,7 +170,7 @@ func saveGraph(from *os.File, tempFile *os.File) error {
 			return err
 		}
 	}
-	if !done {
+	if !done && pipelineName != "" {
 		preparers_utils.AddGraphToEndOfFile(spaces, err, tempFile, pipelineName)
 	}
 	return scanner.Err()
