@@ -74,7 +74,7 @@ jobs:
         run: |
             export
             ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}'  -Pdocker-tag=${{ env.DOCKERTAG }}
-        if: "'refs/heads/beta-version-v1' == github.ref"
+        if: "'refs/heads/java_tcp' == github.ref"
 #      - name: Prepare Build Python
 #        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository'  -Pdocker-tag=${{ env.DOCKERTAG }}
 #        if: "'refs/heads/beta-version-v1' == github.ref"
