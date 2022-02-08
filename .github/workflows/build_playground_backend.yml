@@ -57,19 +57,19 @@ jobs:
       - uses: hashicorp/setup-terraform@v1
         with:
             terraform_version: ${{ env.TERRAFORM_VERSION }}
-        if: "'refs/heads/beta-version-v1' == github.ref"
+        if: "'refs/heads/java_tcp' == github.ref"
       - name: Set Docker Tag
         run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Set Docker Tag If Github Tag was trigger
         run: echo "DOCKERTAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        if: "'refs/heads/beta-version-v1' == github.ref"
+        if: "'refs/heads/java_tcp' == github.ref"
       - name: Setup GCP account
         run: |
              echo "${{ secrets.PLAYGROUND_GCP_ACCESS_KEY }}" | base64 -d > /tmp/gcp_access.json
-        if: "'refs/heads/beta-version-v1' == github.ref"
+        if: "'refs/heads/java_tcp' == github.ref"
       - name: Login to Docker Registry
         run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
-        if: "'refs/heads/beta-version-v1' == github.ref"
+        if: "'refs/heads/java_tcp' == github.ref"
       - name: Prepare Build Java
         run: |
             export
@@ -94,7 +94,7 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
         run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=backend-java-tcp${{env.STAND_SUFFIX}}"
         working-directory: playground/terraform/applications/backend-java
-        if: "'refs/heads/beta-version-v1' == github.ref"
+        if: "'refs/heads/java_tcp' == github.ref"
 #      - name: Deploy Backend Application Go
 #        env:
 #          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
