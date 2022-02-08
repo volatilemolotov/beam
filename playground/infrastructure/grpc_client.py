@@ -16,7 +16,7 @@
 """
 Module contains the client to communicate with GRPC test Playground server
 """
-
+import logging
 import uuid
 
 import grpc
@@ -130,12 +130,13 @@ class GRPCClient:
     response = await self._stub.GetCompileOutput(request)
     return response.output
 
-  async def get_graph(self, pipeline_uuid: str) -> str:
+  async def get_graph(self, pipeline_uuid: str, example_filepath: str) -> str:
     """
     Get the graph of pipeline execution.
 
     Args:
         pipeline_uuid: uuid of the pipeline
+        example_filepath: path to the file of the example
 
     Returns:
         graph: contain the graph of pipeline execution as a string
@@ -145,8 +146,10 @@ class GRPCClient:
     try:
       response = await self._stub.GetGraph(request)
       return response.graph
+      if response.graph == "":
+        logging.warning("Graph for %s wasn't generated", example_filepath)
     except grpc.RpcError as e:
-      # Temporary solution because of Java Graph generation
+      logging.warning("Graph for %s wasn't generated", example_filepath)
       return ""
 
   def _verify_pipeline_uuid(self, pipeline_uuid):
