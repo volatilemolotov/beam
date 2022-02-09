@@ -19,7 +19,9 @@ import "beam.apache.org/playground/backend/internal/preparers/preparers_utils"
 
 const (
 	scioPublicClassNamePattern = "object (.*?) [{]"
-	scioPackagePattern         = `^package [\w]+`
+	scioPackagePattern         = `^package .*$`
+	scioExampleImport          = `^import com.spotify.scio.examples.*$`
+	emptyStr                   = ""
 )
 
 //ScioPreparersBuilder facet of PreparersBuilder
@@ -52,9 +54,22 @@ func (builder *ScioPreparersBuilder) WithPackageRemover() *ScioPreparersBuilder 
 	return builder
 }
 
+//WithImportRemover adds preparer to remove examples import from the code
+func (builder *ScioPreparersBuilder) WithImportRemover() *ScioPreparersBuilder {
+	removeImportPreparer := Preparer{
+		Prepare: replace,
+		Args:    []interface{}{builder.filePath, scioExampleImport, emptyStr},
+	}
+	builder.AddPreparer(removeImportPreparer)
+	return builder
+}
+
 // GetScioPreparers returns preparation methods that should be applied to Scio code
 func GetScioPreparers(builder *PreparersBuilder) {
-	builder.ScioPreparers().WithPackageRemover().WithFileNameChanger()
+	builder.ScioPreparers().
+		WithPackageRemover().
+		WithImportRemover().
+		WithFileNameChanger()
 }
 
 func changeScioFileName(args ...interface{}) error {
