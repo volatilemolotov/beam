@@ -20,39 +20,36 @@ package org.apache.beam.sdk.io.cdap.context;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.validation.ValidationException;
 import io.cdap.cdap.etl.api.validation.ValidationFailure;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
+import javax.annotation.Nullable;
 
-/**
- * Class FailureCollectorWrapper is a class for collecting ValidationFailure.
- */
+/** Class FailureCollectorWrapper is a class for collecting ValidationFailure. */
 public class FailureCollectorWrapper implements FailureCollector {
-    private ArrayList<ValidationFailure> failuresCollection;
+  private ArrayList<ValidationFailure> failuresCollection;
 
-    public FailureCollectorWrapper() {
-        this.failuresCollection = new ArrayList<>();
+  public FailureCollectorWrapper() {
+    this.failuresCollection = new ArrayList<>();
+  }
+
+  @Override
+  public ValidationFailure addFailure(String message, @Nullable String correctiveAction) {
+    ValidationFailure validationFailure = new ValidationFailure(message, correctiveAction);
+    failuresCollection.add(validationFailure);
+
+    return validationFailure;
+  }
+
+  @Override
+  public ValidationException getOrThrowException() throws ValidationException {
+    if (failuresCollection.isEmpty()) {
+      return new ValidationException(this.failuresCollection);
     }
 
-    @Override
-    public ValidationFailure addFailure(String message, @Nullable String correctiveAction) {
-        ValidationFailure validationFailure = new ValidationFailure(message, correctiveAction);
-        failuresCollection.add(validationFailure);
+    throw new ValidationException(this.failuresCollection);
+  }
 
-        return validationFailure;
-    }
-
-    @Override
-    public ValidationException getOrThrowException() throws ValidationException {
-        if (failuresCollection.isEmpty()) {
-            return new ValidationException(this.failuresCollection);
-        }
-
-        throw new ValidationException(this.failuresCollection);
-    }
-
-    @Override
-    public ArrayList<ValidationFailure> getValidationFailures() {
-        return this.failuresCollection;
-    }
+  @Override
+  public ArrayList<ValidationFailure> getValidationFailures() {
+    return this.failuresCollection;
+  }
 }

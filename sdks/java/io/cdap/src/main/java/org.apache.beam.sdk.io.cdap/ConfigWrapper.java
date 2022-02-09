@@ -20,17 +20,14 @@ package org.apache.beam.sdk.io.cdap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cdap.cdap.api.plugin.PluginConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Class for building {@link PluginConfig} object of the specific class {@param <T>}.
- */
+/** Class for building {@link PluginConfig} object of the specific class {@param <T>}. */
 public class ConfigWrapper<T extends PluginConfig> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigWrapper.class);
@@ -43,11 +40,10 @@ public class ConfigWrapper<T extends PluginConfig> {
   }
 
   public ConfigWrapper<T> fromJsonString(String jsonString) {
-    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-    };
+    TypeReference<HashMap<String, Object>> typeRef =
+        new TypeReference<HashMap<String, Object>>() {};
     try {
-      paramsMap = new ObjectMapper()
-          .readValue(jsonString, typeRef);
+      paramsMap = new ObjectMapper().readValue(jsonString, typeRef);
     } catch (IOException e) {
       LOG.error("Can not read json string to params map", e);
     }
@@ -55,11 +51,10 @@ public class ConfigWrapper<T extends PluginConfig> {
   }
 
   public ConfigWrapper<T> fromJsonFile(File jsonFile) {
-    TypeReference<HashMap<String, Object>> typeRef = new TypeReference<HashMap<String, Object>>() {
-    };
+    TypeReference<HashMap<String, Object>> typeRef =
+        new TypeReference<HashMap<String, Object>>() {};
     try {
-      paramsMap = new ObjectMapper()
-          .readValue(jsonFile, typeRef);
+      paramsMap = new ObjectMapper().readValue(jsonFile, typeRef);
     } catch (IOException e) {
       LOG.error("Can not read json file to params map", e);
     }

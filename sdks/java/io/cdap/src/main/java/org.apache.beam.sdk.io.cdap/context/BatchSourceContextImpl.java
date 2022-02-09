@@ -21,23 +21,21 @@ import io.cdap.cdap.api.data.batch.Input;
 import io.cdap.cdap.etl.api.batch.BatchSourceContext;
 
 /**
- * Class BatchSourceContextWrapper is a class for creating context object
- * of different CDAP classes with batch source type.
+ * Class BatchSourceContextWrapper is a class for creating context object of different CDAP classes
+ * with batch source type.
  */
 public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
 
-    @Override
-    public void setInput(Input input) {
+  @Override
+  public void setInput(Input input) {}
 
-    }
+  @Override
+  public boolean isPreviewEnabled() {
+    return false;
+  }
 
-    @Override
-    public boolean isPreviewEnabled() {
-        return false;
-    }
-
-    @Override
-    public int getMaxPreviewRecords() {
-        return 0;
-    }
+  @Override
+  public int getMaxPreviewRecords() {
+    return 0;
+  }
 }

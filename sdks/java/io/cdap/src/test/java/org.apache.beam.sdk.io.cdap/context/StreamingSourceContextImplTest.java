@@ -17,29 +17,26 @@
  */
 package org.apache.beam.sdk.io.cdap.context;
 
-import io.cdap.cdap.etl.api.streaming.StreamingSourceContext;
-import org.junit.Test;
-
-import java.sql.Timestamp;
-
 import static org.junit.Assert.*;
 
-/**
- * Test class for {@link StreamingSourceContextImpl}.
- */
+import io.cdap.cdap.etl.api.streaming.StreamingSourceContext;
+import java.sql.Timestamp;
+import org.junit.Test;
+
+/** Test class for {@link StreamingSourceContextImpl}. */
 public class StreamingSourceContextImplTest {
 
-    /**
-     * TODO: Remove tests(getFailureCollector, getLogicalStartTime) if these methods weren't override and
-     * were implemented own methods of StreamingSourceContextImplTest class.
-     */
-    @Test
-    public void getLogicalStartTime() {
-        /** arrange */
-        StreamingSourceContext context = new StreamingSourceContextImpl();
-        Timestamp startTime = new Timestamp(System.currentTimeMillis());
+  /**
+   * TODO: Remove tests(getFailureCollector, getLogicalStartTime) if these methods weren't override
+   * and were implemented own methods of StreamingSourceContextImplTest class.
+   */
+  @Test
+  public void getLogicalStartTime() {
+    /** arrange */
+    StreamingSourceContext context = new StreamingSourceContextImpl();
+    Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
-        /** assert */
-        assertTrue(startTime.getTime() - context.getLogicalStartTime() <= 100);
-    }
+    /** assert */
+    assertTrue(startTime.getTime() - context.getLogicalStartTime() <= 100);
+  }
 }

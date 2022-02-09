@@ -31,210 +31,192 @@ import io.cdap.cdap.etl.api.*;
 import io.cdap.cdap.etl.api.action.SettableArguments;
 import io.cdap.cdap.etl.api.batch.BatchContext;
 import io.cdap.cdap.etl.api.lineage.field.FieldOperation;
-
-import javax.annotation.Nullable;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
- * Class OperationContext is a common class for Batch, Sink
- * and Stream CDAP wrapper classes that use it to provide common details.
+ * Class OperationContext is a common class for Batch, Sink and Stream CDAP wrapper classes that use
+ * it to provide common details.
  */
 @SuppressWarnings("TypeParameterUnusedInFormals")
 public class BatchContextImpl implements BatchContext {
 
-    private final FailureCollectorWrapper failureCollector = new FailureCollectorWrapper();
+  private final FailureCollectorWrapper failureCollector = new FailureCollectorWrapper();
 
-    private final Timestamp startTime = new Timestamp(System.currentTimeMillis());
+  private final Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
-    @Override
-    public String getStageName() {
-        return null;
-    }
+  @Override
+  public String getStageName() {
+    return null;
+  }
 
-    @Override
-    public String getNamespace() {
-        return null;
-    }
+  @Override
+  public String getNamespace() {
+    return null;
+  }
 
-    @Override
-    public String getPipelineName() {
-        return null;
-    }
+  @Override
+  public String getPipelineName() {
+    return null;
+  }
 
-    @Override
-    public long getLogicalStartTime() {
-        return this.startTime.getTime();
-    }
+  @Override
+  public long getLogicalStartTime() {
+    return this.startTime.getTime();
+  }
 
-    @Override
-    public StageMetrics getMetrics() {
-        return null;
-    }
+  @Override
+  public StageMetrics getMetrics() {
+    return null;
+  }
 
-    @Override
-    public PluginProperties getPluginProperties() {
-        return null;
-    }
+  @Override
+  public PluginProperties getPluginProperties() {
+    return null;
+  }
 
-    @Override
-    public PluginProperties getPluginProperties(String pluginId) {
-        return null;
-    }
+  @Override
+  public PluginProperties getPluginProperties(String pluginId) {
+    return null;
+  }
 
-    @Override
-    public <T> Class<T> loadPluginClass(String pluginId) {
-        return null;
-    }
+  @Override
+  public <T> Class<T> loadPluginClass(String pluginId) {
+    return null;
+  }
 
-    @Override
-    public <T> T newPluginInstance(String pluginId) throws InstantiationException {
-        return null;
-    }
+  @Override
+  public <T> T newPluginInstance(String pluginId) throws InstantiationException {
+    return null;
+  }
 
-    @Nullable
-    @Override
-    public Schema getInputSchema() {
-        return null;
-    }
+  @Nullable
+  @Override
+  public Schema getInputSchema() {
+    return null;
+  }
 
-    @Override
-    public Map<String, Schema> getInputSchemas() {
-        return null;
-    }
+  @Override
+  public Map<String, Schema> getInputSchemas() {
+    return null;
+  }
 
-    @Nullable
-    @Override
-    public Schema getOutputSchema() {
-        return null;
-    }
+  @Nullable
+  @Override
+  public Schema getOutputSchema() {
+    return null;
+  }
 
-    @Override
-    public Map<String, Schema> getOutputPortSchemas() {
-        return null;
-    }
+  @Override
+  public Map<String, Schema> getOutputPortSchemas() {
+    return null;
+  }
 
-    @Override
-    public void createDataset(String datasetName, String typeName, DatasetProperties properties) throws DatasetManagementException {
+  @Override
+  public void createDataset(String datasetName, String typeName, DatasetProperties properties)
+      throws DatasetManagementException {}
 
-    }
+  @Override
+  public boolean datasetExists(String datasetName) throws DatasetManagementException {
+    return false;
+  }
 
-    @Override
-    public boolean datasetExists(String datasetName) throws DatasetManagementException {
-        return false;
-    }
+  @Override
+  public SettableArguments getArguments() {
+    return null;
+  }
 
-    @Override
-    public SettableArguments getArguments() {
-        return null;
-    }
+  @Override
+  public FailureCollector getFailureCollector() {
+    return this.failureCollector;
+  }
 
-    @Override
-    public FailureCollector getFailureCollector() {
-        return this.failureCollector;
-    }
+  @Nullable
+  @Override
+  public URL getServiceURL(String applicationId, String serviceId) {
+    return null;
+  }
 
-    @Nullable
-    @Override
-    public URL getServiceURL(String applicationId, String serviceId) {
-        return null;
-    }
+  @Nullable
+  @Override
+  public URL getServiceURL(String serviceId) {
+    return null;
+  }
 
-    @Nullable
-    @Override
-    public URL getServiceURL(String serviceId) {
-        return null;
-    }
+  @Override
+  public Map<MetadataScope, Metadata> getMetadata(MetadataEntity metadataEntity)
+      throws MetadataException {
+    return null;
+  }
 
-    @Override
-    public Map<MetadataScope, Metadata> getMetadata(MetadataEntity metadataEntity) throws MetadataException {
-        return null;
-    }
+  @Override
+  public Metadata getMetadata(MetadataScope scope, MetadataEntity metadataEntity)
+      throws MetadataException {
+    return null;
+  }
 
-    @Override
-    public Metadata getMetadata(MetadataScope scope, MetadataEntity metadataEntity) throws MetadataException {
-        return null;
-    }
+  @Override
+  public void addProperties(MetadataEntity metadataEntity, Map<String, String> properties) {}
 
-    @Override
-    public void addProperties(MetadataEntity metadataEntity, Map<String, String> properties) {
+  @Override
+  public void addTags(MetadataEntity metadataEntity, String... tags) {}
 
-    }
+  @Override
+  public void addTags(MetadataEntity metadataEntity, Iterable<String> tags) {}
 
-    @Override
-    public void addTags(MetadataEntity metadataEntity, String... tags) {
+  @Override
+  public void removeMetadata(MetadataEntity metadataEntity) {}
 
-    }
+  @Override
+  public void removeProperties(MetadataEntity metadataEntity) {}
 
-    @Override
-    public void addTags(MetadataEntity metadataEntity, Iterable<String> tags) {
+  @Override
+  public void removeProperties(MetadataEntity metadataEntity, String... keys) {}
 
-    }
+  @Override
+  public void removeTags(MetadataEntity metadataEntity) {}
 
-    @Override
-    public void removeMetadata(MetadataEntity metadataEntity) {
+  @Override
+  public void removeTags(MetadataEntity metadataEntity, String... tags) {}
 
-    }
+  @Override
+  public void record(List<FieldOperation> fieldOperations) {}
 
-    @Override
-    public void removeProperties(MetadataEntity metadataEntity) {
+  @Override
+  public <T extends Dataset> T getDataset(String name) throws DatasetInstantiationException {
+    return null;
+  }
 
-    }
+  @Override
+  public <T extends Dataset> T getDataset(String namespace, String name)
+      throws DatasetInstantiationException {
+    return null;
+  }
 
-    @Override
-    public void removeProperties(MetadataEntity metadataEntity, String... keys) {
+  @Override
+  public <T extends Dataset> T getDataset(String name, Map<String, String> arguments)
+      throws DatasetInstantiationException {
+    return null;
+  }
 
-    }
+  @Override
+  public <T extends Dataset> T getDataset(
+      String namespace, String name, Map<String, String> arguments)
+      throws DatasetInstantiationException {
+    return null;
+  }
 
-    @Override
-    public void removeTags(MetadataEntity metadataEntity) {
+  @Override
+  public void releaseDataset(Dataset dataset) {}
 
-    }
+  @Override
+  public void discardDataset(Dataset dataset) {}
 
-    @Override
-    public void removeTags(MetadataEntity metadataEntity, String... tags) {
-
-    }
-
-    @Override
-    public void record(List<FieldOperation> fieldOperations) {
-
-    }
-
-    @Override
-    public <T extends Dataset> T getDataset(String name) throws DatasetInstantiationException {
-        return null;
-    }
-
-    @Override
-    public <T extends Dataset> T getDataset(String namespace, String name) throws DatasetInstantiationException {
-        return null;
-    }
-
-    @Override
-    public <T extends Dataset> T getDataset(String name, Map<String, String> arguments) throws DatasetInstantiationException {
-        return null;
-    }
-
-    @Override
-    public <T extends Dataset> T getDataset(String namespace, String name, Map<String, String> arguments) throws DatasetInstantiationException {
-        return null;
-    }
-
-    @Override
-    public void releaseDataset(Dataset dataset) {
-
-    }
-
-    @Override
-    public void discardDataset(Dataset dataset) {
-
-    }
-
-    @Override
-    public <T> Lookup<T> provide(String table, Map<String, String> arguments) {
-        return null;
-    }
+  @Override
+  public <T> Lookup<T> provide(String table, Map<String, String> arguments) {
+    return null;
+  }
 }

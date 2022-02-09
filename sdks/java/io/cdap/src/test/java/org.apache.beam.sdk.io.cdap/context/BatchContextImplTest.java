@@ -17,42 +17,39 @@
  */
 package org.apache.beam.sdk.io.cdap.context;
 
-import io.cdap.cdap.etl.api.FailureCollector;
-import io.cdap.cdap.etl.api.validation.ValidationException;
-import org.junit.Test;
-
-import java.sql.Timestamp;
-
 import static org.junit.Assert.*;
 
-/**
- * Test class for {@link BatchContextImpl}.
- */
+import io.cdap.cdap.etl.api.FailureCollector;
+import io.cdap.cdap.etl.api.validation.ValidationException;
+import java.sql.Timestamp;
+import org.junit.Test;
+
+/** Test class for {@link BatchContextImpl}. */
 public class BatchContextImplTest {
 
-    @Test
-    public void getLogicalStartTime() {
-        /** arrange */
-        Timestamp expectedStartTime = new Timestamp(System.currentTimeMillis());
-        BatchContextImpl context = new BatchContextImpl();
+  @Test
+  public void getLogicalStartTime() {
+    /** arrange */
+    Timestamp expectedStartTime = new Timestamp(System.currentTimeMillis());
+    BatchContextImpl context = new BatchContextImpl();
 
-        /** act */
-        long actualStartTime = context.getLogicalStartTime();
+    /** act */
+    long actualStartTime = context.getLogicalStartTime();
 
-        /** assert */
-        assertTrue((expectedStartTime.getTime() - actualStartTime) <= 100);
-    }
+    /** assert */
+    assertTrue((expectedStartTime.getTime() - actualStartTime) <= 100);
+  }
 
-    @Test
-    public void getFailureCollector() {
-        /** arrange */
-        BatchContextImpl context = new BatchContextImpl();
+  @Test
+  public void getFailureCollector() {
+    /** arrange */
+    BatchContextImpl context = new BatchContextImpl();
 
-        /** act */
-        FailureCollector failureCollector = context.getFailureCollector();
+    /** act */
+    FailureCollector failureCollector = context.getFailureCollector();
 
-        /** assert */
-        ValidationException validationException = failureCollector.getOrThrowException();
-        assertEquals(0, validationException.getFailures().size());
-    }
+    /** assert */
+    ValidationException validationException = failureCollector.getOrThrowException();
+    assertEquals(0, validationException.getFailures().size());
+  }
 }

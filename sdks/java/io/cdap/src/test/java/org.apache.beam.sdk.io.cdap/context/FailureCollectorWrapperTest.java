@@ -17,75 +17,76 @@
  */
 package org.apache.beam.sdk.io.cdap.context;
 
-import io.cdap.cdap.etl.api.validation.ValidationException;
-import io.cdap.cdap.etl.api.validation.ValidationFailure;
-import org.junit.Test;
-
-import java.util.ArrayList;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-/**
- * Test class for {@link FailureCollectorWrapper}.
- */
+import io.cdap.cdap.etl.api.validation.ValidationException;
+import io.cdap.cdap.etl.api.validation.ValidationFailure;
+import java.util.ArrayList;
+import org.junit.Test;
+
+/** Test class for {@link FailureCollectorWrapper}. */
 public class FailureCollectorWrapperTest {
 
-    @Test
-    public void addFailure() {
-        /** arrange */
-        FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
+  @Test
+  public void addFailure() {
+    /** arrange */
+    FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
 
-        /** act */
-        RuntimeException error = new RuntimeException("An error has occurred");
-        failureCollectorWrapper.addFailure(error.getMessage(), null);
+    /** act */
+    RuntimeException error = new RuntimeException("An error has occurred");
+    failureCollectorWrapper.addFailure(error.getMessage(), null);
 
-        /** assert */
-        assertThrows(ValidationException.class, () -> failureCollectorWrapper.getOrThrowException());
-    }
+    /** assert */
+    assertThrows(ValidationException.class, () -> failureCollectorWrapper.getOrThrowException());
+  }
 
-    @Test
-    public void getOrThrowException() {
-        /** arrange */
-        FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
-        String errorMessage = "An error has occurred";
-        String expectedMessage = "Errors were encountered during validation. An error has occurred";
+  @Test
+  public void getOrThrowException() {
+    /** arrange */
+    FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
+    String errorMessage = "An error has occurred";
+    String expectedMessage = "Errors were encountered during validation. An error has occurred";
 
-        FailureCollectorWrapper emptyFailureCollectorWrapper = new FailureCollectorWrapper();
+    FailureCollectorWrapper emptyFailureCollectorWrapper = new FailureCollectorWrapper();
 
-        RuntimeException error = new RuntimeException(errorMessage);
-        failureCollectorWrapper.addFailure(error.getMessage(), null);
+    RuntimeException error = new RuntimeException(errorMessage);
+    failureCollectorWrapper.addFailure(error.getMessage(), null);
 
-        /** act && assert */
-        ValidationException e = assertThrows(ValidationException.class, () -> failureCollectorWrapper.getOrThrowException());
-        assertEquals(expectedMessage, e.getMessage());
+    /** act && assert */
+    ValidationException e =
+        assertThrows(
+            ValidationException.class, () -> failureCollectorWrapper.getOrThrowException());
+    assertEquals(expectedMessage, e.getMessage());
 
-        // A case when return ValidationException with empty collector
-        ArrayList<ValidationFailure> exceptionCollector = emptyFailureCollectorWrapper.getValidationFailures();
-        assertEquals(0, exceptionCollector.size());
-    }
+    // A case when return ValidationException with empty collector
+    ArrayList<ValidationFailure> exceptionCollector =
+        emptyFailureCollectorWrapper.getValidationFailures();
+    assertEquals(0, exceptionCollector.size());
+  }
 
-    @Test
-    public void getValidationFailures() {
-        /** arrange */
-        FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
-        String errorMessage = "An error has occurred";
+  @Test
+  public void getValidationFailures() {
+    /** arrange */
+    FailureCollectorWrapper failureCollectorWrapper = new FailureCollectorWrapper();
+    String errorMessage = "An error has occurred";
 
-        FailureCollectorWrapper emptyFailureCollectorWrapper = new FailureCollectorWrapper();
+    FailureCollectorWrapper emptyFailureCollectorWrapper = new FailureCollectorWrapper();
 
-        RuntimeException error = new RuntimeException(errorMessage);
-        failureCollectorWrapper.addFailure(error.getMessage(), null);
+    RuntimeException error = new RuntimeException(errorMessage);
+    failureCollectorWrapper.addFailure(error.getMessage(), null);
 
-        /** act */
-        ArrayList<ValidationFailure> exceptionCollector = failureCollectorWrapper.getValidationFailures();
-        ArrayList<ValidationFailure> emptyExceptionCollector = emptyFailureCollectorWrapper.getValidationFailures();
+    /** act */
+    ArrayList<ValidationFailure> exceptionCollector =
+        failureCollectorWrapper.getValidationFailures();
+    ArrayList<ValidationFailure> emptyExceptionCollector =
+        emptyFailureCollectorWrapper.getValidationFailures();
 
+    /** assert */
+    assertEquals(1, exceptionCollector.size());
+    String actualMessage = exceptionCollector.get(0).getMessage();
+    assertEquals(errorMessage, actualMessage);
 
-        /** assert */
-        assertEquals(1, exceptionCollector.size());
-        String actualMessage = exceptionCollector.get(0).getMessage();
-        assertEquals(errorMessage, actualMessage);
-
-        assertEquals(0, emptyExceptionCollector.size());
-    }
+    assertEquals(0, emptyExceptionCollector.size());
+  }
 }

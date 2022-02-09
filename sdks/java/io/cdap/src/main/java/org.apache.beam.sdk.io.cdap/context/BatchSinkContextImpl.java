@@ -21,24 +21,21 @@ import io.cdap.cdap.api.data.batch.Output;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
 
 /**
- * Class BatchSinkContextWrapper is a class for creating context object
- * of different CDAP classes with batch sink type.
+ * Class BatchSinkContextWrapper is a class for creating context object of different CDAP classes
+ * with batch sink type.
  */
 public class BatchSinkContextImpl extends BatchContextImpl implements BatchSinkContext {
 
-    @Override
-    public void addOutput(Output output) {
+  @Override
+  public void addOutput(Output output) {}
 
-    }
+  @Override
+  public boolean isPreviewEnabled() {
+    return false;
+  }
 
-    @Override
-    public boolean isPreviewEnabled() {
-        return false;
-    }
-
-    @Override
-    public String getStageName() {
-        return null;
-    }
-
+  @Override
+  public String getStageName() {
+    return null;
+  }
 }
