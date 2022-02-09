@@ -68,7 +68,7 @@ jobs:
              echo "${{ secrets.PLAYGROUND_GCP_ACCESS_KEY }}" | base64 -d > /tmp/gcp_access.json
         if: "'refs/heads/beta-version-v2' == github.ref"
       - name: Set up GCP SDK
-          uses: google-github-actions/setup-gcloud@v0.3.0
+        uses: google-github-actions/setup-gcloud@v0.3.0
       - name: Setup GCP account
         run: |
           gcloud auth activate-service-account --project=apache-beam-testing --key-file=/tmp/gcp_access.json
