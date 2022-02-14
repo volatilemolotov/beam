@@ -46,7 +46,6 @@ COPY --from=build /go/bin/server_scio_backend /opt/playground/backend/
 COPY --from=build /go/src/playground/backend/configs /opt/playground/backend/configs/
 COPY --from=build /go/src/playground/backend/logging.properties /opt/playground/backend/
 COPY --from=build /go/src/playground/backend/new_scio_project.sh /opt/playground/backend/
-COPY --from=build /go/src/playground/backend/internal/fs_tool/ExampleData.scala /opt/playground/backend/
 
 # Install sbt
 RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list &&\
@@ -74,8 +73,11 @@ RUN sh /proxy.sh
 # Create a user group `appgroup` and a user `appuser`
 RUN groupadd --gid 20000 appgroup \
   && useradd --uid 20000 --gid appgroup --shell /bin/bash --create-home appuser
-# Chown all the files to the app user.
-RUN chown -R appuser:appgroup /opt/playground/backend/ && chmod +x /entrypoint.sh
+
+RUN mkdir -p /opt/playground/backend/executable_files/
+
+# Chown all the files to the `appuser`.
+RUN chown -R appuser:appgroup /opt/playground/backend/executable_files/ && chmod +x /entrypoint.sh
 
 # Switch to appuser
 USER appuser
