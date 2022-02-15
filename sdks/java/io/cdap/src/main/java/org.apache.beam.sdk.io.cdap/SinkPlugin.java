@@ -25,15 +25,13 @@ import org.apache.hadoop.mapreduce.OutputFormat;
 /**
  * Class wrapper for a CDAP Sink plugin.
  */
-@SuppressWarnings("rawtypes")
-public class SinkPlugin<OF extends OutputFormat, OFP extends OutputFormatProvider, PC extends PluginConfig>
-        extends Plugin<OF, OFP, PC> {
+public class SinkPlugin extends Plugin {
 
     /**
      * Sets a plugin Hadoop configuration.
      */
     @Override
-    public SinkPlugin<OF, OFP, PC> withHadoopConfiguration(Class<?> OutputFormatKeyClass,
+    public SinkPlugin withHadoopConfiguration(Class<?> OutputFormatKeyClass,
                                                            Class<?> OutputFormatValueClass) {
         this.hadoopConfiguration = new Configuration(false);
 
@@ -48,7 +46,7 @@ public class SinkPlugin<OF extends OutputFormat, OFP extends OutputFormatProvide
     }
 
     @Override
-    public SinkPlugin<OF, OFP, PC> withHadoopConfiguration(Configuration hadoopConfiguration) {
+    public SinkPlugin withHadoopConfiguration(Configuration hadoopConfiguration) {
         this.hadoopConfiguration = hadoopConfiguration;
 
         return this;

@@ -23,12 +23,12 @@ import org.apache.hadoop.conf.Configuration;
 /**
  * Class wrapper for a CDAP plugin.
  */
-public abstract class Plugin<F, FP, PC extends PluginConfig> {
+public abstract class Plugin {
     protected Class<?> pluginClass;
-    protected Class<F> formatClass;
-    protected Class<FP> formatProviderClass;
+    protected Class<?> formatClass;
+    protected Class<?> formatProviderClass;
 
-    protected PC pluginConfig;
+    protected PluginConfig pluginConfig;
     protected Configuration hadoopConfiguration;
 
     /**
@@ -48,35 +48,35 @@ public abstract class Plugin<F, FP, PC extends PluginConfig> {
     /**
      * Sets InputFormat or OutputFormat class for a plugin.
      */
-    public void setFormatClass(Class<F> formatClass) {
+    public void setFormatClass(Class<?> formatClass) {
         this.formatClass = formatClass;
     }
 
     /**
      * Gets InputFormat or OutputFormat class for a plugin.
      */
-    public Class<F> getFormatClass() {
+    public Class<?> getFormatClass() {
         return formatClass;
     }
 
     /**
      * Sets InputFormatProvider or OutputFormatProvider class for a plugin.
      */
-    public void setFormatProviderClass(Class<FP> formatProviderClass) {
+    public void setFormatProviderClass(Class<?> formatProviderClass) {
         this.formatProviderClass = formatProviderClass;
     }
 
     /**
      * Gets InputFormatProvider or OutputFormatProvider class for a plugin.
      */
-    public Class<FP> getFormatProviderClass() {
+    public Class<?> getFormatProviderClass() {
         return formatProviderClass;
     }
 
     /**
      * Sets a plugin config.
      */
-    public Plugin<F, FP, PC> withConfig(PC pluginConfig) {
+    public Plugin withConfig(PluginConfig pluginConfig) {
         this.pluginConfig = pluginConfig;
         return this;
     }
@@ -84,20 +84,20 @@ public abstract class Plugin<F, FP, PC extends PluginConfig> {
     /**
      * Gets a plugin config.
      */
-    public PC getPluginConfig() {
+    public PluginConfig getPluginConfig() {
         return pluginConfig;
     }
 
     /**
      * Sets a plugin Hadoop configuration.
      */
-    public abstract Plugin<F, FP, PC> withHadoopConfiguration(Class<?> FormatKeyClass, Class<?> FormatValueClass);
+    public abstract Plugin withHadoopConfiguration(Class<?> FormatKeyClass, Class<?> FormatValueClass);
 
 
     /**
      * Sets a plugin Hadoop configuration.
      */
-    public abstract Plugin<F, FP, PC> withHadoopConfiguration(Configuration hadoopConfiguration);
+    public abstract Plugin withHadoopConfiguration(Configuration hadoopConfiguration);
 
     /**
      * Gets a plugin Hadoop configuration.

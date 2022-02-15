@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for building {@link SourcePlugin} object.
  */
-@SuppressWarnings("rawtypes")
-public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormatProvider, PC extends PluginConfig>
-        extends PluginBuilder<IF, IFP, PC> {
+public class SourcePluginBuilder extends PluginBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(SourcePluginBuilder.class);
 
@@ -58,7 +56,7 @@ public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormat
      * Builds instance of a source plugin.
      */
     @Override
-    public SourcePlugin<IF, IFP, PC> build() {
+    public SourcePlugin build() {
         try {
             validatePluginClass();
         } catch (IllegalArgumentException e) {
@@ -66,7 +64,7 @@ public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormat
             throw e;
         }
 
-        SourcePlugin<IF, IFP, PC> sp = new SourcePlugin<>();
+        SourcePlugin sp = new SourcePlugin();
         sp.setPluginClass(pluginClass);
         sp.setFormatClass(formatClass);
         sp.setFormatProviderClass(formatProviderClass);

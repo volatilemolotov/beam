@@ -22,11 +22,11 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 /**
  * Class for building {@link Plugin} object.
  */
-public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
+public abstract class PluginBuilder {
     protected Class<?> pluginClass;
 
-    protected Class<F> formatClass;
-    protected Class<FP> formatProviderClass;
+    protected Class<?> formatClass;
+    protected Class<?> formatProviderClass;
 
     /**
      * Constructor for a plugin builder.
@@ -46,7 +46,7 @@ public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
     /**
      * Sets InputFormat or OutputFormat class for a plugin.
      */
-    public PluginBuilder<F, FP, PC> withFormat(Class<F> formatClass) {
+    public PluginBuilder withFormat(Class<?> formatClass) {
         this.formatClass = formatClass;
         return this;
     }
@@ -54,7 +54,7 @@ public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
     /**
      * Sets InputFormatProvider or OutputFormatProvider class for a plugin.
      */
-    public PluginBuilder<F, FP, PC> withFormatProvider(Class<FP> formatProviderClass) {
+    public PluginBuilder withFormatProvider(Class<?> formatProviderClass) {
         this.formatProviderClass = formatProviderClass;
         return this;
     }
@@ -67,5 +67,5 @@ public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
     /**
      * Builds instance of a plugin.
      */
-    public abstract Plugin<F, FP, PC> build();
+    public abstract Plugin build();
 }

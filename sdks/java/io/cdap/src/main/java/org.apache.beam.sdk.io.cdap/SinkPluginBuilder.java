@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for building {@link SinkPlugin} object.
  */
-@SuppressWarnings("rawtypes")
-public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormatProvider, PC extends PluginConfig>
-        extends PluginBuilder<OF, OFP, PC> {
+public class SinkPluginBuilder extends PluginBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(SinkPluginBuilder.class);
 
@@ -58,7 +56,7 @@ public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormat
      * Builds instance of a sink plugin.
      */
     @Override
-    public SinkPlugin<OF, OFP, PC> build() {
+    public SinkPlugin build() {
         try {
             validatePluginClass();
         } catch (IllegalArgumentException e) {
@@ -66,7 +64,7 @@ public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormat
             throw e;
         }
 
-        SinkPlugin<OF, OFP, PC> sp = new SinkPlugin<>();
+        SinkPlugin sp = new SinkPlugin();
         sp.setPluginClass(pluginClass);
         sp.setFormatClass(formatClass);
         sp.setFormatProviderClass(formatProviderClass);

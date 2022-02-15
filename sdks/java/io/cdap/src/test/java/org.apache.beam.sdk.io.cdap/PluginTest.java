@@ -45,8 +45,7 @@ public class PluginTest {
     /**
      * Builder for Salesforce Batch Source plugin.
      */
-    public static class SalesforceSourcePluginBuilder extends
-            SourcePluginBuilder<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> {
+    public static class SalesforceSourcePluginBuilder extends SourcePluginBuilder {
 
         /**
          * Constructor for Salesforce Batch Source plugin wrapper builder.
@@ -61,8 +60,7 @@ public class PluginTest {
     /**
      * Salesforce Batch Source plugin.
      */
-    public static class SalesforceSourcePlugin extends
-            SourcePlugin<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> { }
+    public static class SalesforceSourcePlugin extends SourcePlugin { }
 
     private final ImmutableMap<String, String> TEST_SALESFORCE_PARAMS_MAP =
             ImmutableMap.<String, String>builder()
@@ -93,7 +91,7 @@ public class PluginTest {
     @Test
     public void testBuildingSourcePluginWithCDAPClasses() {
         try {
-            Plugin<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> salesforceSourcePlugin =
+            Plugin salesforceSourcePlugin =
                     new SalesforceSourcePluginBuilder()
                     .build()
                     .withConfig(salesforceSourceConfig)
