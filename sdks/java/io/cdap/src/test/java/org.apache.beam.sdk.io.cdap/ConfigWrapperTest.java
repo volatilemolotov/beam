@@ -139,39 +139,4 @@ public class ConfigWrapperTest {
     assertEquals(params.get(SalesforceConstants.PROPERTY_PASSWORD), config.getPassword());
     assertEquals(params.get(SalesforceConstants.PROPERTY_LOGIN_URL), config.getLoginUrl());
   }
-
-  @Rule public final transient TestPipeline p = TestPipeline.create();
-
-  @Test
-  public void testReadFromSalesforce() {
-    try {
-
-      List<KV<Schema, Map<String, String>>> inputs = new ArrayList<>();
-      for (int i = 0; i < 100; i++) {
-        inputs.add(
-            KV.of(
-                Schema.recordOf("rec" + i),
-                ImmutableMap.<String, String>builder().put("k" + i, "v" + i).build()));
-      }
-
-      SalesforceSourceConfig pluginConfig =
-          new ConfigWrapper<>(SalesforceSourceConfig.class)
-              .withParams(TEST_SALESFORCE_PARAMS_MAP)
-              .build();
-
-      CdapIO.Read<Schema, Map<String, String>> reader =
-          CdapIO.<Schema, Map<String, String>>read()
-              .withCdapPluginClass(SalesforceBatchSource.class)
-              .withPluginConfig(pluginConfig);
-
-      PCollection<KV<Schema, Map<String, String>>> input = p.apply(reader);
-
-      PAssert.that(input).containsInAnyOrder(inputs);
-      p.run();
-
-    } catch (Exception e) {
-      LOG.error("Error occurred while building the config object", e);
-      fail();
-    }
-  }
 }
