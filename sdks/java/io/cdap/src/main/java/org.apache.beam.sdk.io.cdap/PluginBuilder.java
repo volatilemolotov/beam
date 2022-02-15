@@ -62,10 +62,10 @@ public abstract class PluginBuilder<F, FP, PC extends PluginConfig> {
     /**
      * Validates plugin fields.
      */
-    protected abstract void validatePluginClass() throws IllegalArgumentException;
+    protected abstract void validatePluginClass();
 
     /**
      * Builds instance of a plugin.
      */
-    public abstract Plugin<F, FP, PC> build() throws IllegalArgumentException;
+    public abstract Plugin<F, FP, PC> build();
 }

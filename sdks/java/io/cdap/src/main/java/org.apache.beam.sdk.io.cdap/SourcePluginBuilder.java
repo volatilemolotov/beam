@@ -45,7 +45,7 @@ public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormat
      * Validates source plugin fields.
      */
     @Override
-    protected void validatePluginClass() throws IllegalArgumentException {
+    protected void validatePluginClass() {
         if (formatClass == null) {
             throw new IllegalArgumentException("InputFormat must be not null");
         }
@@ -58,7 +58,7 @@ public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormat
      * Builds instance of a source plugin.
      */
     @Override
-    public SourcePlugin<IF, IFP, PC> build() throws IllegalArgumentException {
+    public SourcePlugin<IF, IFP, PC> build() {
         try {
             validatePluginClass();
         } catch (IllegalArgumentException e) {

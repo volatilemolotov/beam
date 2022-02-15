@@ -25,6 +25,7 @@ import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import org.apache.hadoop.io.MapWritable;
 import io.cdap.cdap.api.data.schema.Schema;
 
+import org.apache.hadoop.mapreduce.InputFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -102,6 +103,8 @@ public class PluginTest {
             assertEquals(salesforceSourcePlugin.getFormatClass(), SalesforceInputFormat.class);
             assertEquals(salesforceSourcePlugin.getFormatProviderClass(), SalesforceInputFormatProvider.class);
             assertEquals(salesforceSourcePlugin.getPluginConfig(), salesforceSourceConfig);
+            assertEquals(salesforceSourcePlugin.getHadoopConfiguration()
+                    .getClass("mapreduce.job.inputformat.class", InputFormat.class), SalesforceInputFormat.class);
 
         } catch (Exception e) {
             LOG.error("Error occurred while building the Salesforce Source Plugin", e);

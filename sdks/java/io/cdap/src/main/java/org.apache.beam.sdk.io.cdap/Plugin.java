@@ -28,7 +28,7 @@ public abstract class Plugin<F, FP, PC extends PluginConfig> {
     protected Class<F> formatClass;
     protected Class<FP> formatProviderClass;
 
-    public PC pluginConfig;
+    protected PC pluginConfig;
     protected Configuration hadoopConfiguration;
 
     /**

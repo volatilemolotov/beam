@@ -45,7 +45,7 @@ public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormat
      * Validates sink plugin fields.
      */
     @Override
-    protected void validatePluginClass() throws IllegalArgumentException {
+    protected void validatePluginClass() {
         if (formatClass == null) {
             throw new IllegalArgumentException("OutputFormat must be not null");
         }
@@ -58,7 +58,7 @@ public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormat
      * Builds instance of a sink plugin.
      */
     @Override
-    public SinkPlugin<OF, OFP, PC> build() throws IllegalArgumentException {
+    public SinkPlugin<OF, OFP, PC> build() {
         try {
             validatePluginClass();
         } catch (IllegalArgumentException e) {
