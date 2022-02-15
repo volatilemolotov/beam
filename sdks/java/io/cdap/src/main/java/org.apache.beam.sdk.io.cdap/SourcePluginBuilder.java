@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for building {@link SourcePlugin} object.
  */
+@SuppressWarnings("rawtypes")
 public class SourcePluginBuilder<IF extends InputFormat, IFP extends InputFormatProvider, PC extends PluginConfig>
         extends PluginBuilder<IF, IFP, PC> {
 

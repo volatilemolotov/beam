@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for building {@link SinkPlugin} object.
  */
+@SuppressWarnings("rawtypes")
 public class SinkPluginBuilder<OF extends OutputFormat, OFP extends OutputFormatProvider, PC extends PluginConfig>
         extends PluginBuilder<OF, OFP, PC> {
 

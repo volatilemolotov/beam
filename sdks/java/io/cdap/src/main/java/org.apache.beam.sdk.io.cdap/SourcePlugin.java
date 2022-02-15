@@ -25,6 +25,7 @@ import org.apache.hadoop.mapreduce.InputFormat;
 /**
  * Class wrapper for a CDAP Source plugin.
  */
+@SuppressWarnings("rawtypes")
 public class SourcePlugin<IF extends InputFormat, IFP extends InputFormatProvider, PC extends PluginConfig>
         extends Plugin<IF, IFP, PC> {
 

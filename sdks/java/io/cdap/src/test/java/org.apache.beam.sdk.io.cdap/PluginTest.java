@@ -92,8 +92,8 @@ public class PluginTest {
     @Test
     public void testBuildingSourcePluginWithCDAPClasses() {
         try {
-            SalesforceSourcePlugin salesforceSourcePlugin =
-                    (SalesforceSourcePlugin) new SalesforceSourcePluginBuilder()
+            Plugin<SalesforceInputFormat, SalesforceInputFormatProvider, SalesforceSourceConfig> salesforceSourcePlugin =
+                    new SalesforceSourcePluginBuilder()
                     .build()
                     .withConfig(salesforceSourceConfig)
                     .withHadoopConfiguration(Schema.class, MapWritable.class);

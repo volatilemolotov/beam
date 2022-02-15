@@ -21,6 +21,11 @@ plugins {
     id 'org.apache.beam.module'
 }
 
+// Exclude unneeded dependencies when building jar
+def excluded_dependencies = [
+        "com.google.auto.value:auto-value",          // Provided scope added from applyJavaNature
+]
+
 applyJavaNature(
         exportJavadoc: false,
         automaticModuleName: 'org.apache.beam.sdk.io.cdap',
@@ -54,6 +59,10 @@ dependencies {
     implementation "io.cdap.cdap:cdap-etl-api:6.5.1"
     implementation "org.apache.hadoop:hadoop-mapred:0.22.0"
     implementation "com.github.data-integrations:salesforce:v1.3.9"
+    implementation 'com.google.auto.value:auto-value:1.6.3'
+    annotationProcessor "com.google.auto.value:auto-value:1.9"
+    compileOnly         "com.google.auto.value:auto-value-annotations:1.9"
+//    provided 'com.jakewharton.auto.value:auto-value-annotations:1.4'
     testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
     testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")
     testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntimeMigration")
