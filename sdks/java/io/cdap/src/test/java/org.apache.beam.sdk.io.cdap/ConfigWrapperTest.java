@@ -20,12 +20,21 @@ package org.apache.beam.sdk.io.cdap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.salesforce.SalesforceConstants;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import io.cdap.plugin.salesforce.plugin.source.batch.util.SalesforceSourceConstants;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import org.apache.beam.sdk.testing.PAssert;
+import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.values.KV;
+import org.apache.beam.sdk.values.PCollection;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -129,5 +138,40 @@ public class ConfigWrapperTest {
     assertEquals(params.get(SalesforceConstants.PROPERTY_USERNAME), config.getUsername());
     assertEquals(params.get(SalesforceConstants.PROPERTY_PASSWORD), config.getPassword());
     assertEquals(params.get(SalesforceConstants.PROPERTY_LOGIN_URL), config.getLoginUrl());
+  }
+
+  @Rule public final transient TestPipeline p = TestPipeline.create();
+
+  @Test
+  public void testReadFromSalesforce() {
+    try {
+
+      List<KV<Schema, Map<String, String>>> inputs = new ArrayList<>();
+      for (int i = 0; i < 100; i++) {
+        inputs.add(
+            KV.of(
+                Schema.recordOf("rec" + i),
+                ImmutableMap.<String, String>builder().put("k" + i, "v" + i).build()));
+      }
+
+      SalesforceSourceConfig pluginConfig =
+          new ConfigWrapper<>(SalesforceSourceConfig.class)
+              .withParams(TEST_SALESFORCE_PARAMS_MAP)
+              .build();
+
+      CdapIO.Read<Schema, Map<String, String>> reader =
+          CdapIO.<Schema, Map<String, String>>read()
+              .withCdapPluginClass(SalesforceBatchSource.class)
+              .withPluginConfig(pluginConfig);
+
+      PCollection<KV<Schema, Map<String, String>>> input = p.apply(reader);
+
+      PAssert.that(input).containsInAnyOrder(inputs);
+      p.run();
+
+    } catch (Exception e) {
+      LOG.error("Error occurred while building the config object", e);
+      fail();
+    }
   }
 }

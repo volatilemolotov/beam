@@ -45,6 +45,9 @@ allprojects {
 
 dependencies {
     implementation project(path: ":sdks:java:core", configuration: "shadow")
+    implementation project(":sdks:java:io:hadoop-common")
+    implementation project(":sdks:java:io:hadoop-format")
+    implementation "org.apache.hadoop:hadoop-mapred:0.22.0"
     implementation library.java.vendored_guava_26_0_jre
     implementation library.java.slf4j_api
     implementation "org.apache.commons:commons-lang3:3.9"
@@ -57,6 +60,8 @@ dependencies {
     testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")
     testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntimeMigration")
     testImplementation project(":sdks:java:io:jdbc")
+    testImplementation project(":sdks:java:io:hadoop-common")
+    testImplementation project(":sdks:java:io:hadoop-format")
     testImplementation project(path: ":examples:java", configuration: "testRuntimeMigration")
     testImplementation project(path: ":runners:direct-java", configuration: "shadow")
     testImplementation project(":sdks:java:io:google-cloud-platform")

@@ -27,7 +27,9 @@ import io.cdap.cdap.etl.api.batch.BatchSourceContext;
 public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
 
   @Override
-  public void setInput(Input input) {}
+  public void setInput(Input input) {
+    this.inputFormatProvider = ((Input.InputFormatProviderInput) input).getInputFormatProvider();
+  }
 
   @Override
   public boolean isPreviewEnabled() {
