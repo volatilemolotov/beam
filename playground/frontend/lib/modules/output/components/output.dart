@@ -20,8 +20,14 @@ import 'package:flutter/material.dart';
 import 'package:playground/modules/output/components/output_area.dart';
 import 'package:playground/modules/output/components/output_header/output_header.dart';
 
+const kTabsCount = 3;
+
 class Output extends StatefulWidget {
-  const Output({Key? key}) : super(key: key);
+  final bool isEmbedded;
+  final bool showGraph;
+
+  const Output({Key? key, required this.isEmbedded, required this.showGraph})
+      : super(key: key);
 
   @override
   State<Output> createState() => _OutputState();
@@ -33,7 +39,8 @@ class _OutputState extends State<Output> with SingleTickerProviderStateMixin {
 
   @override
   void initState() {
-    tabController = TabController(vsync: this, length: 2);
+    final tabsCount = widget.showGraph ? kTabsCount : kTabsCount - 1;
+    tabController = TabController(vsync: this, length: tabsCount);
     tabController.addListener(onTabChange);
     super.initState();
   }
@@ -55,8 +62,17 @@ class _OutputState extends State<Output> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        OutputHeader(tabController: tabController),
-        Expanded(child: OutputArea(tabController: tabController)),
+        OutputHeader(
+          tabController: tabController,
+          showOutputPlacements: widget.isEmbedded,
+          showGraph: widget.showGraph,
+        ),
+        Expanded(
+          child: OutputArea(
+            tabController: tabController,
+            showGraph: widget.showGraph,
+          ),
+        ),
       ],
     );
   }

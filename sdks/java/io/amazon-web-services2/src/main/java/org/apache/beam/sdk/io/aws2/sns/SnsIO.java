@@ -61,7 +61,7 @@ import software.amazon.awssdk.services.sns.model.PublishResponse;
 /**
  * {@link PTransform}s for writing to <a href="https://aws.amazon.com/sns/">SNS</a>.
  *
- * <h3>Writing to SNS Synchronously</h3>
+ * <h3>Writing to SNS</h3>
  *
  * <p>Example usage:
  *
@@ -87,53 +87,26 @@ import software.amazon.awssdk.services.sns.model.PublishResponse;
  * AwsResponseMetadata}, you can call {@link Write#withFullPublishResponse()}. If you need the HTTP
  * status code only but no headers, you can use {@link
  * Write#withFullPublishResponseWithoutHeaders()}.
- *
- * <h3>Writing to SNS Asynchronously</h3>
- *
- * <p>Example usage:
- *
- * <pre>{@code
- * PCollection<String> data = ...;
- *
- * data.apply(SnsIO.<String>writeAsync()
- * 		.withElementCoder(StringUtf8Coder.of())
- * 		.withPublishRequestFn(createPublishRequestFn())
- * 		.withSnsClientProvider(new BasicSnsClientProvider(awsCredentialsProvider, region));
- *
- * }</pre>
- *
- * <pre>{@code
- * PCollection<String> data = ...;
- *
- * PCollection<SnsResponse<String>> responses = data.apply(SnsIO.<String>writeAsync()
- *      .withElementCoder(StringUtf8Coder.of())
- *      .withPublishRequestFn(createPublishRequestFn())
- *  *   .withSnsClientProvider(new BasicSnsClientProvider(awsCredentialsProvider, region));
- *
- * }</pre>
- *
- * <p>As a client, you need to provide at least the following things:
- *
- * <ul>
- *   <li>Coder for element T.
- *   <li>publishRequestFn, a function to convert your message into PublishRequest
- *   <li>SnsClientProvider, a provider to create an async client.
- * </ul>
  */
 @Experimental(Kind.SOURCE_SINK)
 @SuppressWarnings({
-  "rawtypes", // TODO(https://issues.apache.org/jira/browse/BEAM-10556)
   "nullness" // TODO(https://issues.apache.org/jira/browse/BEAM-10402)
 })
 public final class SnsIO {
 
-  // Write data to SNS (synchronous)
+  // Write data to SNS
   public static <T> Write<T> write() {
-    return new AutoValue_SnsIO_Write.Builder().build();
+    return new AutoValue_SnsIO_Write.Builder<T>().build();
   }
 
+  /**
+   * @deprecated Please use {@link SnsIO#write()} to avoid the risk of data loss.
+   * @see <a href="https://issues.apache.org/jira/browse/BEAM-13824">BEAM-13824</a>, <a
+   *     href="https://issues.apache.org/jira/browse/BEAM-13203">BEAM-13203</a>
+   */
+  @Deprecated
   public static <T> WriteAsync<T> writeAsync() {
-    return new AutoValue_SnsIO_WriteAsync.Builder().build();
+    return new AutoValue_SnsIO_WriteAsync.Builder<T>().build();
   }
 
   /**
@@ -391,7 +364,7 @@ public final class SnsIO {
 
     static class SnsWriterFn<T> extends DoFn<T, PublishResponse> {
       @VisibleForTesting
-      static final String RETRY_ATTEMPT_LOG = "Error writing to SNS. Retry attempt[%d]";
+      static final String RETRY_ATTEMPT_LOG = "Error writing to SNS. Retry attempt[{}]";
 
       private transient FluentBackoff retryBackoff; // defaults to no retries
       private static final Logger LOG = LoggerFactory.getLogger(SnsWriterFn.class);
@@ -457,7 +430,7 @@ public final class SnsIO {
                   ex);
             } else {
               // Note: this used in test cases to verify behavior
-              LOG.warn(String.format(RETRY_ATTEMPT_LOG, attempt), ex);
+              LOG.warn(RETRY_ATTEMPT_LOG, attempt, ex);
             }
           }
         }
@@ -473,7 +446,14 @@ public final class SnsIO {
     }
   }
 
-  /** Implementation of {@link #writeAsync}. */
+  /**
+   * Implementation of {@link #writeAsync}.
+   *
+   * @deprecated Please use {@link SnsIO#write()} to avoid the risk of data loss.
+   * @see <a href="https://issues.apache.org/jira/browse/BEAM-13824">BEAM-13824</a>, <a
+   *     href="https://issues.apache.org/jira/browse/BEAM-13203">BEAM-13203</a>
+   */
+  @Deprecated
   @AutoValue
   public abstract static class WriteAsync<T>
       extends PTransform<PCollection<T>, PCollection<SnsResponse<T>>> {
