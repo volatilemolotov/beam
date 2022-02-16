@@ -25,18 +25,18 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const kDescriptionWidth = 300.0;
+const kMultifileWidth = 300.0;
 
-class DescriptionPopover extends StatelessWidget {
+class MultifilePopover extends StatelessWidget {
   final ExampleModel example;
 
-  const DescriptionPopover({Key? key, required this.example}) : super(key: key);
+  const MultifilePopover({Key? key, required this.example}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     AppLocalizations appLocale = AppLocalizations.of(context)!;
     return SizedBox(
-      width: kDescriptionWidth,
+      width: kMultifileWidth,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(kLgSpacing),
@@ -44,21 +44,20 @@ class DescriptionPopover extends StatelessWidget {
             runSpacing: kMdSpacing,
             children: [
               Text(
-                example.name,
+                appLocale.multifile,
                 style: const TextStyle(
                   fontSize: kTitleFontSize,
                   fontWeight: kBoldWeight,
                 ),
               ),
-              Text(example.description),
-              if (example.link?.isNotEmpty ?? false)
-                TextButton.icon(
-                  icon: SvgPicture.asset(kGithubIconAsset),
-                  onPressed: () {
-                    launch(example.link ?? '');
-                  },
-                  label: Text(appLocale.viewOnGithub),
-                ),
+              Text(appLocale.multifileWarning),
+              TextButton.icon(
+                icon: SvgPicture.asset(kGithubIconAsset),
+                onPressed: () {
+                  launch(example.link ?? '');
+                },
+                label: Text(appLocale.viewOnGithub),
+              ),
             ],
           ),
         ),
