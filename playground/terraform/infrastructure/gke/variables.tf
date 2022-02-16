@@ -17,34 +17,30 @@
 # under the License.
 #
 
-output "examples-bucket-id" {
-  value = "${google_storage_bucket.examples_bucket.id}"
+variable "project_id" {
+  description = "The GCP Project ID where Playground Applications will be created"
 }
 
-output "examples-bucket-name" {
-  value = "${google_storage_bucket.examples_bucket.name}"
+variable "gke_machine_type" {
+  description = "Node pool machine types"
+  default     = "e2-standard-4"
 }
 
-output "examples-bucket-project" {
-  value = "${google_storage_bucket.examples_bucket.project}"
+variable "gke_node_count" {
+  description = "Node pool size"
+  default     = 1
 }
 
-output "examples-bucket-location" {
-  value = "${google_storage_bucket.examples_bucket.location}"
+variable "service_account" {
+  description = "Service account email"
 }
 
-output "terraform-bucket-id" {
-  value = "${google_storage_bucket.terraform_bucket.id}"
+variable "gke_name" {
+  description = "Name of GKE cluster"
+  default     = "playground-examples"
 }
 
-output "terraform-bucket-name" {
-  value = "${google_storage_bucket.terraform_bucket.name}"
-}
-
-output "terraform-bucket-project" {
-  value = "${google_storage_bucket.terraform_bucket.project}"
-}
-
-output "terraform-bucket-location" {
-  value = "${google_storage_bucket.terraform_bucket.location}"
+variable "gke_location" {
+  description = "Location of GKE cluster"
+  default     = "us-central1-a"
 }

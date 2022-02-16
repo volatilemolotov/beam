@@ -1,4 +1,3 @@
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,20 +17,9 @@
 # under the License.
 #
 
-variable "project_id" {
-  description = "The GCP Project ID where Playground Applications will be created"
-}
-
-variable "machine_type" {
-  description = "Node pool machine types"
-  default = "e2-standard-4"
-}
-
-variable "node_count" {
-  description = "Node pool size"
-  default = 1
-}
-
-variable "service_account" {
-  description = "Service account email"
+resource "google_compute_network" "playground_vpc" {
+  project                 = var.project_id
+  name                    = var.vpc_name
+  auto_create_subnetworks = var.create_subnets
+  mtu                     = var.mtu
 }

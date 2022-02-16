@@ -1,4 +1,3 @@
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,24 +17,27 @@
 # under the License.
 #
 
-variable "project_id" {
-  description = "The GCP Project ID where Playground Applications will be created"
-}
 
-variable "vpc_name" {
-  description = "Name of VPC to be created"
-  default     = "playground-vpc"
-}
-
-variable "create_subnets" {
-  description = "Auto Create Subnets Inside VPC"
-  default = true
-}
-
-variable "mtu" {
-  description = "MTU Inside VPC"
-  default     = 1460
+data "terraform_remote_state" "remote_state_vpc" {
+  backend = "gcs"
+  config  = {
+    bucket = var.terraform_state_bucket_name
+  }
 }
 
 
+# Redis for storing state of Playground application.
+# In this cache Playground instances stores pipeline's statuses, outputs and pipeline's graph
+resource "google_redis_instance" "cache" {
+  provider       = google-beta
+  project        = var.project_id
+  region         = var.redis_region
+  name           = var.redis_name
+  tier           = var.redis_tier
+  memory_size_gb = var.redis_memory_size_gb
+  replica_count  = var.redis_replica_count
 
+  redis_version = var.redis_version
+  display_name  = var.display_name
+
+}

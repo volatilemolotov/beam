@@ -18,43 +18,17 @@
 #
 
 variable "project_id" {
-  description = "Project ID"
+  description = "The GCP Project ID where Playground Applications will be created"
 }
 
-variable "docker_registry_address" {
-  description = "Docker registry address"
+variable "repository_location" {
+  description = "Location of Artifact Registry"
+  default     = "us-central1"
 }
 
-variable "docker_image_name" {
-  description = "Docker Image Name To Be Deployed"
-  default = "beam_playground-backend-java"
+variable "repository_id" {
+  description = "ID of Artifact Registry"
+  default     = "playground-repository"
 }
 
-variable "docker_image_tag" {
-  description = "Docker Image Tag To Be Deployed"
-  default     = "latest"
-}
 
-variable "memory_size" {
-  description = "RAM in GB. The requested memory for the application"
-  type        = number
-  default     = 2
-}
-
-variable "volume_size" {
-  description = "Size of the in memory file system to be used by the application, in GB"
-  type        = number
-  default     = 1
-}
-
-variable "service_name" {
-  default = "backend"
-}
-
-variable "cache_type" {
-  default = "remote"
-}
-
-variable "cache_address" {
-  default = ""
-}

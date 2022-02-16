@@ -1,4 +1,3 @@
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,9 +17,34 @@
 # under the License.
 #
 
-resource "google_compute_network" "playground_vpc" {
-  project                 = "${var.project_id}"
-  name                    = "${var.vpc_name}"
-  auto_create_subnetworks = "${var.create_subnets}"
-  mtu                     = "${var.mtu}"
+output "examples-bucket-id" {
+  value = google_storage_bucket.examples_bucket.id
+}
+
+output "examples-bucket-name" {
+  value = google_storage_bucket.examples_bucket.name
+}
+
+output "examples-bucket-project" {
+  value = google_storage_bucket.examples_bucket.project
+}
+
+output "examples-bucket-location" {
+  value = google_storage_bucket.examples_bucket.location
+}
+
+output "terraform-bucket-id" {
+  value = google_storage_bucket.terraform_bucket.id
+}
+
+output "terraform-bucket-name" {
+  value = google_storage_bucket.terraform_bucket.name
+}
+
+output "terraform-bucket-project" {
+  value = google_storage_bucket.terraform_bucket.project
+}
+
+output "terraform-bucket-location" {
+  value = google_storage_bucket.terraform_bucket.location
 }

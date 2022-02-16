@@ -1,4 +1,3 @@
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,6 +17,12 @@
 # under the License.
 #
 
-output "gke_name" {
-  value = "${google_container_cluster.playground-gke.name}"
+resource "google_artifact_registry_repository" "playground_repo" {
+  provider = google-beta
+
+  project       = var.project_id
+  location      = var.repository_location
+  repository_id = var.repository_id
+  description   = "Playground docker repository"
+  format        = "DOCKER"
 }

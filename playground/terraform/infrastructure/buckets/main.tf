@@ -1,4 +1,3 @@
-
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -18,28 +17,22 @@
 # under the License.
 #
 
-terraform {
-  backend "gcs" {
-    bucket  = "playground_terraform"
-  }
+resource "google_storage_bucket" "examples_bucket" {
+  name          = var.examples_bucket_name
+  location      = var.examples_bucket_location
+  project       = var.project_id
+  storage_class = var.examples_storage_class
 }
 
-resource "google_container_cluster" "playground-gke" {
-  name               = "playground-examples"
-  project            = "${var.project_id}"
-  location           = "us-central1-a"
-  initial_node_count = "${var.node_count}"
-  node_config {
-    machine_type     = "${var.machine_type}"
-    service_account  = "${var.service_account}"
+resource "google_storage_bucket_access_control" "public_rule" {
+  bucket = google_storage_bucket.examples_bucket.name
+  role   = "READER"
+  entity = "allUsers"
+}
 
-    oauth_scopes    = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-    labels = {
-      component      = "beam-playground"
-    }
-    tags             = ["beam-playground"]
-
-  }
+resource "google_storage_bucket" "terraform_bucket" {
+  name          = var.terraform_bucket_name
+  location      = var.terraform_bucket_location
+  project       = var.project_id
+  storage_class = var.terraform_storage_class
 }
