@@ -46,3 +46,8 @@ variable "cache_type" {
 variable "cache_address" {
   default = ""
 }
+
+variable "network_name" {
+  description = "VPC Name"
+  default     = "playground-vpc"
+}

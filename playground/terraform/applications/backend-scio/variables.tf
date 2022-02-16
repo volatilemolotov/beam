@@ -52,3 +52,8 @@ variable "volume_size" {
   type        = number
   default     = 1
 }
+
+variable "network_name" {
+  description = "VPC Name"
+  default     = "playground-vpc"
+}
