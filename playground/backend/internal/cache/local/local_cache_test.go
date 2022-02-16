@@ -612,6 +612,7 @@ func TestLocalCache_clearItems(t *testing.T) {
 func TestNew(t *testing.T) {
 	items := make(map[uuid.UUID]map[cache.SubKey]interface{})
 	pipelinesExpiration := make(map[uuid.UUID]time.Time)
+	defaultPrecompiledObjects := make(map[pb.Sdk]*pb.PrecompiledObject)
 	type args struct {
 		ctx context.Context
 	}
@@ -626,10 +627,11 @@ func TestNew(t *testing.T) {
 			name: "initialize local cache",
 			args: args{ctx: context.Background()},
 			want: &Cache{
-				cleanupInterval:     cleanupInterval,
-				items:               items,
-				pipelinesExpiration: pipelinesExpiration,
-				catalog:             nil,
+				cleanupInterval:           cleanupInterval,
+				items:                     items,
+				pipelinesExpiration:       pipelinesExpiration,
+				catalog:                   nil,
+				defaultPrecompiledObjects: defaultPrecompiledObjects,
 			},
 		},
 	}
