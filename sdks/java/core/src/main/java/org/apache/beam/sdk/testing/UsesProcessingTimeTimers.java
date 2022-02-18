@@ -15,20 +15,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.aws2.sns;
+package org.apache.beam.sdk.testing;
 
-import org.apache.beam.sdk.io.aws2.StaticSupplier;
-import software.amazon.awssdk.services.sns.SnsClient;
+import org.apache.beam.sdk.annotations.Internal;
+import org.apache.beam.sdk.transforms.ParDo;
 
-/** Client provider supporting unserializable clients such as mock instances for unit tests. */
-class StaticSnsClientProvider extends StaticSupplier<SnsClient, StaticSnsClientProvider>
-    implements SnsClientProvider {
-  static SnsClientProvider of(SnsClient client) {
-    return new StaticSnsClientProvider().withObject(client);
-  }
-
-  @Override
-  public SnsClient getSnsClient() {
-    return get();
-  }
-}
+/** Category tag for validation tests which utilize timers in {@link ParDo}. */
+@Internal
+public interface UsesProcessingTimeTimers {}
