@@ -94,7 +94,9 @@ public class CdapIOTest {
     CdapIO.Read<Text, Branch> reader =
         CdapIO.<Text, Branch>read()
             .withCdapPluginClass(GithubBatchSource.class)
-            .withPluginConfig(pluginConfig);
+            .withPluginConfig(pluginConfig)
+            .withKeyClass(Text.class)
+            .withValueClass(Branch.class);
 
     assertNotNull(reader.getPluginConfig());
     assertNotNull(reader.getCdapPlugin());

@@ -76,9 +76,7 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
 
   private T cdapPluginObj;
 
-  public CdapPlugin(Class<T> cdapPluginClass, Class<?> keyClass, Class<?> valueClass) {
-    this.keyClass = keyClass;
-    this.valueClass = valueClass;
+  public CdapPlugin(Class<T> cdapPluginClass) {
     this.cdapPluginClass = cdapPluginClass;
 
     // Determine is unbounded or bounded
@@ -123,8 +121,6 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
   public Configuration getHadoopConf() {
     if (hadoopConf == null) {
       hadoopConf = new Configuration(false);
-      hadoopConf.setClass(format.keyClass, keyClass, Object.class);
-      hadoopConf.setClass(format.valueClass, valueClass, Object.class);
     }
     return hadoopConf;
   }
@@ -154,6 +150,9 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
       throw new IllegalStateException("Can not get format class by name");
     }
     getHadoopConf().setClass(format.formatClass, formatClass, InputFormat.class);
+    getHadoopConf().setClass(format.keyClass, keyClass, Object.class);
+    getHadoopConf().setClass(format.valueClass, valueClass, Object.class);
+
     for (Map.Entry<String, String> entry :
         context.getInputFormatProvider().getInputFormatConfiguration().entrySet()) {
       getHadoopConf().set(entry.getKey(), entry.getValue());
@@ -162,5 +161,13 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
 
   public BatchContext getContext() {
     return context;
+  }
+
+  public void setKeyClass(Class<?> keyClass) {
+    this.keyClass = keyClass;
+  }
+
+  public void setValueClass(Class<?> valueClass) {
+    this.valueClass = valueClass;
   }
 }

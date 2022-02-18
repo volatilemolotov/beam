@@ -22,14 +22,12 @@ import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Prec
 import com.google.auto.value.AutoValue;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import org.apache.beam.sdk.annotations.Experimental;
-import org.apache.beam.sdk.io.cdap.github.common.model.impl.Branch;
 import org.apache.beam.sdk.io.hadoop.format.HadoopFormatIO;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.Text;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,12 +47,16 @@ public class CdapIO {
 
   @AutoValue
   @AutoValue.CopyAnnotations
-  @SuppressWarnings({"rawtypes"})
+  @SuppressWarnings({"rawtypes", "unchecked", "UnnecessaryParentheses", "UnusedVariable"})
   public abstract static class Read<K, V> extends PTransform<PBegin, PCollection<KV<K, V>>> {
 
     abstract @Nullable PluginConfig getPluginConfig();
 
     abstract @Nullable CdapPlugin getCdapPlugin();
+
+    abstract @Nullable Class<K> getKeyClass();
+
+    abstract @Nullable Class<V> getValueClass();
 
     abstract Builder<K, V> toBuilder();
 
@@ -66,18 +68,17 @@ public class CdapIO {
 
       abstract Builder<K, V> setCdapPlugin(CdapPlugin plugin);
 
+      abstract Builder<K, V> setKeyClass(Class<K> keyClass);
+
+      abstract Builder<K, V> setValueClass(Class<V> valueClass);
+
       abstract Read<K, V> build();
     }
 
-    @SuppressWarnings("unchecked")
     public Read<K, V> withCdapPluginClass(Class<?> cdapPluginClass) {
 
-      // TODO: pass key/value classes correctly
-      Class keyClass = Text.class;
-      Class valueClass = Branch.class;
-
       // TODO: build CdapPlugin correctly
-      CdapPlugin plugin = new CdapPlugin(cdapPluginClass, keyClass, valueClass);
+      CdapPlugin plugin = new CdapPlugin(cdapPluginClass);
 
       return toBuilder().setCdapPlugin(plugin).build();
     }
@@ -86,11 +87,23 @@ public class CdapIO {
       return toBuilder().setPluginConfig(pluginConfig).build();
     }
 
+    public Read<K, V> withKeyClass(Class<K> keyClass) {
+      return toBuilder().setKeyClass(keyClass).build();
+    }
+
+    public Read<K, V> withValueClass(Class<V> valueClass) {
+      return toBuilder().setValueClass(valueClass).build();
+    }
+
     @Override
     public PCollection<KV<K, V>> expand(PBegin input) {
       checkArgument(getPluginConfig() != null, "withPluginConfig() is required");
       checkArgument(getCdapPlugin() != null, "withCdapPluginClass() is required");
+      checkArgument(getKeyClass() != null, "withKeyClass() is required");
+      checkArgument(getValueClass() != null, "withValueClass() is required");
 
+      getCdapPlugin().setKeyClass(getKeyClass());
+      getCdapPlugin().setValueClass(getValueClass());
       getCdapPlugin().prepareRun(getPluginConfig());
 
       if (getCdapPlugin().isUnbounded()) {
