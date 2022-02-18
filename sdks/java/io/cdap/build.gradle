@@ -56,6 +56,8 @@ dependencies {
     implementation "io.cdap.cdap:cdap-api:6.5.1"
     implementation "io.cdap.cdap:cdap-etl-api:6.5.1"
     implementation "com.github.data-integrations:salesforce:v1.3.9"
+    // https://mvnrepository.com/artifact/com.google.http-client/google-http-client-gson
+    implementation 'com.google.http-client:google-http-client-gson:1.32.1'
     testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
     testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")
     testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntimeMigration")

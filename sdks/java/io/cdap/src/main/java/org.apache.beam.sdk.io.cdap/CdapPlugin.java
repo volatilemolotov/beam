@@ -31,7 +31,6 @@ import java.util.Map;
 import org.apache.beam.sdk.io.cdap.context.BatchContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSinkContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
-import org.apache.beam.sdk.io.cdap.context.StreamingSourceContextImpl;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.slf4j.Logger;
@@ -48,23 +47,17 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
   private static final Logger LOG = LoggerFactory.getLogger(CdapPlugin.class);
 
   private enum Format {
-    INPUT(
-        "mapreduce.job.inputformat.class",
-        "mapreduce.job.input.key.class",
-        "mapreduce.job.input.value.class"),
-    OUTPUT(
-        "mapreduce.job.outputformat.class",
-        "mapreduce.job.output.key.class",
-        "mapreduce.job.output.value.class");
+    INPUT("mapreduce.job.inputformat.class", "key.class", "value.class"),
+    OUTPUT("mapreduce.job.outputformat.class", "key.class", "value.class");
 
     private final String formatClass;
-    //    private final String keyClass;
-    //    private final String valueClass;
+    private final String keyClass;
+    private final String valueClass;
 
     Format(String formatClass, String keyClass, String valueClass) {
       this.formatClass = formatClass;
-      //      this.keyClass = keyClass;
-      //      this.valueClass = valueClass;
+      this.keyClass = keyClass;
+      this.valueClass = valueClass;
     }
   }
 
@@ -77,11 +70,15 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
   private BatchContextImpl context;
 
   protected Class<?> formatClass;
+  protected Class<?> keyClass;
+  protected Class<?> valueClass;
   protected Class<?> formatProviderClass;
 
   private T cdapPluginObj;
 
-  public CdapPlugin(Class<T> cdapPluginClass) {
+  public CdapPlugin(Class<T> cdapPluginClass, Class<?> keyClass, Class<?> valueClass) {
+    this.keyClass = keyClass;
+    this.valueClass = valueClass;
     this.cdapPluginClass = cdapPluginClass;
 
     // Determine is unbounded or bounded
@@ -113,8 +110,9 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
       context = new BatchSinkContextImpl();
       format = Format.OUTPUT;
     } else {
-      // TODO:
-      context = new StreamingSourceContextImpl();
+      // TODO: context = new StreamingSourceContextImpl();
+      format = Format.INPUT;
+      context = new BatchSourceContextImpl();
     }
   }
 
@@ -125,8 +123,8 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
   public Configuration getHadoopConf() {
     if (hadoopConf == null) {
       hadoopConf = new Configuration(false);
-      //      hadoopConf.setClass(format.keyClass, keyClass, Object.class);
-      //      hadoopConf.setClass(format.valueClass, valueClass, Object.class);
+      hadoopConf.setClass(format.keyClass, keyClass, Object.class);
+      hadoopConf.setClass(format.valueClass, valueClass, Object.class);
     }
     return hadoopConf;
   }

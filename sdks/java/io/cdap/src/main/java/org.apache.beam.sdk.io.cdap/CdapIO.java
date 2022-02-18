@@ -22,12 +22,14 @@ import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Prec
 import com.google.auto.value.AutoValue;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import org.apache.beam.sdk.annotations.Experimental;
+import org.apache.beam.sdk.io.cdap.github.common.model.impl.Branch;
 import org.apache.beam.sdk.io.hadoop.format.HadoopFormatIO;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.Text;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +71,13 @@ public class CdapIO {
 
     @SuppressWarnings("unchecked")
     public Read<K, V> withCdapPluginClass(Class<?> cdapPluginClass) {
-      // TODO: build CdapPlugin correctly
 
-      CdapPlugin plugin = new CdapPlugin(cdapPluginClass);
+      // TODO: pass key/value classes correctly
+      Class keyClass = Text.class;
+      Class valueClass = Branch.class;
+
+      // TODO: build CdapPlugin correctly
+      CdapPlugin plugin = new CdapPlugin(cdapPluginClass, keyClass, valueClass);
 
       return toBuilder().setCdapPlugin(plugin).build();
     }
@@ -88,9 +94,8 @@ public class CdapIO {
       getCdapPlugin().prepareRun(getPluginConfig());
 
       if (getCdapPlugin().isUnbounded()) {
-        // TODO: implement
+        // TODO: implement SparkReceiverIO.<~>read()
         return null;
-        //        return input.apply(new ReadFromCdapUnboundedViaSDF<>(this));
       } else {
         Configuration hConf = getCdapPlugin().getHadoopConf();
         HadoopFormatIO.Read<K, V> readFromHadoop =
