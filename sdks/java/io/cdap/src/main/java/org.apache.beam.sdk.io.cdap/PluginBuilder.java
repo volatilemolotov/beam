@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Class for building {@link Plugin} object.
  */
-public abstract class PluginBuilder {
-    protected Plugin plugin;
+public class PluginBuilder {
+    private final Plugin plugin;
 
     private final Class<?> pluginClass;
     private Class<?> formatClass;
@@ -46,6 +46,8 @@ public abstract class PluginBuilder {
         } catch (IllegalArgumentException e) {
             LOG.error("Error occurred while setting plugin class", e);
         }
+
+        this.plugin = new Plugin();
     }
 
     /**

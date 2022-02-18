@@ -23,7 +23,7 @@ import org.apache.hadoop.conf.Configuration;
 /**
  * Class wrapper for a CDAP plugin.
  */
-public abstract class Plugin {
+public class Plugin {
     private Class<?> formatClass;
     private Class<?> formatProviderClass;
 
