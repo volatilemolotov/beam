@@ -17,16 +17,22 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.plugin.PluginConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for building {@link Plugin} object.
  */
 public abstract class PluginBuilder {
-    protected Class<?> pluginClass;
+    protected Plugin plugin;
 
-    protected Class<?> formatClass;
-    protected Class<?> formatProviderClass;
+    private final Class<?> pluginClass;
+    private Class<?> formatClass;
+    private Class<?> formatProviderClass;
+
+    private PluginConstants.PluginType pluginType;
+
+    private static final Logger LOG = LoggerFactory.getLogger(PluginBuilder.class);
 
     /**
      * Constructor for a plugin builder.
@@ -34,19 +40,20 @@ public abstract class PluginBuilder {
      */
     public PluginBuilder(Class<?> pluginClass) {
         this.pluginClass = pluginClass;
-    }
 
-    /**
-     * Gets the main class of a plugin.
-     */
-    public Class<?> getPluginClass() {
-        return pluginClass;
+        try {
+            this.setPluginType();
+        } catch (IllegalArgumentException e) {
+            LOG.error("Error occurred while setting plugin class", e);
+        }
     }
 
     /**
      * Sets InputFormat or OutputFormat class for a plugin.
      */
     public PluginBuilder withFormat(Class<?> formatClass) {
+        validateFormat(formatClass);
+
         this.formatClass = formatClass;
         return this;
     }
@@ -55,17 +62,83 @@ public abstract class PluginBuilder {
      * Sets InputFormatProvider or OutputFormatProvider class for a plugin.
      */
     public PluginBuilder withFormatProvider(Class<?> formatProviderClass) {
+        validateFormatProvider(formatProviderClass);
+
         this.formatProviderClass = formatProviderClass;
         return this;
     }
 
     /**
-     * Validates plugin fields.
-     */
-    protected abstract void validatePluginClass();
-
-    /**
      * Builds instance of a plugin.
      */
-    public abstract Plugin build();
+    public Plugin build() {
+        this.plugin.setPluginClass(pluginClass);
+        this.plugin.setPluginType(pluginType);
+        this.plugin.setFormatClass(formatClass);
+        this.plugin.setFormatProviderClass(formatProviderClass);
+
+        try {
+            this.plugin.validatePluginClass();
+        } catch (IllegalArgumentException e) {
+            LOG.error("Validation error", e);
+            throw e;
+        }
+
+        return this.plugin;
+    }
+
+    /**
+     * Validates InputFormat or OutputFormat class for a plugin.
+     */
+    private void validateFormat(Class<?> formatClass) {
+        PluginConstants.Format formatType =
+                pluginType == PluginConstants.PluginType.SOURCE
+                        ? PluginConstants.Format.INPUT
+                        : PluginConstants.Format.OUTPUT;
+
+        if (!formatType.getFormatClass().isAssignableFrom(formatClass)) {
+            throw new IllegalArgumentException(
+                    String.format("Provided class must be extended from %s", formatType.getFormatName())
+            );
+        }
+    }
+
+    /**
+     * Validates InputFormatProvider or OutputFormatProvider class for a plugin.
+     */
+    private void validateFormatProvider(Class<?> formatClassProvider) {
+        PluginConstants.FormatProvider formatProviderType =
+                pluginType == PluginConstants.PluginType.SOURCE
+                        ? PluginConstants.FormatProvider.INPUT
+                        : PluginConstants.FormatProvider.OUTPUT;
+
+        if (!formatProviderType.getFormatProviderClass().isAssignableFrom(formatClassProvider)) {
+            throw new IllegalArgumentException(
+                    String.format("Provided class must be extended from %s", formatProviderType.getFormatProviderName())
+            );
+        }
+    }
+
+    /**
+     * Sets a plugin type.
+     */
+    private void setPluginType() throws IllegalArgumentException {
+        String pluginName = pluginClass.getSimpleName();
+        this.setPluginType(pluginName);
+    }
+
+    /**
+     * Sets a plugin type.
+     */
+    private void setPluginType(String pluginClassName) throws IllegalArgumentException {
+        String lowerPluginClassName = pluginClassName.toLowerCase();
+
+        if (lowerPluginClassName.contains("source")) {
+            this.pluginType = PluginConstants.PluginType.SOURCE;
+        } else if (lowerPluginClassName.contains("sink")) {
+            this.pluginType = PluginConstants.PluginType.SINK;
+        } else {
+            throw new IllegalArgumentException("Provided class should be source or sink plugin");
+        }
+    }
 }

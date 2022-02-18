@@ -24,12 +24,13 @@ import org.apache.hadoop.conf.Configuration;
  * Class wrapper for a CDAP plugin.
  */
 public abstract class Plugin {
-    protected Class<?> pluginClass;
-    protected Class<?> formatClass;
-    protected Class<?> formatProviderClass;
+    private Class<?> formatClass;
+    private Class<?> formatProviderClass;
 
-    protected PluginConfig pluginConfig;
-    protected Configuration hadoopConfiguration;
+    private Class<?> pluginClass;
+    private PluginConfig pluginConfig;
+    private Configuration hadoopConfiguration;
+    private PluginConstants.PluginType pluginType;
 
     /**
      * Sets the main class of a plugin.
@@ -91,18 +92,85 @@ public abstract class Plugin {
     /**
      * Sets a plugin Hadoop configuration.
      */
-    public abstract Plugin withHadoopConfiguration(Class<?> FormatKeyClass, Class<?> FormatValueClass);
+    public Plugin withHadoopConfiguration(Class<?> OutputFormatKeyClass,
+                                              Class<?> OutputFormatValueClass) {
+        PluginConstants.PluginType pluginType = getPluginType();
 
+        PluginConstants.Format formatType =
+                pluginType == PluginConstants.PluginType.SOURCE
+                ? PluginConstants.Format.INPUT
+                : PluginConstants.Format.OUTPUT;
+
+        PluginConstants.Hadoop hadoopType =
+                pluginType == PluginConstants.PluginType.SOURCE
+                ? PluginConstants.Hadoop.SOURCE
+                : PluginConstants.Hadoop.SINK;
+
+        this.hadoopConfiguration = new Configuration(false);
+
+        this.hadoopConfiguration.setClass(hadoopType.getFormatClass(), formatClass, formatType.getFormatClass());
+        this.hadoopConfiguration.setClass(hadoopType.getKeyClass(), OutputFormatKeyClass, Object.class);
+        this.hadoopConfiguration.setClass(hadoopType.getValueClass(), OutputFormatValueClass, Object.class);
+
+        return this;
+    }
 
     /**
      * Sets a plugin Hadoop configuration.
      */
-    public abstract Plugin withHadoopConfiguration(Configuration hadoopConfiguration);
+    public Plugin withHadoopConfiguration(Configuration hadoopConfiguration) {
+        this.hadoopConfiguration = hadoopConfiguration;
+
+        return this;
+    }
 
     /**
      * Gets a plugin Hadoop configuration.
      */
     public Configuration getHadoopConfiguration() {
         return hadoopConfiguration;
+    }
+
+    /**
+     * Sets a plugin type.
+     */
+    public void setPluginType(PluginConstants.PluginType pluginType) {
+        this.pluginType = pluginType;
+    }
+
+    /**
+     * Gets a plugin type.
+     */
+    public PluginConstants.PluginType getPluginType() {
+        return pluginType;
+    }
+
+    /**
+     * Validates plugin fields.
+     */
+    public void validatePluginClass() {
+        PluginConstants.PluginType pluginType = getPluginType();
+
+        PluginConstants.Format formatType =
+                pluginType == PluginConstants.PluginType.SOURCE
+                        ? PluginConstants.Format.INPUT
+                        : PluginConstants.Format.OUTPUT;
+
+        if (formatClass == null) {
+            throw new IllegalArgumentException(
+                    String.format("%s must be not null", formatType.getFormatName())
+            );
+        }
+
+        PluginConstants.FormatProvider formatProviderType =
+                pluginType == PluginConstants.PluginType.SOURCE
+                        ? PluginConstants.FormatProvider.INPUT
+                        : PluginConstants.FormatProvider.OUTPUT;
+
+        if (formatProviderClass == null) {
+            throw new IllegalArgumentException(
+                    String.format("%s must be not null", formatProviderType.getFormatProviderName())
+            );
+        }
     }
 }

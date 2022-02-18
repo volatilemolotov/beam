@@ -17,38 +17,7 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.data.batch.OutputFormatProvider;
-import io.cdap.cdap.api.plugin.PluginConfig;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.OutputFormat;
-
 /**
  * Class wrapper for a CDAP Sink plugin.
  */
-public class SinkPlugin extends Plugin {
-
-    /**
-     * Sets a plugin Hadoop configuration.
-     */
-    @Override
-    public SinkPlugin withHadoopConfiguration(Class<?> OutputFormatKeyClass,
-                                                           Class<?> OutputFormatValueClass) {
-        this.hadoopConfiguration = new Configuration(false);
-
-        this.hadoopConfiguration.setClass("mapreduce.job.outputformat.class",
-                formatClass, OutputFormat.class);
-        this.hadoopConfiguration.setClass("mapreduce.job.output.key.class",
-                OutputFormatKeyClass, Object.class);
-        this.hadoopConfiguration.setClass("mapreduce.job.output.value.class",
-                OutputFormatValueClass, Object.class);
-
-        return this;
-    }
-
-    @Override
-    public SinkPlugin withHadoopConfiguration(Configuration hadoopConfiguration) {
-        this.hadoopConfiguration = hadoopConfiguration;
-
-        return this;
-    }
-}
+public class SinkPlugin extends Plugin { }

@@ -17,19 +17,10 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.data.batch.OutputFormatProvider;
-import io.cdap.cdap.api.plugin.PluginConfig;
-import org.apache.hadoop.mapreduce.OutputFormat;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Class for building {@link SinkPlugin} object.
  */
 public class SinkPluginBuilder extends PluginBuilder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SinkPluginBuilder.class);
 
     /**
      * Constructor for a sink plugin builder.
@@ -37,38 +28,6 @@ public class SinkPluginBuilder extends PluginBuilder {
      */
     public SinkPluginBuilder(Class<?> pluginClass) {
         super(pluginClass);
-    }
-
-    /**
-     * Validates sink plugin fields.
-     */
-    @Override
-    protected void validatePluginClass() {
-        if (formatClass == null) {
-            throw new IllegalArgumentException("OutputFormat must be not null");
-        }
-        if (formatProviderClass == null) {
-            throw new IllegalArgumentException("OutputFormatProvider must be not null");
-        }
-    }
-
-    /**
-     * Builds instance of a sink plugin.
-     */
-    @Override
-    public SinkPlugin build() {
-        try {
-            validatePluginClass();
-        } catch (IllegalArgumentException e) {
-            LOG.error("Validation error", e);
-            throw e;
-        }
-
-        SinkPlugin sp = new SinkPlugin();
-        sp.setPluginClass(pluginClass);
-        sp.setFormatClass(formatClass);
-        sp.setFormatProviderClass(formatProviderClass);
-
-        return sp;
+        this.plugin = new SinkPlugin();
     }
 }

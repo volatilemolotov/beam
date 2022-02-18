@@ -25,7 +25,6 @@ import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import org.apache.hadoop.io.MapWritable;
 import io.cdap.cdap.api.data.schema.Schema;
 
-import org.apache.hadoop.mapreduce.InputFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -97,16 +96,28 @@ public class PluginTest {
                     .withConfig(salesforceSourceConfig)
                     .withHadoopConfiguration(Schema.class, MapWritable.class);
 
-            assertEquals(salesforceSourcePlugin.getPluginClass(), SalesforceBatchSource.class);
-            assertEquals(salesforceSourcePlugin.getFormatClass(), SalesforceInputFormat.class);
-            assertEquals(salesforceSourcePlugin.getFormatProviderClass(), SalesforceInputFormatProvider.class);
-            assertEquals(salesforceSourcePlugin.getPluginConfig(), salesforceSourceConfig);
-            assertEquals(salesforceSourcePlugin.getHadoopConfiguration()
-                    .getClass("mapreduce.job.inputformat.class", InputFormat.class), SalesforceInputFormat.class);
+            assertEquals(SalesforceBatchSource.class, salesforceSourcePlugin.getPluginClass());
+            assertEquals(SalesforceInputFormat.class, salesforceSourcePlugin.getFormatClass());
+            assertEquals(SalesforceInputFormatProvider.class, salesforceSourcePlugin.getFormatProviderClass());
+            assertEquals(salesforceSourceConfig, salesforceSourcePlugin.getPluginConfig());
+            assertEquals(SalesforceInputFormat.class, salesforceSourcePlugin.getHadoopConfiguration()
+                    .getClass(PluginConstants.Hadoop.SOURCE.getFormatClass(),
+                            PluginConstants.Format.INPUT.getFormatClass()));
 
         } catch (Exception e) {
             LOG.error("Error occurred while building the Salesforce Source Plugin", e);
             fail();
         }
+    }
+
+    @Test
+    public void testSettingPluginType() {
+        Plugin salesforceSourcePlugin =
+                new SalesforceSourcePluginBuilder()
+                        .build()
+                        .withConfig(salesforceSourceConfig)
+                        .withHadoopConfiguration(Schema.class, MapWritable.class);
+
+        assertEquals(PluginConstants.PluginType.SOURCE, salesforceSourcePlugin.getPluginType());
     }
 }

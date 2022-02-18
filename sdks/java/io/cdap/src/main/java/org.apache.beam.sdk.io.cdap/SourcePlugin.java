@@ -17,39 +17,7 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.data.batch.InputFormatProvider;
-import io.cdap.cdap.api.plugin.PluginConfig;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.mapreduce.InputFormat;
-
 /**
  * Class wrapper for a CDAP Source plugin.
  */
-@SuppressWarnings("rawtypes")
-public class SourcePlugin extends Plugin {
-
-    /**
-     * Sets a plugin Hadoop configuration.
-     */
-    @Override
-    public SourcePlugin withHadoopConfiguration(Class<?> InputFormatKeyClass,
-                                                     Class<?> InputFormatValueClass) {
-        this.hadoopConfiguration = new Configuration(false);
-
-        this.hadoopConfiguration.setClass("mapreduce.job.inputformat.class",
-                formatClass, InputFormat.class);
-        this.hadoopConfiguration.setClass("key.class", InputFormatKeyClass, Object.class);
-        this.hadoopConfiguration.setClass("value.class", InputFormatValueClass, Object.class);
-
-        return this;
-    }
-
-    @Override
-    public SourcePlugin withHadoopConfiguration(Configuration hadoopConfiguration) {
-        this.hadoopConfiguration = hadoopConfiguration;
-
-        return this;
-    }
-
-
-}
+public class SourcePlugin extends Plugin { }

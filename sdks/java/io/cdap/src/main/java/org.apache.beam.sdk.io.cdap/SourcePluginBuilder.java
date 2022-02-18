@@ -17,19 +17,10 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.plugin.PluginConfig;
-import org.apache.hadoop.mapreduce.InputFormat;
-import io.cdap.cdap.api.data.batch.InputFormatProvider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Class for building {@link SourcePlugin} object.
  */
 public class SourcePluginBuilder extends PluginBuilder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SourcePluginBuilder.class);
 
     /**
      * Constructor for a source plugin builder.
@@ -37,38 +28,6 @@ public class SourcePluginBuilder extends PluginBuilder {
      */
     public SourcePluginBuilder(Class<?> pluginClass) {
         super(pluginClass);
-    }
-
-    /**
-     * Validates source plugin fields.
-     */
-    @Override
-    protected void validatePluginClass() {
-        if (formatClass == null) {
-            throw new IllegalArgumentException("InputFormat must be not null");
-        }
-        if (formatProviderClass == null) {
-            throw new IllegalArgumentException("InputFormatProvider must be not null");
-        }
-    }
-
-    /**
-     * Builds instance of a source plugin.
-     */
-    @Override
-    public SourcePlugin build() {
-        try {
-            validatePluginClass();
-        } catch (IllegalArgumentException e) {
-            LOG.error("Validation error", e);
-            throw e;
-        }
-
-        SourcePlugin sp = new SourcePlugin();
-        sp.setPluginClass(pluginClass);
-        sp.setFormatClass(formatClass);
-        sp.setFormatProviderClass(formatProviderClass);
-
-        return sp;
+        this.plugin = new SourcePlugin();
     }
 }
