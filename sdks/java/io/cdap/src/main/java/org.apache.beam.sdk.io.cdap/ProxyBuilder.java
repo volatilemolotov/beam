@@ -112,17 +112,19 @@ public class ProxyBuilder<X, T extends Receiver<X>> {
     MethodInterceptor handler =
         (obj, method, args, proxy) -> {
           String methodName = method.getName();
-          if (methodName.equals("supervisor") || methodName.equals("_supervisor")) {
-            return getWrappedSupervisor();
-          } else if (methodName.equals("onStart")) {
-            LOG.info("Custom Receiver was started");
-            return null;
-          } else if (methodName.equals("stop")) {
-            LOG.info("Custom Receiver was stopped. Message = {}", args[0]);
-            return null;
-          } else if (methodName.equals("store")) {
-            storeConsumer.accept(args);
-            return null;
+          switch (methodName) {
+            case "supervisor":
+            case "_supervisor":
+              return getWrappedSupervisor();
+            case "onStart":
+              LOG.info("Custom Receiver was started");
+              return null;
+            case "stop":
+              LOG.info("Custom Receiver was stopped. Message = {}", args[0]);
+              return null;
+            case "store":
+              storeConsumer.accept(args);
+              return null;
           }
           return proxy.invoke(originalReceiver, args);
         };
