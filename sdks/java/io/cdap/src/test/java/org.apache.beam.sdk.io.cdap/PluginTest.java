@@ -52,7 +52,22 @@ public class PluginTest {
         public SalesforceSourcePluginBuilder() {
             super(SalesforceBatchSource.class);
             this.withFormat(SalesforceInputFormat.class)
-                .withFormatProvider(SalesforceInputFormatProvider.class);
+                    .withFormatProvider(SalesforceInputFormatProvider.class);
+        }
+    }
+
+    /**
+     * Incorrect builder for Salesforce Batch Source plugin.
+     */
+    public static class IncorrectPluginBuilder extends PluginBuilder {
+
+        /**
+         * Incorrect constructor for Salesforce Batch Source plugin wrapper builder.
+         */
+        public IncorrectPluginBuilder() {
+            super(Object.class);
+            this.withFormat(SalesforceInputFormat.class)
+                    .withFormatProvider(SalesforceInputFormatProvider.class);
         }
     }
 
@@ -114,5 +129,20 @@ public class PluginTest {
                         .withHadoopConfiguration(Schema.class, MapWritable.class);
 
         assertEquals(PluginConstants.PluginType.SOURCE, salesforceSourcePlugin.getPluginType());
+    }
+
+    @Test
+    @SuppressWarnings("UnusedVariable")
+    public void testSettingPluginTypeFailed() {
+        try {
+            Plugin salesforceSourcePlugin =
+                    new IncorrectPluginBuilder()
+                            .build()
+                            .withConfig(salesforceSourceConfig)
+                            .withHadoopConfiguration(Schema.class, MapWritable.class);
+            fail("This should have thrown an exception");
+        } catch (Exception e) {
+            assertEquals("Provided class should be source or sink plugin", e.getMessage());
+        }
     }
 }

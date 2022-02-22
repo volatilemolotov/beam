@@ -92,25 +92,16 @@ public class Plugin {
     /**
      * Sets a plugin Hadoop configuration.
      */
-    public Plugin withHadoopConfiguration(Class<?> OutputFormatKeyClass,
-                                              Class<?> OutputFormatValueClass) {
-        PluginConstants.PluginType pluginType = getPluginType();
-
-        PluginConstants.Format formatType =
-                pluginType == PluginConstants.PluginType.SOURCE
-                ? PluginConstants.Format.INPUT
-                : PluginConstants.Format.OUTPUT;
-
-        PluginConstants.Hadoop hadoopType =
-                pluginType == PluginConstants.PluginType.SOURCE
-                ? PluginConstants.Hadoop.SOURCE
-                : PluginConstants.Hadoop.SINK;
+    public Plugin withHadoopConfiguration(Class<?> formatKeyClass,
+                                              Class<?> formatValueClass) {
+        PluginConstants.Format formatType = getFormatType();
+        PluginConstants.Hadoop hadoopType = getHadoopType();
 
         this.hadoopConfiguration = new Configuration(false);
 
         this.hadoopConfiguration.setClass(hadoopType.getFormatClass(), formatClass, formatType.getFormatClass());
-        this.hadoopConfiguration.setClass(hadoopType.getKeyClass(), OutputFormatKeyClass, Object.class);
-        this.hadoopConfiguration.setClass(hadoopType.getValueClass(), OutputFormatValueClass, Object.class);
+        this.hadoopConfiguration.setClass(hadoopType.getKeyClass(), formatKeyClass, Object.class);
+        this.hadoopConfiguration.setClass(hadoopType.getValueClass(), formatValueClass, Object.class);
 
         return this;
     }
@@ -149,12 +140,7 @@ public class Plugin {
      * Validates plugin fields.
      */
     public void validatePluginClass() {
-        PluginConstants.PluginType pluginType = getPluginType();
-
-        PluginConstants.Format formatType =
-                pluginType == PluginConstants.PluginType.SOURCE
-                        ? PluginConstants.Format.INPUT
-                        : PluginConstants.Format.OUTPUT;
+        PluginConstants.Format formatType = getFormatType();
 
         if (formatClass == null) {
             throw new IllegalArgumentException(
@@ -162,15 +148,30 @@ public class Plugin {
             );
         }
 
-        PluginConstants.FormatProvider formatProviderType =
-                pluginType == PluginConstants.PluginType.SOURCE
-                        ? PluginConstants.FormatProvider.INPUT
-                        : PluginConstants.FormatProvider.OUTPUT;
+        PluginConstants.FormatProvider formatProviderType = getFormatProviderType();
 
         if (formatProviderClass == null) {
             throw new IllegalArgumentException(
                     String.format("%s must be not null", formatProviderType.getFormatProviderName())
             );
         }
+    }
+
+    private PluginConstants.Format getFormatType() {
+        return pluginType == PluginConstants.PluginType.SOURCE
+                ? PluginConstants.Format.INPUT
+                : PluginConstants.Format.OUTPUT;
+    }
+
+    private PluginConstants.FormatProvider getFormatProviderType() {
+        return pluginType == PluginConstants.PluginType.SOURCE
+                ? PluginConstants.FormatProvider.INPUT
+                : PluginConstants.FormatProvider.OUTPUT;
+ }
+
+    private PluginConstants.Hadoop getHadoopType() {
+        return pluginType == PluginConstants.PluginType.SOURCE
+                ? PluginConstants.Hadoop.SOURCE
+                : PluginConstants.Hadoop.SINK;
     }
 }

@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
  * Class for building {@link Plugin} object.
  */
 public class PluginBuilder {
-    private final Plugin plugin;
-
     private final Class<?> pluginClass;
     private Class<?> formatClass;
     private Class<?> formatProviderClass;
@@ -45,9 +43,8 @@ public class PluginBuilder {
             this.setPluginType();
         } catch (IllegalArgumentException e) {
             LOG.error("Error occurred while setting plugin class", e);
+            throw e;
         }
-
-        this.plugin = new Plugin();
     }
 
     /**
@@ -74,19 +71,21 @@ public class PluginBuilder {
      * Builds instance of a plugin.
      */
     public Plugin build() {
-        this.plugin.setPluginClass(pluginClass);
-        this.plugin.setPluginType(pluginType);
-        this.plugin.setFormatClass(formatClass);
-        this.plugin.setFormatProviderClass(formatProviderClass);
+        Plugin plugin = new Plugin();
+
+        plugin.setPluginClass(pluginClass);
+        plugin.setPluginType(pluginType);
+        plugin.setFormatClass(formatClass);
+        plugin.setFormatProviderClass(formatProviderClass);
 
         try {
-            this.plugin.validatePluginClass();
+            plugin.validatePluginClass();
         } catch (IllegalArgumentException e) {
             LOG.error("Validation error", e);
             throw e;
         }
 
-        return this.plugin;
+        return plugin;
     }
 
     /**
