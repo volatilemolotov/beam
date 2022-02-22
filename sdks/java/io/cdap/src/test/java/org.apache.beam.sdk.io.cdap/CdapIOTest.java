@@ -24,9 +24,12 @@ import static org.junit.Assert.fail;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
+import io.cdap.cdap.format.StructuredRecordStringConverter;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +42,18 @@ import org.apache.beam.sdk.io.cdap.github.batch.GithubBatchSourceConfig;
 import org.apache.beam.sdk.io.cdap.github.batch.GithubFormatProvider;
 import org.apache.beam.sdk.io.cdap.github.batch.GithubInputFormat;
 import org.apache.beam.sdk.io.cdap.github.common.model.impl.*;
+import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskBatchSource;
+import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskBatchSourceConfig;
+import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskInputFormat;
+import org.apache.beam.sdk.io.cdap.zendesk.batch.util.ZendeskBatchSourceConstants;
+import org.apache.beam.sdk.io.cdap.zendesk.common.ObjectType;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.junit.Rule;
 import org.junit.Test;
@@ -81,6 +90,24 @@ public class CdapIOTest {
           .put("datasetName", "Branches")
           .put("hostname", "https://api.github.com")
           .build();
+  private static final ImmutableMap<String, Object> TEST_ZENDESK_PARAMS_MAP =
+      ImmutableMap.<String, java.lang.Object>builder()
+          .put("referenceName", "referenceName")
+          .put("adminEmail", System.getenv("ZENDESK_ADMIN_EMAIL"))
+          .put("apiToken", System.getenv("ZENDESK_TOKEN"))
+          .put("zendeskBaseUrl", System.getenv("ZENDESK_BASE_URL"))
+          .put("subdomains", "api/v2")
+          .put("maxRetryCount", 10000)
+          .put("maxRetryWait", 10000)
+          .put("maxRetryJitterWait", 10000)
+          .put("connectTimeout", 10)
+          .put("readTimeout", 10)
+          .put("objectsToPull", "Groups")
+          .build();
+  private static final String TEST_ZENDESK_RECORD =
+      "{\"url\":\"https://akv1119.zendesk.com/api/v2/groups/4422893473693.json\",\"id\":4422893473693,\"name\":"
+          + "\"Поддержка\",\"deleted\":false,\"createdAt\":"
+          + "\"2022-02-22T09:38:12Z\",\"updatedAt\":\"2022-02-22T09:38:12Z\",\"object\":\"Groups\"}";
   private static final Gson GSON = new GsonBuilder().create();
 
   @Test
@@ -124,6 +151,57 @@ public class CdapIOTest {
         GSON.fromJson(configJson, GithubBatchSourceConfig.class);
 
     assertEquals(pluginConfig.getAuthorizationToken(), configFromJson.getAuthorizationToken());
+  }
+
+  @Test
+  public void testReadFromZendesk() {
+
+    ZendeskBatchSourceConfig pluginConfig =
+        new ConfigWrapper<>(ZendeskBatchSourceConfig.class)
+            .withParams(TEST_ZENDESK_PARAMS_MAP)
+            .build();
+
+    CdapIO.Read<NullWritable, StructuredRecord> reader =
+        CdapIO.<NullWritable, StructuredRecord>read()
+            .withCdapPluginClass(ZendeskBatchSource.class)
+            .withPluginConfig(pluginConfig)
+            .withKeyClass(NullWritable.class)
+            .withValueClass(StructuredRecord.class);
+
+    assertNotNull(reader.getPluginConfig());
+    assertNotNull(reader.getCdapPlugin());
+    assertFalse(reader.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
+
+    List<KV<NullWritable, StructuredRecord>> inputs = new ArrayList<>();
+    Schema schema = ObjectType.GROUPS.getObjectSchema();
+    try {
+      inputs.add(
+          KV.of(
+              NullWritable.get(),
+              StructuredRecordStringConverter.fromJsonString(TEST_ZENDESK_RECORD, schema)));
+    } catch (IOException e) {
+      LOG.error("Fail to get StructuredRecord from JSON string", e);
+    }
+
+    PCollection<KV<NullWritable, StructuredRecord>> input =
+        p.apply(reader)
+            .setCoder(
+                KvCoder.of(
+                    NullableCoder.of(WritableCoder.of(NullWritable.class)),
+                    SerializableCoder.of(StructuredRecord.class)));
+
+    PAssert.that(input).containsInAnyOrder(inputs);
+    p.run();
+
+    assertEquals(ZendeskInputFormat.class, reader.getCdapPlugin().formatClass);
+
+    Configuration hadoopConf = reader.getCdapPlugin().getHadoopConf();
+    String configJson = hadoopConf.get(ZendeskBatchSourceConstants.PROPERTY_CONFIG_JSON);
+    ZendeskBatchSourceConfig configFromJson =
+        GSON.fromJson(configJson, ZendeskBatchSourceConfig.class);
+
+    assertEquals(pluginConfig.getAdminEmail(), configFromJson.getAdminEmail());
   }
 
   @Test
