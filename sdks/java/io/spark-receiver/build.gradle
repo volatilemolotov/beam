@@ -21,19 +21,33 @@ plugins {
     id 'org.apache.beam.module'
 }
 
+applyJavaNature(
+        exportJavadoc: false,
+        automaticModuleName: 'org.apache.beam.sdk.io.spark-receiver',
+)
+provideIntegrationTestingDependencies()
+enableJavaPerformanceTesting()
+
 description = "Apache Beam :: SDKs :: Java :: IO :: Spark Receiver"
 ext.summary = """Apache Beam SDK provides a simple, Java-based
 interface for streaming integration with CDAP plugins."""
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-}
-
-test {
-    useJUnitPlatform()
+    implementation project(path: ":sdks:java:core", configuration: "shadow")
+    implementation library.java.vendored_guava_26_0_jre
+    implementation library.java.slf4j_api
+    implementation "org.apache.commons:commons-lang3:3.9"
+    implementation "org.apache.httpcomponents:httpclient:4.5.13"
+    implementation "org.apache.httpcomponents:httpcore:4.4.13"
+    testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
+    testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")
+    testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntimeMigration")
+    testImplementation project(":sdks:java:io:jdbc")
+    testImplementation project(path: ":examples:java", configuration: "testRuntimeMigration")
+    testImplementation project(path: ":runners:direct-java", configuration: "shadow")
+    testImplementation project(":sdks:java:io:google-cloud-platform")
+    testImplementation project(":sdks:java:extensions:ml")
+    testImplementation library.java.hamcrest
+    testImplementation library.java.junit
+    testImplementation library.java.mockito_core
 }
