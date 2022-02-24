@@ -60,8 +60,8 @@ and flexibility to [over 85K customers](https://www.paloaltonetworks.com/about-u
 
 Palo Alto Networks’ integrated security operations platform - [Cortex™](https://www.paloaltonetworks.com/cortex) -
 applies AI and machine learning to enable security automation, advanced threat intelligence, and effective rapid
-security responses for Palo Alto Networks’ customers. (Cortex™ Data
-Lake)[https://www.paloaltonetworks.com/cortex/cortex-data-lake] infrastructure collects, integrates, and normalizes
+security responses for Palo Alto Networks’ customers. [Cortex™ Data
+Lake](https://www.paloaltonetworks.com/cortex/cortex-data-lake) infrastructure collects, integrates, and normalizes
 enterprises’ security data combined with trillions of multi-source artifacts.
 
 Cortex™ data infrastructure processes ~10 millions of security log events per second currently, at ~3 PB per day, which
