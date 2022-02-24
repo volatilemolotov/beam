@@ -71,21 +71,7 @@ public class PluginBuilder {
      * Builds instance of a plugin.
      */
     public Plugin build() {
-        Plugin plugin = new Plugin();
-
-        plugin.setPluginClass(pluginClass);
-        plugin.setPluginType(pluginType);
-        plugin.setFormatClass(formatClass);
-        plugin.setFormatProviderClass(formatProviderClass);
-
-        try {
-            plugin.validatePluginClass();
-        } catch (IllegalArgumentException e) {
-            LOG.error("Validation error", e);
-            throw e;
-        }
-
-        return plugin;
+        return new Plugin(pluginClass, pluginType, formatClass, formatProviderClass);
     }
 
     /**

@@ -19,24 +19,40 @@ package org.apache.beam.sdk.io.cdap;
 
 import io.cdap.cdap.api.plugin.PluginConfig;
 import org.apache.hadoop.conf.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class wrapper for a CDAP plugin.
  */
 public class Plugin {
-    private Class<?> formatClass;
-    private Class<?> formatProviderClass;
+    private final Class<?> formatClass;
+    private final Class<?> formatProviderClass;
 
-    private Class<?> pluginClass;
+    private final Class<?> pluginClass;
     private PluginConfig pluginConfig;
     private Configuration hadoopConfiguration;
-    private PluginConstants.PluginType pluginType;
+    private final PluginConstants.PluginType pluginType;
+
+    private static final Logger LOG = LoggerFactory.getLogger(Plugin.class);
 
     /**
-     * Sets the main class of a plugin.
+     * Constructor for a plugin.
      */
-    public void setPluginClass(Class<?> pluginClass) {
+    public Plugin(Class<?> pluginClass, PluginConstants.PluginType pluginType,
+                  Class<?> formatClass, Class<?> formatProviderClass) {
+
         this.pluginClass = pluginClass;
+        this.pluginType = pluginType;
+        this.formatClass = formatClass;
+        this.formatProviderClass = formatProviderClass;
+
+        try {
+            validatePluginClass();
+        } catch (IllegalArgumentException e) {
+            LOG.error("Validation error", e);
+            throw e;
+        }
     }
 
     /**
@@ -47,24 +63,10 @@ public class Plugin {
     }
 
     /**
-     * Sets InputFormat or OutputFormat class for a plugin.
-     */
-    public void setFormatClass(Class<?> formatClass) {
-        this.formatClass = formatClass;
-    }
-
-    /**
      * Gets InputFormat or OutputFormat class for a plugin.
      */
     public Class<?> getFormatClass() {
         return formatClass;
-    }
-
-    /**
-     * Sets InputFormatProvider or OutputFormatProvider class for a plugin.
-     */
-    public void setFormatProviderClass(Class<?> formatProviderClass) {
-        this.formatProviderClass = formatProviderClass;
     }
 
     /**
@@ -120,13 +122,6 @@ public class Plugin {
      */
     public Configuration getHadoopConfiguration() {
         return hadoopConfiguration;
-    }
-
-    /**
-     * Sets a plugin type.
-     */
-    public void setPluginType(PluginConstants.PluginType pluginType) {
-        this.pluginType = pluginType;
     }
 
     /**
