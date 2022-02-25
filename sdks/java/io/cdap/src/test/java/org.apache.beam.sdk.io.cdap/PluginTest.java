@@ -41,36 +41,6 @@ public class PluginTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(PluginTest.class);
 
-    /**
-     * Builder for Salesforce Batch Source plugin.
-     */
-    public static class SalesforceSourcePluginBuilder extends PluginBuilder {
-
-        /**
-         * Constructor for Salesforce Batch Source plugin wrapper builder.
-         */
-        public SalesforceSourcePluginBuilder() {
-            super(SalesforceBatchSource.class);
-            this.withFormat(SalesforceInputFormat.class)
-                    .withFormatProvider(SalesforceInputFormatProvider.class);
-        }
-    }
-
-    /**
-     * Incorrect builder for Salesforce Batch Source plugin.
-     */
-    public static class IncorrectPluginBuilder extends PluginBuilder {
-
-        /**
-         * Incorrect constructor for Salesforce Batch Source plugin wrapper builder.
-         */
-        public IncorrectPluginBuilder() {
-            super(Object.class);
-            this.withFormat(SalesforceInputFormat.class)
-                    .withFormatProvider(SalesforceInputFormatProvider.class);
-        }
-    }
-
     private final ImmutableMap<String, String> TEST_SALESFORCE_PARAMS_MAP =
             ImmutableMap.<String, String>builder()
                     .put("sObjectName", "sObject")
@@ -101,8 +71,7 @@ public class PluginTest {
     public void testBuildingSourcePluginWithCDAPClasses() {
         try {
             Plugin salesforceSourcePlugin =
-                    new SalesforceSourcePluginBuilder()
-                    .build()
+                    Plugin.create(SalesforceBatchSource.class, SalesforceInputFormat.class, SalesforceInputFormatProvider.class)
                     .withConfig(salesforceSourceConfig)
                     .withHadoopConfiguration(Schema.class, MapWritable.class);
 
@@ -123,10 +92,9 @@ public class PluginTest {
     @Test
     public void testSettingPluginType() {
         Plugin salesforceSourcePlugin =
-                new SalesforceSourcePluginBuilder()
-                        .build()
-                        .withConfig(salesforceSourceConfig)
-                        .withHadoopConfiguration(Schema.class, MapWritable.class);
+                Plugin.create(SalesforceBatchSource.class, SalesforceInputFormat.class, SalesforceInputFormatProvider.class)
+                .withConfig(salesforceSourceConfig)
+                .withHadoopConfiguration(Schema.class, MapWritable.class);
 
         assertEquals(PluginConstants.PluginType.SOURCE, salesforceSourcePlugin.getPluginType());
     }
@@ -136,10 +104,9 @@ public class PluginTest {
     public void testSettingPluginTypeFailed() {
         try {
             Plugin salesforceSourcePlugin =
-                    new IncorrectPluginBuilder()
-                            .build()
-                            .withConfig(salesforceSourceConfig)
-                            .withHadoopConfiguration(Schema.class, MapWritable.class);
+                    Plugin.create(Object.class, Object.class, Object.class)
+                    .withConfig(salesforceSourceConfig)
+                    .withHadoopConfiguration(Schema.class, MapWritable.class);
             fail("This should have thrown an exception");
         } catch (Exception e) {
             assertEquals("Provided class should be source or sink plugin", e.getMessage());
