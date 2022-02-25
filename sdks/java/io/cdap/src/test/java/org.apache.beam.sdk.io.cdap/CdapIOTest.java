@@ -24,24 +24,35 @@ import static org.junit.Assert.fail;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.format.StructuredRecordStringConverter;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.apache.beam.sdk.coders.CustomCoder;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
 import org.apache.beam.sdk.io.cdap.github.batch.GithubBatchSource;
 import org.apache.beam.sdk.io.cdap.github.batch.GithubBatchSourceConfig;
 import org.apache.beam.sdk.io.cdap.github.batch.GithubFormatProvider;
 import org.apache.beam.sdk.io.cdap.github.batch.GithubInputFormat;
 import org.apache.beam.sdk.io.cdap.github.common.model.impl.*;
+import org.apache.beam.sdk.io.cdap.hubspot.common.BaseHubspotConfig;
+import org.apache.beam.sdk.io.cdap.hubspot.common.SourceHubspotConfig;
+import org.apache.beam.sdk.io.cdap.hubspot.source.batch.HubspotBatchSource;
+import org.apache.beam.sdk.io.cdap.hubspot.source.batch.HubspotInputFormat;
+import org.apache.beam.sdk.io.cdap.hubspot.source.batch.HubspotInputFormatProvider;
 import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskBatchSource;
 import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskBatchSourceConfig;
 import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskInputFormat;
@@ -71,6 +82,8 @@ public class CdapIOTest {
   @Rule public final transient TestPipeline p = TestPipeline.create();
 
   private static final Logger LOG = LoggerFactory.getLogger(CdapIOTest.class);
+  private static final Gson GSON = new GsonBuilder().create();
+
   private static final ImmutableMap<String, Object> TEST_SALESFORCE_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("sObjectName", "sObject")
@@ -82,6 +95,7 @@ public class CdapIOTest {
           .put("loginUrl", "https://www.google.com")
           .put("referenceName", "oldReference")
           .build();
+
   private static final ImmutableMap<String, Object> TEST_GITHUB_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("authorizationToken", System.getenv("GITHUB_TOKEN"))
@@ -90,6 +104,7 @@ public class CdapIOTest {
           .put("datasetName", "Branches")
           .put("hostname", "https://api.github.com")
           .build();
+
   private static final ImmutableMap<String, Object> TEST_ZENDESK_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("referenceName", "referenceName")
@@ -108,7 +123,42 @@ public class CdapIOTest {
       "{\"url\":\"https://akv1119.zendesk.com/api/v2/groups/4422893473693.json\",\"id\":4422893473693,\"name\":"
           + "\"Поддержка\",\"deleted\":false,\"createdAt\":"
           + "\"2022-02-22T09:38:12Z\",\"updatedAt\":\"2022-02-22T09:38:12Z\",\"object\":\"Groups\"}";
-  private static final Gson GSON = new GsonBuilder().create();
+
+  private static final ImmutableMap<String, Object> TEST_HUBSPOT_PARAMS_MAP =
+      ImmutableMap.<String, java.lang.Object>builder()
+          .put("apiServerUrl", BaseHubspotConfig.DEFAULT_API_SERVER_URL)
+          .put("objectType", "Contacts")
+          .put("referenceName", "Contacts")
+          .put("apiKey", System.getenv("HUBSPOT_TOKEN"))
+          .build();
+  private static final String TEST_HUBSPOT_RECORD =
+      "{\"addedAt\":1645689445047,\"vid\":51,\"canonical-vid\":51,\"merged-vids\":[],\"portal-id\":"
+          + "25607150,\"is-contact\":true,\"properties\":{\"firstname\":{\"value\":\"Brian\"},\"lastmodifieddate\":"
+          + "{\"value\":\"1645689455344\"},\"company\":{\"value\":\"HubSpot\"},\"lastname\":{\"value\":"
+          + "\"Halligan (Sample Contact)\"}},\"form-submissions\":[],\"identity-profiles\":[{\"vid\":"
+          + "51,\"saved-at-timestamp\":1645689444893,\"deleted-changed-timestamp\":0,\"identities\":"
+          + "[{\"type\":\"EMAIL\",\"value\":\"bh@hubspot.com\",\"timestamp\":1645689444548,\"is-primary\":"
+          + "true},{\"type\":\"LEAD_GUID\",\"value\":\"5f3e1b63-4135-4f49-9a02-a0bfe3afe0b9\",\"timestamp\":"
+          + "1645689444889}]}],\"merge-audits\":[]}";
+
+  public static class JsonElementCoder extends CustomCoder<JsonElement> {
+    private static final JsonElementCoder CODER = new JsonElementCoder();
+    private static final StringUtf8Coder STRING_CODER = StringUtf8Coder.of();
+
+    public static JsonElementCoder of() {
+      return CODER;
+    }
+
+    @Override
+    public void encode(JsonElement value, OutputStream outStream) throws IOException {
+      STRING_CODER.encode(value.toString(), outStream);
+    }
+
+    @Override
+    public JsonElement decode(InputStream inStream) throws IOException {
+      return JsonParser.parseString(STRING_CODER.decode(inStream));
+    }
+  }
 
   @Test
   public void testReadFromGithub() {
@@ -202,6 +252,46 @@ public class CdapIOTest {
         GSON.fromJson(configJson, ZendeskBatchSourceConfig.class);
 
     assertEquals(pluginConfig.getAdminEmail(), configFromJson.getAdminEmail());
+  }
+
+  @Test
+  public void testReadFromHubspot() {
+
+    SourceHubspotConfig pluginConfig =
+        new ConfigWrapper<>(SourceHubspotConfig.class).withParams(TEST_HUBSPOT_PARAMS_MAP).build();
+
+    CdapIO.Read<NullWritable, JsonElement> reader =
+        CdapIO.<NullWritable, JsonElement>read()
+            .withCdapPluginClass(HubspotBatchSource.class)
+            .withPluginConfig(pluginConfig)
+            .withKeyClass(NullWritable.class)
+            .withValueClass(JsonElement.class);
+
+    assertNotNull(reader.getPluginConfig());
+    assertNotNull(reader.getCdapPlugin());
+    assertFalse(reader.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
+
+    List<KV<NullWritable, JsonElement>> inputs = new ArrayList<>();
+    inputs.add(KV.of(null, JsonParser.parseString(TEST_HUBSPOT_RECORD)));
+    p.getCoderRegistry().registerCoderForClass(JsonElement.class, JsonElementCoder.of());
+
+    PCollection<KV<NullWritable, JsonElement>> input =
+        p.apply(reader)
+            .setCoder(
+                KvCoder.of(
+                    NullableCoder.of(WritableCoder.of(NullWritable.class)), JsonElementCoder.of()));
+
+    PAssert.that(input).containsInAnyOrder(inputs);
+    p.run();
+
+    assertEquals(HubspotInputFormat.class, reader.getCdapPlugin().formatClass);
+
+    Configuration hadoopConf = reader.getCdapPlugin().getHadoopConf();
+    String configJson = hadoopConf.get(HubspotInputFormatProvider.PROPERTY_CONFIG_JSON);
+    SourceHubspotConfig configFromJson = GSON.fromJson(configJson, SourceHubspotConfig.class);
+
+    assertEquals(pluginConfig.getObjectType(), configFromJson.getObjectType());
   }
 
   @Test
