@@ -99,18 +99,27 @@ public abstract class Plugin {
      */
     public abstract PluginConstants.PluginType getPluginType();
 
+    /**
+     * Gets a format type.
+     */
     private PluginConstants.Format getFormatType() {
         return getPluginType() == PluginConstants.PluginType.SOURCE
                 ? PluginConstants.Format.INPUT
                 : PluginConstants.Format.OUTPUT;
     }
 
+    /**
+     * Gets a Hadoop type.
+     */
     private PluginConstants.Hadoop getHadoopType() {
         return getPluginType() == PluginConstants.PluginType.SOURCE
                 ? PluginConstants.Hadoop.SOURCE
                 : PluginConstants.Hadoop.SINK;
     }
 
+    /**
+     * Gets value of a plugin type.
+     */
     public static PluginConstants.PluginType initPluginType(Class<?> pluginClass) throws IllegalArgumentException {
         if (BatchSource.class.isAssignableFrom(pluginClass)) {
             return PluginConstants.PluginType.SOURCE;
@@ -121,6 +130,9 @@ public abstract class Plugin {
         }
     }
 
+    /**
+     * Creates a plugin instance.
+     */
     public static Plugin create(Class<?> newPluginClass, Class<?> newFormatClass, Class<?> newFormatProviderClass) {
         return builder()
                 .setPluginClass(newPluginClass)
@@ -130,10 +142,17 @@ public abstract class Plugin {
                 .build();
     }
 
+    /**
+     * Creates a plugin builder instance.
+     */
     public static Builder builder() {
         return new AutoValue_Plugin.Builder();
     }
 
+
+    /**
+     * Builder class for a {@link Plugin}.
+     */
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder setPluginClass(Class<?> newPluginClass);
