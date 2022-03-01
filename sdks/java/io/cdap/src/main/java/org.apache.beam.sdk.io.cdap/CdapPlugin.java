@@ -61,18 +61,16 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
     }
   }
 
-  private Boolean isUnbounded;
-  private Format format;
-
+  private final Format format;
   private final Class<?> cdapPluginClass;
+  private final BatchContextImpl context;
 
   private Configuration hadoopConf;
-  private BatchContextImpl context;
+  private Boolean isUnbounded;
 
   protected Class<?> formatClass;
   protected Class<?> keyClass;
   protected Class<?> valueClass;
-  protected Class<?> formatProviderClass;
 
   private T cdapPluginObj;
 
@@ -125,16 +123,24 @@ public class CdapPlugin<T extends SubmitterLifecycle> {
     return hadoopConf;
   }
 
+  /**
+   * Calls {@link SubmitterLifecycle#prepareRun(Object)} method on the {@link #cdapPluginObj}
+   * passing needed {@param config} configuration object as a parameter. This method is needed for
+   * setting up {@link #formatClass}, validating connection to the CDAP sink/source and performing
+   * initial tuning.
+   */
   public void prepareRun(PluginConfig config) {
     // TODO: validate
 
-    for (Constructor<?> constructor : cdapPluginClass.getDeclaredConstructors()) {
-      constructor.setAccessible(true);
-      try {
-        cdapPluginObj = (T) constructor.newInstance(config);
-      } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-        LOG.error("Can not instantiate CDAP plugin class", e);
-        throw new IllegalStateException("Can not call prepareRun");
+    if (cdapPluginObj == null) {
+      for (Constructor<?> constructor : cdapPluginClass.getDeclaredConstructors()) {
+        constructor.setAccessible(true);
+        try {
+          cdapPluginObj = (T) constructor.newInstance(config);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+          LOG.error("Can not instantiate CDAP plugin class", e);
+          throw new IllegalStateException("Can not call prepareRun");
+        }
       }
     }
     try {

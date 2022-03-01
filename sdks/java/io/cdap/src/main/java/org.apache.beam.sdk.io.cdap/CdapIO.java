@@ -45,6 +45,7 @@ public class CdapIO {
     return new AutoValue_CdapIO_Read.Builder<K, V>().build();
   }
 
+  /** A {@link PTransform} to read from CDAP source. */
   @AutoValue
   @AutoValue.CopyAnnotations
   @SuppressWarnings({"rawtypes", "unchecked", "UnnecessaryParentheses", "UnusedVariable"})
