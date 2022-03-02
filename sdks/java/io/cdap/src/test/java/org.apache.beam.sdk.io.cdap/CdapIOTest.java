@@ -25,6 +25,7 @@ import static org.junit.Assert.fail;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
@@ -61,6 +62,7 @@ import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -118,6 +120,8 @@ public class CdapIOTest {
           .put("objectsToPull", "Groups")
           .build();
 
+  private static final long NUM_OF_TEST_HUBSPOT_CONTACTS =
+      Long.parseLong(System.getenv("HUBSPOT_CONTACTS_NUM"));
   private static final ImmutableMap<String, Object> TEST_HUBSPOT_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("apiServerUrl", BaseHubspotConfig.DEFAULT_API_SERVER_URL)
@@ -215,10 +219,15 @@ public class CdapIOTest {
                     NullableCoder.of(WritableCoder.of(NullWritable.class)),
                     SerializableCoder.of(StructuredRecord.class)));
 
-    PAssert.thatMap(input)
+    PAssert.that(input)
         .satisfies(
-            (map) -> {
-              assertEquals(1, map.size());
+            (iterable) -> {
+              List<KV<NullWritable, StructuredRecord>> list =
+                  (List<KV<NullWritable, StructuredRecord>>) iterable;
+              assertEquals(1, list.size());
+              StructuredRecord record = list.get(0).getValue();
+              assertNotNull(record);
+              assertEquals(TEST_ZENDESK_PARAMS_MAP.get("objectsToPull"), record.get("object"));
               return null;
             });
     p.run();
@@ -259,10 +268,23 @@ public class CdapIOTest {
                 KvCoder.of(
                     NullableCoder.of(WritableCoder.of(NullWritable.class)), JsonElementCoder.of()));
 
-    PAssert.thatMap(input)
+    PAssert.that(input)
         .satisfies(
             (map) -> {
-              assertEquals(1, map.size());
+              long numOfCorrectRecords = 0;
+              for (KV<NullWritable, JsonElement> record : map) {
+                assertNotNull(record.getValue());
+                JsonObject contactProperties =
+                    record.getValue().getAsJsonObject().getAsJsonObject("properties");
+                String firstName =
+                    contactProperties.getAsJsonObject("firstname").get("value").toString();
+                String lastname =
+                    contactProperties.getAsJsonObject("lastname").get("value").toString();
+                assertFalse(StringUtils.isEmpty(firstName));
+                assertFalse(StringUtils.isEmpty(lastname));
+                numOfCorrectRecords++;
+              }
+              assertEquals(NUM_OF_TEST_HUBSPOT_CONTACTS, numOfCorrectRecords);
               return null;
             });
     p.run();
