@@ -15,29 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.cdap.context;
+package org.apache.beam.sdk.io.cdap.hubspot.source.batch;
 
-import io.cdap.cdap.api.data.batch.Input;
-import io.cdap.cdap.etl.api.batch.BatchSourceContext;
+import java.util.Collections;
+import java.util.List;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.JobContext;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
 
-/**
- * Class BatchSourceContextWrapper is a class for creating context object of different CDAP classes
- * with batch source type.
- */
-public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
+/** InputFormat for mapreduce job, which provides a single split of data. */
+@SuppressWarnings("rawtypes")
+public class HubspotInputFormat extends InputFormat {
 
   @Override
-  public void setInput(Input input) {
-    this.inputFormatProvider = ((Input.InputFormatProviderInput) input).getInputFormatProvider();
+  public List<InputSplit> getSplits(JobContext jobContext) {
+    return Collections.singletonList(new HubspotSplit());
   }
 
   @Override
-  public boolean isPreviewEnabled() {
-    return false;
-  }
-
-  @Override
-  public int getMaxPreviewRecords() {
-    return 0;
+  public RecordReader createRecordReader(
+      InputSplit inputSplit, TaskAttemptContext taskAttemptContext) {
+    return new HubspotRecordReader();
   }
 }

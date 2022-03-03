@@ -987,7 +987,7 @@ public class HadoopFormatIO {
 
       /** Utility method to check if the passed object is of a known immutable type. */
       private boolean isKnownImmutable(Object o) {
-        return immutableTypes.contains(o.getClass());
+        return o == null || immutableTypes.contains(o.getClass());
       }
 
       @Override

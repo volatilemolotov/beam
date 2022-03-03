@@ -15,29 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.cdap.context;
+package org.apache.beam.sdk.io.cdap.github.common.model.impl;
 
-import io.cdap.cdap.api.data.batch.Input;
-import io.cdap.cdap.etl.api.batch.BatchSourceContext;
+import com.google.api.client.util.Key;
+import org.apache.beam.sdk.io.cdap.github.common.model.GitHubModel;
+import org.apache.beam.sdk.io.cdap.github.common.model.impl.user.User;
 
-/**
- * Class BatchSourceContextWrapper is a class for creating context object of different CDAP classes
- * with batch source type.
- */
-public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
+/** Comment model for github. */
+@SuppressWarnings("UnusedVariable")
+public class Comment implements GitHubModel {
 
-  @Override
-  public void setInput(Input input) {
-    this.inputFormatProvider = ((Input.InputFormatProviderInput) input).getInputFormatProvider();
-  }
+  @Key("html_url")
+  private String htmlUrl;
 
-  @Override
-  public boolean isPreviewEnabled() {
-    return false;
-  }
+  @Key private String url;
+  @Key private Long id;
 
-  @Override
-  public int getMaxPreviewRecords() {
-    return 0;
-  }
+  @Key("node_id")
+  private String nodeId;
+
+  @Key private String body;
+  @Key private String path;
+  @Key private Integer position;
+  @Key private Integer line;
+
+  @Key("commit_id")
+  private String commitId;
+
+  @Key private User user;
+
+  @Key("created_at")
+  private String createdAt;
+
+  @Key("updated_at")
+  private String updatedAt;
 }

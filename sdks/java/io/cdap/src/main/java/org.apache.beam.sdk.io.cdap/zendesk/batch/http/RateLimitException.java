@@ -15,29 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.cdap.context;
+package org.apache.beam.sdk.io.cdap.zendesk.batch.http;
 
-import io.cdap.cdap.api.data.batch.Input;
-import io.cdap.cdap.etl.api.batch.BatchSourceContext;
-
-/**
- * Class BatchSourceContextWrapper is a class for creating context object of different CDAP classes
- * with batch source type.
- */
-public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
-
-  @Override
-  public void setInput(Input input) {
-    this.inputFormatProvider = ((Input.InputFormatProviderInput) input).getInputFormatProvider();
-  }
-
-  @Override
-  public boolean isPreviewEnabled() {
-    return false;
-  }
-
-  @Override
-  public int getMaxPreviewRecords() {
-    return 0;
-  }
-}
+/** Exception for Zendesk Rate Limit. */
+public class RateLimitException extends RuntimeException {}

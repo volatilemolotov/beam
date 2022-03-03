@@ -15,29 +15,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.cdap.context;
+package org.apache.beam.sdk.io.cdap.hubspot.source.batch;
 
-import io.cdap.cdap.api.data.batch.Input;
-import io.cdap.cdap.etl.api.batch.BatchSourceContext;
+import java.io.DataInput;
+import java.io.DataOutput;
+import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapreduce.InputSplit;
 
-/**
- * Class BatchSourceContextWrapper is a class for creating context object of different CDAP classes
- * with batch source type.
- */
-public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
-
-  @Override
-  public void setInput(Input input) {
-    this.inputFormatProvider = ((Input.InputFormatProviderInput) input).getInputFormatProvider();
-  }
+/** A no-op split. */
+public class HubspotSplit extends InputSplit implements Writable {
+  public HubspotSplit() {}
 
   @Override
-  public boolean isPreviewEnabled() {
-    return false;
-  }
+  public void readFields(DataInput dataInput) {}
 
   @Override
-  public int getMaxPreviewRecords() {
+  public void write(DataOutput dataOutput) {}
+
+  @Override
+  public long getLength() {
     return 0;
+  }
+
+  @Override
+  public String[] getLocations() {
+    return new String[0];
   }
 }

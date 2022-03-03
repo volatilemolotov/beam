@@ -15,29 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.cdap.context;
+package org.apache.beam.sdk.io.cdap.github.common.model.impl;
 
-import io.cdap.cdap.api.data.batch.Input;
-import io.cdap.cdap.etl.api.batch.BatchSourceContext;
+import com.google.api.client.util.Key;
+import org.apache.beam.sdk.io.cdap.github.common.model.impl.user.User;
 
-/**
- * Class BatchSourceContextWrapper is a class for creating context object of different CDAP classes
- * with batch source type.
- */
-public class BatchSourceContextImpl extends BatchContextImpl implements BatchSourceContext {
+/** Collaborator model for github. */
+@SuppressWarnings("UnusedVariable")
+public class Collaborator extends User {
 
-  @Override
-  public void setInput(Input input) {
-    this.inputFormatProvider = ((Input.InputFormatProviderInput) input).getInputFormatProvider();
-  }
+  @Key private Permissions permissions;
 
-  @Override
-  public boolean isPreviewEnabled() {
-    return false;
-  }
-
-  @Override
-  public int getMaxPreviewRecords() {
-    return 0;
+  /** Collaborator.Permissions model */
+  public static class Permissions {
+    @Key private Boolean pull;
+    @Key private Boolean push;
+    @Key private Boolean admin;
   }
 }
