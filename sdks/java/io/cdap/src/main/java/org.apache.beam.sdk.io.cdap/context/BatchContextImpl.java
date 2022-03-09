@@ -19,7 +19,6 @@ package org.apache.beam.sdk.io.cdap.context;
 
 import io.cdap.cdap.api.data.DatasetInstantiationException;
 import io.cdap.cdap.api.data.batch.InputFormatProvider;
-import io.cdap.cdap.api.data.batch.OutputFormatProvider;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.dataset.Dataset;
 import io.cdap.cdap.api.dataset.DatasetManagementException;
@@ -29,10 +28,7 @@ import io.cdap.cdap.api.metadata.MetadataEntity;
 import io.cdap.cdap.api.metadata.MetadataException;
 import io.cdap.cdap.api.metadata.MetadataScope;
 import io.cdap.cdap.api.plugin.PluginProperties;
-import io.cdap.cdap.etl.api.FailureCollector;
-import io.cdap.cdap.etl.api.Lookup;
-import io.cdap.cdap.etl.api.StageMetrics;
-import io.cdap.cdap.etl.api.SubmitterLifecycle;
+import io.cdap.cdap.etl.api.*;
 import io.cdap.cdap.etl.api.action.SettableArguments;
 import io.cdap.cdap.etl.api.batch.BatchContext;
 import io.cdap.cdap.etl.api.lineage.field.FieldOperation;
@@ -42,23 +38,20 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-/** Class for Batch, Sink and Stream CDAP wrapper classes that use it to provide common details. */
-@SuppressWarnings({"TypeParameterUnusedInFormals", "nullness"})
-public abstract class BatchContextImpl implements BatchContext {
+/**
+ * Class OperationContext is a common class for Batch, Sink and Stream CDAP wrapper classes that use
+ * it to provide common details.
+ */
+@SuppressWarnings("TypeParameterUnusedInFormals")
+public class BatchContextImpl implements BatchContext {
 
   private final FailureCollectorWrapper failureCollector = new FailureCollectorWrapper();
 
   /**
    * This should be set after {@link SubmitterLifecycle#prepareRun(Object)} call with passing this
-   * context object as a param.
+   * context object as a param
    */
   protected InputFormatProvider inputFormatProvider;
-
-  /**
-   * This should be set after {@link SubmitterLifecycle#prepareRun(Object)} call with passing this
-   * context object as a param.
-   */
-  protected OutputFormatProvider outputFormatProvider;
 
   private final Timestamp startTime = new Timestamp(System.currentTimeMillis());
 
@@ -66,22 +59,18 @@ public abstract class BatchContextImpl implements BatchContext {
     return inputFormatProvider;
   }
 
-  public OutputFormatProvider getOutputFormatProvider() {
-    return outputFormatProvider;
-  }
-
   @Override
-  public @Nullable String getStageName() {
+  public String getStageName() {
     return null;
   }
 
   @Override
-  public @Nullable String getNamespace() {
+  public String getNamespace() {
     return null;
   }
 
   @Override
-  public @Nullable String getPipelineName() {
+  public String getPipelineName() {
     return null;
   }
 
@@ -96,42 +85,44 @@ public abstract class BatchContextImpl implements BatchContext {
   }
 
   @Override
-  public @Nullable PluginProperties getPluginProperties() {
+  public PluginProperties getPluginProperties() {
     return null;
   }
 
   @Override
-  public @Nullable PluginProperties getPluginProperties(String pluginId) {
+  public PluginProperties getPluginProperties(String pluginId) {
     return null;
   }
 
   @Override
-  public @Nullable <T> Class<T> loadPluginClass(String pluginId) {
+  public <T> Class<T> loadPluginClass(String pluginId) {
     return null;
   }
 
   @Override
-  public @Nullable <T> T newPluginInstance(String pluginId) throws InstantiationException {
+  public <T> T newPluginInstance(String pluginId) throws InstantiationException {
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public Schema getInputSchema() {
     return null;
   }
 
   @Override
-  public @Nullable Schema getInputSchema() {
+  public Map<String, Schema> getInputSchemas() {
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public Schema getOutputSchema() {
     return null;
   }
 
   @Override
-  public @Nullable Map<String, Schema> getInputSchemas() {
-    return null;
-  }
-
-  @Override
-  public @Nullable Schema getOutputSchema() {
-    return null;
-  }
-
-  @Override
-  public @Nullable Map<String, Schema> getOutputPortSchemas() {
+  public Map<String, Schema> getOutputPortSchemas() {
     return null;
   }
 
@@ -145,7 +136,7 @@ public abstract class BatchContextImpl implements BatchContext {
   }
 
   @Override
-  public @Nullable SettableArguments getArguments() {
+  public SettableArguments getArguments() {
     return null;
   }
 
@@ -154,24 +145,26 @@ public abstract class BatchContextImpl implements BatchContext {
     return this.failureCollector;
   }
 
+  @Nullable
   @Override
-  public @Nullable URL getServiceURL(String applicationId, String serviceId) {
+  public URL getServiceURL(String applicationId, String serviceId) {
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public URL getServiceURL(String serviceId) {
     return null;
   }
 
   @Override
-  public @Nullable URL getServiceURL(String serviceId) {
-    return null;
-  }
-
-  @Override
-  public @Nullable Map<MetadataScope, Metadata> getMetadata(MetadataEntity metadataEntity)
+  public Map<MetadataScope, Metadata> getMetadata(MetadataEntity metadataEntity)
       throws MetadataException {
     return null;
   }
 
   @Override
-  public @Nullable Metadata getMetadata(MetadataScope scope, MetadataEntity metadataEntity)
+  public Metadata getMetadata(MetadataScope scope, MetadataEntity metadataEntity)
       throws MetadataException {
     return null;
   }
@@ -209,19 +202,19 @@ public abstract class BatchContextImpl implements BatchContext {
   }
 
   @Override
-  public @Nullable <T extends Dataset> T getDataset(String namespace, String name)
+  public <T extends Dataset> T getDataset(String namespace, String name)
       throws DatasetInstantiationException {
     return null;
   }
 
   @Override
-  public @Nullable <T extends Dataset> T getDataset(String name, Map<String, String> arguments)
+  public <T extends Dataset> T getDataset(String name, Map<String, String> arguments)
       throws DatasetInstantiationException {
     return null;
   }
 
   @Override
-  public @Nullable <T extends Dataset> T getDataset(
+  public <T extends Dataset> T getDataset(
       String namespace, String name, Map<String, String> arguments)
       throws DatasetInstantiationException {
     return null;
@@ -234,7 +227,7 @@ public abstract class BatchContextImpl implements BatchContext {
   public void discardDataset(Dataset dataset) {}
 
   @Override
-  public @Nullable <T> Lookup<T> provide(String table, Map<String, String> arguments) {
+  public <T> Lookup<T> provide(String table, Map<String, String> arguments) {
     return null;
   }
 }
