@@ -25,7 +25,6 @@ import static org.junit.Assert.fail;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
@@ -34,7 +33,6 @@ import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.beam.sdk.coders.CustomCoder;
@@ -42,17 +40,11 @@ import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
-import org.apache.beam.sdk.io.cdap.github.batch.GithubBatchSource;
-import org.apache.beam.sdk.io.cdap.github.batch.GithubBatchSourceConfig;
-import org.apache.beam.sdk.io.cdap.github.batch.GithubFormatProvider;
-import org.apache.beam.sdk.io.cdap.github.batch.GithubInputFormat;
-import org.apache.beam.sdk.io.cdap.github.common.model.impl.*;
 import org.apache.beam.sdk.io.cdap.hubspot.common.BaseHubspotConfig;
 import org.apache.beam.sdk.io.cdap.hubspot.common.SourceHubspotConfig;
 import org.apache.beam.sdk.io.cdap.hubspot.source.batch.HubspotBatchSource;
-import org.apache.beam.sdk.io.cdap.hubspot.source.batch.HubspotInputFormat;
-import org.apache.beam.sdk.io.cdap.hubspot.source.batch.HubspotInputFormatProvider;
 import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskBatchSource;
 import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskBatchSourceConfig;
 import org.apache.beam.sdk.io.cdap.zendesk.batch.ZendeskInputFormat;
@@ -60,12 +52,13 @@ import org.apache.beam.sdk.io.cdap.zendesk.batch.util.ZendeskBatchSourceConstant
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.commons.lang.StringUtils;
+import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.io.Text;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,15 +89,6 @@ public class CdapIOTest {
           .put("referenceName", "oldReference")
           .build();
 
-  private static final ImmutableMap<String, Object> TEST_GITHUB_PARAMS_MAP =
-      ImmutableMap.<String, java.lang.Object>builder()
-          .put("authorizationToken", System.getenv("GITHUB_TOKEN"))
-          .put("repoOwner", System.getenv("GITHUB_REPO_OWNER"))
-          .put("repoName", System.getenv("GITHUB_REPO_NAME"))
-          .put("datasetName", "Branches")
-          .put("hostname", "https://api.github.com")
-          .build();
-
   private static final ImmutableMap<String, Object> TEST_ZENDESK_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("referenceName", "referenceName")
@@ -120,8 +104,6 @@ public class CdapIOTest {
           .put("objectsToPull", "Groups")
           .build();
 
-  private static final long NUM_OF_TEST_HUBSPOT_CONTACTS =
-      Long.parseLong(System.getenv("HUBSPOT_CONTACTS_NUM"));
   private static final ImmutableMap<String, Object> TEST_HUBSPOT_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("apiServerUrl", BaseHubspotConfig.DEFAULT_API_SERVER_URL)
@@ -129,6 +111,8 @@ public class CdapIOTest {
           .put("referenceName", "Contacts")
           .put("apiKey", System.getenv("HUBSPOT_TOKEN"))
           .build();
+
+  private static final String HUBSPOT_CONTACTS_OUTPUT_TXT = "src/test/resources/hubspot-contacts-output.txt";
 
   public static class JsonElementCoder extends CustomCoder<JsonElement> {
     private static final JsonElementCoder CODER = new JsonElementCoder();
@@ -147,49 +131,6 @@ public class CdapIOTest {
     public JsonElement decode(InputStream inStream) throws IOException {
       return JsonParser.parseString(STRING_CODER.decode(inStream));
     }
-  }
-
-  @Test
-  public void testReadFromGithub() {
-
-    GithubBatchSourceConfig pluginConfig =
-        new ConfigWrapper<>(GithubBatchSourceConfig.class)
-            .withParams(TEST_GITHUB_PARAMS_MAP)
-            .build();
-
-    CdapIO.Read<Text, Branch> reader =
-        CdapIO.<Text, Branch>read()
-            .withCdapPluginClass(GithubBatchSource.class)
-            .withPluginConfig(pluginConfig)
-            .withKeyClass(Text.class)
-            .withValueClass(Branch.class);
-
-    assertNotNull(reader.getPluginConfig());
-    assertNotNull(reader.getCdapPlugin());
-    assertFalse(reader.getCdapPlugin().isUnbounded());
-    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
-
-    List<KV<Text, Branch>> inputs = new ArrayList<>();
-    inputs.add(KV.of(null, new Branch("master", false)));
-
-    PCollection<KV<Text, Branch>> input =
-        p.apply(reader)
-            .setCoder(
-                KvCoder.of(
-                    NullableCoder.of(WritableCoder.of(Text.class)),
-                    SerializableCoder.of(Branch.class)));
-
-    PAssert.that(input).containsInAnyOrder(inputs);
-    p.run();
-
-    assertEquals(GithubInputFormat.class, reader.getCdapPlugin().formatClass);
-
-    Configuration hadoopConf = reader.getCdapPlugin().getHadoopConf();
-    String configJson = hadoopConf.get(GithubFormatProvider.PROPERTY_CONFIG_JSON);
-    GithubBatchSourceConfig configFromJson =
-        GSON.fromJson(configJson, GithubBatchSourceConfig.class);
-
-    assertEquals(pluginConfig.getAuthorizationToken(), configFromJson.getAuthorizationToken());
   }
 
   @Test
@@ -255,47 +196,27 @@ public class CdapIOTest {
             .withKeyClass(NullWritable.class)
             .withValueClass(JsonElement.class);
 
-    assertNotNull(reader.getPluginConfig());
-    assertNotNull(reader.getCdapPlugin());
-    assertFalse(reader.getCdapPlugin().isUnbounded());
-    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
-
     p.getCoderRegistry().registerCoderForClass(JsonElement.class, JsonElementCoder.of());
 
-    PCollection<KV<NullWritable, JsonElement>> input =
+    PCollection<KV<NullWritable, JsonElement>> output =
         p.apply(reader)
             .setCoder(
                 KvCoder.of(
                     NullableCoder.of(WritableCoder.of(NullWritable.class)), JsonElementCoder.of()));
 
-    PAssert.that(input)
-        .satisfies(
-            (map) -> {
-              long numOfCorrectRecords = 0;
-              for (KV<NullWritable, JsonElement> record : map) {
-                assertNotNull(record.getValue());
-                JsonObject contactProperties =
-                    record.getValue().getAsJsonObject().getAsJsonObject("properties");
-                String firstName =
-                    contactProperties.getAsJsonObject("firstname").get("value").toString();
-                String lastname =
-                    contactProperties.getAsJsonObject("lastname").get("value").toString();
-                assertFalse(StringUtils.isEmpty(firstName));
-                assertFalse(StringUtils.isEmpty(lastname));
-                numOfCorrectRecords++;
-              }
-              assertEquals(NUM_OF_TEST_HUBSPOT_CONTACTS, numOfCorrectRecords);
-              return null;
-            });
+    // Write to .txt file
+    PCollection<String> strings =
+        output
+            .apply(
+                MapElements.into(TypeDescriptors.strings())
+                    .via(
+                        ((SerializableFunction<KV<NullWritable, JsonElement>, String>)
+                            input -> GSON.toJson(input.getValue()))))
+            .setCoder(StringUtf8Coder.of());
+
+    strings.apply(TextIO.write().to(HUBSPOT_CONTACTS_OUTPUT_TXT));
+
     p.run();
-
-    assertEquals(HubspotInputFormat.class, reader.getCdapPlugin().formatClass);
-
-    Configuration hadoopConf = reader.getCdapPlugin().getHadoopConf();
-    String configJson = hadoopConf.get(HubspotInputFormatProvider.PROPERTY_CONFIG_JSON);
-    SourceHubspotConfig configFromJson = GSON.fromJson(configJson, SourceHubspotConfig.class);
-
-    assertEquals(pluginConfig.getObjectType(), configFromJson.getObjectType());
   }
 
   @Test
