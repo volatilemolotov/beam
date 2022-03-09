@@ -19,9 +19,6 @@ package org.apache.beam.sdk.io.cdap;
 
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.plugin.PluginConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -31,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class for getting any filled {@link io.cdap.cdap.api.plugin.PluginConfig} configuration object.
@@ -40,21 +39,24 @@ public class PluginConfigInstantiationUtils {
   private static final Logger LOG = LoggerFactory.getLogger(PluginConfigInstantiationUtils.class);
 
   /**
-   * @param params map of config fields, where key is the name of the field, value must be String or boxed primitive
+   * @param params map of config fields, where key is the name of the field, value must be String or
+   *     boxed primitive
    * @return Config object for given map of arguments and configuration class
    */
-  public static <T extends PluginConfig> T getPluginConfig(Map<String, Object> params, Class<T> configClass) {
-    //Validate configClass
-    if (configClass == null || configClass.isPrimitive()
-        || configClass.isArray()) {
+  public static <T extends PluginConfig> T getPluginConfig(
+      Map<String, Object> params, Class<T> configClass) {
+    // Validate configClass
+    if (configClass == null || configClass.isPrimitive() || configClass.isArray()) {
       throw new IllegalArgumentException("Config class must be correct!");
     }
     List<Field> allFields = new ArrayList<>();
     Class<?> currClass = configClass;
     while (!currClass.equals(Object.class)) {
-      allFields.addAll(Arrays.stream(currClass.getDeclaredFields())
-          .filter(f -> !Modifier.isStatic(f.getModifiers())
-              && f.isAnnotationPresent(Name.class)).collect(Collectors.toList()));
+      allFields.addAll(
+          Arrays.stream(currClass.getDeclaredFields())
+              .filter(
+                  f -> !Modifier.isStatic(f.getModifiers()) && f.isAnnotationPresent(Name.class))
+              .collect(Collectors.toList()));
       currClass = currClass.getSuperclass();
     }
     T config = getEmptyObjectOf(configClass);
@@ -78,15 +80,15 @@ public class PluginConfigInstantiationUtils {
     return config;
   }
 
-  /**
-   * @return empty {@link Object} of {@param tClass}
-   */
+  /** @return empty {@link Object} of {@param tClass} */
   private static <T> T getEmptyObjectOf(Class<T> tClass) {
     for (Constructor<?> constructor : tClass.getDeclaredConstructors()) {
       constructor.setAccessible(true);
       Class<?>[] parameterTypes = constructor.getParameterTypes();
-      Object[] parameters = Arrays.stream(parameterTypes)
-          .map(PluginConfigInstantiationUtils::getDefaultValue).toArray();
+      Object[] parameters =
+          Arrays.stream(parameterTypes)
+              .map(PluginConfigInstantiationUtils::getDefaultValue)
+              .toArray();
       try {
         return (T) constructor.newInstance(parameters);
       } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
@@ -96,9 +98,7 @@ public class PluginConfigInstantiationUtils {
     return null;
   }
 
-  /**
-   * @return default value for given {@param tClass}
-   */
+  /** @return default value for given {@param tClass} */
   private static Object getDefaultValue(Class<?> tClass) {
     if (Boolean.TYPE.equals(tClass)) {
       return false;
