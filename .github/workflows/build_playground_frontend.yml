@@ -32,6 +32,7 @@ jobs:
       FLUTTER_VERSION: 2.5.2-stable
       STAND_SUFFIX: '-beta'
       GOOGLE_DOMAIN: '-dot-apache-beam-testing.appspot.com'
+      PLAYGROUND_BRANCH: 'beta-version-4'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -65,28 +66,28 @@ jobs:
       - uses: hashicorp/setup-terraform@v1
         with:
             terraform_version: ${{ env.TERRAFORM_VERSION }}
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
       - name: Set Docker Tag
         run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Set Docker Tag If Github Tag was trigger
         run: echo "DOCKERTAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
       - name: Setup GCP account
         run: |
              echo "${{ secrets.GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
       - name: Login to Docker Registry
         run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
       - name: Create config
         run: ./gradlew playground:frontend:createConfig -PplaygroundBackendJavaRouteUrl="https://backend-java${{env.STAND_SUFFIX}}${{env.GOOGLE_DOMAIN}}/" -PplaygroundBackendGoRouteUrl="https://backend-go${{env.STAND_SUFFIX}}${{env.GOOGLE_DOMAIN}}/" -PplaygroundBackendPythonRouteUrl="https://backend-python${{env.STAND_SUFFIX}}${{env.GOOGLE_DOMAIN}}/" -PplaygroundBackendUrl="https://backend-router${{env.STAND_SUFFIX}}${{env.GOOGLE_DOMAIN}}/" -PplaygroundBackendScioRouteUrl="https://backend-scio${{env.STAND_SUFFIX}}${{env.GOOGLE_DOMAIN}}/"
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
       - name: Prepare Build Frontend
         run: ./gradlew playground:frontend:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{env.DOCKERTAG}}
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
       - name: Deploy Frontend Application
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
         run: terraform init && terraform apply -auto-approve -var="project_id=${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}" -var="docker_registry_address=${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository" -var="docker_image_tag=${{ env.DOCKERTAG }}" -var="service_name=frontend${{env.STAND_SUFFIX}}"
         working-directory: playground/terraform/applications/frontend
-        if: "'refs/heads/beta-version-3' == github.ref"
+        if: "'refs/heads/${{env.PLAYGROUND_BRANCH}}' == github.ref"
