@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 import org.apache.beam.sdk.coders.Coder;
+import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PBegin;
@@ -44,6 +45,8 @@ public class SparkReceiverIO {
 
     abstract @Nullable Coder<V> getValueCoder();
 
+    abstract @Nullable Class getReceiverClass();
+
     abstract Builder<K, V> toBuilder();
 
     // TODO: Decide which fields and methods are needed
@@ -54,10 +57,16 @@ public class SparkReceiverIO {
 
       abstract Builder<K, V> setValueCoder(Coder<V> valueCoder);
 
+      abstract Builder<K, V> setReceiverClass(Class receiverClass);
+
+//      abstract Builder<K, V> setCdapPlugin(CdapPlugin plugin);
+
       public abstract Read<K, V> build();
 
       // TODO: Add setup steps
     }
+
+    // TODO: Save data from store method to PCollection
 
     public Read<K, V> withKeyCoder(Coder<K> keyCoder) {
       return toBuilder().setKeyCoder(keyCoder).build();
@@ -67,12 +76,22 @@ public class SparkReceiverIO {
       return toBuilder().setValueCoder(valueCoder).build();
     }
 
+    public Read<K, V> withReceiverClass(Class receiverClass) {
+      return toBuilder().setReceiverClass(receiverClass).build();
+    }
+
+//    public Read<K, V> withPluginConfig(PluginConfig pluginConfig) {
+//      return toBuilder().setPluginConfig(pluginConfig).build();
+//    }
+
     @Override
     public PCollection<KV<K, V>> expand(PBegin input) {
-      checkArgument(getKeyCoder() != null, "withKeyClass() is withKeyCoder");
-      checkArgument(getValueCoder() != null, "withValueClass() is withValueCoder");
-      PCollection<KV<K, V>> read = null;
-      return read;
+      checkArgument(getKeyCoder() != null, "withKeyClass() is required");
+      checkArgument(getValueCoder() != null, "withValueClass() is required");
+      checkArgument(getReceiverClass() != null, "withReceiverClass() is required");
+
+      // store into collection ?
+      return input.apply(new SparkReceiverViaSDF<>(this, getKeyCoder(), getValueCoder()));
     }
   }
 }
