@@ -23,6 +23,8 @@ import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSource;
 import org.apache.hadoop.conf.Configuration;
 
+import java.lang.annotation.Annotation;
+
 /**
  * Class wrapper for a CDAP plugin.
  */
@@ -100,6 +102,11 @@ public abstract class Plugin {
     public abstract PluginConstants.PluginType getPluginType();
 
     /**
+     * Gets if a plugin is unbounded.
+     */
+    public abstract Boolean getIsUnbounded();
+
+    /**
      * Gets a format type.
      */
     private PluginConstants.Format getFormatType() {
@@ -128,6 +135,24 @@ public abstract class Plugin {
         } else {
             throw new IllegalArgumentException("Provided class should be source or sink plugin");
         }
+    }
+
+    /**
+     * Gets value of a plugin type.
+     */
+    public static Boolean isUnbounded(Class<?> pluginClass) {
+        Boolean isUnbounded = null;
+
+        for (Annotation annotation : pluginClass.getDeclaredAnnotations()) {
+            if (annotation.annotationType().equals(io.cdap.cdap.api.annotation.Plugin.class)) {
+                String pluginType = ((io.cdap.cdap.api.annotation.Plugin) annotation).type();
+                isUnbounded = pluginType != null && pluginType.startsWith("streaming");
+            }
+        }
+        if (isUnbounded == null) {
+            throw new IllegalArgumentException("CDAP plugin class must have Plugin annotation!");
+        }
+        return isUnbounded;
     }
 
     /**
@@ -162,6 +187,8 @@ public abstract class Plugin {
         public abstract Builder setFormatProviderClass(Class<?> newFormatProviderClass);
 
         public abstract Builder setPluginType(PluginConstants.PluginType newPluginType);
+
+        public abstract Builder setIsUnbounded(Boolean isUnbounded);
 
         public abstract Plugin build();
     }
