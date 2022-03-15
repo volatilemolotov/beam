@@ -99,9 +99,9 @@ public class CdapIOTest {
   private static final ImmutableMap<String, Object> TEST_GITHUB_PARAMS_MAP =
       ImmutableMap.<String, java.lang.Object>builder()
           .put("authorizationToken", System.getenv("GITHUB_TOKEN"))
-          .put("repoOwner", "ktttnv")
-          .put("repoName", "react-quiz")
-          .put("datasetName", "Commits")
+          .put("repoOwner", System.getenv("GITHUB_REPO_OWNER"))
+          .put("repoName", System.getenv("GITHUB_REPO_NAME"))
+          .put("datasetName", "Branches")
           .put("hostname", "https://api.github.com")
           .build();
 
