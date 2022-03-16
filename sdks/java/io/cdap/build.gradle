@@ -96,4 +96,4 @@ dependencies {
 
 shadowJar {
     zip64 true
-}Z
+}
