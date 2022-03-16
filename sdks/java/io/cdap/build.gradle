@@ -16,9 +16,19 @@
  * limitations under the License.
  */
 
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.apache.beam.module'
+    id 'com.github.johnrengelman.shadow'
 }
 
 applyJavaNature(
@@ -63,6 +73,9 @@ dependencies {
     implementation 'com.github.rholder:guava-retrying:2.0.0'
     // https://mvnrepository.com/artifact/commons-validator/commons-validator
     implementation 'commons-validator:commons-validator:1.7'
+    runtimeOnly project(path: ":runners:direct-java", configuration: "shadow")
+    // https://mvnrepository.com/artifact/org.apache.beam/beam-runners-google-cloud-dataflow-java
+    implementation 'org.apache.beam:beam-runners-google-cloud-dataflow-java:2.37.0'
     testImplementation project(path: ":sdks:java:core", configuration: "shadowTest")
     testImplementation project(path: ":sdks:java:io:common", configuration: "testRuntimeMigration")
     testImplementation project(path: ":sdks:java:testing:test-utils", configuration: "testRuntimeMigration")
@@ -80,3 +93,7 @@ dependencies {
     testImplementation library.java.testcontainers_kafka
     testImplementation library.java.testcontainers_gcloud
 }
+
+shadowJar {
+    zip64 true
+}Z
