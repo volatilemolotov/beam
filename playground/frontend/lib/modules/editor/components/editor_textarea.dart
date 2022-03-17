@@ -130,7 +130,6 @@ class _EditorTextAreaState extends State<EditorTextArea> {
   _setTextScrolling() {
     focusNode.requestFocus();
     if (_codeController!.text.isNotEmpty) {
-      print('offset ${_getOffset()}');
       _codeController!.selection = TextSelection.fromPosition(
         TextPosition(
           offset: _getOffset(),
@@ -142,8 +141,6 @@ class _EditorTextAreaState extends State<EditorTextArea> {
   int _getOffset() {
     int contextLine = _getIndexOfContextLine();
     String pattern = _getPattern(_getQntOfStringsOnScreen());
-    print('contextLine ${contextLine}');
-    print('pattern ${pattern}');
     if (pattern == '' || pattern == '}') {
       return _codeController!.text.lastIndexOf(pattern);
     }
@@ -179,12 +176,10 @@ class _EditorTextAreaState extends State<EditorTextArea> {
   int _getIndexOfContextLine() {
     int ctxLineNumber = widget.example!.contextLine;
     String contextLine = _codeController!.text.split('\n')[ctxLineNumber];
-    print(contextLine);
     while (contextLine == '') {
       ctxLineNumber -= 1;
       contextLine = _codeController!.text.split('\n')[ctxLineNumber];
     }
-    print(contextLine);
     return _codeController!.text.indexOf(contextLine);
   }
 
