@@ -54,14 +54,14 @@ jobs:
         id: check_has_example
         run: |
           $SourceDiff = "${{ steps.check_file_changed.outputs.example_diff }}" | Where-Object { $_ }
-          $HasDiff = python3 checker.py --paths $SourceDiff
+          $HasDiff = python3 -c "from checker import check;check()"
           Write-Host "::set-output name=example_has_changed::$HasDiff"
         working-directory: playground/infrastructure
   deploy_examples:
     name: Deploy examples
     runs-on: 'ubuntu-20.04'
     needs: [ check_examples ]
-    if: needs.check_examples.outputs.example_has_changed == 0
+    if: needs.check_examples.outputs.example_has_changed == 'True'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
