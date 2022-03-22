@@ -18,11 +18,15 @@ Module implements check to define if it is needed to run CI step for Beam
 Playground examples
 """
 import argparse
+import logging
 import os
+import sys
 
 from config import Config
 from helper import get_tag
 
+root_dir = os.getenv("BEAM_ROOT_DIR")
+from logger import setup_logger
 parser = argparse.ArgumentParser(
     description="Check before CI step")
 parser.add_argument(
@@ -32,12 +36,27 @@ parser.add_argument(
     required=True,
     help="Paths to the files")
 
-def check() -> bool:
-  flags = parser.parse_args()
-  for filepath in flags.paths:
+
+def _check_envs():
+  if root_dir is None:
+    raise KeyError(
+        "BEAM_ROOT_DIR environment variable should be specified in os")
+
+
+def check(paths):
+  for filepath in paths:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
       continue
+    filepath = root_dir + "/" + filepath
     if get_tag(filepath) is not None:
-      return True
-  return False
+      logging.info("%s contains a tag", filepath)
+      sys.exit(0)
+  sys.exit(1)
+
+
+if __name__ == "__main__":
+    flags = parser.parse_args()
+    _check_envs()
+    setup_logger()
+    check(flags.paths)
