@@ -43,7 +43,7 @@ jobs:
       - shell: pwsh
         id: check_has_example
         run: |
-          $SourceDiff = ${{ steps.check_file_changed.outputs.example_diff }} | Where-Object { $_ }
+          $SourceDiff = "${{ steps.check_file_changed.outputs.example_diff }}" | Where-Object { $_ }
           $HasDiff = $SourceDiff.Length -gt 0
           Write-Host "::set-output name=example_has_changed::$HasDiff"
   deploy_examples:
