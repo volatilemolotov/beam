@@ -20,7 +20,6 @@ Playground examples
 import argparse
 import logging
 import os
-import sys
 
 from config import Config
 from helper import get_tag
@@ -32,7 +31,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument(
     "--paths",
     dest="paths",
-    type=lambda s: [item for item in s.split('/n')],
+    type=lambda s: [item for item in s.split("\\n")],
     required=True,
     help="Paths to the files")
 
