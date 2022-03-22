@@ -20,7 +20,12 @@ on:
     tags: 'v*'
     branch: 'beta-version'
   workflow_dispatch:
-
+env:
+  BEAM_ROOT_DIR: ../../
+  BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
+  BEAM_VERSION: 2.33.0
+  K8S_NAMESPACE: playground-backend
+  HELM_APP_NAME: playground-backend
 jobs:
   check_examples:
     name: Check examples
@@ -51,12 +56,6 @@ jobs:
   deploy_examples:
     name: Deploy examples
     runs-on: 'ubuntu-20.04'
-    env:
-      BEAM_ROOT_DIR: ../../
-      BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
-      BEAM_VERSION: 2.33.0
-      K8S_NAMESPACE: playground-backend
-      HELM_APP_NAME: playground-backend
     needs: [ check_examples ]
     if: needs.check_examples.outputs.example_has_changed == 'True'
     steps:
