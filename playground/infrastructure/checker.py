@@ -43,20 +43,17 @@ def _check_envs():
         "BEAM_ROOT_DIR environment variable should be specified in os")
 
 
-def check(paths):
-  for filepath in paths:
+def check() -> bool:
+  flags = parser.parse_args()
+  _check_envs()
+  setup_logger()
+  logging.info("%s files", len(flags.paths))
+  for filepath in flags.paths:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
       continue
     filepath = root_dir + "/" + filepath
     if get_tag(filepath) is not None:
       logging.info("%s contains a tag", filepath)
-      sys.exit(0)
-  sys.exit(1)
-
-
-if __name__ == "__main__":
-    flags = parser.parse_args()
-    _check_envs()
-    setup_logger()
-    check(flags.paths)
+      return True
+  return False
