@@ -36,11 +36,13 @@ jobs:
         with:
           python-version: '3.8'
       - shell: pwsh
+        name: get Difference
         id: check_file_changed
         run: |
           $diff = git diff --name-only HEAD^ HEAD
           Write-Host "::set-output name=example_diff::$diff"
       - shell: pwsh
+        name: has Exapmles
         id: check_has_example
         run: |
           $SourceDiff = "${{ steps.check_file_changed.outputs.example_diff }}" | Where-Object { $_ }
@@ -58,6 +60,8 @@ jobs:
     needs: [ check_examples ]
     if: needs.check_examples.outputs.example_has_changed == 'True'
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
