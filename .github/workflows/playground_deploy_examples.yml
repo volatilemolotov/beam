@@ -26,7 +26,7 @@ jobs:
     name: Check examples
     runs-on: 'ubuntu-20.04'
     outputs:
-      example_has_changed: ${{ steps.changes.outputs.example_has_changed }}
+      example_has_changed: ${{ steps.check_has_example.outputs.example_has_changed }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -39,7 +39,11 @@ jobs:
         id: check_file_changed
         run: |
           $diff = git diff --name-only HEAD^ HEAD
-          $SourceDiff = $diff | Where-Object { $_ }
+          Write-Host "::set-output name=example_diff::$diff"
+      - shell: pwsh
+        id: check_has_example
+        run: |
+          $SourceDiff = ${{ steps.check_file_changed.outputs.example_diff }} | Where-Object { $_ }
           $HasDiff = $SourceDiff.Length -gt 0
           Write-Host "::set-output name=example_has_changed::$HasDiff"
   deploy_examples:
