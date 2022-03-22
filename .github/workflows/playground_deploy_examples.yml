@@ -30,15 +30,24 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+      - name: Get file changes
+        id: get_file_changes
+        uses: trilom/file-changes-action@v1.2.3
+        with:
+          output: ' '
+
+      - name: Echo file changes
+        id: hello
+        run: |
+          echo Added files: ${{ steps.get_file_changes.outputs.files_added }}
+          echo Changed files: ${{ steps.get_file_changes.outputs.files_modified }}
+          echo Removed files: ${{ steps.get_file_changes.outputs.files_removed }}
       - shell: pwsh
         id: check_file_changed
         run: |
-          # Diff HEAD with the previous commit
-          $diff = git diff --name-only HEAD^ HEAD
-
           # Check if a file exist
-          $SourceDiff = $diff
-          $HasDiff = $SourceDiff.Length -gt 0
+          $SourceDiff = ${{steps.get_file_changes.outputs.files_added}}  -gt 0'
+          $HasDiff = 'True'
 
           # Set the output named "docs_changed"
           Write-Host "::set-output name=example_has_changed::$HasDiff"
