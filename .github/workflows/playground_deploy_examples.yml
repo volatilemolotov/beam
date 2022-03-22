@@ -22,8 +22,30 @@ on:
   workflow_dispatch:
 
 jobs:
+  check_examples:
+    name: Check examples
+    runs-on: ubuntu-latest
+    outputs:
+      example_has_changed: ${{ steps.check_examples.outputs.example_has_changed }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - shell: pwsh
+        id: check_file_changed
+        run: |
+          # Diff HEAD with the previous commit
+          $diff = git diff --name-only HEAD^ HEAD
+
+          # Check if a file exist
+          $SourceDiff = $diff
+          $HasDiff = $SourceDiff.Length -gt 0
+
+          # Set the output named "docs_changed"
+          Write-Host "::set-output name=example_has_changed::$HasDiff"
   deploy_examples:
     name: Deploy examples
+    needs: [ check_examples ]
+    if: needs.check_examples.outputs.example_has_changed == 'True'
     runs-on: ubuntu-latest
     env:
       BEAM_ROOT_DIR: ../../
@@ -32,8 +54,6 @@ jobs:
       K8S_NAMESPACE: playground-backend
       HELM_APP_NAME: playground-backend
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
