@@ -50,7 +50,6 @@ jobs:
         name: has Exapmles
         id: check_has_example
         run: |
-          BEAM_ROOT_DIR="../../"
           $SourceDiff = "${{ steps.check_file_changed.outputs.example_diff }}" | Where-Object { $_ }
           $HasDiff = python3 checker.py --paths $SourceDiff
           Write-Host "::set-output name=example_has_changed::$HasDiff"
