@@ -27,21 +27,11 @@ jobs:
     runs-on: 'ubuntu-20.04'
     outputs:
       example_has_changed: ${{ steps.changes.outputs.example_has_changed }}
-      all_has_changed: ${{ steps.changes.outputs.all_has_changed }}
-      ts_has_changed: ${{ steps.changes.outputs.ts_has_changed }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Get changed files
-        id: changes
-        # Set outputs using the command.
-        run: |
-          echo "::set-output name=all_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
-          echo "::set-output name=ts_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
-      - name: echo changed files
-        run: echo ${{steps.changes.outputs.ts_has_changed }}
       - uses: actions/setup-python@v2
         with:
           python-version: '3.8'
@@ -49,11 +39,8 @@ jobs:
         id: check_file_changed
         run: |
           $diff = git diff --name-only HEAD^ HEAD
-          $HasDiff = $diff.Length -gt 0
-          # Check if a file exist
-          # $SourceDiff = ${{ steps.changes.outputs.ts_has_changed }}  -gt 0'
-          # Set the output named "docs_changed"
-          echo "::set-output name=example_has_changed::True"
+          $SourceDiff = $diff | Where-Object { $_ }
+          $HasDiff = $SourceDiff.Length -gt 0
           Write-Host "::set-output name=example_has_changed::$HasDiff"
   deploy_examples:
     name: Deploy examples
