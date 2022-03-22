@@ -42,18 +42,21 @@ jobs:
           echo "::set-output name=ts_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
       - name: echo changed files
         run: echo ${{steps.changes.outputs.ts_has_changed }}
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
       - shell: pwsh
         id: check_file_changed
         run: |
           $diff = git diff --name-only HEAD^ HEAD
+          $HasDiff = $diff.Length -gt 0
           # Check if a file exist
           # $SourceDiff = ${{ steps.changes.outputs.ts_has_changed }}  -gt 0'
           # Set the output named "docs_changed"
           echo "::set-output name=example_has_changed::True"
+          Write-Host "::set-output name=example_has_changed::$HasDiff"
   deploy_examples:
     name: Deploy examples
-    needs: [ check_examples ]
-    if: needs.check_examples.outputs.example_has_changed == 'True'
     runs-on: 'ubuntu-20.04'
     env:
       BEAM_ROOT_DIR: ../../
@@ -61,6 +64,8 @@ jobs:
       BEAM_VERSION: 2.33.0
       K8S_NAMESPACE: playground-backend
       HELM_APP_NAME: playground-backend
+    needs: [ check_examples ]
+    if: needs.check_examples.outputs.example_has_changed == 'True'
     steps:
       - uses: actions/setup-python@v2
         with:
