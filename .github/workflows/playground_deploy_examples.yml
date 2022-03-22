@@ -26,9 +26,9 @@ jobs:
     name: Check examples
     runs-on: 'ubuntu-20.04'
     outputs:
-      example_has_changed: ${{ steps.check_examples.outputs.example_has_changed }}
-      all_has_changed: ${{ steps.check_examples.outputs.all_has_changed }}
-      ts_has_changed: ${{ steps.check_examples.outputs.ts_has_changed }}
+      example_has_changed: ${{ steps.changes.outputs.example_has_changed }}
+      all_has_changed: ${{ steps.changes.outputs.all_has_changed }}
+      ts_has_changed: ${{ steps.changes.outputs.ts_has_changed }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -41,12 +41,12 @@ jobs:
           echo "::set-output name=all_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
           echo "::set-output name=ts_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
       - name: echo changed files
-        run: echo ${{steps.check_examples.outputs.ts_has_changed }}
+        run: echo ${{steps.changes.outputs.ts_has_changed }}
       - shell: pwsh
         id: check_file_changed
         run: |
           # Check if a file exist
-          $SourceDiff = ${{ steps.check_examples.outputs.ts_has_changed }}  -gt 0'
+          # $SourceDiff = ${{ steps.changes.outputs.ts_has_changed }}  -gt 0'
           # Set the output named "docs_changed"
           Write-Host "::set-output name=example_has_changed::'True'"
   deploy_examples:
