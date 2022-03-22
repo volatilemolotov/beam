@@ -40,15 +40,15 @@ jobs:
         run: |
           echo "::set-output name=all_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
           echo "::set-output name=ts_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
+      - name: echo changed files
+        run: echo ${{steps.check_examples.outputs.ts_has_changed }}
       - shell: pwsh
         id: check_file_changed
         run: |
           # Check if a file exist
           $SourceDiff = ${{ steps.check_examples.outputs.ts_has_changed }}  -gt 0'
-          $HasDiff = 'True'
-
           # Set the output named "docs_changed"
-          Write-Host "::set-output name=example_has_changed::$HasDiff"
+          Write-Host "::set-output name=example_has_changed::'True'"
   deploy_examples:
     name: Deploy examples
     needs: [ check_examples ]
