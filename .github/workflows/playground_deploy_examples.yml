@@ -27,26 +27,24 @@ jobs:
     runs-on: 'ubuntu-20.04'
     outputs:
       example_has_changed: ${{ steps.check_examples.outputs.example_has_changed }}
+      all_has_changed: ${{ steps.check_examples.outputs.all_has_changed }}
+      ts_has_changed: ${{ steps.check_examples.outputs.ts_has_changed }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
-      - name: Get file changes
-        id: get_file_changes
-        uses: trilom/file-changes-action@v1.2.3
         with:
-          output: ' '
-
-      - name: Echo file changes
-        id: hello
+          fetch-depth: 0
+      - name: Get changed files
+        id: changes
+        # Set outputs using the command.
         run: |
-          echo Added files: ${{ steps.get_file_changes.outputs.files_added }}
-          echo Changed files: ${{ steps.get_file_changes.outputs.files_modified }}
-          echo Removed files: ${{ steps.get_file_changes.outputs.files_removed }}
+          echo "::set-output name=all_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
+          echo "::set-output name=ts_has_changed::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep .ts$ | xargs)"
       - shell: pwsh
         id: check_file_changed
         run: |
           # Check if a file exist
-          $SourceDiff = ${{steps.get_file_changes.outputs.files_added}}  -gt 0'
+          $SourceDiff = ${{ steps.check_examples.outputs.ts_has_changed }}  -gt 0'
           $HasDiff = 'True'
 
           # Set the output named "docs_changed"
