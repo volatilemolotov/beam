@@ -54,7 +54,7 @@ jobs:
         id: check_has_example
         run: |
           $SourceDiff = "${{ steps.check_file_changed.outputs.example_diff }}" | Where-Object { $_ }
-          $HasDiff = python3 -c "from checker import check;check()" --paths $SourceDiff
+          $HasDiff = python3 -c "from checker import check;check($SourceDiff)"
           Write-Host "::set-output name=example_has_changed::$HasDiff"
         working-directory: playground/infrastructure
   deploy_examples:
