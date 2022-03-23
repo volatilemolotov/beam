@@ -47,7 +47,7 @@ jobs:
         name: get Difference
         id: check_file_changed
         run: |
-          $diff = git diff --name-only HEAD^ HEAD
+          $diff = git diff --name-only -z HEAD^ HEAD
           Write-Host "::set-output name=example_diff::$diff"
       - name: has Exapmles
         run: |

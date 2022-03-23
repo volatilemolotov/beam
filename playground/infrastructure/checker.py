@@ -29,23 +29,23 @@ root_dir = os.getenv("BEAM_ROOT_DIR")
 def _check_envs():
   if root_dir is None:
     raise KeyError(
-        "BEAM_ROOT_DIR environment variable should be specified in os")
+      "BEAM_ROOT_DIR environment variable should be specified in os")
 
 
 def check(arg) -> bool:
-  print(arg)
-  paths = arg.split("\n")
-  print(paths)
+  paths = arg.split("^@")
   for filepath in paths:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
       continue
     filepath = root_dir + filepath
-    print(filepath)
     if get_tag(filepath) is not None:
       return True
   return False
 
 
 if __name__ == "__main__":
-  print(check(sys.argv[1]))
+  paths = ""
+  for arg in sys.argv[1:]:
+    paths += arg + " "
+  print(check(paths.removesuffix("^@ ")))
