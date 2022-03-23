@@ -17,13 +17,11 @@
 Module implements check to define if it is needed to run CI step for Beam
 Playground examples
 """
-import logging
 import os
 import sys
 
 from config import Config
 from helper import get_tag
-from logger import setup_logger
 
 root_dir = os.getenv("BEAM_ROOT_DIR")
 
@@ -35,16 +33,13 @@ def _check_envs():
 
 
 def check(arg) -> bool:
-  setup_logger()
   paths = arg.split("\n")
-  logging.info("%s files", len(paths))
   for filepath in paths:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
       continue
     filepath = root_dir + "/" + filepath
     if get_tag(filepath) is not None:
-      logging.info("%s contains a tag", filepath)
       return True
   return False
 
