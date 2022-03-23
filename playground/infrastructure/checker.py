@@ -39,6 +39,7 @@ def check(arg) -> bool:
     if extension not in Config.SDK_TO_EXTENSION.values():
       continue
     filepath = root_dir + "/" + filepath
+    print(filepath)
     if get_tag(filepath) is not None:
       return True
   return False
