@@ -19,6 +19,7 @@ Playground examples
 """
 import logging
 import os
+import sys
 
 from config import Config
 from helper import get_tag
@@ -46,3 +47,7 @@ def check(arg) -> bool:
       logging.info("%s contains a tag", filepath)
       return True
   return False
+
+
+if __name__ == "__main__":
+  print(check(sys.argv[1]))

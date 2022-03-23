@@ -49,14 +49,14 @@ jobs:
         run: |
           $diff = git diff --name-only HEAD^ HEAD
           Write-Host "::set-output name=example_diff::$diff"
-      - shell: pwsh
-        name: has Exapmles
-        id: check_has_example
+      - name: has Exapmles
         run: |
-          $SourceDiff = "${{ steps.check_file_changed.outputs.example_diff }}" | Where-Object { $_ }
-          $HasDiff = python3 -c "from checker import check;check('${{$SourceDiff}}')"
-          Write-Host "::set-output name=example_has_changed::$HasDiff"
+          output=$(python3 checker.py ${{ steps.check_file_changed.outputs.example_diff }})
+          echo "::set-output name=example_has_changed::$output"
+        id: check_has_example
         working-directory: playground/infrastructure
+      - name: Print has_example
+        run: echo "${{ steps.check_has_example.outputs.example_has_changed }}"
   deploy_examples:
     name: Deploy examples
     runs-on: 'ubuntu-20.04'
