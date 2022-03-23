@@ -89,3 +89,34 @@ func Test_formatCode(t *testing.T) {
 		})
 	}
 }
+
+func Test_changeGoTestFileName(t *testing.T) {
+	preparedArgs1 := getPreparedArgs(correctGoFile)
+	preparedArgs2 := getPreparedArgs("non-existent_file.go")
+	type args struct {
+		args []interface{}
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "File exist",
+			args:    args{preparedArgs1},
+			wantErr: false,
+		},
+		{
+			name:    "Non-existent file",
+			args:    args{preparedArgs2},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := changeGoTestFileName(tt.args.args...); (err != nil) != tt.wantErr {
+				t.Errorf("changeGoTestFileName() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
