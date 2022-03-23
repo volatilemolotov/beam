@@ -45,7 +45,6 @@ def check(paths) -> bool:
       lastInd += 1
       startInd = lastInd
     lastInd += 1
-  print(pathsArr)
   for filepath in pathsArr:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
