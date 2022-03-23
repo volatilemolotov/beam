@@ -33,7 +33,9 @@ def _check_envs():
 
 
 def check(arg) -> bool:
+  print(arg)
   paths = arg.split("\n")
+  print(paths)
   for filepath in paths:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
