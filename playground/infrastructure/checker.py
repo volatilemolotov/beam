@@ -32,9 +32,20 @@ def _check_envs():
       "BEAM_ROOT_DIR environment variable should be specified in os")
 
 
-def check(arg) -> bool:
-  paths = arg.split("^@")
-  for filepath in paths:
+def check(paths) -> bool:
+  pathsArr = []
+  startInd = 0
+  lastInd = 0
+  while lastInd < len(paths):
+    if paths[lastInd] == ".":
+      lastInd += 1
+      while lastInd < len(paths) and paths[lastInd] != " ":
+        lastInd += 1
+      pathsArr.append(paths[startInd:lastInd])
+      lastInd += 1
+      startInd = lastInd
+    lastInd += 1
+  for filepath in pathsArr:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
       continue
@@ -46,6 +57,10 @@ def check(arg) -> bool:
 
 if __name__ == "__main__":
   paths = ""
-  for arg in sys.argv[1:]:
-    paths += arg + " "
-  print(check(paths.removesuffix("^@ ")))
+  if len(sys.argv) > 1:
+    for arg in sys.argv[1:len(sys.argv) - 1]:
+      paths += arg + " "
+    paths += sys.argv[len(sys.argv) - 1]
+  else:
+    print(False)
+  print(check(paths))
