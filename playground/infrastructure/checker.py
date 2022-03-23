@@ -46,6 +46,8 @@ def check(arg) -> bool:
 
 if __name__ == "__main__":
   paths = ""
+  print(sys.argv)
   for arg in sys.argv[1:]:
     paths += arg + " "
-  print(check(paths.removesuffix("^@ ")))
+  print(paths)
+  print(check(paths.removesuffix("\n")))
