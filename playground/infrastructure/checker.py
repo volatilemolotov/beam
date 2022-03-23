@@ -33,7 +33,7 @@ def _check_envs():
 
 
 def check(arg) -> bool:
-  paths = arg.split("^@")
+  paths = arg.split("\n")
   for filepath in paths:
     extension = filepath.split(os.extsep)[-1]
     if extension not in Config.SDK_TO_EXTENSION.values():
@@ -47,7 +47,11 @@ def check(arg) -> bool:
 if __name__ == "__main__":
   paths = ""
   print(sys.argv)
-  for arg in sys.argv[1:]:
-    paths += arg + " "
-  print(paths)
-  print(check(paths.removesuffix("\n")))
+  if len(sys.argv) > 1:
+    for arg in sys.argv[1:len(sys.argv) - 1]:
+      paths += arg + " "
+    paths += sys.argv[len(sys.argv) - 1]
+    print(paths)
+  else:
+    print(False)
+  print(check(paths))
