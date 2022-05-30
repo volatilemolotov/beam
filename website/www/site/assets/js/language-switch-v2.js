@@ -115,10 +115,10 @@ $(document).ready(function() {
                 var pref=localStorage.getItem(this.dbKey) || this.default;
                 var isPrefSelected = false;
 
-                // Adjusting active elements in navigation header.
-                $("." + this.wrapper + " li").removeClass("active").each(function() {
+                // Adjusting in-action elements in navigation header.
+                $("." + this.wrapper + " li").removeClass("in-action").each(function() {
                     if ($(this).data("type") === pref) {
-                        $(this).addClass("active");
+                        $(this).addClass("in-action");
                         isPrefSelected = true;
                     }
                 });
@@ -136,7 +136,7 @@ $(document).ready(function() {
 
                     $("." + this.wrapper + " li").each(function() {
                         if ($(this).data("type") === pref) {
-                            $(this).addClass("active");
+                            $(this).addClass("in-action");
                         }
                     });
                 }
