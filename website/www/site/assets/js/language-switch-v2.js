@@ -10,6 +10,21 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+function getElementData(element) {
+    const clickedLangSwitchEl = element.target.closest(".language-switcher");
+    const elPreviousOffsetFromViewPort = clickedLangSwitchEl.getBoundingClientRect().top;
+    return {
+        elPreviousOffsetFromViewPort,
+        clickedLangSwitchEl,
+    }
+}
+
+function setScrollToNewPosition(clickedElementData) {
+    const { elPreviousOffsetFromViewPort, clickedLangSwitchEl } = clickedElementData;
+    const elCurrentHeight = window.pageYOffset + clickedLangSwitchEl.getBoundingClientRect().top;
+    $('html, body').scrollTop(elCurrentHeight - elPreviousOffsetFromViewPort);
+}
+
 $(document).ready(function() {
     function Switcher(conf) {
         var id = conf["class-prefix"],
@@ -25,10 +40,10 @@ $(document).ready(function() {
 
             /**
              * @desc Generate bootstrapped like nav template,
-                    showing supported types in nav.
+             showing supported types in nav.
              * @param array $types - list of supported types.
              * @return string - html template, which is bootstrapped nav tabs.
-            */
+             */
             "navHtml": function(types) {
                 var lists = "";
                 var selectors = "";
@@ -69,12 +84,12 @@ $(document).ready(function() {
             },
             /**
              * @desc Search next sibling and if it's also a code block, then store
-                    its type and move on to the next element. It will keep
-                    looking until there is no direct code block descendant left.
+             its type and move on to the next element. It will keep
+             looking until there is no direct code block descendant left.
              * @param object $el - jQuery object, from where to start searching.
              * @param array $lang - list to hold types, found while searching.
              * @return array - list of types found.
-            */
+             */
             "lookup": function(el, lang) {
                 if (!el.is("div"+this.selector)) {
                     langs = lang;
@@ -89,44 +104,53 @@ $(document).ready(function() {
                 $("." + _self.wrapper + " ul li").click(function(el) {
                     // Making type preferences presistance, for user.
                     localStorage.setItem(_self.dbKey, $(this).data("type"));
+
+                    // Set scroll to new position because Safari and Firefox can't do it automatically, only Chrome under the hood detects the correct position of viewport
+                    const clickedLangSwitchData = getElementData(el);
                     _self.toggle();
+                    setScrollToNewPosition(clickedLangSwitchData);
                 });
             },
             "toggle": function() {
                 var pref=localStorage.getItem(this.dbKey) || this.default;
                 var isPrefSelected = false;
 
-                // Adjusting active elements in navigation header.
-                $("." + this.wrapper + " li").removeClass("active").each(function() {
+                // Adjusting in-action elements in navigation header.
+                $("." + this.wrapper + " li").removeClass("in-action").each(function() {
                     if ($(this).data("type") === pref) {
-                        $(this).addClass("active");
+                        $(this).addClass("in-action");
                         isPrefSelected = true;
                     }
                 });
 
                 if (!isPrefSelected) {
-                  // if there's a code block for the default language,
-                  // set the preferred language to the default language
-                  if (langs.includes(this.default)) {
-                    pref = this.default;
-                  // otherwise set the preferred language to the first available
-                  // language, so we don't have a page with no code blocks
-                  } else {
-                    pref = langs[0];
-                  }
+                    // if there's a code block for the default language,
+                    // set the preferred language to the default language
+                    if (langs.includes(this.default)) {
+                        pref = this.default;
+                        // otherwise set the preferred language to the first available
+                        // language, so we don't have a page with no code blocks
+                    } else {
+                        pref = langs[0];
+                    }
 
-                  $("." + this.wrapper + " li").each(function() {
-                      if ($(this).data("type") === pref) {
-                          $(this).addClass("active");
-                      }
-                  });
-               }
+                    $("." + this.wrapper + " li").each(function() {
+                        if ($(this).data("type") === pref) {
+                            $(this).addClass("in-action");
+                        }
+                    });
+                }
                 // Swapping visibility of code blocks.
-                $(this.selector).hide();
-                $("nav"+this.selector).show();
+                $(this.selector).css('display', 'none');
+                $("nav"+this.selector).css('display', 'block');
                 // make sure that runner and shell snippets are still visible after changing language
-                $("code"+this.selector).show();
-                $("." + pref).show();
+                $("code"+this.selector).css('display', 'block');
+                $("." + pref).css('display', 'block');
+
+                // Fix nav-menu bug with jumping between links when switching tabs
+                $('[data-spy="scroll"]').each(function () {
+                    var $spy = $(this).scrollspy('refresh')
+                })
             },
             "render": function(wrapper) {
                 this.addTabs();
