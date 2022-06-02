@@ -16,10 +16,8 @@
  * limitations under the License.
  */
 
-const kExampleParam = 'example';
-const kIsEditableParam = 'editable';
-const kSourceCode = 'code';
-const kContextLine = 'line';
-const kIsShared = 'shared';
+class GetCodeRequestWrapper {
+  final String id;
 
-const kQuickStartCategoryName = 'quick start';
+  GetCodeRequestWrapper(this.id);
+}
