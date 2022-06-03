@@ -25,6 +25,7 @@ import org.apache.spark.streaming.receiver.BlockGenerator;
 import org.apache.spark.streaming.receiver.BlockGeneratorListener;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.apache.spark.streaming.receiver.ReceiverSupervisor;
+import scala.Function0;
 import scala.Option;
 import scala.collection.Iterator;
 import scala.collection.mutable.ArrayBuffer;
@@ -85,5 +86,10 @@ public class WrappedSupervisor extends ReceiverSupervisor {
   @Override
   public boolean isReceiverStopped() {
     return super.isReceiverStopped();
+  }
+
+  @Override
+  public void logInfo(Function0<String> msg) {
+    // Do not log with Spark logging
   }
 }
