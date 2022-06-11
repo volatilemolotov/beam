@@ -17,6 +17,7 @@ name: Build And Deploy Playground Backend Application
 
 on:
   workflow_dispatch:
+  push:
 jobs:
   build_playground_backend_docker_image:
     name: Build Playground Backend App
