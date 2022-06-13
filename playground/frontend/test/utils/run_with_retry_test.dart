@@ -27,7 +27,7 @@ class ExecutionTime<T> {
   ExecutionTime(this.time, {this.value, this.error});
 }
 
-Future<ExecutionTime> withExecutionTime(Function fn) async {
+Future<ExecutionTime> withExecutionTime(Function() fn) async {
   final stopwatch = Stopwatch()..start();
   try {
     final result = await fn();
@@ -38,7 +38,7 @@ Future<ExecutionTime> withExecutionTime(Function fn) async {
 }
 
 class ResultBuilder {
-  static Function getFutureWithResult(List<Future Function()> futures) {
+  static Function() getFutureWithResult(List<Future Function()> futures) {
     var attempt = 0;
     return () async {
       final futureCreator = futures[attempt];

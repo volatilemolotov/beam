@@ -47,13 +47,13 @@ class ExpansionPanelItem extends StatelessWidget {
         child: GestureDetector(
           onTap: () async {
             if (playgroundState.selectedExample != example) {
+              AnalyticsService.get(context).trackSelectExample(example);
               closeDropdown(exampleState);
               final exampleWithInfo = await exampleState.loadExampleInfo(
                 example,
                 playgroundState.sdk,
               );
               playgroundState.setExample(exampleWithInfo);
-              AnalyticsService.get(context).trackSelectExample(exampleWithInfo);
             }
           },
           child: Container(

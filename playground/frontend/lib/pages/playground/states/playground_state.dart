@@ -152,7 +152,7 @@ class PlaygroundState with ChangeNotifier {
     notifyListeners();
   }
 
-  void runCode({Function? onFinish}) {
+  void runCode({Function()? onFinish}) {
     final parsedPipelineOptions = parsePipelineOptions(pipelineOptions);
     if (parsedPipelineOptions == null) {
       _result = RunCodeResult(

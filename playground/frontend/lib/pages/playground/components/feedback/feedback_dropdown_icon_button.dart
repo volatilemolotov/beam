@@ -33,7 +33,7 @@ class FeedbackDropdownIconButton extends StatefulWidget {
   final String iconAsset;
   final String filledIconAsset;
   final bool isSelected;
-  final Function onClick;
+  final Function() onClick;
 
   const FeedbackDropdownIconButton({
     Key? key,
