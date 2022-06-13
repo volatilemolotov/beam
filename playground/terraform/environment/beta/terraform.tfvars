@@ -1,4 +1,4 @@
-project_id   = "playgroundsandbox2"
+project_id   = "sandbox-353119"
 router_cpu = 2
 router_memory = 4
 router_max_instance = 1
@@ -15,6 +15,6 @@ scio_cpu = 2
 scio_memory = 4
 scio_max_instance = 1
 network_name = "playground"
-bucket = "pg-sndboxbucket"
-bucket_examples_name = "pg-sndboxbucket-1"
-state_bucket = "pg-sndboxbucket"
+bucket = "sndbox119"
+bucket_examples_name = "sndbox119-1"
+state_bucket = "sndbox119"
