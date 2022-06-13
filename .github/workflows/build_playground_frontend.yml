@@ -17,11 +17,6 @@ name: Build And Deploy Playground Frontend Application
 
 on:
   push:
-    tags: 'v*'
-    branches: ['master', 'release-*']
-  pull_request:
-    paths: ['playground/backend/**']
-    branches: ['playground-staging']
   workflow_dispatch:
 
 jobs:
