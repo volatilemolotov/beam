@@ -34,12 +34,14 @@ import org.apache.beam.sdk.transforms.splittabledofn.WatermarkEstimators;
 import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("nullness")
 @UnboundedPerElement
-public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescriptor, V> {
+public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ReadFromSparkReceiverDoFn.class);
   private static final int START_POLL_TIMEOUT_MS = 500;
@@ -52,12 +54,12 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescri
   private Receiver<V> sparkReceiver;
   private SparkConsumer<V> sparkConsumer;
 
-  public ReadFromSparkReceiverDoFn(SparkReceiverIO.ReadFromSparkReceiverViaSdf<V> transform) {
+  public ReadFromSparkReceiverDoFn(SparkReceiverIO.Read<V> transform) {
     createWatermarkEstimatorFn = WatermarkEstimators.Manual::new;
-    sparkReceiverBuilder = transform.sparkReceiverRead.getSparkReceiverBuilder();
-    getOffsetFn = transform.sparkReceiverRead.getGetOffsetFn();
-    if (!receiverHasOffset()) {
-      sparkConsumer = transform.sparkReceiverRead.getSparkConsumer();
+    sparkReceiverBuilder = transform.getSparkReceiverBuilder();
+    getOffsetFn = transform.getGetOffsetFn();
+    if (sparkReceiverBuilder != null && !receiverHasOffset()) {
+      sparkConsumer = transform.getSparkConsumer();
       try {
         sparkReceiver = sparkReceiverBuilder.build();
         sparkConsumer.start(sparkReceiver);
@@ -68,7 +70,7 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescri
   }
 
   @GetInitialRestriction
-  public OffsetRange initialRestriction(@Element SparkReceiverSourceDescriptor sourceDescriptor) {
+  public OffsetRange initialRestriction(@Element byte[] element) {
     return new OffsetRange(0, Long.MAX_VALUE);
   }
 
@@ -84,10 +86,8 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescri
   }
 
   @GetSize
-  public double getSize(
-      @Element SparkReceiverSourceDescriptor sourceDescriptor,
-      @Restriction OffsetRange offsetRange) {
-    return restrictionTracker(sourceDescriptor, offsetRange).getProgress().getWorkRemaining();
+  public double getSize(@Element byte[] element, @Restriction OffsetRange offsetRange) {
+    return restrictionTracker(element, offsetRange).getProgress().getWorkRemaining();
     // Before processing elements, we don't have a good estimated size of records and offset gap.
   }
 
@@ -111,8 +111,7 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescri
 
   @NewTracker
   public OffsetRangeTracker restrictionTracker(
-      @Element SparkReceiverSourceDescriptor sourceDescriptor,
-      @Restriction OffsetRange restriction) {
+      @Element byte[] element, @Restriction OffsetRange restriction) {
     return new GrowableOffsetRangeTracker(
         restriction.getFrom(), new SparkReceiverLatestOffsetEstimator()) {};
   }
@@ -189,7 +188,7 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescri
 
   @ProcessElement
   public ProcessContinuation processElement(
-      @Element SparkReceiverSourceDescriptor sourceDescriptor,
+      @Element byte[] element,
       RestrictionTracker<OffsetRange, Long> tracker,
       WatermarkEstimator<Instant> watermarkEstimator,
       OutputReceiver<V> receiver) {
@@ -206,17 +205,20 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<SparkReceiverSourceDescri
 
     while (sparkConsumer.hasRecords()) {
       V record = sparkConsumer.poll();
-      Long offset = getOffsetFn.apply(record);
-      if (!tracker.tryClaim(offset)) {
-        if (receiverHasOffset()) {
-          sparkConsumer.stop();
+      if (record != null) {
+        Long offset = getOffsetFn.apply(record);
+        if (!tracker.tryClaim(offset)) {
+          if (receiverHasOffset()) {
+            sparkConsumer.stop();
+          }
+          LOG.debug(
+              "ProcessContinuation.stop for restriction {}",
+              tracker.currentRestriction().toString());
+          return ProcessContinuation.stop();
         }
-        LOG.debug(
-            "ProcessContinuation.stop for restriction {}", tracker.currentRestriction().toString());
-        return ProcessContinuation.stop();
+        ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(Instant.now());
+        receiver.outputWithTimestamp(record, Instant.now());
       }
-      ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(Instant.now());
-      receiver.outputWithTimestamp(record, Instant.now());
     }
     if (receiverHasOffset()) {
       sparkConsumer.stop();

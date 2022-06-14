@@ -19,6 +19,7 @@ package org.apache.beam.sdk.io.sparkreceiver;
 
 import java.io.Serializable;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Interface for start/stop reading from some Spark {@link Receiver} into some place and poll from
@@ -28,6 +29,7 @@ public interface SparkConsumer<V> extends Serializable {
 
   boolean hasRecords();
 
+  @Nullable
   V poll();
 
   void start(Receiver<V> sparkReceiver);

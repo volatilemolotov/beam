@@ -22,7 +22,6 @@ import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Prec
 import com.google.auto.value.AutoValue;
 import org.apache.beam.sdk.annotations.Experimental;
 import org.apache.beam.sdk.coders.Coder;
-import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.Impulse;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -97,22 +96,25 @@ public class SparkReceiverIO {
 
     @Override
     public PCollection<V> expand(PBegin input) {
-      checkArgument(getValueCoder() != null, "withValueCoder() is required");
+      Coder<V> valueCoder = getValueCoder();
+      checkArgument(valueCoder != null, "withValueCoder() is required");
       checkArgument(getValueClass() != null, "withValueClass() is required");
-      checkArgument(getSparkReceiverBuilder() != null, "withSparkReceiverBuilder() is required");
       checkArgument(getGetOffsetFn() != null, "withGetOffsetFn() is required");
-      if (!HasOffset.class.isAssignableFrom(getSparkReceiverBuilder().getSparkReceiverClass())) {
+
+      ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder = getSparkReceiverBuilder();
+      checkArgument(sparkReceiverBuilder != null, "withSparkReceiverBuilder() is required");
+      if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
         checkArgument(getSparkConsumer() != null, "withSparkConsumer() is required");
       }
 
-      return input.apply(new ReadFromSparkReceiverViaSdf<>(this, getValueCoder()));
+      return input.apply(new ReadFromSparkReceiverViaSdf<>(this, valueCoder));
     }
   }
 
-  public static class ReadFromSparkReceiverViaSdf<V> extends PTransform<PBegin, PCollection<V>> {
+  static class ReadFromSparkReceiverViaSdf<V> extends PTransform<PBegin, PCollection<V>> {
 
-    Read<V> sparkReceiverRead;
-    Coder<V> valueCoder;
+    private Read<V> sparkReceiverRead;
+    private Coder<V> valueCoder;
 
     ReadFromSparkReceiverViaSdf(Read<V> sparkReceiverRead, Coder<V> valueCoder) {
       this.sparkReceiverRead = sparkReceiverRead;
@@ -123,21 +125,8 @@ public class SparkReceiverIO {
     public PCollection<V> expand(PBegin input) {
       return input
           .apply(Impulse.create())
-          .apply(ParDo.of(new GenerateSparkReceiverSourceDescriptor()))
-          .apply(ParDo.of(new ReadFromSparkReceiverDoFn<>(this)))
+          .apply(ParDo.of(new ReadFromSparkReceiverDoFn<>(sparkReceiverRead)))
           .setCoder(valueCoder);
-    }
-  }
-
-  static class GenerateSparkReceiverSourceDescriptor
-      extends DoFn<byte[], SparkReceiverSourceDescriptor> {
-
-    GenerateSparkReceiverSourceDescriptor() {}
-
-    @ProcessElement
-    public void processElement(OutputReceiver<SparkReceiverSourceDescriptor> receiver) {
-      // TODO:
-      receiver.output(new SparkReceiverSourceDescriptor(null));
     }
   }
 }
