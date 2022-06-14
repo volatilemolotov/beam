@@ -17,6 +17,9 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
+
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -28,12 +31,6 @@ import org.apache.spark.streaming.receiver.Receiver;
  * Class for building an instance for {@link Receiver} that uses Apache Beam mechanisms instead of
  * Spark environment.
  */
-@SuppressWarnings({
-  "unchecked",
-  "argument.type.incompatible",
-  "return.type.incompatible",
-  "dereference.of.nullable"
-})
 public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
 
   private final Class<T> sparkReceiverClass;
@@ -56,10 +53,10 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
   public T build()
       throws InvocationTargetException, InstantiationException, IllegalAccessException {
 
-    if (constructorArgs == null) {
-      throw new IllegalStateException(
-          "It is not possible to build a Receiver proxy without setting the obligatory parameters.");
-    }
+    checkState(
+        constructorArgs != null,
+        "It is not possible to build a Receiver proxy without setting the obligatory parameters.");
+
     Constructor<?> currentConstructor = null;
     for (Constructor<?> constructor : sparkReceiverClass.getDeclaredConstructors()) {
       Class<?>[] paramTypes = constructor.getParameterTypes();
@@ -69,9 +66,9 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
       boolean matches = true;
       for (int i = 0; i < constructorArgs.length; i++) {
         Object arg = constructorArgs[i];
-        if (arg == null) {
-          throw new IllegalArgumentException("All args must be not null!");
-        }
+
+        checkArgument(arg != null, "All args must be not null!");
+
         Class<?> currArgClass = paramTypes[i];
         if (currArgClass.isPrimitive()) {
           currArgClass = ClassUtils.primitiveToWrapper(currArgClass);
@@ -85,11 +82,10 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
         currentConstructor = constructor;
       }
     }
-    if (currentConstructor == null) {
-      throw new IllegalStateException("Can not find appropriate constructor!");
-    }
+    checkState(currentConstructor != null, "Can not find appropriate constructor!");
+
     currentConstructor.setAccessible(true);
-    return (T) currentConstructor.newInstance(constructorArgs);
+    return sparkReceiverClass.cast(currentConstructor.newInstance(constructorArgs));
   }
 
   public Class<T> getSparkReceiverClass() {
