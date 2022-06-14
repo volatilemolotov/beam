@@ -74,40 +74,46 @@ public class SparkReceiverIO {
     }
 
     public Read<V> withValueClass(Class<V> valueClass) {
+      checkArgument(valueClass != null, "Value class can not be null");
       return toBuilder().setValueClass(valueClass).build();
     }
 
     public Read<V> withValueCoder(Coder<V> valueCoder) {
+      checkArgument(valueCoder != null, "Value coder can not be null");
       return toBuilder().setValueCoder(valueCoder).build();
     }
 
     public Read<V> withSparkReceiverBuilder(
         ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder) {
+      checkArgument(sparkReceiverBuilder != null, "Spark receiver builder can not be null");
       return toBuilder().setSparkReceiverBuilder(sparkReceiverBuilder).build();
     }
 
     public Read<V> withGetOffsetFn(SerializableFunction<V, Long> getOffsetFn) {
+      checkArgument(getOffsetFn != null, "Get offset function can not be null");
       return toBuilder().setGetOffsetFn(getOffsetFn).build();
     }
 
     public Read<V> withSparkConsumer(SparkConsumer<V> sparkConsumer) {
+      checkArgument(sparkConsumer != null, "Spark consumer can not be null");
       return toBuilder().setSparkConsumer(sparkConsumer).build();
     }
 
     @Override
     public PCollection<V> expand(PBegin input) {
-      Coder<V> valueCoder = getValueCoder();
-      checkArgument(valueCoder != null, "withValueCoder() is required");
-      checkArgument(getValueClass() != null, "withValueClass() is required");
-      checkArgument(getGetOffsetFn() != null, "withGetOffsetFn() is required");
+      validateTransform();
+      return input.apply(new ReadFromSparkReceiverViaSdf<>(this, getValueCoder()));
+    }
 
+    public void validateTransform() {
       ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder = getSparkReceiverBuilder();
       checkArgument(sparkReceiverBuilder != null, "withSparkReceiverBuilder() is required");
       if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
         checkArgument(getSparkConsumer() != null, "withSparkConsumer() is required");
       }
-
-      return input.apply(new ReadFromSparkReceiverViaSdf<>(this, valueCoder));
+      checkArgument(getValueCoder() != null, "withValueCoder() is required");
+      checkArgument(getValueClass() != null, "withValueClass() is required");
+      checkArgument(getGetOffsetFn() != null, "withGetOffsetFn() is required");
     }
   }
 

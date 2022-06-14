@@ -17,23 +17,18 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.testing.TestPipeline;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.apache.spark.SparkConf;
-import org.apache.spark.storage.StorageLevel;
-import org.apache.spark.streaming.receiver.Receiver;
+import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.joda.time.Duration;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
@@ -41,123 +36,77 @@ public class SparkReceiverIOTest {
 
   @Rule public final transient TestPipeline p = TestPipeline.create();
 
-  private static class CustomReceiverWithoutOffset extends Receiver<String> {
+  @Test
+  public void testReadBuildsCorrectly() {
+    ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
+        new ReceiverBuilder<>(CustomReceiverWithoutOffset.class).withConstructorArgs();
+    SerializableFunction<String, Long> offsetFn = Long::valueOf;
+    CustomSparkConsumer<String> sparkConsumer = new CustomSparkConsumer<>();
 
-    private static final Logger LOG = LoggerFactory.getLogger(CustomReceiverWithoutOffset.class);
+    SparkReceiverIO.Read<String> read =
+        SparkReceiverIO.<String>read()
+            .withSparkConsumer(sparkConsumer)
+            .withValueClass(String.class)
+            .withValueCoder(StringUtf8Coder.of())
+            .withGetOffsetFn(offsetFn)
+            .withSparkReceiverBuilder(receiverBuilder);
 
-    CustomReceiverWithoutOffset() {
-      super(StorageLevel.MEMORY_AND_DISK_2());
-    }
-
-    @Override
-    @SuppressWarnings("FutureReturnValueIgnored")
-    public void onStart() {
-      Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().build()).submit(this::receive);
-    }
-
-    @Override
-    public void onStop() {}
-
-    private void receive() {
-      Long currentOffset = 0L;
-      while (!isStopped()) {
-        store((currentOffset++).toString());
-        try {
-          TimeUnit.MILLISECONDS.sleep(100);
-        } catch (InterruptedException e) {
-          LOG.error("Interrupted", e);
-        }
-      }
-    }
-  }
-
-  private static class CustomReceiverWithOffset extends Receiver<String> implements HasOffset {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CustomReceiverWithOffset.class);
-
-    private Long startOffset;
-
-    CustomReceiverWithOffset() {
-      super(StorageLevel.MEMORY_AND_DISK_2());
-    }
-
-    @Override
-    public void setStartOffset(Long startOffset) {
-      if (startOffset != null) {
-        this.startOffset = startOffset;
-      }
-    }
-
-    @Override
-    @SuppressWarnings("FutureReturnValueIgnored")
-    public void onStart() {
-      Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().build()).submit(this::receive);
-    }
-
-    @Override
-    public void onStop() {}
-
-    @Override
-    public Long getEndOffset() {
-      return Long.MAX_VALUE;
-    }
-
-    private void receive() {
-      Long currentOffset = startOffset;
-      while (!isStopped()) {
-        store((currentOffset++).toString());
-        try {
-          TimeUnit.MILLISECONDS.sleep(100);
-        } catch (InterruptedException e) {
-          LOG.error("Interrupted", e);
-        }
-      }
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static class CustomSparkConsumer<V> implements SparkConsumer<V> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(CustomSparkConsumer.class);
-
-    private static final Queue<Object> queue = new ConcurrentLinkedQueue<>();
-    private Receiver<V> sparkReceiver;
-
-    @Override
-    public V poll() {
-      return (V) queue.poll();
-    }
-
-    @Override
-    public void start(Receiver<V> sparkReceiver) {
-      try {
-        this.sparkReceiver = sparkReceiver;
-        new WrappedSupervisor(
-            sparkReceiver,
-            new SparkConf(),
-            objects -> {
-              queue.offer(objects[0]);
-              return null;
-            });
-        sparkReceiver.supervisor().startReceiver();
-      } catch (Exception e) {
-        LOG.error("Can not init Spark Receiver!", e);
-      }
-    }
-
-    @Override
-    public void stop() {
-      queue.clear();
-      sparkReceiver.stop("Stopped");
-    }
-
-    @Override
-    public boolean hasRecords() {
-      return !queue.isEmpty();
-    }
+    assertEquals(sparkConsumer, read.getSparkConsumer());
+    assertEquals(StringUtf8Coder.of(), read.getValueCoder());
+    assertEquals(offsetFn, read.getGetOffsetFn());
+    assertEquals(receiverBuilder, read.getSparkReceiverBuilder());
+    assertEquals(String.class, read.getValueClass());
   }
 
   @Test
+  public void testReadObjectCreationFailsIfReceiverBuilderIsNull() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> SparkReceiverIO.<String>read().withSparkReceiverBuilder(null));
+  }
+
+  @Test
+  public void testReadObjectCreationFailsIfGetOffsetFnIsNull() {
+    assertThrows(
+        IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withGetOffsetFn(null));
+  }
+
+  @Test
+  public void testReadObjectCreationFailsIfSparkConsumerIsNull() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> SparkReceiverIO.<String>read().withSparkConsumer(null));
+  }
+
+  @Test
+  public void testReadObjectCreationFailsIfValueCoderIsNull() {
+    assertThrows(
+        IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withValueCoder(null));
+  }
+
+  @Test
+  public void testReadObjectCreationFailsIfValueClassIsNull() {
+    assertThrows(
+        IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withValueClass(null));
+  }
+
+  @Test
+  public void testReadValidationFailsMissingReceiverBuilder() {
+    SparkReceiverIO.Read<String> read = SparkReceiverIO.read();
+    assertThrows(IllegalArgumentException.class, read::validateTransform);
+  }
+
+  @Test
+  public void testReadValidationFailsMissingSparkConsumer() {
+    ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
+        new ReceiverBuilder<>(CustomReceiverWithOffset.class).withConstructorArgs();
+    SparkReceiverIO.Read<String> read =
+        SparkReceiverIO.<String>read().withSparkReceiverBuilder(receiverBuilder);
+    assertThrows(IllegalArgumentException.class, read::validateTransform);
+  }
+
+  @Test
+  @Ignore
   public void testReadFromCustomReceiverWithOffset() {
 
     ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
@@ -174,6 +123,7 @@ public class SparkReceiverIOTest {
   }
 
   @Test
+  @Ignore
   public void testReadFromCustomReceiverWithoutOffset() {
 
     ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
