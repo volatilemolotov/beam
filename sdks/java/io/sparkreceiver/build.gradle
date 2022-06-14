@@ -41,9 +41,6 @@ dependencies {
     implementation library.java.vendored_guava_26_0_jre
     implementation project(path: ":sdks:java:core", configuration: "shadow")
     compileOnly "org.scala-lang:scala-library:2.11.12"
-    testImplementation "io.cdap:hubspot-plugins:1.0.0"
-    testImplementation "io.cdap.plugin:salesforce-plugins:1.4.0"
-    testImplementation library.java.cdap_etl_api
     testImplementation library.java.junit
     testImplementation project(path: ":runners:direct-java", configuration: "shadow")
     testImplementation project(path: ":examples:java", configuration: "testRuntimeMigration")
