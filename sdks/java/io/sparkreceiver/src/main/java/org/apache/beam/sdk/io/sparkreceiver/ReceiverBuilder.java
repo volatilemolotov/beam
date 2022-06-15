@@ -19,7 +19,6 @@ package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
-import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -38,11 +37,12 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
 
   public ReceiverBuilder(Class<T> sparkReceiverClass) {
     this.sparkReceiverClass = sparkReceiverClass;
+    this.constructorArgs = new Object[0];
   }
 
   /** Method for specifying constructor arguments for corresponding {@link #sparkReceiverClass}. */
   public ReceiverBuilder<X, T> withConstructorArgs(Object... args) {
-    this.constructorArgs = checkNotNull(args);
+    this.constructorArgs = args;
     return this;
   }
 
@@ -84,7 +84,7 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
     }
     checkState(currentConstructor != null, "Can not find appropriate constructor!");
 
-    checkNotNull(currentConstructor).setAccessible(true);
+    currentConstructor.setAccessible(true);
     return sparkReceiverClass.cast(currentConstructor.newInstance(constructorArgs));
   }
 
