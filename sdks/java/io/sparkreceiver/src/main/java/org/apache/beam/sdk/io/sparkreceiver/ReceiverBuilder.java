@@ -18,7 +18,6 @@
 package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
-import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -53,10 +52,6 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
   public T build()
       throws InvocationTargetException, InstantiationException, IllegalAccessException {
 
-    checkState(
-        constructorArgs != null,
-        "It is not possible to build a Receiver proxy without setting the obligatory parameters.");
-
     Constructor<?> currentConstructor = null;
     for (Constructor<?> constructor : sparkReceiverClass.getDeclaredConstructors()) {
       Class<?>[] paramTypes = constructor.getParameterTypes();
@@ -82,7 +77,8 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
         currentConstructor = constructor;
       }
     }
-    checkState(currentConstructor != null, "Can not find appropriate constructor!");
+
+    assert currentConstructor != null : "Can not find appropriate constructor!";
 
     currentConstructor.setAccessible(true);
     return sparkReceiverClass.cast(currentConstructor.newInstance(constructorArgs));
