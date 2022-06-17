@@ -17,7 +17,7 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.*;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -63,7 +63,7 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
       for (int i = 0; i < constructorArgs.length; i++) {
         Object arg = constructorArgs[i];
 
-        checkArgument(arg != null, "All args must be not null!");
+        checkState(arg != null, "All args must be not null!");
 
         Class<?> currArgClass = paramTypes[i];
         if (currArgClass.isPrimitive()) {
