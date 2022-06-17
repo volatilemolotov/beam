@@ -18,12 +18,10 @@
 package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
-import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkState;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import javax.annotation.Nullable;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.spark.streaming.receiver.Receiver;
 
@@ -34,10 +32,11 @@ import org.apache.spark.streaming.receiver.Receiver;
 public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
 
   private final Class<T> sparkReceiverClass;
-  private @Nullable Object[] constructorArgs;
+  private Object[] constructorArgs;
 
   public ReceiverBuilder(Class<T> sparkReceiverClass) {
     this.sparkReceiverClass = sparkReceiverClass;
+    this.constructorArgs = new Object[0];
   }
 
   /** Method for specifying constructor arguments for corresponding {@link #sparkReceiverClass}. */
@@ -52,10 +51,6 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
    */
   public T build()
       throws InvocationTargetException, InstantiationException, IllegalAccessException {
-
-    checkState(
-        constructorArgs != null,
-        "It is not possible to build a Receiver proxy without setting the obligatory parameters.");
 
     Constructor<?> currentConstructor = null;
     for (Constructor<?> constructor : sparkReceiverClass.getDeclaredConstructors()) {
@@ -82,7 +77,8 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
         currentConstructor = constructor;
       }
     }
-    checkState(currentConstructor != null, "Can not find appropriate constructor!");
+
+    assert currentConstructor != null : "Can not find appropriate constructor!";
 
     currentConstructor.setAccessible(true);
     return sparkReceiverClass.cast(currentConstructor.newInstance(constructorArgs));
