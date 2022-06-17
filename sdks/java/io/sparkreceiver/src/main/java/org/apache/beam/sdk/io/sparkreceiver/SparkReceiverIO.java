@@ -32,6 +32,7 @@ import org.apache.spark.streaming.receiver.Receiver;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /** Streaming sources for Spark {@link Receiver}. */
+@SuppressWarnings("nullness")
 public class SparkReceiverIO {
 
   public static <V> Read<V> read() {

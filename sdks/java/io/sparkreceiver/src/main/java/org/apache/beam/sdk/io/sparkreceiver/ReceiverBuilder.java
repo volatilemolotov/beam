@@ -17,7 +17,7 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -29,6 +29,7 @@ import org.apache.spark.streaming.receiver.Receiver;
  * Class for building an instance for {@link Receiver} that uses Apache Beam mechanisms instead of
  * Spark environment.
  */
+@SuppressWarnings("nullness")
 public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
 
   private final Class<T> sparkReceiverClass;
@@ -75,10 +76,11 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
       }
       if (matches) {
         currentConstructor = constructor;
+        break;
       }
     }
 
-    assert currentConstructor != null : "Can not find appropriate constructor!";
+    checkState(currentConstructor != null, "Can not find appropriate constructor!");
 
     currentConstructor.setAccessible(true);
     return sparkReceiverClass.cast(currentConstructor.newInstance(constructorArgs));
