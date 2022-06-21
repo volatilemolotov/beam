@@ -30,6 +30,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
 public class SparkReceiverIOTest {
@@ -106,7 +111,6 @@ public class SparkReceiverIOTest {
   }
 
   @Test
-  @Ignore
   public void testReadFromCustomReceiverWithOffset() {
 
     ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
@@ -119,11 +123,10 @@ public class SparkReceiverIOTest {
                     .withSparkReceiverBuilder(receiverBuilder);
 
     p.apply(reader).setCoder(StringUtf8Coder.of());
-    p.run().waitUntilFinish(Duration.standardSeconds(30));
+    runPipelineWithExecutorService();
   }
 
   @Test
-  @Ignore
   public void testReadFromCustomReceiverWithoutOffset() {
 
     ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
@@ -137,6 +140,20 @@ public class SparkReceiverIOTest {
                     .withSparkReceiverBuilder(receiverBuilder);
 
     p.apply(reader).setCoder(StringUtf8Coder.of());
-    p.run().waitUntilFinish(Duration.standardSeconds(30));
+    runPipelineWithExecutorService();
+  }
+
+  private void runPipelineWithExecutorService() {
+    ExecutorService service = Executors.newFixedThreadPool(1);
+    Runnable runPipeline = p::run;
+    Future<?> result = service.submit(runPipeline);
+    try {
+      if (!service.awaitTermination(5, TimeUnit.SECONDS) && result.isDone()) {
+        service.shutdownNow();
+      }
+    } catch (InterruptedException ex) {
+      service.shutdownNow();
+      Thread.currentThread().interrupt();
+    }
   }
 }
