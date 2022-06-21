@@ -20,6 +20,7 @@ const kExampleParam = 'example';
 const kIsEditableParam = 'editable';
 const kSourceCode = 'code';
 const kContextLine = 'line';
-const kIsShared = 'shared';
+const kIsEmbedded = 'embedded';
+const kSnippetId = 'snippetId';
 
 const kQuickStartCategoryName = 'quick start';
