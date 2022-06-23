@@ -19,7 +19,9 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:onmessage/onmessage.dart';
 import 'package:playground/modules/editor/parsers/run_options_parser.dart';
 import 'package:playground/modules/editor/repository/code_repository/code_repository.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_request.dart';
@@ -27,6 +29,8 @@ import 'package:playground/modules/editor/repository/code_repository/run_code_re
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/models/outputs_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
+
+import '../../../modules/messages/models/set_content_message.dart';
 
 const kTitleLength = 15;
 const kExecutionTimeUpdate = 100;
@@ -39,30 +43,34 @@ const kCachedResultsLog =
     'The results of this example are taken from the Apache Beam Playground cache.\n';
 
 class PlaygroundState with ChangeNotifier {
+  StreamSubscription? _onMessageSubscription;
+  String? _lastMessageCode;
+
+  final codeController = CodeController(webSpaceFix: false);
   late SDK _sdk;
   CodeRepository? _codeRepository;
   ExampleModel? _selectedExample;
-  String _source = '';
   RunCodeResult? _result;
   StreamSubscription<RunCodeResult>? _runSubscription;
   String _pipelineOptions = '';
-  DateTime? resetKey;
   StreamController<int>? _executionTime;
   OutputType? selectedOutputFilterType;
   String? outputResult;
 
   PlaygroundState({
-    SDK sdk = SDK.java,
+    SDK? sdk,
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
   }) {
     _selectedExample = selectedExample;
     _pipelineOptions = selectedExample?.pipelineOptions ?? '';
-    _sdk = sdk;
-    _source = _selectedExample?.source ?? '';
+    _sdk = sdk ?? getDefaultSdk();
+    codeController.language = _sdk.highlight;
+    codeController.text = _selectedExample?.source ?? '';
     _codeRepository = codeRepository;
     selectedOutputFilterType = OutputType.all;
     outputResult = '';
+    _onMessageSubscription = OnMessage.instance.stream.listen(_onWindowMessage);
   }
 
   String get examplesTitle {
@@ -74,7 +82,7 @@ class PlaygroundState with ChangeNotifier {
 
   SDK get sdk => _sdk;
 
-  String get source => _source;
+  String get source => codeController.text;
 
   bool get isCodeRunning => !(result?.isFinished ?? true);
 
@@ -99,7 +107,7 @@ class PlaygroundState with ChangeNotifier {
   setExample(ExampleModel example) {
     _selectedExample = example;
     _pipelineOptions = example.pipelineOptions ?? '';
-    _source = example.source ?? '';
+    codeController.text = example.source ?? '';
     _result = null;
     _executionTime = null;
     setOutputResult('');
@@ -108,11 +116,12 @@ class PlaygroundState with ChangeNotifier {
 
   setSdk(SDK sdk) {
     _sdk = sdk;
+    codeController.language = sdk.highlight;
     notifyListeners();
   }
 
   setSource(String source) {
-    _source = source;
+    codeController.text = source;
   }
 
   setSelectedOutputFilterType(OutputType type) {
@@ -131,9 +140,8 @@ class PlaygroundState with ChangeNotifier {
   }
 
   reset() {
-    _source = _selectedExample?.source ?? '';
+    codeController.text = _selectedExample?.source ?? '';
     _pipelineOptions = selectedExample?.pipelineOptions ?? '';
-    resetKey = DateTime.now();
     _executionTime = null;
     setOutputResult('');
     notifyListeners();
@@ -224,6 +232,23 @@ class PlaygroundState with ChangeNotifier {
     setOutputResult(_result!.log! + _result!.output!);
     _executionTime?.close();
     notifyListeners();
+  }
+
+  void _onWindowMessage(MessageEvent event) {
+    final code = SetContentMessage.tryParseMessageEvent(event)?.code;
+
+    if (code == null) {
+      return;
+    }
+
+    if (code == _lastMessageCode) {
+      // Ignore repeating messages because without acknowledgement mechanism
+      // they may be sent periodically just to make sure the code is loaded.
+      return;
+    }
+
+    codeController.text = code;
+    _lastMessageCode = code;
   }
 
   StreamController<int> _createExecutionTimeStream() {

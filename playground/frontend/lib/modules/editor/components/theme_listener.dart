@@ -16,11 +16,31 @@
  * limitations under the License.
  */
 
-const kExampleParam = 'example';
-const kSdkParam = 'sdk';
-const kIsEditable = 'enabled';
-const kSourceCode = 'code';
-const kContextLine = 'line';
-const kIsEmbedded = 'embedded';
+import 'package:flutter/widgets.dart';
+import 'package:playground/config/theme.dart';
+import 'package:playground/modules/editor/components/editor_themes.dart';
+import 'package:provider/provider.dart';
 
-const kQuickStartCategoryName = 'quick start';
+import '../../../pages/playground/states/playground_state.dart';
+
+class ThemeListenerWidget extends StatelessWidget {
+  final Widget child;
+
+  const ThemeListenerWidget({
+    required this.child,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeProvider>(
+      builder: (context, theme, child) {
+        final playgroundState = Provider.of<PlaygroundState>(context);
+        playgroundState.codeController.theme =
+            theme.isDarkMode ? kDarkCodeTheme : kLightCodeTheme;
+
+        return this.child;
+      },
+    );
+  }
+}
