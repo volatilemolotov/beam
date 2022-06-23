@@ -43,21 +43,16 @@ class CodeTextAreaWrapper extends StatelessWidget {
         });
       }
       return Column(
-        key: ValueKey(EditorKeyObject(
-          state.sdk,
-          state.selectedExample,
-          state.resetKey,
-        )),
         children: [
           Expanded(
             child: Stack(
               children: [
                 Positioned.fill(
                   child: EditorTextArea(
+                    codeController: state.codeController,
                     enabled: !(state.selectedExample?.isMultiFile ?? false),
                     example: state.selectedExample,
                     sdk: state.sdk,
-                    onSourceChange: state.setSource,
                     isEditable: true,
                   ),
                 ),
@@ -140,24 +135,4 @@ class CodeTextAreaWrapper extends StatelessWidget {
     );
     state.resetError();
   }
-}
-
-class EditorKeyObject {
-  final SDK sdk;
-  final ExampleModel? example;
-  final DateTime? resetKey;
-
-  const EditorKeyObject(this.sdk, this.example, this.resetKey);
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is EditorKeyObject &&
-          runtimeType == other.runtimeType &&
-          sdk == other.sdk &&
-          example == other.example &&
-          resetKey == other.resetKey;
-
-  @override
-  int get hashCode => hashValues(sdk, example, resetKey);
 }
