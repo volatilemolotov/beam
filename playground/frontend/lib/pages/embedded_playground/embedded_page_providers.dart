@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/constants/params.dart';
+import 'package:playground/modules/editor/components/theme_listener.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/output/models/output_placement_state.dart';
 import 'package:playground/pages/embedded_playground/embedded_playground_page.dart';
@@ -58,8 +59,10 @@ class EmbeddedPageProviders extends StatelessWidget {
           create: (context) => OutputPlacementState(),
         ),
       ],
-      child: EmbeddedPlaygroundPage(
-        isEditable: _isEditableToBool(),
+      child: ThemeListenerWidget(
+        child: EmbeddedPlaygroundPage(
+          isEditable: _isEditableToBool(),
+        ),
       ),
     );
   }

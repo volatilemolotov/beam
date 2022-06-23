@@ -26,6 +26,7 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/analytics/analytics_service.dart';
 import 'package:playground/modules/editor/components/run_button.dart';
 import 'package:playground/modules/notifications/components/notification.dart';
+import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:playground/utils/analytics_utils.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,11 @@ class EmbeddedAppBarTitle extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: kXlSpacing,
         children: [
+          SDKSelector(
+            sdk: state.sdk,
+            setSdk: state.setSdk,
+            setExample: state.setExample,
+          ),
           RunButton(
             isRunning: state.isCodeRunning,
             cancelRun: () {
