@@ -41,6 +41,8 @@ class ExpansionPanelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsService analyticsService = AnalyticsService.get(context);
+
     return Consumer2<PlaygroundState, ExampleState>(
       builder: (context, playgroundState, exampleState, child) => MouseRegion(
         cursor: SystemMouseCursors.click,
@@ -48,12 +50,12 @@ class ExpansionPanelItem extends StatelessWidget {
           onTap: () async {
             if (playgroundState.selectedExample != example) {
               closeDropdown(exampleState);
-              AnalyticsService.get(context).trackSelectExample(example);
               final exampleWithInfo = await exampleState.loadExampleInfo(
                 example,
                 playgroundState.sdk,
               );
               playgroundState.setExample(exampleWithInfo);
+              analyticsService.trackSelectExample(exampleWithInfo);
             }
           },
           child: Container(
