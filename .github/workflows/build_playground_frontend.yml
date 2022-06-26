@@ -98,6 +98,13 @@ jobs:
         run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Set Docker Tag If Github Tag was trigger
         run: echo "DOCKERTAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        
+      - name: Changing bucket name
+        run: | 
+            echo "bucket  = "\"${{ env.BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
+            echo "bucket_examples_name = "\"${{ env.BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+            echo "state_bucket = "\"${{ env.BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+            echo "project_id = "\"${{ env.PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
 
       - name: Deploy Frontend Application
         env:
