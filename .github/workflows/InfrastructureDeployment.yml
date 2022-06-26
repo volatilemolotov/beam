@@ -42,6 +42,7 @@ jobs:
           echo "bucket  = "\"${{ env.BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
           echo "bucket_examples_name = "\"${{ env.BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
           echo "state_bucket = "\"${{ env.BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "project_id = "\"${{ env.PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
 
       - name: Deploy infrastructure
         env:
