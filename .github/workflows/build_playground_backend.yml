@@ -86,6 +86,11 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
           
+      - name: Authinticate in Artifact registry
+        run: |
+           DOCKER_BUILDKIT=0
+           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+          
       - name: Changing bucket name
         run: | 
             echo "bucket  = "\"${{ env.BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
