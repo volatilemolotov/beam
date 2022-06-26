@@ -93,5 +93,5 @@ jobs:
 
       - name: Deploy Backend Applications
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
         run: ./gradlew playground:terraform:deployBackend -Pproject_environment="${{ env.PROJECT_ENV }}" -Pdocker-tag="${{ env.PROJECT_ENV }}" -Pdocker-repository-root='us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/playground-repository'
