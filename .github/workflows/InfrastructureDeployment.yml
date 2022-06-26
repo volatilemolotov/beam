@@ -1,0 +1,49 @@
+name: New Infrastructure Deployment
+
+on:
+  workflow_dispatch:
+
+
+permissions:
+  id-token: write
+
+jobs:
+  Infrastructure_deployment:
+    runs-on: ubuntu-latest
+    env:
+      BUCKET_NAME: pg-bucket-test
+      PROJECT_ENV: beta
+      PROJECT_ID: beaming-crowbar-354322
+      SERVICE_ACCOUNT: pg-svsaccount@beaming-crowbar-354322.iam.gserviceaccount.com
+    steps:
+      - name: git clone repo
+        uses: actions/checkout@v2
+
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0.3.1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: 'projects/1007768986752/locations/global/workloadIdentityPools/google-git/providers/google-git'
+          service_account: "${{ env.SERVICE_ACCOUNT }}"
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+          
+      - id: 'gcloud'
+        name: 'gcloud'
+        run: |-
+          gcloud auth login --brief --cred-file='${{ steps.auth.outputs.credentials_file_path }}'
+          gcloud config set project ${{ env.PROJECT_ID }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+
+      - name: Changing bucket name
+        run: |
+          echo "bucket  = "\"${{ env.BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
+          echo "bucket_examples_name = "\"${{ env.BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "state_bucket = "\"${{ env.BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "project_id = "\"${{ env.PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+      - name: Deploy infrastructure
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+        run: ./gradlew playground:terraform:InitInfrastructure -Pproject_environment="${{ env.PROJECT_ENV }}"
