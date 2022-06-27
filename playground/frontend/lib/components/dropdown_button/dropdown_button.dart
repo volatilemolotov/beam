@@ -151,6 +151,11 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
   }
 
   void _close() {
+    // handle description dialogs
+    Navigator.of(context, rootNavigator: true).popUntil((route) {
+      return route.isFirst;
+    });
+
     animationController.reverse();
     dropdown?.remove();
     setState(() {

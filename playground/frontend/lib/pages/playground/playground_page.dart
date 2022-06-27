@@ -34,7 +34,6 @@ import 'package:playground/pages/playground/components/close_listener_nonweb.dar
 import 'package:playground/pages/playground/components/more_actions.dart';
 import 'package:playground/pages/playground/components/playground_page_body.dart';
 import 'package:playground/pages/playground/components/playground_page_footer.dart';
-import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
 
@@ -56,15 +55,7 @@ class PlaygroundPage extends StatelessWidget {
                   spacing: kXlSpacing,
                   children: [
                     const Logo(),
-                    Consumer<ExampleState>(
-                      builder: (context, state, child) {
-                        return ExampleSelector(
-                          changeSelectorVisibility:
-                              state.changeSelectorVisibility,
-                          isSelectorOpened: state.isSelectorOpened,
-                        );
-                      },
-                    ),
+                    const ExampleSelector(),
                     SDKSelector(
                       sdk: state.sdk,
                       setSdk: (newSdk) {

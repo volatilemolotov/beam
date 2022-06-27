@@ -30,7 +30,6 @@ class ExampleState with ChangeNotifier {
   Map<SDK, List<CategoryModel>>? sdkCategories;
   Map<SDK, ExampleModel> defaultExamplesMap = {};
   ExampleModel? defaultExample;
-  bool isSelectorOpened = false;
 
   ExampleState(this._exampleRepository);
 
@@ -117,11 +116,6 @@ class ExampleState with ChangeNotifier {
           GetListOfExamplesRequestWrapper(sdk: null, category: null),
         )
         .then((map) => setSdkCategories(map));
-  }
-
-  changeSelectorVisibility() {
-    isSelectorOpened = !isSelectorOpened;
-    notifyListeners();
   }
 
   loadDefaultExamples() async {

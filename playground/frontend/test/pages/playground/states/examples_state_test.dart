@@ -49,10 +49,6 @@ void main() {
     expect(state.defaultExamplesMap, {});
   });
 
-  test('Initial value of isSelectorOpened should be false', () {
-    expect(state.isSelectorOpened, false);
-  });
-
   test(
     'Example state init should initiate loading of sdkCategories from server',
     () async {
@@ -70,16 +66,6 @@ void main() {
         expect(state.sdkCategories, sdkCategoriesFromServerMock);
       });
       state.setSdkCategories(sdkCategoriesFromServerMock);
-    },
-  );
-
-  test(
-    'Example state changeSelectorVisibility should change isSelectorOpened to !isSelectorOpened',
-    () {
-      state.changeSelectorVisibility();
-      expect(state.isSelectorOpened, true);
-      state.changeSelectorVisibility();
-      expect(state.isSelectorOpened, false);
     },
   );
 

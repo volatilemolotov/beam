@@ -28,32 +28,32 @@ import 'package:provider/provider.dart';
 class ExpansionPanelItem extends StatelessWidget {
   final ExampleModel example;
   final ExampleModel selectedExample;
-  final AnimationController animationController;
-  final OverlayEntry? dropdown;
+  final VoidCallback close;
 
   const ExpansionPanelItem({
-    Key? key,
+    super.key,
     required this.example,
     required this.selectedExample,
-    required this.animationController,
-    required this.dropdown,
-  }) : super(key: key);
+    required this.close,
+  });
 
   @override
   Widget build(BuildContext context) {
+    AnalyticsService analyticsService = AnalyticsService.get(context);
+
     return Consumer2<PlaygroundState, ExampleState>(
       builder: (context, playgroundState, exampleState, child) => MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () async {
             if (playgroundState.selectedExample != example) {
-              closeDropdown(exampleState);
+              close();
               final exampleWithInfo = await exampleState.loadExampleInfo(
                 example,
                 playgroundState.sdk,
               );
               playgroundState.setExample(exampleWithInfo);
-              AnalyticsService.get(context).trackSelectExample(exampleWithInfo);
+              analyticsService.trackSelectExample(exampleWithInfo);
             }
           },
           child: Container(
@@ -80,11 +80,5 @@ class ExpansionPanelItem extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void closeDropdown(ExampleState exampleState) {
-    animationController.reverse();
-    dropdown?.remove();
-    exampleState.changeSelectorVisibility();
   }
 }

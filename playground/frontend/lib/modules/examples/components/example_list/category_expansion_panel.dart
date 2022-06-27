@@ -28,16 +28,14 @@ class CategoryExpansionPanel extends StatelessWidget {
   final String categoryName;
   final List examples;
   final ExampleModel selectedExample;
-  final AnimationController animationController;
-  final OverlayEntry? dropdown;
+  final VoidCallback close;
 
   const CategoryExpansionPanel({
     Key? key,
     required this.categoryName,
     required this.examples,
     required this.selectedExample,
-    required this.animationController,
-    required this.dropdown,
+    required this.close,
   }) : super(key: key);
 
   @override
@@ -69,20 +67,19 @@ class CategoryExpansionPanel extends StatelessWidget {
         ),
       ),
       content: Column(
-        children: buildItems(),
+        children: _buildItems(),
       ),
     );
   }
 
-  List<Widget> buildItems() {
+  List<Widget> _buildItems() {
     List<Widget> items = [];
     for (var example in examples) {
       items.add(
         ExpansionPanelItem(
           example: example,
           selectedExample: selectedExample,
-          animationController: animationController,
-          dropdown: dropdown,
+          close: close,
         ),
       );
     }
