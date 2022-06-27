@@ -120,8 +120,8 @@ public class SparkReceiverIO {
 
   static class ReadFromSparkReceiverViaSdf<V> extends PTransform<PBegin, PCollection<V>> {
 
-    private Read<V> sparkReceiverRead;
-    private Coder<V> valueCoder;
+    private final Read<V> sparkReceiverRead;
+    private final Coder<V> valueCoder;
 
     ReadFromSparkReceiverViaSdf(Read<V> sparkReceiverRead, Coder<V> valueCoder) {
       this.sparkReceiverRead = sparkReceiverRead;
@@ -130,10 +130,18 @@ public class SparkReceiverIO {
 
     @Override
     public PCollection<V> expand(PBegin input) {
-      return input
-          .apply(Impulse.create())
-          .apply(ParDo.of(new ReadFromSparkReceiverDoFn<>(sparkReceiverRead)))
-          .setCoder(valueCoder);
+      if (!HasOffset.class.isAssignableFrom(
+          sparkReceiverRead.getSparkReceiverBuilder().getSparkReceiverClass())) {
+        return input
+            .apply(Impulse.create())
+            .apply(ParDo.of(new ReadFromSparkReceiverWithoutOffsetDoFn<>(sparkReceiverRead)))
+            .setCoder(valueCoder);
+      } else {
+        return input
+            .apply(Impulse.create())
+            .apply(ParDo.of(new ReadFromSparkReceiverWithOffsetDoFn<>(sparkReceiverRead)))
+            .setCoder(valueCoder);
+      }
     }
   }
 }

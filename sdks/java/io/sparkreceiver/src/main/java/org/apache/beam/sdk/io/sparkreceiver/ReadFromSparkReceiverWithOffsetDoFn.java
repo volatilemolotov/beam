@@ -17,6 +17,8 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
@@ -34,38 +36,36 @@ import org.apache.beam.sdk.transforms.splittabledofn.WatermarkEstimators;
 import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("nullness")
+/** A SplittableDoFn which reads from {@link Receiver} that implements {@link HasOffset}. */
+// @SuppressWarnings("nullness")
 @UnboundedPerElement
-public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
+public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ReadFromSparkReceiverDoFn.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(ReadFromSparkReceiverWithOffsetDoFn.class);
   private static final int START_POLL_TIMEOUT_MS = 500;
-  private static final int CONTINUE_POLL_TIMEOUT_MS = 300;
 
   private final SerializableFunction<Instant, WatermarkEstimator<Instant>>
       createWatermarkEstimatorFn;
   private final SerializableFunction<V, Long> getOffsetFn;
   private final ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder;
-  private Receiver<V> sparkReceiver;
-  private SparkConsumer<V> sparkConsumer;
 
-  public ReadFromSparkReceiverDoFn(SparkReceiverIO.Read<V> transform) {
+  public ReadFromSparkReceiverWithOffsetDoFn(SparkReceiverIO.Read<V> transform) {
     createWatermarkEstimatorFn = WatermarkEstimators.Manual::new;
-    sparkReceiverBuilder = transform.getSparkReceiverBuilder();
-    getOffsetFn = transform.getGetOffsetFn();
-    if (sparkReceiverBuilder != null && !receiverHasOffset()) {
-      sparkConsumer = transform.getSparkConsumer();
-      try {
-        sparkReceiver = sparkReceiverBuilder.build();
-        sparkConsumer.start(sparkReceiver);
-      } catch (Exception e) {
-        LOG.error("Can not build Spark Receiver", e);
-      }
-    }
+
+    ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder =
+        transform.getSparkReceiverBuilder();
+    checkStateNotNull(sparkReceiverBuilder, "Spark Receiver Builder can't be null!");
+    this.sparkReceiverBuilder = sparkReceiverBuilder;
+
+    SerializableFunction<V, Long> getOffsetFn = transform.getGetOffsetFn();
+    checkStateNotNull(getOffsetFn, "Get offset fn can't be null!");
+    this.getOffsetFn = getOffsetFn;
   }
 
   @GetInitialRestriction
@@ -90,22 +90,15 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
     // Before processing elements, we don't have a good estimated size of records and offset gap.
   }
 
-  private class SparkReceiverLatestOffsetEstimator
+  private static class SparkReceiverLatestOffsetEstimator
       implements GrowableOffsetRangeTracker.RangeEndEstimator {
 
     public SparkReceiverLatestOffsetEstimator() {}
 
     @Override
     public long estimate() {
-      if (receiverHasOffset()) {
-        return ((HasOffset) sparkReceiver).getEndOffset();
-      }
       return Long.MAX_VALUE;
     }
-  }
-
-  private boolean receiverHasOffset() {
-    return HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass());
   }
 
   @NewTracker
@@ -129,19 +122,17 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
   public void teardown() throws Exception {
     // Closeables close
     LOG.debug("Teardown");
-    if (!receiverHasOffset()) {
-      sparkConsumer.stop();
-    }
   }
 
   @SuppressWarnings("unchecked")
   private static class SparkConsumerWithOffset<V> implements SparkConsumer<V> {
-    private final Queue<V> recordsQueue = new ConcurrentLinkedQueue<>();
-    private Receiver<V> sparkReceiver;
+    private final Queue<V> recordsQueue;
+    private @Nullable Receiver<V> sparkReceiver;
     private final Long startOffset;
 
     public SparkConsumerWithOffset(Long startOffset) {
       this.startOffset = startOffset;
+      this.recordsQueue = new ConcurrentLinkedQueue<>();
     }
 
     @Override
@@ -150,7 +141,7 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
     }
 
     @Override
-    public V poll() {
+    public @Nullable V poll() {
       return recordsQueue.poll();
     }
 
@@ -180,7 +171,9 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
 
     @Override
     public void stop() {
-      sparkReceiver.stop("Stopped");
+      if (sparkReceiver != null) {
+        sparkReceiver.stop("Stopped");
+      }
       recordsQueue.clear();
     }
   }
@@ -192,24 +185,23 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
       WatermarkEstimator<Instant> watermarkEstimator,
       OutputReceiver<V> receiver) {
 
-    if (receiverHasOffset()) {
-      try {
-        this.sparkReceiver = sparkReceiverBuilder.build();
-        this.sparkConsumer = new SparkConsumerWithOffset<>(tracker.currentRestriction().getFrom());
-        sparkConsumer.start(sparkReceiver);
-      } catch (Exception e) {
-        LOG.error("Can not build Spark Receiver", e);
-      }
+    SparkConsumer<V> sparkConsumer;
+    Receiver<V> sparkReceiver;
+    try {
+      sparkReceiver = sparkReceiverBuilder.build();
+    } catch (Exception e) {
+      LOG.error("Can not build Spark Receiver", e);
+      throw new IllegalStateException("Spark Receiver was not built!");
     }
+    sparkConsumer = new SparkConsumerWithOffset<>(tracker.currentRestriction().getFrom());
+    sparkConsumer.start(sparkReceiver);
 
     while (sparkConsumer.hasRecords()) {
       V record = sparkConsumer.poll();
       if (record != null) {
         Long offset = getOffsetFn.apply(record);
         if (!tracker.tryClaim(offset)) {
-          if (receiverHasOffset()) {
-            sparkConsumer.stop();
-          }
+          sparkConsumer.stop();
           LOG.debug(
               "ProcessContinuation.stop for restriction {}",
               tracker.currentRestriction().toString());
@@ -219,15 +211,7 @@ public class ReadFromSparkReceiverDoFn<V> extends DoFn<byte[], V> {
         receiver.outputWithTimestamp(record, Instant.now());
       }
     }
-    if (receiverHasOffset()) {
-      sparkConsumer.stop();
-    } else {
-      try {
-        TimeUnit.MILLISECONDS.sleep(CONTINUE_POLL_TIMEOUT_MS);
-      } catch (InterruptedException e) {
-        LOG.error("Interrupted", e);
-      }
-    }
+    sparkConsumer.stop();
     LOG.info("Current restriction: {}", tracker.currentRestriction().toString());
     return ProcessContinuation.resume();
   }
