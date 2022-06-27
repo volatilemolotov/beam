@@ -16,17 +16,21 @@
 name: Collect And Deploy Playground Examples
 
 on:
-  push:
-    tags: 'v*'
-    branches: ['master', 'release-*']
-  pull_request:
   workflow_dispatch:
+  
+permissions:
+  id-token: write
+  
 env:
   BEAM_ROOT_DIR: ../../
   BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
   BEAM_VERSION: 2.33.0
   K8S_NAMESPACE: playground-backend
   HELM_APP_NAME: playground-backend
+  PROJECT_ENV: beta
+  PROJECT_ID: beaming-crowbar-354322
+  SERVICE_ACCOUNT: pg-svsaccount@beaming-crowbar-354322.iam.gserviceaccount.com
+  PLAYGROUND_REGISTRY_NAME: us-central1-docker.pkg.dev
 jobs:
   check_examples:
     name: Check examples
@@ -91,11 +95,26 @@ jobs:
       - name: Remove default github maven configuration
         # This step is a workaround to avoid a decryption issue
         run: rm ~/.m2/settings.xml
-      - name: Setup GCP account
-        run: |
-             echo "${{ secrets.GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
-             which gcloud
-             gcloud auth activate-service-account --project=apache-beam-testing --key-file=/tmp/gcp_access.json
+
+      - id: 'auth'
+        name: 'Authenticate to GCP'
+        uses: 'google-github-actions/auth@v0.3.1'
+        with:
+          create_credentials_file: 'true'
+          workload_identity_provider: 'projects/1007768986752/locations/global/workloadIdentityPools/google-git/providers/google-git'
+          service_account: "${{ env.SERVICE_ACCOUNT }}"
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+          
+      - id: 'gcloud'
+        name: 'gcloud'
+        run: |-
+          gcloud auth login --brief --cred-file='${{ steps.auth.outputs.credentials_file_path }}'
+          gcloud config set project ${{ env.PROJECT_ID }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+
+
       - name: Set Docker Tag
         run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Set Docker Tag If Github Tag was trigger
@@ -103,21 +122,25 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
       - name: Get K8s Config
         run: gcloud container clusters get-credentials --region     us-central1-a playground-examples
+        
       - name: Login to Docker Registry
-        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.PLAYGROUND_REGISTRY_NAME }}
+        run: gcloud artifacts docker images list us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/playground-repository
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+        
       - name: Build And Push Java Backend
         run: |
-             ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag=${{ env.DOCKERTAG }}
+             ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ env.PLAYGROUND_REGISTRY_NAME}}/${{ env.PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag=${{ env.DOCKERTAG }}
       - name: Build And Push Go Backend
-        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ env.PLAYGROUND_REGISTRY_NAME}}/${{ env.PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
       - name: Build And Push Python Backend
-        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.PLAYGROUND_REGISTRY_NAME}}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ env.PLAYGROUND_REGISTRY_NAME}}/${{ env.PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
       - name: Clean All Build directories
         run: ./gradlew clean
       - name: Install helm chart
         run: |
              kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f - &&\
-             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.PLAYGROUND_REGISTRY_NAME }}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
+             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ env.PLAYGROUND_REGISTRY_NAME }}/${{ env.PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
              sleep 120
         working-directory: playground/infrastructure/helm
       - name: Run Python Examples CI
@@ -136,7 +159,7 @@ jobs:
              export SERVER_ADDRESS="$K8S_SERVER_ADDRESS:8081" && python3 ci_cd.py --step CD --sdk SDK_PYTHON
         working-directory: playground/infrastructure
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
       - name: Run Go Examples CI
         run: |
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-go" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
@@ -152,7 +175,7 @@ jobs:
              export SERVER_ADDRESS="$K8S_SERVER_ADDRESS:8082" && python3 ci_cd.py --step CD --sdk SDK_GO
         working-directory: playground/infrastructure
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
       - name: Run Java Examples CI
         run: |
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-java" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
@@ -168,7 +191,7 @@ jobs:
              export SERVER_ADDRESS="$K8S_SERVER_ADDRESS:8080" && python3 ci_cd.py --step CD --sdk SDK_JAVA
         working-directory: playground/infrastructure
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
       - name: Delete Helm Chart
         if: always()
         run: |
