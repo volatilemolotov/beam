@@ -30,6 +30,7 @@ package org.apache.beam.examples;
 //     - Core Transforms
 //     - Quickstart
 
+
 import java.util.Arrays;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.io.TextIO;
