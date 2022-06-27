@@ -113,6 +113,11 @@ jobs:
           gcloud config set project ${{ env.PROJECT_ID }}
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+          
+      - name: Authinticate in Artifact registry
+        run: |
+           DOCKER_BUILDKIT=0
+           gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
 
       - name: Set Docker Tag
