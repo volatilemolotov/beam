@@ -29,16 +29,19 @@ import 'package:playground/modules/editor/parsers/run_options_parser.dart';
 const kOptionsTabIndex = 0;
 const kRawTabIndex = 1;
 
+final kDefaultOption = [PipelineOptionController()];
+
 class PipelineOptionsDropdownBody extends StatefulWidget {
   final String pipelineOptions;
   final void Function(String) setPipelineOptions;
   final void Function() close;
 
-  PipelineOptionsDropdownBody({
+  const PipelineOptionsDropdownBody({
+    Key? key,
     required this.pipelineOptions,
     required this.setPipelineOptions,
     required this.close,
-  }) : super(key: ValueKey(pipelineOptions));
+  }) : super(key: key);
 
   @override
   State<PipelineOptionsDropdownBody> createState() =>
@@ -51,7 +54,7 @@ class _PipelineOptionsDropdownBodyState
   late final TabController tabController;
   final TextEditingController pipelineOptionsController =
       TextEditingController();
-  List<PipelineOptionController> pipelineOptionsList = [];
+  List<PipelineOptionController> pipelineOptionsList = kDefaultOption;
   int selectedTab = kOptionsTabIndex;
   bool showError = false;
 
@@ -62,7 +65,7 @@ class _PipelineOptionsDropdownBodyState
     pipelineOptionsController.text = widget.pipelineOptions;
     pipelineOptionsList = _pipelineOptionsMapToList(widget.pipelineOptions);
     if (pipelineOptionsList.isEmpty) {
-      pipelineOptionsList = [PipelineOptionController()];
+      pipelineOptionsList = kDefaultOption;
     }
     super.initState();
   }
@@ -71,12 +74,6 @@ class _PipelineOptionsDropdownBodyState
   void dispose() {
     tabController.removeListener(onTabChange);
     tabController.dispose();
-    pipelineOptionsController.dispose();
-
-    for (final controller in pipelineOptionsList) {
-      controller.dispose();
-    }
-
     super.dispose();
   }
 
