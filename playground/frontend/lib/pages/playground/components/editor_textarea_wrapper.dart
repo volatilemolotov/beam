@@ -49,7 +49,7 @@ class CodeTextAreaWrapper extends StatelessWidget {
               children: [
                 Positioned.fill(
                   child: EditorTextArea(
-                    codeController: state.codeController,
+                    codeController: state.snippetEditingController.codeController,
                     enabled: !(state.selectedExample?.isMultiFile ?? false),
                     example: state.selectedExample,
                     sdk: state.sdk,

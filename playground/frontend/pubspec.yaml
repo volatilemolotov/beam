@@ -48,7 +48,7 @@ dependencies:
   code_text_field:
     git:
       url: https://github.com/alexeyinkin/code_field.git
-      ref: inkin_all_fixes
+      ref: 92826739b0479fd6688cc37bf568d021b2173566
   collection: ^1.15.0
   expansion_widget: ^0.0.2
   flutter:

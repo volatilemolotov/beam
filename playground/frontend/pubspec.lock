@@ -145,8 +145,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: inkin_all_fixes
-      resolved-ref: ca08976fc41e014912238b70c330a6209a98dc3a
+      ref: "92826739b0479fd6688cc37bf568d021b2173566"
+      resolved-ref: "92826739b0479fd6688cc37bf568d021b2173566"
       url: "https://github.com/alexeyinkin/code_field.git"
     source: git
     version: "1.0.3"
