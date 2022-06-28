@@ -17,11 +17,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/pages/embedded_playground/embedded_page_providers.dart';
+import 'package:playground/constants/params.dart';
+import 'package:playground/pages/embedded_playground/embedded_playground_page.dart';
 import 'package:playground/pages/playground/playground_page.dart';
 
 class Routes {
-  static const String playground = '/';
   static const String embedded = '/embedded';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -29,11 +29,17 @@ class Routes {
     final queryIndex = name.indexOf('?');
     final routePath =
         name.substring(0, queryIndex < 0 ? name.length : queryIndex);
+
     switch (routePath) {
-      case Routes.playground:
-        return Routes.renderRoute(const PlaygroundPage());
       case Routes.embedded:
-        return Routes.renderRoute(const EmbeddedPageProviders());
+        final isEditable = Uri.base.queryParameters[kIsEditable] == 'true';
+
+        return Routes.renderRoute(
+          EmbeddedPlaygroundPage(
+            isEditable: isEditable,
+          ),
+        );
+
       default:
         return Routes.renderRoute(const PlaygroundPage());
     }

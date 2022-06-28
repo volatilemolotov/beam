@@ -42,7 +42,7 @@ const kCachedResultsLog =
     'The results of this example are taken from the Apache Beam Playground cache.\n';
 
 class PlaygroundState with ChangeNotifier {
-  StreamSubscription? _onMessageSubscription;
+  late final StreamSubscription _onMessageSubscription;
   String? _lastMessageCode;
 
   final _snippetEditingControllers = <SDK, SnippetEditingController>{};
@@ -51,7 +51,6 @@ class PlaygroundState with ChangeNotifier {
   CodeRepository? _codeRepository;
   RunCodeResult? _result;
   StreamSubscription<RunCodeResult>? _runSubscription;
-  String _pipelineOptions = '';
   StreamController<int>? _executionTime;
   OutputType? selectedOutputFilterType;
   String? outputResult;
@@ -61,23 +60,22 @@ class PlaygroundState with ChangeNotifier {
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
   }) : _sdk = sdk ?? getDefaultSdk() {
-    _ensureSnippetEditingControllerExists();
-
+    _getOrCreateSnippetEditingController(_sdk);
     snippetEditingController.selectedExample = selectedExample;
 
-    _pipelineOptions = selectedExample?.pipelineOptions ?? '';
     _codeRepository = codeRepository;
     selectedOutputFilterType = OutputType.all;
     outputResult = '';
     _onMessageSubscription = OnMessage.instance.stream.listen(_onWindowMessage);
   }
 
-  void _ensureSnippetEditingControllerExists() {
-    if (_snippetEditingControllers.containsKey(_sdk)) {
-      return;
+  SnippetEditingController _getOrCreateSnippetEditingController(SDK sdk) {
+    final controller = _snippetEditingControllers[sdk];
+    if (controller != null) {
+      return controller;
     }
 
-    _snippetEditingControllers[_sdk] = SnippetEditingController(sdk: _sdk);
+    return _snippetEditingControllers[sdk] = SnippetEditingController(sdk: sdk);
   }
 
   String get examplesTitle {
@@ -97,65 +95,69 @@ class PlaygroundState with ChangeNotifier {
 
   RunCodeResult? get result => _result;
 
-  String get pipelineOptions => _pipelineOptions;
+  String get pipelineOptions => snippetEditingController.pipelineOptions;
 
   Stream<int>? get executionTime => _executionTime?.stream;
 
   bool get isExampleChanged {
-    return selectedExample?.source != source || _arePipelineOptionsChanges;
-  }
-
-  bool get _arePipelineOptionsChanges {
-    return pipelineOptions != (selectedExample?.pipelineOptions ?? '');
+    return snippetEditingController.isChanged;
   }
 
   bool get graphAvailable =>
       selectedExample?.type != ExampleType.test &&
       [SDK.java, SDK.python].contains(sdk);
 
-  setExample(ExampleModel example) {
+  void setExample(ExampleModel example) {
     snippetEditingController.selectedExample = example;
-    _pipelineOptions = example.pipelineOptions ?? '';
     _result = null;
     _executionTime = null;
     setOutputResult('');
     notifyListeners();
   }
 
-  setSdk(SDK sdk) {
+  /// Sets the [example] as the current for [sdk].
+  ///
+  /// Creates a [SnippetEditingController] for [sdk] if it not exists yet.
+  /// Unlike [setExample], this method does not affect run status like result,
+  /// execution time or output.
+  void setExampleForSdk(SDK sdk, ExampleModel example) {
+    final controller = _getOrCreateSnippetEditingController(sdk);
+    controller.selectedExample = example;
+  }
+
+  void setSdk(SDK sdk) {
     _sdk = sdk;
-    _ensureSnippetEditingControllerExists();
+    _getOrCreateSnippetEditingController(sdk);
     notifyListeners();
   }
 
-  setSource(String source) {
+  void setSource(String source) {
     snippetEditingController.codeController.text = source;
   }
 
-  setSelectedOutputFilterType(OutputType type) {
+  void setSelectedOutputFilterType(OutputType type) {
     selectedOutputFilterType = type;
     notifyListeners();
   }
 
-  setOutputResult(String outputs) {
+  void setOutputResult(String outputs) {
     outputResult = outputs;
     notifyListeners();
   }
 
-  clearOutput() {
+  void clearOutput() {
     _result = null;
     notifyListeners();
   }
 
-  reset() {
+  void reset() {
     snippetEditingController.reset();
-    _pipelineOptions = selectedExample?.pipelineOptions ?? '';
     _executionTime = null;
     setOutputResult('');
     notifyListeners();
   }
 
-  resetError() {
+  void resetError() {
     if (result == null) {
       return;
     }
@@ -163,8 +165,8 @@ class PlaygroundState with ChangeNotifier {
     notifyListeners();
   }
 
-  setPipelineOptions(String options) {
-    _pipelineOptions = options;
+  void setPipelineOptions(String options) {
+    snippetEditingController.pipelineOptions = options;
     notifyListeners();
   }
 
@@ -223,7 +225,7 @@ class PlaygroundState with ChangeNotifier {
     notifyListeners();
   }
 
-  _showPrecompiledResult() async {
+  Future<void> _showPrecompiledResult() async {
     _result = RunCodeResult(
       status: RunCodeStatus.preparation,
     );
@@ -297,7 +299,7 @@ class PlaygroundState with ChangeNotifier {
     return streamController;
   }
 
-  filterOutput(OutputType type) {
+  void filterOutput(OutputType type) {
     var output = result?.output ?? '';
     var log = result?.log ?? '';
 
@@ -315,5 +317,11 @@ class PlaygroundState with ChangeNotifier {
         setOutputResult(log + output);
         break;
     }
+  }
+
+  @override
+  void dispose() {
+    _onMessageSubscription.cancel();
+    super.dispose();
   }
 }

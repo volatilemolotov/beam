@@ -26,4 +26,9 @@ class PipelineOptionController {
     this.name.text = name;
     this.value.text = value;
   }
+
+  void dispose() {
+    name.dispose();
+    value.dispose();
+  }
 }

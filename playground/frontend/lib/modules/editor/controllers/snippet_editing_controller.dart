@@ -22,29 +22,52 @@ import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 class SnippetEditingController extends ChangeNotifier {
-  // TODO: Add pipeline options
   final SDK sdk;
   final CodeController codeController;
   ExampleModel? _selectedExample;
+  String _pipelineOptions;
 
   SnippetEditingController({
     required this.sdk,
     ExampleModel? selectedExample,
+    String pipelineOptions = '',
   })  : codeController = CodeController(
           language: sdk.highlight,
           webSpaceFix: false,
         ),
-        _selectedExample = selectedExample;
+        _selectedExample = selectedExample,
+        _pipelineOptions = pipelineOptions;
 
   set selectedExample(ExampleModel? value) {
     _selectedExample = value;
     codeController.text = _selectedExample?.source ?? '';
+    _pipelineOptions = _selectedExample?.pipelineOptions ?? '';
     notifyListeners();
   }
 
   ExampleModel? get selectedExample => _selectedExample;
 
+  set pipelineOptions(String value) {
+    _pipelineOptions = value;
+    notifyListeners();
+  }
+
+  String get pipelineOptions => _pipelineOptions;
+
+  bool get isChanged {
+    return _isCodeChanged() || _arePipelineOptionsChanged();
+  }
+
+  bool _isCodeChanged() {
+    return _selectedExample?.source != codeController.text;
+  }
+
+  bool _arePipelineOptionsChanged() {
+    return _pipelineOptions != (_selectedExample?.pipelineOptions ?? '');
+  }
+
   void reset() {
     codeController.text = _selectedExample?.source ?? '';
+    _pipelineOptions = _selectedExample?.pipelineOptions ?? '';
   }
 }

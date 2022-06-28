@@ -42,9 +42,8 @@ class EmbeddedAppBarTitle extends StatelessWidget {
         spacing: kXlSpacing,
         children: [
           SDKSelector(
-            sdk: state.sdk,
-            setSdk: state.setSdk,
-            setExample: state.setExample,
+            value: state.sdk,
+            onChanged: state.setSdk,
           ),
           RunButton(
             isRunning: state.isCodeRunning,
