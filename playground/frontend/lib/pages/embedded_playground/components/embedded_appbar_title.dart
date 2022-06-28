@@ -26,7 +26,6 @@ import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/analytics/analytics_service.dart';
 import 'package:playground/modules/editor/components/run_button.dart';
 import 'package:playground/modules/notifications/components/notification.dart';
-import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:playground/utils/analytics_utils.dart';
 import 'package:provider/provider.dart';
@@ -41,17 +40,9 @@ class EmbeddedAppBarTitle extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.center,
         spacing: kXlSpacing,
         children: [
-          SDKSelector(
-            value: state.sdk,
-            onChanged: state.setSdk,
-          ),
           RunButton(
             isRunning: state.isCodeRunning,
             cancelRun: () {
-              final exampleName = getAnalyticsExampleName(state);
-              final analyticsService = AnalyticsService.get(context);
-              analyticsService.trackClickCancelRunEvent(exampleName);
-
               state.cancelRun().catchError(
                     (_) => NotificationManager.showError(
                       context,
@@ -62,18 +53,20 @@ class EmbeddedAppBarTitle extends StatelessWidget {
             },
             runCode: () {
               final stopwatch = Stopwatch()..start();
-              final exampleName = getAnalyticsExampleName(state);
-              final analyticsService = AnalyticsService.get(context);
-
+              final exampleName = getAnalyticsExampleName(
+                state.selectedExample,
+                state.isExampleChanged,
+                state.sdk,
+              );
               state.runCode(
                 onFinish: () {
-                  analyticsService.trackRunTimeEvent(
+                  AnalyticsService.get(context).trackRunTimeEvent(
                     exampleName,
                     stopwatch.elapsedMilliseconds,
                   );
                 },
               );
-              analyticsService.trackClickRunEvent(exampleName);
+              AnalyticsService.get(context).trackClickRunEvent(exampleName);
             },
           ),
           const ToggleThemeIconButton(),
