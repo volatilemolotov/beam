@@ -19,24 +19,30 @@
 import 'dart:convert';
 
 import 'package:onmessage/onmessage.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
 class SetContentMessage {
+  final SDK? sdk;
   final String? code;
 
   SetContentMessage({
+    this.sdk,
     this.code,
   });
 
   static SetContentMessage? tryParseMessageEvent(MessageEvent event) {
     final data = event.data;
-    return SetContentMessage.tryParseMap(data) ?? SetContentMessage.tryParseJson(data);
+    return SetContentMessage.tryParseMap(data) ??
+        SetContentMessage.tryParseJson(data);
   }
 
   static SetContentMessage? tryParseMap(Object? map) {
     return map is Map ? SetContentMessage.fromMap(map) : null;
   }
 
-  SetContentMessage.fromMap(Map map) : code = _parseCode(map);
+  SetContentMessage.fromMap(Map map)
+      : sdk = _parseSdk(map),
+        code = _tryParseCode(map);
 
   static SetContentMessage? tryParseJson(Object? json) {
     if (json is String) {
@@ -54,9 +60,14 @@ class SetContentMessage {
     return null;
   }
 
-  static String? _parseCode(Map map) {
+  static SDK? _parseSdk(Map map) {
+    final sdkString = map['sdk'];
+    return sdkString == null ? null : SDK.values.byName(sdkString);
+  }
+
+  static String? _tryParseCode(Map map) {
     final code = map['code'];
-    return code is String ? code : null;
+    return code?.toString();
   }
 
   @override
