@@ -30,7 +30,7 @@ class EmbeddedEditor extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = Provider.of<PlaygroundState>(context);
     return EditorTextArea(
-      codeController: state.codeController,
+      codeController: state.snippetEditingController.codeController,
       key: ValueKey(state.selectedExample),
       enabled: true,
       sdk: state.sdk,

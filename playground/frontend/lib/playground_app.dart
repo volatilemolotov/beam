@@ -16,13 +16,14 @@
  * limitations under the License.
  */
 
+import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:playground/config/locale.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/l10n/l10n.dart';
-import 'package:playground/modules/editor/components/theme_listener.dart';
+import 'package:playground/modules/editor/components/editor_themes.dart';
 import 'package:playground/pages/playground/components/playground_page_providers.dart';
 import 'package:playground/pages/playground/playground_page.dart';
 import 'package:playground/pages/routes.dart';
@@ -37,12 +38,13 @@ class PlaygroundApp extends StatelessWidget {
       create: (context) => ThemeProvider()..init(),
       builder: (context, _) {
         final themeProvider = Provider.of<ThemeProvider>(context);
-        return ChangeNotifierProvider<LocaleProvider>(
-          create: (context) => LocaleProvider(),
-          builder: (context, state) {
-            final localeProvider = Provider.of<LocaleProvider>(context);
-            return PlaygroundPageProviders(
-              child: ThemeListenerWidget(
+        return CodeTheme(
+          data: themeProvider.isDarkMode ? kDarkCodeTheme : kLightCodeTheme,
+          child: ChangeNotifierProvider<LocaleProvider>(
+            create: (context) => LocaleProvider(),
+            builder: (context, state) {
+              final localeProvider = Provider.of<LocaleProvider>(context);
+              return PlaygroundPageProviders(
                 child: MaterialApp(
                   title: 'Apache Beam Playground',
                   themeMode: themeProvider.themeMode,
@@ -59,9 +61,9 @@ class PlaygroundApp extends StatelessWidget {
                     GlobalWidgetsLocalizations.delegate,
                   ],
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
