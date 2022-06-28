@@ -19,18 +19,17 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:onmessage/onmessage.dart';
+import 'package:playground/modules/editor/controllers/snippet_editing_controller.dart';
 import 'package:playground/modules/editor/parsers/run_options_parser.dart';
 import 'package:playground/modules/editor/repository/code_repository/code_repository.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_request.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_result.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/models/outputs_model.dart';
+import 'package:playground/modules/messages/models/set_content_message.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
-
-import '../../../modules/messages/models/set_content_message.dart';
 
 const kTitleLength = 15;
 const kExecutionTimeUpdate = 100;
@@ -46,10 +45,10 @@ class PlaygroundState with ChangeNotifier {
   StreamSubscription? _onMessageSubscription;
   String? _lastMessageCode;
 
-  final codeController = CodeController(webSpaceFix: false);
-  late SDK _sdk;
+  final _snippetEditingControllers = <SDK, SnippetEditingController>{};
+
+  SDK _sdk;
   CodeRepository? _codeRepository;
-  ExampleModel? _selectedExample;
   RunCodeResult? _result;
   StreamSubscription<RunCodeResult>? _runSubscription;
   String _pipelineOptions = '';
@@ -61,28 +60,38 @@ class PlaygroundState with ChangeNotifier {
     SDK? sdk,
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
-  }) {
-    _selectedExample = selectedExample;
+  }) : _sdk = sdk ?? getDefaultSdk() {
+    _ensureSnippetEditingControllerExists();
+
+    snippetEditingController.selectedExample = selectedExample;
+
     _pipelineOptions = selectedExample?.pipelineOptions ?? '';
-    _sdk = sdk ?? getDefaultSdk();
-    codeController.language = _sdk.highlight;
-    codeController.text = _selectedExample?.source ?? '';
     _codeRepository = codeRepository;
     selectedOutputFilterType = OutputType.all;
     outputResult = '';
     _onMessageSubscription = OnMessage.instance.stream.listen(_onWindowMessage);
   }
 
+  void _ensureSnippetEditingControllerExists() {
+    if (_snippetEditingControllers.containsKey(_sdk)) {
+      return;
+    }
+
+    _snippetEditingControllers[_sdk] = SnippetEditingController(sdk: _sdk);
+  }
+
   String get examplesTitle {
-    final name = _selectedExample?.name ?? kTitle;
+    final name = snippetEditingController.selectedExample?.name ?? kTitle;
     return name.substring(0, min(kTitleLength, name.length));
   }
 
-  ExampleModel? get selectedExample => _selectedExample;
+  ExampleModel? get selectedExample => snippetEditingController.selectedExample;
 
   SDK get sdk => _sdk;
 
-  String get source => codeController.text;
+  SnippetEditingController get snippetEditingController => _snippetEditingControllers[_sdk]!;
+
+  String get source => snippetEditingController.codeController.text;
 
   bool get isCodeRunning => !(result?.isFinished ?? true);
 
@@ -97,7 +106,7 @@ class PlaygroundState with ChangeNotifier {
   }
 
   bool get _arePipelineOptionsChanges {
-    return pipelineOptions != (_selectedExample?.pipelineOptions ?? '');
+    return pipelineOptions != (selectedExample?.pipelineOptions ?? '');
   }
 
   bool get graphAvailable =>
@@ -105,9 +114,8 @@ class PlaygroundState with ChangeNotifier {
       [SDK.java, SDK.python].contains(sdk);
 
   setExample(ExampleModel example) {
-    _selectedExample = example;
+    snippetEditingController.selectedExample = example;
     _pipelineOptions = example.pipelineOptions ?? '';
-    codeController.text = example.source ?? '';
     _result = null;
     _executionTime = null;
     setOutputResult('');
@@ -116,12 +124,12 @@ class PlaygroundState with ChangeNotifier {
 
   setSdk(SDK sdk) {
     _sdk = sdk;
-    codeController.language = sdk.highlight;
+    _ensureSnippetEditingControllerExists();
     notifyListeners();
   }
 
   setSource(String source) {
-    codeController.text = source;
+    snippetEditingController.codeController.text = source;
   }
 
   setSelectedOutputFilterType(OutputType type) {
@@ -140,7 +148,7 @@ class PlaygroundState with ChangeNotifier {
   }
 
   reset() {
-    codeController.text = _selectedExample?.source ?? '';
+    snippetEditingController.reset();
     _pipelineOptions = selectedExample?.pipelineOptions ?? '';
     _executionTime = null;
     setOutputResult('');
@@ -172,7 +180,7 @@ class PlaygroundState with ChangeNotifier {
     }
     _executionTime?.close();
     _executionTime = _createExecutionTimeStream();
-    if (!isExampleChanged && _selectedExample?.outputs != null) {
+    if (!isExampleChanged && snippetEditingController.selectedExample?.outputs != null) {
       _showPrecompiledResult();
     } else {
       final request = RunCodeRequestWrapper(
@@ -219,35 +227,41 @@ class PlaygroundState with ChangeNotifier {
     _result = RunCodeResult(
       status: RunCodeStatus.preparation,
     );
+    final selectedExample = snippetEditingController.selectedExample!;
+
     notifyListeners();
     // add a little delay to improve user experience
     await Future.delayed(kPrecompiledDelay);
-    String logs = _selectedExample!.logs ?? '';
+
+    String logs = selectedExample.logs ?? '';
     _result = RunCodeResult(
       status: RunCodeStatus.finished,
-      output: _selectedExample!.outputs,
+      output: selectedExample.outputs,
       log: kCachedResultsLog + logs,
-      graph: _selectedExample!.graph,
+      graph: selectedExample.graph,
     );
+
     setOutputResult(_result!.log! + _result!.output!);
     _executionTime?.close();
     notifyListeners();
   }
 
   void _onWindowMessage(MessageEvent event) {
-    final code = SetContentMessage.tryParseMessageEvent(event)?.code;
+    final message = SetContentMessage.tryParseMessageEvent(event);
 
-    if (code == null) {
+    if (message == null) {
       return;
     }
 
+    final code = message.code ?? '';
     if (code == _lastMessageCode) {
       // Ignore repeating messages because without acknowledgement mechanism
       // they may be sent periodically just to make sure the code is loaded.
       return;
     }
 
-    codeController.text = code;
+    setSdk(message.sdk);
+    snippetEditingController.codeController.text = code;
     _lastMessageCode = code;
   }
 
