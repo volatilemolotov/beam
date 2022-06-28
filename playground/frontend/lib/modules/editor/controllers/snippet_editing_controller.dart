@@ -32,7 +32,7 @@ class SnippetEditingController extends ChangeNotifier {
     ExampleModel? selectedExample,
     String pipelineOptions = '',
   })  : codeController = CodeController(
-          language: sdk.highlight,
+          language: sdk.highlightMode,
           webSpaceFix: false,
         ),
         _selectedExample = selectedExample,
