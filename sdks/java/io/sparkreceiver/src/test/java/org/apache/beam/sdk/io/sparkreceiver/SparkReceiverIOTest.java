@@ -20,12 +20,13 @@ package org.apache.beam.sdk.io.sparkreceiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import org.apache.beam.runners.direct.DirectOptions;
+import org.apache.beam.runners.direct.DirectRunner;
+import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.joda.time.Duration;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -33,8 +34,6 @@ import org.junit.runners.JUnit4;
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
 public class SparkReceiverIOTest {
-
-  @Rule public final transient TestPipeline p = TestPipeline.create();
 
   @Test
   public void testReadBuildsCorrectly() {
@@ -106,8 +105,11 @@ public class SparkReceiverIOTest {
   }
 
   @Test
-  @Ignore
   public void testReadFromCustomReceiverWithOffset() {
+    DirectOptions options = PipelineOptionsFactory.as(DirectOptions.class);
+    options.setBlockOnRun(false);
+    options.setRunner(DirectRunner.class);
+    Pipeline p = Pipeline.create(options);
 
     ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
         new ReceiverBuilder<>(CustomReceiverWithOffset.class).withConstructorArgs();
@@ -119,12 +121,15 @@ public class SparkReceiverIOTest {
             .withSparkReceiverBuilder(receiverBuilder);
 
     p.apply(reader).setCoder(StringUtf8Coder.of());
-    p.run().waitUntilFinish(Duration.standardSeconds(30));
+    p.run().waitUntilFinish(Duration.standardSeconds(10));
   }
 
   @Test
-  @Ignore
   public void testReadFromCustomReceiverWithoutOffset() {
+    DirectOptions options = PipelineOptionsFactory.as(DirectOptions.class);
+    options.setBlockOnRun(false);
+    options.setRunner(DirectRunner.class);
+    Pipeline p = Pipeline.create(options);
 
     ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
         new ReceiverBuilder<>(CustomReceiverWithoutOffset.class).withConstructorArgs();
@@ -137,6 +142,6 @@ public class SparkReceiverIOTest {
             .withSparkReceiverBuilder(receiverBuilder);
 
     p.apply(reader).setCoder(StringUtf8Coder.of());
-    p.run().waitUntilFinish(Duration.standardSeconds(30));
+    p.run().waitUntilFinish(Duration.standardSeconds(10));
   }
 }

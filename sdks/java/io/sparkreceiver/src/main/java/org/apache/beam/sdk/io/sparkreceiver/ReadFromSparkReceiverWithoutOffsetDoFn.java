@@ -25,7 +25,6 @@ import org.apache.beam.sdk.io.range.OffsetRange;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.DoFn.UnboundedPerElement;
 import org.apache.beam.sdk.transforms.SerializableFunction;
-import org.apache.beam.sdk.transforms.splittabledofn.GrowableOffsetRangeTracker;
 import org.apache.beam.sdk.transforms.splittabledofn.ManualWatermarkEstimator;
 import org.apache.beam.sdk.transforms.splittabledofn.OffsetRangeTracker;
 import org.apache.beam.sdk.transforms.splittabledofn.RestrictionTracker;
@@ -38,13 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** A SplittableDoFn which reads from {@link Receiver} that doesn't implement {@link HasOffset}. */
-// @SuppressWarnings("nullness")
 @UnboundedPerElement
 public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(ReadFromSparkReceiverWithoutOffsetDoFn.class);
-  private static final int CONTINUE_POLL_TIMEOUT_MS = 300;
+  private static final int CONTINUE_POLL_TIMEOUT_MS = 2000;
 
   private final SerializableFunction<Instant, WatermarkEstimator<Instant>>
       createWatermarkEstimatorFn;
@@ -95,22 +93,10 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
     // Before processing elements, we don't have a good estimated size of records and offset gap.
   }
 
-  private static class SparkReceiverLatestOffsetEstimator
-      implements GrowableOffsetRangeTracker.RangeEndEstimator {
-
-    public SparkReceiverLatestOffsetEstimator() {}
-
-    @Override
-    public long estimate() {
-      return Long.MAX_VALUE;
-    }
-  }
-
   @NewTracker
   public OffsetRangeTracker restrictionTracker(
       @Element byte[] element, @Restriction OffsetRange restriction) {
-    return new GrowableOffsetRangeTracker(
-        restriction.getFrom(), new SparkReceiverLatestOffsetEstimator()) {};
+    return new OffsetRangeTracker(restriction);
   }
 
   @GetRestrictionCoder
