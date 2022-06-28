@@ -70,7 +70,7 @@ extension SdkToRoute on SDK {
 }
 
 extension SdkToHighlightMode on SDK {
-  Mode get highlight {
+  Mode get highlightMode {
     switch (this) {
       case SDK.java:
         return java;
