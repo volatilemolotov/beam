@@ -82,13 +82,13 @@ void main() {
 
   group('SetContentMessage.tryParseMessageEvent parses code', () {
     test(
-      'SetContentMessage.tryParseMessageEvent returns empty message for numeric code',
+      'SetContentMessage.tryParseMessageEvent parses numeric code',
       () {
         final event = _getMessageEventWithData('{"code": 123}');
 
         final parsed = SetContentMessage.tryParseMessageEvent(event);
 
-        expect(parsed, SetContentMessage(code: null));
+        expect(parsed, SetContentMessage(code: '123'));
       },
     );
 

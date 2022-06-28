@@ -260,7 +260,11 @@ class PlaygroundState with ChangeNotifier {
       return;
     }
 
-    setSdk(message.sdk);
+    final sdk = message.sdk;
+    if (sdk != null) {
+      setSdk(sdk);
+    }
+
     snippetEditingController.codeController.text = code;
     _lastMessageCode = code;
   }
