@@ -32,7 +32,6 @@ const kOpenShortcutsModalEvent = 'open_shortcuts_modal';
 const kOpenLinkEvent = 'open_link';
 const kClickEnjoyPlaygroundEvent = 'click_enjoy_playground';
 const kClickRunEvent = 'click_run';
-const kClickCancelRunEvent = 'click_cancel_run';
 const kRunTimeEvent = 'run_time';
 const kClickReportIssueEvent = 'click_report_issue';
 const kClickSendFeedbackEvent = 'click_send_feedback';
