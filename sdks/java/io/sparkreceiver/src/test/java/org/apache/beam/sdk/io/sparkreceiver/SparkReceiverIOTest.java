@@ -20,7 +20,9 @@ package org.apache.beam.sdk.io.sparkreceiver;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.joda.time.Duration;
@@ -123,7 +125,9 @@ public class SparkReceiverIOTest {
                     .withSparkReceiverBuilder(receiverBuilder);
 
     p.apply(reader).setCoder(StringUtf8Coder.of());
-    runPipelineWithExecutorService();
+    DirectOptions directOptions = p.getOptions().as(DirectOptions.class);
+    directOptions.setBlockOnRun(false);
+    p.run().waitUntilFinish(Duration.standardSeconds(30));
   }
 
   @Test
@@ -140,20 +144,8 @@ public class SparkReceiverIOTest {
                     .withSparkReceiverBuilder(receiverBuilder);
 
     p.apply(reader).setCoder(StringUtf8Coder.of());
-    runPipelineWithExecutorService();
-  }
-
-  private void runPipelineWithExecutorService() {
-    ExecutorService service = Executors.newFixedThreadPool(1);
-    Runnable runPipeline = p::run;
-    Future<?> result = service.submit(runPipeline);
-    try {
-      if (!service.awaitTermination(5, TimeUnit.SECONDS) && result.isDone()) {
-        service.shutdownNow();
-      }
-    } catch (InterruptedException ex) {
-      service.shutdownNow();
-      Thread.currentThread().interrupt();
-    }
+    DirectOptions directOptions = p.getOptions().as(DirectOptions.class);
+    directOptions.setBlockOnRun(false);
+    p.run().waitUntilFinish(Duration.standardSeconds(30));
   }
 }
