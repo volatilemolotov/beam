@@ -158,6 +158,8 @@ jobs:
              echo "$K8S_SERVER_ADDRESS"
              export SERVER_ADDRESS="$K8S_SERVER_ADDRESS:8081" && python3 ci_cd.py --step CI --sdk SDK_PYTHON
         working-directory: playground/infrastructure
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
       - name: Run Python Examples CD
         run: |
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-python" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
