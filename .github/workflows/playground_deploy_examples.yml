@@ -148,6 +148,8 @@ jobs:
              helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ env.PLAYGROUND_REGISTRY_NAME }}/${{ env.PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
              sleep 120
         working-directory: playground/infrastructure/helm
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
       - name: Run Python Examples CI
         run: |
              echo "$K8S_NAMESPACE"
