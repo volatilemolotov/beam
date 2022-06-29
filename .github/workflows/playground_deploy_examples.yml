@@ -144,6 +144,8 @@ jobs:
         run: ./gradlew clean
       - name: Install helm chart
         run: |
+             gcloud components install gke-gcloud-auth-plugin
+             gke-gcloud-auth-plugin --version
              kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f - &&\
              helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ env.PLAYGROUND_REGISTRY_NAME }}/${{ env.PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
              sleep 120
