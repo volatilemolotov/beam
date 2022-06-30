@@ -17,6 +17,7 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
+import java.nio.ByteBuffer;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.spark.SparkConf;
 import org.apache.spark.storage.StreamBlockId;
@@ -29,12 +30,10 @@ import scala.Option;
 import scala.collection.Iterator;
 import scala.collection.mutable.ArrayBuffer;
 
-import java.nio.ByteBuffer;
-
 /** Wrapper class for {@link ReceiverSupervisor} that doesn't use Spark Environment. */
 public class WrappedSupervisor extends ReceiverSupervisor {
 
-  public final SparkConf sparkConf;
+  private final SparkConf sparkConf;
   private final SerializableFunction<Object[], Void> storeFn;
 
   public WrappedSupervisor(
@@ -69,7 +68,11 @@ public class WrappedSupervisor extends ReceiverSupervisor {
 
   @Override
   public BlockGenerator createBlockGenerator(BlockGeneratorListener blockGeneratorListener) {
-    return new BlockGenerator(blockGeneratorListener, this.streamId(), this.sparkConf, BlockGenerator.$lessinit$greater$default$4());
+    return new BlockGenerator(
+        blockGeneratorListener,
+        this.streamId(),
+        this.sparkConf,
+        BlockGenerator.$lessinit$greater$default$4());
   }
 
   @Override

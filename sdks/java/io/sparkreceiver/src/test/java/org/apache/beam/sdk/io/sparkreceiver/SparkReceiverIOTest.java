@@ -46,12 +46,10 @@ public class SparkReceiverIOTest {
         SparkReceiverIO.<String>read()
             .withSparkConsumer(sparkConsumer)
             .withValueClass(String.class)
-            .withValueCoder(StringUtf8Coder.of())
             .withGetOffsetFn(offsetFn)
             .withSparkReceiverBuilder(receiverBuilder);
 
     assertEquals(sparkConsumer, read.getSparkConsumer());
-    assertEquals(StringUtf8Coder.of(), read.getValueCoder());
     assertEquals(offsetFn, read.getGetOffsetFn());
     assertEquals(receiverBuilder, read.getSparkReceiverBuilder());
     assertEquals(String.class, read.getValueClass());
@@ -78,12 +76,6 @@ public class SparkReceiverIOTest {
   }
 
   @Test
-  public void testReadObjectCreationFailsIfValueCoderIsNull() {
-    assertThrows(
-        IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withValueCoder(null));
-  }
-
-  @Test
   public void testReadObjectCreationFailsIfValueClassIsNull() {
     assertThrows(
         IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withValueClass(null));
@@ -92,7 +84,7 @@ public class SparkReceiverIOTest {
   @Test
   public void testReadValidationFailsMissingReceiverBuilder() {
     SparkReceiverIO.Read<String> read = SparkReceiverIO.read();
-    assertThrows(IllegalArgumentException.class, read::validateTransform);
+    assertThrows(IllegalStateException.class, read::validateTransform);
   }
 
   @Test
@@ -101,7 +93,7 @@ public class SparkReceiverIOTest {
         new ReceiverBuilder<>(CustomReceiverWithOffset.class).withConstructorArgs();
     SparkReceiverIO.Read<String> read =
         SparkReceiverIO.<String>read().withSparkReceiverBuilder(receiverBuilder);
-    assertThrows(IllegalArgumentException.class, read::validateTransform);
+    assertThrows(IllegalStateException.class, read::validateTransform);
   }
 
   @Test
@@ -116,7 +108,6 @@ public class SparkReceiverIOTest {
     SparkReceiverIO.Read<String> reader =
         SparkReceiverIO.<String>read()
             .withValueClass(String.class)
-            .withValueCoder(StringUtf8Coder.of())
             .withGetOffsetFn(Long::valueOf)
             .withSparkReceiverBuilder(receiverBuilder);
 
@@ -136,7 +127,6 @@ public class SparkReceiverIOTest {
     SparkReceiverIO.Read<String> reader =
         SparkReceiverIO.<String>read()
             .withValueClass(String.class)
-            .withValueCoder(StringUtf8Coder.of())
             .withGetOffsetFn(Long::valueOf)
             .withSparkConsumer(new CustomSparkConsumer<>())
             .withSparkReceiverBuilder(receiverBuilder);
