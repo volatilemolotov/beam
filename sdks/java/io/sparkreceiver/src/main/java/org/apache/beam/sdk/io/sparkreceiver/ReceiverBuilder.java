@@ -80,10 +80,10 @@ public class ReceiverBuilder<X, T extends Receiver<X>> implements Serializable {
       }
     }
 
-    checkStateNotNull(currentConstructor, "Can not find appropriate constructor!");
+    Constructor<?> nonNullConstructor = checkStateNotNull(currentConstructor, "Can not find appropriate constructor!");
 
-    currentConstructor.setAccessible(true);
-    return sparkReceiverClass.cast(currentConstructor.newInstance(constructorArgs));
+    nonNullConstructor.setAccessible(true);
+    return sparkReceiverClass.cast(nonNullConstructor.newInstance(constructorArgs));
   }
 
   public Class<T> getSparkReceiverClass() {

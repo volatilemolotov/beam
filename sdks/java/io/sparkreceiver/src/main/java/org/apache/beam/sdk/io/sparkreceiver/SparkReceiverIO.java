@@ -17,8 +17,6 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
-
 import com.google.auto.value.AutoValue;
 import org.apache.beam.sdk.annotations.Experimental;
 import org.apache.beam.sdk.coders.Coder;
@@ -29,10 +27,13 @@ import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
+
 /** Streaming sources for Spark {@link Receiver}. */
-@SuppressWarnings("nullness")
 public class SparkReceiverIO {
 
   public static <V> Read<V> read() {
@@ -42,13 +43,13 @@ public class SparkReceiverIO {
   /** A {@link PTransform} to read from Spark {@link Receiver}. */
   @AutoValue
   @AutoValue.CopyAnnotations
-  public abstract static class Read<V> extends PTransform<PBegin, PCollection<V>> {
+  public abstract static class Read<V> extends PTransform<@org.checkerframework.checker.nullness.qual.NonNull PBegin, @org.checkerframework.checker.nullness.qual.NonNull PCollection<V>> {
 
     abstract @Nullable ReceiverBuilder<V, ? extends Receiver<V>> getSparkReceiverBuilder();
 
     abstract @Nullable Class<V> getValueClass();
 
-    abstract @Nullable Coder<V> getValueCoder();
+    abstract @NonNull Coder<V> getValueCoder();
 
     abstract @Nullable SerializableFunction<V, Long> getGetOffsetFn();
 
@@ -79,8 +80,7 @@ public class SparkReceiverIO {
       return toBuilder().setValueClass(valueClass).build();
     }
 
-    public Read<V> withValueCoder(Coder<V> valueCoder) {
-      checkArgument(valueCoder != null, "Value coder can not be null");
+    public Read<V> withValueCoder(@NonNull Coder<V> valueCoder) {
       return toBuilder().setValueCoder(valueCoder).build();
     }
 
@@ -101,24 +101,24 @@ public class SparkReceiverIO {
     }
 
     @Override
-    public PCollection<V> expand(PBegin input) {
+    public @NonNull PCollection<V> expand(@NonNull PBegin input) {
       validateTransform();
       return input.apply(new ReadFromSparkReceiverViaSdf<>(this, getValueCoder()));
     }
 
     public void validateTransform() {
       ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder = getSparkReceiverBuilder();
-      checkArgument(sparkReceiverBuilder != null, "withSparkReceiverBuilder() is required");
+      checkStateNotNull(sparkReceiverBuilder, "withSparkReceiverBuilder() is required");
       if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
-        checkArgument(getSparkConsumer() != null, "withSparkConsumer() is required");
+        checkStateNotNull(getSparkConsumer(), "withSparkConsumer() is required");
       }
-      checkArgument(getValueCoder() != null, "withValueCoder() is required");
-      checkArgument(getValueClass() != null, "withValueClass() is required");
-      checkArgument(getGetOffsetFn() != null, "withGetOffsetFn() is required");
+      checkStateNotNull(getValueCoder(), "withValueCoder() is required");
+      checkStateNotNull(getValueClass(), "withValueClass() is required");
+      checkStateNotNull(getGetOffsetFn(), "withGetOffsetFn() is required");
     }
   }
 
-  static class ReadFromSparkReceiverViaSdf<V> extends PTransform<PBegin, PCollection<V>> {
+  static class ReadFromSparkReceiverViaSdf<V> extends PTransform<@NonNull PBegin, @NonNull PCollection<V>> {
 
     private final Read<V> sparkReceiverRead;
     private final Coder<V> valueCoder;
@@ -129,9 +129,10 @@ public class SparkReceiverIO {
     }
 
     @Override
-    public PCollection<V> expand(PBegin input) {
-      if (!HasOffset.class.isAssignableFrom(
-          sparkReceiverRead.getSparkReceiverBuilder().getSparkReceiverClass())) {
+    public @NonNull PCollection<V> expand(@NonNull PBegin input) {
+      final ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder = sparkReceiverRead.getSparkReceiverBuilder();
+      checkStateNotNull(sparkReceiverBuilder, "withSparkReceiverBuilder() is required");
+      if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
         return input
             .apply(Impulse.create())
             .apply(ParDo.of(new ReadFromSparkReceiverWithoutOffsetDoFn<>(sparkReceiverRead)))
