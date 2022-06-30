@@ -18,7 +18,6 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/example_client.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
 import 'package:playground/pages/playground/states/example_selector_state.dart';
@@ -43,26 +42,9 @@ void main() {
   });
 
   test(
-    'ExampleSelector state selectedFilterType should be ExampleType.all by default',
-    () {
-      expect(state.selectedFilterType, ExampleType.all);
-    },
-  );
-
-  test(
     'ExampleSelector state filterText should be empty string by default',
     () {
       expect(state.filterText, '');
-    },
-  );
-
-  test(
-    'ExampleSelector state should notify all listeners about filter type change',
-    () {
-      state.addListener(() {
-        expect(state.selectedFilterType, ExampleType.example);
-      });
-      state.setSelectedFilterType(ExampleType.example);
     },
   );
 
@@ -99,8 +81,8 @@ void main() {
   });
 
   test(
-      'ExampleSelector state sortExamplesByType should:'
-      '- update categories,'
+      'ExampleSelector state sortExamplesByTags should:'
+      '- return examples which contain all selected tags'
       '- notify all listeners,'
       'but should NOT:'
       '- affect Example state categories', () {
@@ -109,16 +91,16 @@ void main() {
       playgroundState,
       categoriesMock,
     );
-    state.addListener(() {
-      expect(state.categories, examplesSortedByTypeMock);
-      expect(exampleState.sdkCategories, exampleState.sdkCategories);
-    });
-    state.sortExamplesByType(unsortedExamples, ExampleType.kata);
+    state.addSelectedTag('Kata');
+    expect(
+      state.sortExamplesByTags(unsortedExamples),
+      examplesSortedByTagsMock,
+    );
   });
 
   test(
       'ExampleSelector state sortExamplesByName should:'
-      '- update categories'
+      '- return examples with matching names'
       '- notify all listeners,'
       'but should NOT:'
       '- wait for full name of example,'
@@ -129,10 +111,10 @@ void main() {
       playgroundState,
       categoriesMock,
     );
-    state.addListener(() {
-      expect(state.categories, examplesSortedByNameMock);
-      expect(exampleState.sdkCategories, exampleState.sdkCategories);
-    });
-    state.sortExamplesByName(unsortedExamples, 'X1');
+    state.setFilterText('X1');
+    expect(
+      state.sortExamplesByName(unsortedExamples),
+      examplesSortedByNameMock,
+    );
   });
 }

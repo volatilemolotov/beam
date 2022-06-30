@@ -80,6 +80,7 @@ class EmbeddedPageProviders extends StatelessWidget {
     final examplePath = Uri.base.queryParameters[kExampleParam];
 
     return ExampleModel(
+      tags: [],
       name: 'Embedded_Example',
       path: examplePath ?? '',
       description: '',

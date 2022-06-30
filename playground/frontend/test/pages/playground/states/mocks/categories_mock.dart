@@ -33,7 +33,7 @@ final List<CategoryModel> sortedCategories = [
 
 final List<ExampleModel> unsortedExamples = [exampleMock1, exampleMock2];
 
-final List<ExampleModel> examplesSortedByTypeMock = [exampleMock2];
+final List<ExampleModel> examplesSortedByTagsMock = [exampleMock2];
 
 final List<ExampleModel> examplesSortedByNameMock = [exampleMock1];
 

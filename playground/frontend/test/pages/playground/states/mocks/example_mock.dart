@@ -19,14 +19,16 @@
 import 'package:playground/modules/examples/models/example_model.dart';
 
 final ExampleModel exampleMock1 = ExampleModel(
+  tags: [],
   source: 'ex1',
-  name: 'Example',
+  name: 'Ex1',
   type: ExampleType.example,
   description: 'description',
   path: 'SDK/Category/Name',
 );
 
 final ExampleModel exampleMock2 = ExampleModel(
+  tags: ['Kata'],
   source: 'ex2',
   name: 'Kata',
   type: ExampleType.kata,
@@ -35,6 +37,7 @@ final ExampleModel exampleMock2 = ExampleModel(
 );
 
 final ExampleModel exampleWithoutSourceMock = ExampleModel(
+  tags: [],
   name: 'Test example',
   type: ExampleType.example,
   description: 'description',
@@ -42,6 +45,7 @@ final ExampleModel exampleWithoutSourceMock = ExampleModel(
 );
 
 final ExampleModel exampleWithAllAdditionsMock = ExampleModel(
+  tags: [],
   name: 'Test example',
   type: ExampleType.example,
   description: 'description',

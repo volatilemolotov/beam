@@ -263,6 +263,7 @@ class GrpcExampleClient implements ExampleClient {
       pipelineOptions: example.pipelineOptions,
       isMultiFile: example.multifile,
       link: example.link,
+      tags: [],
     );
   }
 }

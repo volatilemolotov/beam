@@ -43,6 +43,7 @@ class ExampleModel with Comparable<ExampleModel> {
   final String name;
   final String path;
   final String description;
+  final List<String> tags;
   int contextLine;
   bool isMultiFile;
   String? link;
@@ -53,6 +54,7 @@ class ExampleModel with Comparable<ExampleModel> {
   String? graph;
 
   ExampleModel({
+    required this.tags,
     required this.name,
     required this.path,
     required this.description,

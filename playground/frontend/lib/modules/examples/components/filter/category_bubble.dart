@@ -19,19 +19,15 @@
 import 'package:flutter/material.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/pages/playground/states/example_selector_state.dart';
 import 'package:provider/provider.dart';
 
+const _kCenterWidthFactor = 1.0;
+
 class CategoryBubble extends StatelessWidget {
-  final ExampleType type;
   final String name;
 
-  const CategoryBubble({
-    Key? key,
-    required this.type,
-    required this.name,
-  }) : super(key: key);
+  const CategoryBubble({super.key, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +37,15 @@ class CategoryBubble extends StatelessWidget {
         padding: const EdgeInsets.only(right: kMdSpacing),
         child: Consumer<ExampleSelectorState>(
           builder: (context, state, child) {
-            final isSelected = type == state.selectedFilterType;
+            final isSelected = state.selectedTags.contains(name);
 
             return GestureDetector(
               onTap: () {
-                if (!isSelected) {
-                  state.setSelectedFilterType(type);
+                if (isSelected) {
+                  state.removeSelectedTag(name);
+                  state.sortCategories();
+                } else {
+                  state.addSelectedTag(name);
                   state.sortCategories();
                 }
               },
@@ -60,6 +59,7 @@ class CategoryBubble extends StatelessWidget {
                   borderRadius: BorderRadius.circular(kXlBorderRadius),
                 ),
                 child: Center(
+                  widthFactor: _kCenterWidthFactor,
                   child: Text(
                     name,
                     style: TextStyle(

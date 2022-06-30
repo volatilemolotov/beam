@@ -71,6 +71,7 @@ class SDKSelector extends StatelessWidget {
                       setExample(
                         state.defaultExamplesMap[value] ??
                             ExampleModel(
+                              tags: [],
                               name: kEmptyExampleName,
                               path: '',
                               description: '',
