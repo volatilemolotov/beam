@@ -18,6 +18,7 @@ module beam.apache.org/playground/backend
 go 1.16
 
 require (
+	cloud.google.com/go/datastore v1.6.0
 	cloud.google.com/go/logging v1.4.2
 	cloud.google.com/go/storage v1.18.2
 	github.com/go-redis/redis/v8 v8.11.4
@@ -26,7 +27,8 @@ require (
 	github.com/improbable-eng/grpc-web v0.14.1
 	github.com/rs/cors v1.8.0
 	go.uber.org/goleak v1.1.12
-	google.golang.org/api v0.58.0
+	google.golang.org/api v0.59.0
 	google.golang.org/grpc v1.41.0
 	google.golang.org/protobuf v1.27.1
+	gopkg.in/yaml.v3 v3.0.1
 )
