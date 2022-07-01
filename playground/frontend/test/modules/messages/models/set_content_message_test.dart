@@ -17,113 +17,67 @@
  */
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:onmessage/onmessage.dart';
 import 'package:playground/modules/messages/models/set_content_message.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-const _code = 'my_code';
+const _content = 'my_code';
+const _sdk = SDK.python;
 
 void main() {
-  group('SetContentMessage parsing null and empty', () {
+  group('SetContentMessage.fromMap', () {
     test(
-      'SetContentMessage.tryParseMessageEvent returns null for null',
+      'SetContentMessage.fromMap returns null for other types',
       () {
-        final event = _getMessageEventWithData(null);
+        const map = {'type': 'any-other'};
 
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
+        final parsed = SetContentMessage.fromMap(map);
 
         expect(parsed, null);
       },
     );
 
     test(
-      'SetContentMessage.tryParseMessageEvent returns null for non-sting and non-map',
+      'SetContentMessage.fromMap parses empty message',
       () {
-        final event = _getMessageEventWithData(DateTime(2022));
+        const map = {'type': SetContentMessage.type};
 
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
+        final parsed = SetContentMessage.fromMap(map);
 
-        expect(parsed, null);
+        expect(parsed, const SetContentMessage());
       },
     );
 
     test(
-      'SetContentMessage.tryParseMessageEvent returns null for non-JSON sting',
+      'SetContentMessage.fromMap parses SDK',
       () {
-        final event = _getMessageEventWithData('non-JSON string');
+        final map = {'type': SetContentMessage.type, 'sdk': _sdk.name};
 
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
+        final parsed = SetContentMessage.fromMap(map);
 
-        expect(parsed, null);
+        expect(parsed, const SetContentMessage(sdk: _sdk));
       },
     );
 
     test(
-      'SetContentMessage.tryParseMessageEvent returns null for JSON scalar',
+      'SetContentMessage.fromMap parses empty for unknown SDK',
       () {
-        final event = _getMessageEventWithData('123');
+        const map = {'type': SetContentMessage.type, 'sdk': 'not-existing'};
 
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
+        final parsed = SetContentMessage.fromMap(map);
 
-        expect(parsed, null);
+        expect(parsed, const SetContentMessage());
       },
     );
 
     test(
-      'SetContentMessage.tryParseMessageEvent returns empty message for alien JSON map',
+      'SetContentMessage.fromMap parses content',
       () {
-        final event = _getMessageEventWithData('{"unknownName": "value"}');
+        const map = {'type': SetContentMessage.type, 'content': _content};
 
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
+        final parsed = SetContentMessage.fromMap(map);
 
-        expect(parsed, SetContentMessage());
+        expect(parsed, const SetContentMessage(content: _content));
       },
     );
   });
-
-  group('SetContentMessage.tryParseMessageEvent parses code', () {
-    test(
-      'SetContentMessage.tryParseMessageEvent parses numeric code',
-      () {
-        final event = _getMessageEventWithData('{"code": 123}');
-
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
-
-        expect(parsed, SetContentMessage(code: '123'));
-      },
-    );
-
-    test(
-      'SetContentMessage.tryParseMessageEvent parses string code',
-      () {
-        final event = _getMessageEventWithData('{"code": "$_code"}');
-
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
-
-        expect(parsed, SetContentMessage(code: _code));
-      },
-    );
-
-    test(
-      'SetContentMessage.tryParseMessageEvent takes code from map',
-      () {
-        final event = _getMessageEventWithData({'code': _code});
-
-        final parsed = SetContentMessage.tryParseMessageEvent(event);
-
-        expect(parsed, SetContentMessage(code: _code));
-      },
-    );
-  });
-}
-
-MessageEvent _getMessageEventWithData(dynamic data) {
-  return MessageEvent(
-    bubbles: true,
-    cancellable: true,
-    data: data,
-    origin: 'origin',
-    lastEventId: 'lastEventId',
-    source: null,
-    ports: [],
-  );
 }

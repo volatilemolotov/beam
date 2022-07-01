@@ -16,63 +16,49 @@
  * limitations under the License.
  */
 
-import 'dart:convert';
-
-import 'package:onmessage/onmessage.dart';
+import 'package:playground/modules/messages/models/abstract_message.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
-class SetContentMessage {
+class SetContentMessage extends AbstractMessage {
   final SDK? sdk;
-  final String? code;
+  final String? content;
 
-  SetContentMessage({
+  static const type = 'SetContentMessage';
+
+  const SetContentMessage({
     this.sdk,
-    this.code,
+    this.content,
   });
 
-  static SetContentMessage? tryParseMessageEvent(MessageEvent event) {
-    final data = event.data;
-    return SetContentMessage.tryParseMap(data) ??
-        SetContentMessage.tryParseJson(data);
-  }
-
-  static SetContentMessage? tryParseMap(Object? map) {
-    return map is Map ? SetContentMessage.fromMap(map) : null;
-  }
-
-  SetContentMessage.fromMap(Map map)
-      : sdk = _parseSdk(map),
-        code = _tryParseCode(map);
-
-  static SetContentMessage? tryParseJson(Object? json) {
-    if (json is String) {
-      try {
-        final map = jsonDecode(json);
-
-        if (map is Map) {
-          return SetContentMessage.fromMap(map);
-        }
-      } on FormatException catch (ex) {
-        // TODO: Log
-      }
+  static SetContentMessage? fromMap(Map eventData) {
+    if (eventData['type'] != type) {
+      return null;
     }
 
-    return null;
+    return fromMapNoCheck(eventData);
   }
 
-  static SDK? _parseSdk(Map map) {
-    final sdkString = map['sdk'];
-    return sdkString == null ? null : SDK.values.byName(sdkString);
+  /// Identical to [fromMap], but does not check `type` field in the map.
+  /// Use this when messages are known to be of this class and so miss `type`.
+  static SetContentMessage fromMapNoCheck(Map eventData) {
+    return SetContentMessage(
+      sdk: _tryParseSdk(eventData),
+      content: _tryParseContent(eventData),
+    );
   }
 
-  static String? _tryParseCode(Map map) {
-    final code = map['code'];
+  static SDK? _tryParseSdk(Map map) {
+    return SDK.tryParse(map['sdk']);
+  }
+
+  static String? _tryParseContent(Map map) {
+    final code = map['content'];
     return code?.toString();
   }
 
   @override
   int get hashCode {
-    return code.hashCode;
+    return content.hashCode;
   }
 
   @override
@@ -81,6 +67,8 @@ class SetContentMessage {
       return true;
     }
 
-    return other is SetContentMessage && code == other.code;
+    return other is SetContentMessage &&
+        sdk == other.sdk &&
+        content == other.content;
   }
 }

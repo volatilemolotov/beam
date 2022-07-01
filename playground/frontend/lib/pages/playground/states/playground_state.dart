@@ -20,7 +20,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:onmessage/onmessage.dart';
 import 'package:playground/modules/editor/controllers/snippet_editing_controller.dart';
 import 'package:playground/modules/editor/parsers/run_options_parser.dart';
 import 'package:playground/modules/editor/repository/code_repository/code_repository.dart';
@@ -28,7 +27,7 @@ import 'package:playground/modules/editor/repository/code_repository/run_code_re
 import 'package:playground/modules/editor/repository/code_repository/run_code_result.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/models/outputs_model.dart';
-import 'package:playground/modules/messages/models/set_content_message.dart';
+import 'package:playground/modules/messages/listeners/message_listener.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 const kTitleLength = 15;
@@ -42,9 +41,7 @@ const kCachedResultsLog =
     'The results of this example are taken from the Apache Beam Playground cache.\n';
 
 class PlaygroundState with ChangeNotifier {
-  late final StreamSubscription _onMessageSubscription;
-  String? _lastMessageCode;
-
+  late final MessageListener _messageListener;
   final _snippetEditingControllers = <SDK, SnippetEditingController>{};
 
   SDK _sdk;
@@ -66,7 +63,8 @@ class PlaygroundState with ChangeNotifier {
     _codeRepository = codeRepository;
     selectedOutputFilterType = OutputType.all;
     outputResult = '';
-    _onMessageSubscription = OnMessage.instance.stream.listen(_onWindowMessage);
+
+    _messageListener = MessageListener(playgroundState: this);
   }
 
   SnippetEditingController _getOrCreateSnippetEditingController(SDK sdk) {
@@ -123,6 +121,11 @@ class PlaygroundState with ChangeNotifier {
   void setExampleForSdk(SDK sdk, ExampleModel example) {
     final controller = _getOrCreateSnippetEditingController(sdk);
     controller.selectedExample = example;
+  }
+
+  void setContentForSdk(SDK sdk, String content) {
+    final controller = _getOrCreateSnippetEditingController(sdk);
+    controller.codeController.text = content;
   }
 
   void setSdk(SDK sdk) {
@@ -248,29 +251,6 @@ class PlaygroundState with ChangeNotifier {
     notifyListeners();
   }
 
-  void _onWindowMessage(MessageEvent event) {
-    final message = SetContentMessage.tryParseMessageEvent(event);
-
-    if (message == null) {
-      return;
-    }
-
-    final code = message.code ?? '';
-    if (code == _lastMessageCode) {
-      // Ignore repeating messages because without acknowledgement mechanism
-      // they may be sent periodically just to make sure the code is loaded.
-      return;
-    }
-
-    final sdk = message.sdk;
-    if (sdk != null) {
-      setSdk(sdk);
-    }
-
-    snippetEditingController.codeController.text = code;
-    _lastMessageCode = code;
-  }
-
   StreamController<int> _createExecutionTimeStream() {
     StreamController<int>? streamController;
     Timer? timer;
@@ -317,11 +297,5 @@ class PlaygroundState with ChangeNotifier {
         setOutputResult(log + output);
         break;
     }
-  }
-
-  @override
-  void dispose() {
-    _onMessageSubscription.cancel();
-    super.dispose();
   }
 }
