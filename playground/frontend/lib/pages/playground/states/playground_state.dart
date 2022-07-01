@@ -56,7 +56,7 @@ class PlaygroundState with ChangeNotifier {
     SDK? sdk,
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
-  }) : _sdk = sdk ?? getDefaultSdk() {
+  }) : _sdk = sdk ?? SDK.java {
     _getOrCreateSnippetEditingController(_sdk);
     snippetEditingController.selectedExample = selectedExample;
 

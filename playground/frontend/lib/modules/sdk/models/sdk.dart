@@ -44,12 +44,6 @@ enum SDK {
   }
 }
 
-SDK getDefaultSdk() {
-  return SDK.values.byName(
-    Uri.base.queryParameters[kSdkParam] ?? SDK.java.name,
-  );
-}
-
 extension SDKToString on SDK {
   String get displayName {
     switch (this) {
