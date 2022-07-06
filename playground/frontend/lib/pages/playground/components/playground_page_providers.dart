@@ -103,6 +103,11 @@ class PlaygroundPageProviders extends StatelessWidget {
     ExampleState exampleState,
     PlaygroundState playgroundState,
   ) async {
+    if (_getSnippetId().isNotEmpty) {
+      _getSnippet(playgroundState, exampleState);
+      return;
+    }
+
     final example = _getEmbeddedExample();
 
     if (example.path.isEmpty) {
@@ -141,6 +146,11 @@ class PlaygroundPageProviders extends StatelessWidget {
   ) async {
     await exampleState.loadDefaultExamplesIfNot();
 
+    if (_getSnippetId().isNotEmpty) {
+      _getSnippet(playgroundState, exampleState);
+      return;
+    }
+
     final example = await _getExample(exampleState, playgroundState);
 
     if (example == null) {
@@ -153,6 +163,19 @@ class PlaygroundPageProviders extends StatelessWidget {
     );
 
     playgroundState.setExample(exampleWithInfo);
+  }
+
+  String _getSnippetId() {
+    return Uri.base.queryParameters[kSnippetId] ?? '';
+  }
+
+  void _getSnippet(
+    PlaygroundState playgroundState,
+    ExampleState exampleState,
+  ) {
+    exampleState.getSharedExample(_getSnippetId());
+    playgroundState.setSdk(exampleState.sharedFilesMap!.keys.first);
+    playgroundState.setExample(exampleState.sharedFilesMap!.values.first);
   }
 
   Future<ExampleModel?> _getExample(
