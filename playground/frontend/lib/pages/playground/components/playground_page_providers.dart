@@ -59,20 +59,7 @@ class PlaygroundPageProviders extends StatelessWidget {
               return PlaygroundState(codeRepository: kCodeRepository);
             }
 
-            if (playground.selectedExample == null &&
-                !Uri.base.toString().contains(kIsEmbedded)) {
-              final example = _getExample(exampleState, playground);
-              if (example != null &&
-                  Uri.base.queryParameters[kSnippetId] == null) {
-                exampleState
-                    .loadExampleInfo(
-                      example,
-                      playground.sdk,
-                    )
-                    .then((exampleWithInfo) =>
-                        playground.setExample(exampleWithInfo));
-              }
-            }
+            _onExampleStateChanged(exampleState, playground);
             return playground;
           },
         ),
@@ -87,10 +74,91 @@ class PlaygroundPageProviders extends StatelessWidget {
     );
   }
 
-  ExampleModel? _getExample(
+  void _onExampleStateChanged(
+    ExampleState exampleState,
+    PlaygroundState playgroundState,
+  ) {
+    // This property currently doubles as a flag of initialization
+    // because it is initialized when an example is ready
+    // and is filled with a null-object if not showing any example.
+    //
+    // TODO: Add a dedicated flag of initialization or make
+    //       PlaygroundState listen for examples and init itself.
+    if (playgroundState.selectedExample != null) {
+      return; // Already initialized.
+    }
+
+    if (_isEmbedded()) {
+      _initEmbedded(exampleState, playgroundState);
+    } else {
+      _initNonEmbedded(exampleState, playgroundState);
+    }
+  }
+
+  bool _isEmbedded() {
+    return Uri.base.toString().contains(kIsEmbedded);
+  }
+
+  Future<void> _initEmbedded(
+    ExampleState exampleState,
+    PlaygroundState playgroundState,
+  ) async {
+    final example = _getEmbeddedExample();
+
+    if (example.path.isEmpty) {
+      String source = Uri.base.queryParameters[kSourceCode] ?? '';
+      example.setSource(source);
+      playgroundState.setExample(example);
+    } else {
+      final loadedExample = await exampleState.getExample(
+        example.path,
+        playgroundState.sdk,
+      );
+
+      final exampleWithInfo = await exampleState.loadExampleInfo(
+        loadedExample,
+        playgroundState.sdk,
+      );
+
+      playgroundState.setExample(exampleWithInfo);
+    }
+  }
+
+  ExampleModel _getEmbeddedExample() {
+    final examplePath = Uri.base.queryParameters[kExampleParam];
+
+    return ExampleModel(
+      name: 'Embedded_Example',
+      path: examplePath ?? '',
+      description: '',
+      type: ExampleType.example,
+    );
+  }
+
+  Future<void> _initNonEmbedded(
+    ExampleState exampleState,
+    PlaygroundState playgroundState,
+  ) async {
+    await exampleState.loadDefaultExamplesIfNot();
+
+    final example = await _getExample(exampleState, playgroundState);
+
+    if (example == null) {
+      return;
+    }
+
+    final exampleWithInfo = await exampleState.loadExampleInfo(
+      example,
+      playgroundState.sdk,
+    );
+
+    playgroundState.setExample(exampleWithInfo);
+  }
+
+  Future<ExampleModel?> _getExample(
     ExampleState exampleState,
     PlaygroundState playground,
-  ) {
+  ) async {
     final examplePath = Uri.base.queryParameters[kExampleParam];
     final snippetId = Uri.base.queryParameters[kSnippetId];
 
