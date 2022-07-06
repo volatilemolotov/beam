@@ -98,6 +98,9 @@ class CodeTextAreaWrapper extends StatelessWidget {
                           disabled: state.selectedExample?.isMultiFile ?? false,
                           isRunning: state.isCodeRunning,
                           cancelRun: () {
+                            final exampleName = getAnalyticsExampleName(state);
+                            AnalyticsService.get(context)
+                                .trackClickCancelRunEvent(exampleName);
                             state.cancelRun().catchError(
                                   (_) => NotificationManager.showError(
                                     context,
@@ -111,11 +114,8 @@ class CodeTextAreaWrapper extends StatelessWidget {
                             AnalyticsService analyticsService =
                                 AnalyticsService.get(context);
                             final stopwatch = Stopwatch()..start();
-                            final exampleName = getAnalyticsExampleName(
-                              state.selectedExample,
-                              state.isExampleChanged,
-                              state.sdk,
-                            );
+                            final exampleName = getAnalyticsExampleName(state);
+
                             state.runCode(
                               onFinish: () {
                                 analyticsService.trackRunTimeEvent(
@@ -124,8 +124,7 @@ class CodeTextAreaWrapper extends StatelessWidget {
                                 );
                               },
                             );
-                            AnalyticsService.get(context)
-                                .trackClickRunEvent(exampleName);
+                            analyticsService.trackClickRunEvent(exampleName);
                           },
                         ),
                       ),
