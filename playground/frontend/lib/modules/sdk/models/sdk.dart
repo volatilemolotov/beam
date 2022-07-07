@@ -22,7 +22,6 @@ import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
 import 'package:playground/config.g.dart';
-import 'package:playground/constants/params.dart';
 
 enum SDK {
   java,
