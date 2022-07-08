@@ -19,14 +19,15 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:code_text_field/code_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:playground/modules/editor/controllers/snippet_editing_controller.dart';
 import 'package:playground/modules/editor/parsers/run_options_parser.dart';
 import 'package:playground/modules/editor/repository/code_repository/code_repository.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_request.dart';
 import 'package:playground/modules/editor/repository/code_repository/run_code_result.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/models/outputs_model.dart';
+import 'package:playground/modules/messages/listeners/message_listener.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 const kTitleLength = 15;
@@ -40,59 +41,64 @@ const kCachedResultsLog =
     'The results of this example are taken from the Apache Beam Playground cache.\n';
 
 class PlaygroundState with ChangeNotifier {
-  final CodeController codeController;
+  late final MessageListener _messageListener;
+  final _snippetEditingControllers = <SDK, SnippetEditingController>{};
+
   SDK _sdk;
   CodeRepository? _codeRepository;
-  ExampleModel? _selectedExample;
   RunCodeResult? _result;
   StreamSubscription<RunCodeResult>? _runSubscription;
-  String _pipelineOptions = '';
   StreamController<int>? _executionTime;
   OutputType? selectedOutputFilterType;
   String? outputResult;
 
   PlaygroundState({
-    SDK sdk = SDK.java,
+    SDK? sdk,
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
-  })  : _sdk = sdk,
-        codeController = CodeController(
-          language: sdk.highlightMode,
-          webSpaceFix: false,
-        ) {
-    _selectedExample = selectedExample;
-    _pipelineOptions = selectedExample?.pipelineOptions ?? '';
-    codeController.text = _selectedExample?.source ?? '';
+  }) : _sdk = sdk ?? SDK.java {
+    _getOrCreateSnippetEditingController(_sdk);
+    snippetEditingController.selectedExample = selectedExample;
+
     _codeRepository = codeRepository;
     selectedOutputFilterType = OutputType.all;
     outputResult = '';
+
+    _messageListener = MessageListener(playgroundState: this);
+  }
+
+  SnippetEditingController _getOrCreateSnippetEditingController(SDK sdk) {
+    final controller = _snippetEditingControllers[sdk];
+    if (controller != null) {
+      return controller;
+    }
+
+    return _snippetEditingControllers[sdk] = SnippetEditingController(sdk: sdk);
   }
 
   String get examplesTitle {
-    final name = _selectedExample?.name ?? kTitle;
+    final name = snippetEditingController.selectedExample?.name ?? kTitle;
     return name.substring(0, min(kTitleLength, name.length));
   }
 
-  ExampleModel? get selectedExample => _selectedExample;
+  ExampleModel? get selectedExample => snippetEditingController.selectedExample;
 
   SDK get sdk => _sdk;
 
-  String get source => codeController.rawText;
+  SnippetEditingController get snippetEditingController => _snippetEditingControllers[_sdk]!;
+
+  String get source => snippetEditingController.codeController.text;
 
   bool get isCodeRunning => !(result?.isFinished ?? true);
 
   RunCodeResult? get result => _result;
 
-  String get pipelineOptions => _pipelineOptions;
+  String get pipelineOptions => snippetEditingController.pipelineOptions;
 
   Stream<int>? get executionTime => _executionTime?.stream;
 
   bool get isExampleChanged {
-    return selectedExample?.source != source || _arePipelineOptionsChanges;
-  }
-
-  bool get _arePipelineOptionsChanges {
-    return pipelineOptions != (_selectedExample?.pipelineOptions ?? '');
+    return snippetEditingController.isChanged;
   }
 
   bool get graphAvailable =>
@@ -100,23 +106,36 @@ class PlaygroundState with ChangeNotifier {
       [SDK.java, SDK.python].contains(sdk);
 
   void setExample(ExampleModel example) {
-    _selectedExample = example;
-    _pipelineOptions = example.pipelineOptions ?? '';
-    codeController.text = example.source ?? '';
+    snippetEditingController.selectedExample = example;
     _result = null;
     _executionTime = null;
     setOutputResult('');
     notifyListeners();
   }
 
+  /// Sets the [example] as the current for [sdk].
+  ///
+  /// Creates a [SnippetEditingController] for [sdk] if it not exists yet.
+  /// Unlike [setExample], this method does not affect run status like result,
+  /// execution time or output.
+  void setExampleForSdk(SDK sdk, ExampleModel example) {
+    final controller = _getOrCreateSnippetEditingController(sdk);
+    controller.selectedExample = example;
+  }
+
+  void setContentForSdk(SDK sdk, String content) {
+    final controller = _getOrCreateSnippetEditingController(sdk);
+    controller.codeController.text = content;
+  }
+
   void setSdk(SDK sdk) {
     _sdk = sdk;
-    codeController.language = sdk.highlightMode;
+    _getOrCreateSnippetEditingController(sdk);
     notifyListeners();
   }
 
   void setSource(String source) {
-    codeController.text = source;
+    snippetEditingController.codeController.text = source;
   }
 
   void setSelectedOutputFilterType(OutputType type) {
@@ -135,8 +154,7 @@ class PlaygroundState with ChangeNotifier {
   }
 
   void reset() {
-    codeController.text = _selectedExample?.source ?? '';
-    _pipelineOptions = selectedExample?.pipelineOptions ?? '';
+    snippetEditingController.reset();
     _executionTime = null;
     setOutputResult('');
     notifyListeners();
@@ -151,7 +169,7 @@ class PlaygroundState with ChangeNotifier {
   }
 
   void setPipelineOptions(String options) {
-    _pipelineOptions = options;
+    snippetEditingController.pipelineOptions = options;
     notifyListeners();
   }
 
@@ -167,7 +185,7 @@ class PlaygroundState with ChangeNotifier {
     }
     _executionTime?.close();
     _executionTime = _createExecutionTimeStream();
-    if (!isExampleChanged && _selectedExample?.outputs != null) {
+    if (!isExampleChanged && snippetEditingController.selectedExample?.outputs != null) {
       _showPrecompiledResult();
     } else {
       final request = RunCodeRequestWrapper(
@@ -214,16 +232,20 @@ class PlaygroundState with ChangeNotifier {
     _result = RunCodeResult(
       status: RunCodeStatus.preparation,
     );
+    final selectedExample = snippetEditingController.selectedExample!;
+
     notifyListeners();
     // add a little delay to improve user experience
     await Future.delayed(kPrecompiledDelay);
-    String logs = _selectedExample!.logs ?? '';
+
+    String logs = selectedExample.logs ?? '';
     _result = RunCodeResult(
       status: RunCodeStatus.finished,
-      output: _selectedExample!.outputs,
+      output: selectedExample.outputs,
       log: kCachedResultsLog + logs,
-      graph: _selectedExample!.graph,
+      graph: selectedExample.graph,
     );
+
     setOutputResult(_result!.log! + _result!.output!);
     _executionTime?.close();
     notifyListeners();

@@ -16,27 +16,44 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/editor_textarea.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
+import 'package:playground/modules/messages/models/abstract_message.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-class EmbeddedEditor extends StatelessWidget {
-  final bool isEditable;
+class SetSdkMessage extends AbstractMessage {
+  final SDK sdk;
 
-  const EmbeddedEditor({Key? key, required this.isEditable}) : super(key: key);
+  static const type = 'SetSdkMessage';
+
+  const SetSdkMessage({
+    required this.sdk,
+  });
+
+  static SetSdkMessage? fromMap(Map map) {
+    if (map['type'] != type) {
+      return null;
+    }
+
+    final sdk = SDK.tryParse(map['sdk']);
+    if (sdk == null) {
+      return null;
+    }
+
+    return SetSdkMessage(
+      sdk: sdk,
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final state = Provider.of<PlaygroundState>(context);
-    return EditorTextArea(
-      codeController: state.snippetEditingController.codeController,
-      key: ValueKey(state.selectedExample),
-      enabled: true,
-      sdk: state.sdk,
-      example: state.selectedExample,
-      isEditable: isEditable,
-      isEmbedded: true,
-    );
+  int get hashCode {
+    return sdk.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other is SetSdkMessage && sdk == other.sdk;
   }
 }

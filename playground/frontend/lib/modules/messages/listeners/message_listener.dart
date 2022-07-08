@@ -16,27 +16,29 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/editor_textarea.dart';
+import 'package:onmessage/onmessage.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
 
-class EmbeddedEditor extends StatelessWidget {
-  final bool isEditable;
+import '../handlers/message_handler.dart';
+import '../parsers/message_parser.dart';
 
-  const EmbeddedEditor({Key? key, required this.isEditable}) : super(key: key);
+class MessageListener {
+  final PlaygroundState playgroundState;
+  final MessageHandler messageHandler;
 
-  @override
-  Widget build(BuildContext context) {
-    final state = Provider.of<PlaygroundState>(context);
-    return EditorTextArea(
-      codeController: state.snippetEditingController.codeController,
-      key: ValueKey(state.selectedExample),
-      enabled: true,
-      sdk: state.sdk,
-      example: state.selectedExample,
-      isEditable: isEditable,
-      isEmbedded: true,
-    );
+  MessageListener({
+    required this.playgroundState,
+  }) : messageHandler = MessageHandler(playgroundState: playgroundState) {
+    OnMessage.instance.stream.listen(_onWindowMessage);
+  }
+
+  void _onWindowMessage(MessageEvent event) {
+    final message = MessageParser().parse(event.data);
+
+    if (message == null) {
+      return;
+    }
+
+    messageHandler.handle(message);
   }
 }

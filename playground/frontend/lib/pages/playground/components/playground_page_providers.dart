@@ -151,6 +151,12 @@ class PlaygroundPageProviders extends StatelessWidget {
       playgroundState.sdk,
     );
 
+    exampleState.defaultExamplesMap[playgroundState.sdk] = exampleWithInfo;
+
+    for (final entry in exampleState.defaultExamplesMap.entries) {
+      playgroundState.setExampleForSdk(entry.key, entry.value);
+    }
+
     playgroundState.setExample(exampleWithInfo);
   }
 

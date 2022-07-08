@@ -16,27 +16,30 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/editor_textarea.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
+import 'package:playground/modules/messages/handlers/abstract_message_handler.dart';
+import 'package:playground/modules/messages/models/abstract_message.dart';
 
-class EmbeddedEditor extends StatelessWidget {
-  final bool isEditable;
+import '../../../pages/playground/states/playground_state.dart';
+import '../models/set_sdk_message.dart';
 
-  const EmbeddedEditor({Key? key, required this.isEditable}) : super(key: key);
+class SetSdkMessageHandler extends AbstractMessageHandler {
+  final PlaygroundState playgroundState;
+
+  SetSdkMessageHandler({
+    required this.playgroundState,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final state = Provider.of<PlaygroundState>(context);
-    return EditorTextArea(
-      codeController: state.snippetEditingController.codeController,
-      key: ValueKey(state.selectedExample),
-      enabled: true,
-      sdk: state.sdk,
-      example: state.selectedExample,
-      isEditable: isEditable,
-      isEmbedded: true,
-    );
+  MessageHandleResult handle(AbstractMessage message) {
+    if (message is! SetSdkMessage) {
+      return MessageHandleResult.notHandled;
+    }
+
+    _handle(message);
+    return MessageHandleResult.handled;
+  }
+
+  void _handle(SetSdkMessage message) {
+    playgroundState.setSdk(message.sdk);
   }
 }
