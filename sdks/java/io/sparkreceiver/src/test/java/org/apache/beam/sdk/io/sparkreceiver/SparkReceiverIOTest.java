@@ -18,9 +18,7 @@
 package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.runners.direct.DirectRunner;
@@ -28,20 +26,12 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.testing.PAssert;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
-import org.apache.beam.sdk.transforms.windowing.BoundedWindow;
-import org.apache.beam.sdk.transforms.windowing.GlobalWindow;
-import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
 import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.util.Arrays;
 
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
