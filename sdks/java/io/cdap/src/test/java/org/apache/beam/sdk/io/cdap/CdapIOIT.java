@@ -17,42 +17,42 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import static org.apache.beam.sdk.io.synthetic.SyntheticOptions.fromJsonString;
+import static org.apache.beam.sdk.io.common.IOITHelper.executeWithRetry;
+import static org.apache.beam.sdk.io.common.IOITHelper.readIOTestPipelineOptions;
+import static org.apache.beam.sdk.io.common.TestRow.getExpectedHashForRowCount;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-import io.cdap.plugin.common.Constants;
-import io.cdap.plugin.hubspot.common.BaseHubspotConfig;
-import io.cdap.plugin.hubspot.common.SourceHubspotConfig;
-import io.cdap.plugin.hubspot.sink.batch.HubspotBatchSink;
-import io.cdap.plugin.hubspot.sink.batch.SinkHubspotConfig;
-import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.*;
+import com.google.cloud.Timestamp;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
 import org.apache.beam.sdk.PipelineResult;
-import org.apache.beam.sdk.coders.CustomCoder;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.io.Read;
+import org.apache.beam.sdk.io.GenerateSequence;
+import org.apache.beam.sdk.io.common.DatabaseTestHelper;
 import org.apache.beam.sdk.io.common.HashingFn;
-import org.apache.beam.sdk.io.common.IOITHelper;
-import org.apache.beam.sdk.io.common.IOTestPipelineOptions;
-import org.apache.beam.sdk.io.synthetic.SyntheticBoundedSource;
-import org.apache.beam.sdk.io.synthetic.SyntheticSourceOptions;
+import org.apache.beam.sdk.io.common.PostgresIOTestPipelineOptions;
+import org.apache.beam.sdk.io.common.TestRow;
+import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
-import org.apache.beam.sdk.options.StreamingOptions;
-import org.apache.beam.sdk.options.Validation;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
-import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.testutils.NamedTestResult;
+import org.apache.beam.sdk.testutils.metrics.IOITMetrics;
+import org.apache.beam.sdk.testutils.metrics.MetricsReader;
+import org.apache.beam.sdk.testutils.metrics.TimeMonitor;
+import org.apache.beam.sdk.testutils.publishing.InfluxDBSettings;
+import org.apache.beam.sdk.transforms.Combine;
+import org.apache.beam.sdk.transforms.DoFn;
+import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.Reshuffle;
+import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
-import org.joda.time.Duration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -60,6 +60,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.postgresql.ds.PGSimpleDataSource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * IO Integration test for {@link org.apache.beam.sdk.io.cdap.CdapIO}.
@@ -68,206 +71,198 @@ import org.junit.runners.JUnit4;
  * more details.
  */
 @RunWith(JUnit4.class)
+@SuppressWarnings("rawtypes")
 public class CdapIOIT {
 
+  private static final String NAMESPACE = CdapIOIT.class.getName();
+
+  private static PGSimpleDataSource dataSource;
+  private static Integer numberOfRows;
+  private static String tableName;
+  private static InfluxDBSettings settings;
+  private static CdapIOITOptions options;
+  private static PostgreSQLContainer postgreSQLContainer;
+
   @Rule public TestPipeline writePipeline = TestPipeline.create();
-
   @Rule public TestPipeline readPipeline = TestPipeline.create();
-
   @Rule public TemporaryFolder tmpFolder = new TemporaryFolder();
 
-  private static SyntheticSourceOptions sourceOptions;
-
-  private static Options options;
-
-  private static String expectedHashcode;
-
-  private static Map<String, Object> hubspotParamsMap;
-
-  private static ObjectMapper objectMapper;
-
-  private static List<String> propertyNames;
-
   @BeforeClass
-  public static void setup() throws IOException {
-    options = IOITHelper.readIOTestPipelineOptions(Options.class);
-    sourceOptions = fromJsonString(options.getSourceOptions(), SyntheticSourceOptions.class);
-    hubspotParamsMap = new HashMap<>();
-    hubspotParamsMap.put(
-        BaseHubspotConfig.API_SERVER_URL, BaseHubspotConfig.DEFAULT_API_SERVER_URL);
-    hubspotParamsMap.put(BaseHubspotConfig.API_KEY, options.getHubspotApiKey());
-    hubspotParamsMap.put(BaseHubspotConfig.OBJECT_TYPE, options.getHubspotObjectType());
-    hubspotParamsMap.put(Constants.Reference.REFERENCE_NAME, "referenceName");
-    objectMapper = new ObjectMapper();
-    propertyNames = options.getHubspotPropertyNames();
+  public static void setup() throws Exception {
+    options = readIOTestPipelineOptions(CdapIOITOptions.class);
+    if (options.isWithTestcontainers()) {
+      setPostgresContainer();
+    }
+
+    dataSource = DatabaseTestHelper.getPostgresDataSource(options);
+    numberOfRows = options.getNumberOfRecords();
+    tableName = DatabaseTestHelper.getTestTableName("HadoopFormatIOIT");
+    if (!options.isWithTestcontainers()) {
+      settings =
+          InfluxDBSettings.builder()
+              .withHost(options.getInfluxHost())
+              .withDatabase(options.getInfluxDatabase())
+              .withMeasurement(options.getInfluxMeasurement())
+              .get();
+    }
+    executeWithRetry(CdapIOIT::createTable);
   }
 
   @AfterClass
-  public static void afterClass() {
-    //TODO: clean hubspot
+  public static void tearDown() throws Exception {
+    executeWithRetry(CdapIOIT::deleteTable);
+    if (postgreSQLContainer != null) {
+      postgreSQLContainer.stop();
+    }
   }
 
   @Test
-  public void testCdapIOReadsAndWritesCorrectlyInBatch() throws IOException {
-    // Map of hashes of set size collections with 100b records - 10b key, 90b values.
-    Map<Long, String> expectedHashes =
-        ImmutableMap.of(
-            1000L, "4507649971ee7c51abbb446e65a5c660",
-            100_000_000L, "0f12c27c9a7672e14775594be66cad9a");
-    expectedHashcode = getHashForRecordCount(sourceOptions.numRecords, expectedHashes);
+  public void testCdapIOReadsAndWritesCorrectlyInBatch() {
+
     writePipeline
-        .apply("Generate records", Read.from(new SyntheticBoundedSource(sourceOptions)))
-        .apply("Map records", ParDo.of(new MapToHubspotRecord()))
-        .apply("Write to Hubspot", writeToHubspot(hubspotParamsMap));
-
-    readPipeline.getCoderRegistry().registerCoderForClass(JsonElement.class, JsonElementCoder.of());
-
-    PCollection<String> hashcode =
-        readPipeline
-            .apply("Read from bounded Hubspot", readFromBoundedHubspot(hubspotParamsMap))
-            .apply("Map records to strings", MapElements.via(new MapHubspotRecordsToStrings()))
-            .apply("Calculate hashcode", Combine.globally(new HashingFn()).withoutDefaults());
-
-    PAssert.thatSingleton(hashcode).isEqualTo(expectedHashcode);
+        .apply("Generate sequence", GenerateSequence.from(0).to(numberOfRows))
+        .apply("Produce db rows", ParDo.of(new TestRow.DeterministicallyConstructTestRowFn()))
+        .apply("Prevent fusion before writing", Reshuffle.viaRandomKey())
+        .apply("Collect write time", ParDo.of(new TimeMonitor<>(NAMESPACE, "write_time")))
+        .apply("Construct rows for DBOutputFormat", ParDo.of(new ConstructDBOutputFormatRowFn()))
+        .apply("Write using CdapIO", writeToDB(getParamsFromOptions(options)));
 
     PipelineResult writeResult = writePipeline.run();
     writeResult.waitUntilFinish();
 
+    PCollection<String> consolidatedHashcode =
+        readPipeline
+            .apply("Read using CdapIO", readFromDB(getParamsFromOptions(options)))
+            .apply("Collect read time", ParDo.of(new TimeMonitor<>(NAMESPACE, "read_time")))
+            .apply("Get values only", Values.create())
+            .apply("Values as string", ParDo.of(new TestRow.SelectNameFn()))
+            .apply("Calculate hashcode", Combine.globally(new HashingFn()));
+
+    PAssert.thatSingleton(consolidatedHashcode).isEqualTo(getExpectedHashForRowCount(numberOfRows));
+
     PipelineResult readResult = readPipeline.run();
-    readResult.waitUntilFinish(Duration.standardSeconds(options.getReadTimeout()));
+    readResult.waitUntilFinish();
+
+    if (!options.isWithTestcontainers()) {
+      collectAndPublishMetrics(writeResult, readResult);
+    }
   }
 
-  /** Pipeline options specific for this test. */
-  public interface Options extends IOTestPipelineOptions, StreamingOptions {
+  private CdapIO.Write<TestRowDBWritable, NullWritable> writeToDB(Map<String, Object> params) {
+    DBConfig pluginConfig = new ConfigWrapper<>(DBConfig.class).withParams(params).build();
 
-    @Description("Options for synthetic source.")
-    @Validation.Required
-    String getSourceOptions();
-
-    void setSourceOptions(String sourceOptions);
-
-    @Description("Time to wait for the events to be processed by the read pipeline (in seconds)")
-    @Validation.Required
-    Integer getReadTimeout();
-
-    void setReadTimeout(Integer readTimeout);
-
-    @Description("Api key for Hubspot source.")
-    @Validation.Required
-    String getHubspotApiKey();
-
-    void setHubspotApiKey(String hubspotApiKey);
-
-    @Description("Object type for Hubspot source.")
-    @Validation.Required
-    String getHubspotObjectType();
-
-    void setHubspotObjectType(String hubspotObjectType);
-
-    @Description("Property names for Hubspot record.")
-    @Validation.Required
-    List<String> getHubspotPropertyNames();
-
-    void setHubspotPropertyNames(List<String> hubspotPropertyNames);
-  }
-
-  private CdapIO.Read<NullWritable, JsonElement> readFromBoundedHubspot(
-      Map<String, Object> paramsMap) {
-    SourceHubspotConfig pluginConfig =
-        new ConfigWrapper<>(SourceHubspotConfig.class).withParams(paramsMap).build();
-    return CdapIO.<NullWritable, JsonElement>read()
-        .withCdapPluginClass(HubspotBatchSource.class)
+    return CdapIO.<TestRowDBWritable, NullWritable>write()
+        .withCdapPluginClass(DBBatchSink.class)
         .withPluginConfig(pluginConfig)
-        .withKeyClass(NullWritable.class)
-        .withValueClass(JsonElement.class);
-  }
-
-  private CdapIO.Write<NullWritable, String> writeToHubspot(Map<String, Object> paramsMap) {
-    SinkHubspotConfig sinkConfig =
-        new ConfigWrapper<>(SinkHubspotConfig.class).withParams(paramsMap).build();
-
-    return CdapIO.<NullWritable, String>write()
-        .withCdapPluginClass(HubspotBatchSink.class)
-        .withPluginConfig(sinkConfig)
-        .withKeyClass(NullWritable.class)
-        .withValueClass(String.class)
+        .withKeyClass(TestRowDBWritable.class)
+        .withValueClass(NullWritable.class)
         .withLocksDirPath(tmpFolder.getRoot().getAbsolutePath());
   }
 
-  public static String getHashForRecordCount(long recordCount, Map<Long, String> hashes) {
-    String hash = hashes.get(recordCount);
-    if (hash == null) {
-      throw new UnsupportedOperationException(
-          String.format("No hash for that record count: %s", recordCount));
-    }
-    return hash;
+  private CdapIO.Read<LongWritable, TestRowDBWritable> readFromDB(Map<String, Object> params) {
+    DBConfig pluginConfig = new ConfigWrapper<>(DBConfig.class).withParams(params).build();
+
+    return CdapIO.<LongWritable, TestRowDBWritable>read()
+        .withCdapPluginClass(DBBatchSource.class)
+        .withPluginConfig(pluginConfig)
+        .withKeyClass(LongWritable.class)
+        .withValueClass(TestRowDBWritable.class);
   }
 
-  public static class JsonElementCoder extends CustomCoder<JsonElement> {
-    private static final JsonElementCoder CODER = new JsonElementCoder();
-    private static final StringUtf8Coder STRING_CODER = StringUtf8Coder.of();
-
-    public static JsonElementCoder of() {
-      return CODER;
-    }
-
-    @Override
-    public void encode(JsonElement value, OutputStream outStream) throws IOException {
-      STRING_CODER.encode(value.toString(), outStream);
-    }
-
-    @Override
-    public JsonElement decode(InputStream inStream) throws IOException {
-      return JsonParser.parseString(STRING_CODER.decode(inStream));
-    }
+  private Map<String, Object> getParamsFromOptions(CdapIOITOptions options) {
+    Map<String, Object> params = new HashMap<>();
+    params.put(DBConfig.DB_URL, DatabaseTestHelper.getPostgresDBUrl(options));
+    params.put(DBConfig.POSTGRES_USERNAME, options.getPostgresUsername());
+    params.put(DBConfig.POSTGRES_PASSWORD, options.getPostgresPassword());
+    return params;
   }
 
-  private static class MapHubspotRecordsToStrings
-      extends SimpleFunction<KV<NullWritable, JsonElement>, String> {
-    @Override
-    public String apply(KV<NullWritable, JsonElement> input) {
-      return input.getValue().toString();
-    }
+  /** Pipeline options specific for this test. */
+  public interface CdapIOITOptions extends PostgresIOTestPipelineOptions {
+
+    @Description("Whether to use testcontainers")
+    @Default.Boolean(false)
+    Boolean isWithTestcontainers();
+
+    void setWithTestcontainers(Boolean withTestcontainers);
   }
 
-  private static class MapToHubspotRecord
-      extends DoFn<KV<byte[], byte[]>, KV<NullWritable, String>> {
+  private static void setPostgresContainer() {
+    postgreSQLContainer =
+        new PostgreSQLContainer(DockerImageName.parse("postgres").withTag("latest"))
+            .withDatabaseName(options.getPostgresDatabaseName())
+            .withUsername(options.getPostgresUsername())
+            .withPassword(options.getPostgresPassword());
+    postgreSQLContainer.start();
+    options.setPostgresServerName(postgreSQLContainer.getContainerIpAddress());
+    options.setPostgresPort(postgreSQLContainer.getMappedPort(PostgreSQLContainer.POSTGRESQL_PORT));
+    options.setPostgresSsl(false);
+  }
+
+  private static void createTable() throws SQLException {
+    DatabaseTestHelper.createTable(dataSource, tableName);
+  }
+
+  private static void deleteTable() throws SQLException {
+    DatabaseTestHelper.deleteTable(dataSource, tableName);
+  }
+
+  private void collectAndPublishMetrics(PipelineResult writeResult, PipelineResult readResult) {
+    String uuid = UUID.randomUUID().toString();
+    String timestamp = Timestamp.now().toString();
+
+    Set<Function<MetricsReader, NamedTestResult>> readSuppliers = getReadSuppliers(uuid, timestamp);
+    Set<Function<MetricsReader, NamedTestResult>> writeSuppliers =
+        getWriteSuppliers(uuid, timestamp);
+
+    IOITMetrics readMetrics =
+        new IOITMetrics(readSuppliers, readResult, NAMESPACE, uuid, timestamp);
+    IOITMetrics writeMetrics =
+        new IOITMetrics(writeSuppliers, writeResult, NAMESPACE, uuid, timestamp);
+    readMetrics.publishToInflux(settings);
+    writeMetrics.publishToInflux(settings);
+  }
+
+  private Set<Function<MetricsReader, NamedTestResult>> getReadSuppliers(
+      String uuid, String timestamp) {
+    Set<Function<MetricsReader, NamedTestResult>> suppliers = new HashSet<>();
+    suppliers.add(getTimeMetric(uuid, timestamp, "read_time"));
+    return suppliers;
+  }
+
+  private Set<Function<MetricsReader, NamedTestResult>> getWriteSuppliers(
+      String uuid, String timestamp) {
+    Set<Function<MetricsReader, NamedTestResult>> suppliers = new HashSet<>();
+    suppliers.add(getTimeMetric(uuid, timestamp, "write_time"));
+    suppliers.add(
+        reader ->
+            NamedTestResult.create(
+                uuid,
+                timestamp,
+                "data_size",
+                DatabaseTestHelper.getPostgresTableSize(dataSource, tableName)
+                    .orElseThrow(() -> new IllegalStateException("Unable to fetch table size"))));
+    return suppliers;
+  }
+
+  private Function<MetricsReader, NamedTestResult> getTimeMetric(
+      final String uuid, final String timestamp, final String metricName) {
+    return reader -> {
+      long startTime = reader.getStartTimeMetric(metricName);
+      long endTime = reader.getEndTimeMetric(metricName);
+      return NamedTestResult.create(uuid, timestamp, metricName, (endTime - startTime) / 1e3);
+    };
+  }
+
+  /**
+   * Uses the input {@link TestRow} values as seeds to produce new {@link KV}s for {@link CdapIO}.
+   */
+  static class ConstructDBOutputFormatRowFn
+      extends DoFn<TestRow, KV<TestRowDBWritable, NullWritable>> {
     @ProcessElement
-    public void process(ProcessContext context) throws JsonProcessingException {
-      byte[] value = context.element().getValue();
-      String strVal = Arrays.toString(value);
-      List<HubspotPropertyJson> props = new ArrayList<>();
-      for (String propertyName : propertyNames) {
-        props.add(new HubspotPropertyJson(propertyName, strVal));
-      }
-      HubspotPropertiesJson hubspotPropertiesJson = new HubspotPropertiesJson(props);
-      context.output(
-          KV.of(
-              NullWritable.get(),
-              objectMapper
-                  .writer()
-                  .withDefaultPrettyPrinter()
-                  .writeValueAsString(hubspotPropertiesJson)));
-    }
-  }
-
-  @SuppressWarnings("UnusedVariable")
-  private static class HubspotPropertiesJson {
-    private List<HubspotPropertyJson> properties;
-
-    public HubspotPropertiesJson(List<HubspotPropertyJson> properties) {
-      this.properties = properties;
-    }
-  }
-
-  @SuppressWarnings("UnusedVariable")
-  private static class HubspotPropertyJson {
-    private String name;
-    private String value;
-
-    public HubspotPropertyJson(String name, String value) {
-      this.name = name;
-      this.value = value;
+    public void processElement(ProcessContext c) {
+      c.output(
+          KV.of(new TestRowDBWritable(c.element().id(), c.element().name()), NullWritable.get()));
     }
   }
 }
