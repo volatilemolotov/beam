@@ -30,6 +30,7 @@ class ExampleState with ChangeNotifier {
   Map<SDK, List<CategoryModel>>? sdkCategories;
   Map<SDK, ExampleModel> defaultExamplesMap = {};
   ExampleModel? defaultExample;
+  bool isSelectorOpened = false;
 
   ExampleState(this._exampleRepository);
 
@@ -118,7 +119,7 @@ class ExampleState with ChangeNotifier {
         .then((map) => setSdkCategories(map));
   }
 
-  loadDefaultExamples() async {
+  Future<void> loadDefaultExamples() async {
     if (defaultExamplesMap.isNotEmpty) {
       return;
     }
@@ -138,10 +139,23 @@ class ExampleState with ChangeNotifier {
     }
 
     defaultExamplesMap.addEntries(defaultExamples);
+    final futures = <Future<void>>[];
+
     for (var entry in defaultExamplesMap.entries) {
-      loadExampleInfo(entry.value, entry.key)
+      final exampleFuture = loadExampleInfo(entry.value, entry.key)
           .then((value) => defaultExamplesMap[entry.key] = value);
+      futures.add(exampleFuture);
     }
     notifyListeners();
+
+    await Future.wait(futures);
+  }
+
+  Future<void> loadDefaultExamplesIfNot() async {
+    if (defaultExamplesMap.isNotEmpty) {
+      return;
+    }
+
+    await loadDefaultExamples();
   }
 }
