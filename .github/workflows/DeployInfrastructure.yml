@@ -17,10 +17,10 @@ jobs:
              echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
       - name: Changing bucket name
         run: |
-          echo "bucket  = "\"${{ secrets.SB_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
-          echo "bucket_examples_name = "\"${{ secrets.SB_BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
-          echo "state_bucket = "\"${{ secrets.SB_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
-          echo "project_id = "\"${{ secrets.SB_PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "bucket  = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
+          echo "bucket_examples_name = "\"${{ secrets.S3D_BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "state_bucket = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "project_id = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
       - name: Changing bucket name
         run: |
           cat playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
