@@ -23,7 +23,7 @@ jobs:
           echo "bucket  = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
           echo "bucket_examples_name = "\"${{ secrets.S3D_BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
           echo "state_bucket = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
-          echo "project_id = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "project_id = "\"${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
       - name: Changing bucket name
         run: |
           cat playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
