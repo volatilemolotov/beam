@@ -19,15 +19,15 @@ package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.testing.PAssert;
+import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
-import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -97,6 +97,7 @@ public class SparkReceiverIOTest {
         SparkReceiverIO.<String>read().withSparkReceiverBuilder(receiverBuilder);
     assertThrows(IllegalStateException.class, read::validateTransform);
   }
+
   @Test
   public void testReadFromCustomReceiverWithOffset() {
     DirectOptions options = PipelineOptionsFactory.as(DirectOptions.class);
@@ -112,9 +113,10 @@ public class SparkReceiverIOTest {
             .withGetOffsetFn(Long::valueOf)
             .withSparkReceiverBuilder(receiverBuilder);
 
-    PCollection<String> output = p.apply(reader).setCoder(StringUtf8Coder.of());
-    PAssert.that(output).empty();
+    TestOutputDoFn testDoFn = new TestOutputDoFn();
+    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
     p.run().waitUntilFinish(Duration.standardSeconds(10));
+    assertTrue(CustomReceiverWithOffset.getRecords().containsAll(testDoFn.getRecords()));
   }
 
   @Test
@@ -133,8 +135,9 @@ public class SparkReceiverIOTest {
             .withSparkConsumer(new CustomSparkConsumer<>())
             .withSparkReceiverBuilder(receiverBuilder);
 
-    PCollection<String> output = p.apply(reader).setCoder(StringUtf8Coder.of());
-    PAssert.that(output).empty();
+    TestOutputDoFn testDoFn = new TestOutputDoFn();
+    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
     p.run().waitUntilFinish(Duration.standardSeconds(10));
+    assertTrue(CustomReceiverWithoutOffset.getRecords().containsAll(testDoFn.getRecords()));
   }
 }
