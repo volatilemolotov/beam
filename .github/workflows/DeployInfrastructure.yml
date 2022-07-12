@@ -14,7 +14,7 @@ jobs:
       
       - name: Setup GCP account
         run: |
-             echo "${{ secrets.SB_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
+             echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
       - name: Changing bucket name
         run: |
           echo "bucket  = "\"${{ secrets.SB_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
