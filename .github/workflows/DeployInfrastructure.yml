@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PROJECT_ENV: beta
-      STAND_SUFFIX: ''
     steps:
       - name: git clone repo
         uses: actions/checkout@v2
