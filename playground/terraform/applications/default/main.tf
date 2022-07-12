@@ -18,8 +18,9 @@
 #
 
 resource "google_app_engine_application" "app_playground" {
-  project     = var.project_id
-  location_id = var.location
+  project       = var.project_id
+  location_id   = var.location
+  database_type = "CLOUD_DATASTORE_COMPABILITY"
 }
 
 resource "google_project_service" "firestore" {
