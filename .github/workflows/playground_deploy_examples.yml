@@ -45,7 +45,7 @@ jobs:
         name: get Difference
         id: check_file_changed
         run: |
-          $diff = git diff --name-only pg-sandbox-example-test
+          $diff = git diff --name-only origin/master
           Write-Host "::set-output name=example_diff::$diff"
       - name: has Examples
         run: |
@@ -92,7 +92,7 @@ jobs:
         run: |
              echo "${{ secrets.TEST_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
              which gcloud
-             gcloud auth activate-service-account --project=keen-optics-354922 --key-file=/tmp/gcp_access.json
+             gcloud auth activate-service-account --project=${{ secrets.TEST_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
       - name: Set Docker Tag
         run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
       - name: Set Docker Tag If Github Tag was trigger
@@ -114,7 +114,7 @@ jobs:
       - name: Install helm chart
         run: |
              kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f - &&\
-             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.PLAYGROUND_REGISTRY_NAME }}/${{ secrets.GCP_PLAYGROUND_PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
+             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.PLAYGROUND_REGISTRY_NAME }}/${{ secrets.TEST_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
              sleep 120
         working-directory: playground/infrastructure/helm
       - name: Run Python Examples CI
