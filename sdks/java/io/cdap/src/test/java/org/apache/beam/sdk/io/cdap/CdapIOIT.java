@@ -53,6 +53,7 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.util.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -75,6 +76,8 @@ import org.testcontainers.utility.DockerImageName;
 public class CdapIOIT {
 
   private static final String NAMESPACE = CdapIOIT.class.getName();
+  private static final String[] TEST_FIELD_NAMES = new String[] {"id", "name"};
+  private static final String TEST_ORDER_BY = "id ASC";
 
   private static PGSimpleDataSource dataSource;
   private static Integer numberOfRows;
@@ -125,14 +128,14 @@ public class CdapIOIT {
         .apply("Prevent fusion before writing", Reshuffle.viaRandomKey())
         .apply("Collect write time", ParDo.of(new TimeMonitor<>(NAMESPACE, "write_time")))
         .apply("Construct rows for DBOutputFormat", ParDo.of(new ConstructDBOutputFormatRowFn()))
-        .apply("Write using CdapIO", writeToDB(getParamsFromOptions(options)));
+        .apply("Write using CdapIO", writeToDB(getWriteTestParamsFromOptions(options)));
 
     PipelineResult writeResult = writePipeline.run();
     writeResult.waitUntilFinish();
 
     PCollection<String> consolidatedHashcode =
         readPipeline
-            .apply("Read using CdapIO", readFromDB(getParamsFromOptions(options)))
+            .apply("Read using CdapIO", readFromDB(getReadTestParamsFromOptions(options)))
             .apply("Collect read time", ParDo.of(new TimeMonitor<>(NAMESPACE, "read_time")))
             .apply("Get values only", Values.create())
             .apply("Values as string", ParDo.of(new TestRow.SelectNameFn()))
@@ -169,11 +172,26 @@ public class CdapIOIT {
         .withValueClass(TestRowDBWritable.class);
   }
 
-  private Map<String, Object> getParamsFromOptions(CdapIOITOptions options) {
+  private Map<String, Object> getTestParamsFromOptions(CdapIOITOptions options) {
     Map<String, Object> params = new HashMap<>();
     params.put(DBConfig.DB_URL, DatabaseTestHelper.getPostgresDBUrl(options));
     params.put(DBConfig.POSTGRES_USERNAME, options.getPostgresUsername());
     params.put(DBConfig.POSTGRES_PASSWORD, options.getPostgresPassword());
+    params.put(DBConfig.FIELD_NAMES, StringUtils.arrayToString(TEST_FIELD_NAMES));
+    params.put(DBConfig.TABLE_NAME, tableName);
+    return params;
+  }
+
+  private Map<String, Object> getReadTestParamsFromOptions(CdapIOITOptions options) {
+    Map<String, Object> params = getTestParamsFromOptions(options);
+    params.put(DBConfig.ORDER_BY, TEST_ORDER_BY);
+    params.put(DBConfig.VALUE_CLASS_NAME, TestRowDBWritable.class.getName());
+    return params;
+  }
+
+  private Map<String, Object> getWriteTestParamsFromOptions(CdapIOITOptions options) {
+    Map<String, Object> params = getTestParamsFromOptions(options);
+    params.put(DBConfig.FIELD_COUNT, String.valueOf(TEST_FIELD_NAMES.length));
     return params;
   }
 

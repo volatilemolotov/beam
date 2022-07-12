@@ -17,9 +17,19 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.DRIVER_CLASS_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.INPUT_CLASS_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.INPUT_FIELD_NAMES_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.INPUT_ORDER_BY_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.INPUT_TABLE_NAME_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.PASSWORD_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.URL_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.USERNAME_PROPERTY;
+
 import io.cdap.cdap.api.data.batch.InputFormatProvider;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.beam.sdk.io.hadoop.format.HadoopFormatIO;
 import org.apache.hadoop.mapreduce.lib.db.DBInputFormat;
 
 /**
@@ -28,11 +38,24 @@ import org.apache.hadoop.mapreduce.lib.db.DBInputFormat;
  */
 public class DBInputFormatProvider implements InputFormatProvider {
 
+  private static final String POSTGRESQL_DRIVER = "org.postgresql.Driver";
+
   private final Map<String, String> conf;
 
   DBInputFormatProvider(DBConfig config) {
-    //TODO:
     this.conf = new HashMap<>();
+
+    conf.put(DRIVER_CLASS_PROPERTY, POSTGRESQL_DRIVER);
+    conf.put(URL_PROPERTY, config.dbUrl);
+    conf.put(USERNAME_PROPERTY, config.pgUsername);
+    conf.put(PASSWORD_PROPERTY, config.pgPassword);
+
+    conf.put(INPUT_TABLE_NAME_PROPERTY, config.tableName);
+    conf.put(INPUT_FIELD_NAMES_PROPERTY, config.fieldNames);
+    conf.put(INPUT_ORDER_BY_PROPERTY, config.orderBy);
+    conf.put(INPUT_CLASS_PROPERTY, config.valueClassName);
+
+    conf.put(HadoopFormatIO.JOB_ID, String.valueOf(1));
   }
 
   @Override

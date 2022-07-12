@@ -27,13 +27,19 @@ import java.util.Set;
 
 /**
  * {@link io.cdap.cdap.api.plugin.PluginConfig} for {@link DBBatchSource} and {@link DBBatchSink}
- * CDAP plugins. Used to test {@link CdapIO#read()} and {@link CdapIO#write()}.
+ * CDAP plugins. Used for integration test {@link CdapIO#read()} and {@link CdapIO#write()}.
  */
 public class DBConfig extends ReferencePluginConfig {
 
   public static final String DB_URL = "dbUrl";
   public static final String POSTGRES_USERNAME = "pgUsername";
   public static final String POSTGRES_PASSWORD = "pgPassword";
+  public static final String TABLE_NAME = "tableName";
+  public static final String FIELD_NAMES = "fieldNames";
+  public static final String FIELD_COUNT = "fieldCount";
+  public static final String ORDER_BY = "orderBy";
+  public static final String KEY_CLASS_NAME = "keyClassName";
+  public static final String VALUE_CLASS_NAME = "valueClassName";
 
   @Name(DB_URL)
   @Macro
@@ -47,11 +53,45 @@ public class DBConfig extends ReferencePluginConfig {
   @Macro
   public String pgPassword;
 
-  public DBConfig(String dbUrl, String pgUsername, String pgPassword, String referenceName) {
+  @Name(TABLE_NAME)
+  @Macro
+  public String tableName;
+
+  @Name(FIELD_NAMES)
+  @Macro
+  public String fieldNames;
+
+  @Name(FIELD_COUNT)
+  @Macro
+  public String fieldCount;
+
+  @Name(ORDER_BY)
+  @Macro
+  public String orderBy;
+
+  @Name(VALUE_CLASS_NAME)
+  @Macro
+  public String valueClassName;
+
+  public DBConfig(
+      String referenceName,
+      String dbUrl,
+      String pgUsername,
+      String pgPassword,
+      String tableName,
+      String fieldNames,
+      String fieldCount,
+      String orderBy,
+      String valueClassName) {
     super(referenceName);
     this.dbUrl = dbUrl;
     this.pgUsername = pgUsername;
     this.pgPassword = pgPassword;
+    this.tableName = tableName;
+    this.fieldNames = fieldNames;
+    this.fieldCount = fieldCount;
+    this.orderBy = orderBy;
+    this.valueClassName = valueClassName;
   }
 
   public Schema getSchema() {

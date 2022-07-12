@@ -17,9 +17,18 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.DRIVER_CLASS_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.OUTPUT_FIELD_COUNT_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.OUTPUT_FIELD_NAMES_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.OUTPUT_TABLE_NAME_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.PASSWORD_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.URL_PROPERTY;
+import static org.apache.hadoop.mapreduce.lib.db.DBConfiguration.USERNAME_PROPERTY;
+
 import io.cdap.cdap.api.data.batch.OutputFormatProvider;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.beam.sdk.io.hadoop.format.HadoopFormatIO;
 import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
 
 /**
@@ -28,12 +37,23 @@ import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
  */
 public class DBOutputFormatProvider implements OutputFormatProvider {
 
-  private final Map<String, String> configMap;
+  private static final String POSTGRESQL_DRIVER = "org.postgresql.Driver";
+
+  private final Map<String, String> conf;
 
   DBOutputFormatProvider(DBConfig config) {
-    //TODO:
-    this.configMap = new HashMap<>();
+    this.conf = new HashMap<>();
 
+    conf.put(DRIVER_CLASS_PROPERTY, POSTGRESQL_DRIVER);
+    conf.put(URL_PROPERTY, config.dbUrl);
+    conf.put(USERNAME_PROPERTY, config.pgUsername);
+    conf.put(PASSWORD_PROPERTY, config.pgPassword);
+
+    conf.put(OUTPUT_TABLE_NAME_PROPERTY, config.tableName);
+    conf.put(OUTPUT_FIELD_COUNT_PROPERTY, config.fieldCount);
+    conf.put(OUTPUT_FIELD_NAMES_PROPERTY, config.fieldNames);
+
+    conf.put(HadoopFormatIO.JOB_ID, String.valueOf(1));
   }
 
   @Override
@@ -43,6 +63,6 @@ public class DBOutputFormatProvider implements OutputFormatProvider {
 
   @Override
   public Map<String, String> getOutputFormatConfiguration() {
-    return configMap;
+    return conf;
   }
 }
