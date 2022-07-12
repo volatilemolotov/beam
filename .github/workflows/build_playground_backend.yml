@@ -27,6 +27,7 @@ jobs:
       TERRAFORM_VERSION: 1.0.9
       STAND_SUFFIX: ''
       DATASTORE_EMULATOR_HOST: 127.0.0.1:8888
+      PROJECT_ENV: beta
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -78,4 +79,4 @@ jobs:
       - name: Deploy Backend Applications
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-        run: ./gradlew playground:terraform:deployBackend -Pdocker-tag=${{env.DOCKERTAG}} -Pproject_id=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
+        run: ./gradlew playground:terraform:deployBackend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
