@@ -28,5 +28,4 @@ ALLOWED_BUCKET_LIST = [
     "beam-samples",
     "apache-beam-samples",
     "playground-precompiled-objects",
-    "conductive-bot-1",
 ]
