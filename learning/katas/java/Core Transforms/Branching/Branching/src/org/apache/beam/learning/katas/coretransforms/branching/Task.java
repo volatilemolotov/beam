@@ -48,6 +48,7 @@ public class Task {
         pipeline.apply(Create.of(1, 2, 3, 4, 5));
 
     PCollection<Integer> mult5Results = applyMultiply5Transform(numbers);
+    
     PCollection<Integer> mult10Results = applyMultiply10Transform(numbers);
 
     mult5Results.apply("Log multiply 5", Log.ofElements("Multiplied by 5: "));
