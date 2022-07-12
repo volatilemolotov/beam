@@ -54,7 +54,7 @@ ENV SERVER_IP=0.0.0.0
 ENV SERVER_PORT=8080
 ENV APP_WORK_DIR=/opt/playground/backend/
 ENV BEAM_SDK="SDK_GO"
-ENV BUCKET_NAME="test1207-1"
+ENV BUCKET_NAME="conductive-bot-1"
 ## Copy build result
 COPY src/configs /opt/playground/backend/configs/
 
