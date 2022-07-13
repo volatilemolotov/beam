@@ -128,8 +128,7 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
       if (record != null) {
         Long offset = getOffsetFn.apply(record);
         if (!tracker.tryClaim(offset)) {
-          LOG.info("Stop for restriction: {}",
-                  tracker.currentRestriction().toString());
+          LOG.info("Stop for restriction: {}", tracker.currentRestriction().toString());
           return ProcessContinuation.stop();
         }
         ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(Instant.now());
