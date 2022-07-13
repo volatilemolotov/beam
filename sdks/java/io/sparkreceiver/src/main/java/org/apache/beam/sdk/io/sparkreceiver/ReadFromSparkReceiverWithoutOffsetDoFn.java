@@ -131,8 +131,10 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
           LOG.info("Stop for restriction: {}", tracker.currentRestriction().toString());
           return ProcessContinuation.stop();
         }
-        ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(Instant.now());
-        receiver.outputWithTimestamp(record, Instant.now());
+        Instant currentTimeStamp = Instant.now();
+        ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(currentTimeStamp);
+        receiver.outputWithTimestamp(record, currentTimeStamp);
+        LOG.info("Record {} was outputted with timestamp {}", record, currentTimeStamp);
       }
     }
     LOG.info("Resume for restriction: {}", tracker.currentRestriction().toString());
@@ -142,8 +144,10 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
   private static Instant ensureTimestampWithinBounds(Instant timestamp) {
     if (timestamp.isBefore(BoundedWindow.TIMESTAMP_MIN_VALUE)) {
       timestamp = BoundedWindow.TIMESTAMP_MIN_VALUE;
+      LOG.debug("Timestamp was before MIN_VALUE({})", BoundedWindow.TIMESTAMP_MIN_VALUE);
     } else if (timestamp.isAfter(BoundedWindow.TIMESTAMP_MAX_VALUE)) {
       timestamp = BoundedWindow.TIMESTAMP_MAX_VALUE;
+      LOG.debug("Timestamp was after MAX_VALUE({})", BoundedWindow.TIMESTAMP_MAX_VALUE);
     }
     return timestamp;
   }

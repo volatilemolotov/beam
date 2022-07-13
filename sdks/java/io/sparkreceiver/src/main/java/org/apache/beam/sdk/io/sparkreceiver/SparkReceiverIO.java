@@ -30,9 +30,14 @@ import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Streaming sources for Spark {@link Receiver}. */
 public class SparkReceiverIO {
+
+  private static final Logger LOG =
+          LoggerFactory.getLogger(SparkReceiverIO.class);
 
   public static <V> Read<V> read() {
     return new AutoValue_SparkReceiverIO_Read.Builder<V>().build();
@@ -121,10 +126,12 @@ public class SparkReceiverIO {
           sparkReceiverRead.getSparkReceiverBuilder();
       checkStateNotNull(sparkReceiverBuilder, "withSparkReceiverBuilder() is required");
       if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
+        LOG.info("{} started reading", ReadFromSparkReceiverWithoutOffsetDoFn.class.getSimpleName());
         return input
             .apply(Impulse.create())
             .apply(ParDo.of(new ReadFromSparkReceiverWithoutOffsetDoFn<>(sparkReceiverRead)));
       } else {
+        LOG.info("{} started reading", ReadFromSparkReceiverWithOffsetDoFn.class.getSimpleName());
         return input
             .apply(Impulse.create())
             .apply(ParDo.of(new ReadFromSparkReceiverWithOffsetDoFn<>(sparkReceiverRead)));
