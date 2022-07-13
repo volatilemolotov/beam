@@ -19,7 +19,6 @@ package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
-import java.util.concurrent.TimeUnit;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.range.OffsetRange;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -124,34 +123,21 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
       WatermarkEstimator<Instant> watermarkEstimator,
       OutputReceiver<V> receiver) {
 
-    while (true) {
-      if (!sparkConsumer.hasRecords()) {
-        try {
-          LOG.info("Poll for restriction: {}", tracker.currentRestriction().toString());
-          TimeUnit.MILLISECONDS.sleep(CONTINUE_POLL_TIMEOUT_MS);
-        } catch (InterruptedException e) {
-          LOG.error("Interrupted", e);
+    while (sparkConsumer.hasRecords()) {
+      V record = sparkConsumer.poll();
+      if (record != null) {
+        Long offset = getOffsetFn.apply(record);
+        if (!tracker.tryClaim(offset)) {
+          LOG.info("Stop for restriction: {}",
+                  tracker.currentRestriction().toString());
+          return ProcessContinuation.stop();
         }
+        ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(Instant.now());
+        receiver.outputWithTimestamp(record, Instant.now());
       }
-      if (!sparkConsumer.hasRecords()) {
-        LOG.info("Resume for restriction: {}", tracker.currentRestriction().toString());
-        return ProcessContinuation.resume()
-            .withResumeDelay(Duration.millis(CONTINUE_POLL_TIMEOUT_MS));
-      }
-      while (sparkConsumer.hasRecords()) {
-        V record = sparkConsumer.poll();
-        if (record != null) {
-          Long offset = getOffsetFn.apply(record);
-          if (!tracker.tryClaim(offset)) {
-            LOG.info("Stop for restriction: {}", tracker.currentRestriction().toString());
-            return ProcessContinuation.stop();
-          }
-          ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(Instant.now());
-          receiver.outputWithTimestamp(record, Instant.now());
-        }
-      }
-      LOG.info("Current restriction: {}", tracker.currentRestriction().toString());
     }
+    LOG.info("Resume for restriction: {}", tracker.currentRestriction().toString());
+    return ProcessContinuation.resume().withResumeDelay(Duration.millis(CONTINUE_POLL_TIMEOUT_MS));
   }
 
   private static Instant ensureTimestampWithinBounds(Instant timestamp) {

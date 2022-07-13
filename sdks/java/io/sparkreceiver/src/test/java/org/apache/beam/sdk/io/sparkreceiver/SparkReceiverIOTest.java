@@ -116,7 +116,7 @@ public class SparkReceiverIOTest {
     TestOutputDoFn testDoFn = new TestOutputDoFn();
     p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
     p.run().waitUntilFinish(Duration.standardSeconds(10));
-    assertTrue(CustomReceiverWithOffset.getRecords().containsAll(testDoFn.getRecords()));
+    assertTrue(CustomReceiverWithOffset.getStoredRecords().containsAll(testDoFn.getRecords()));
   }
 
   @Test
@@ -138,6 +138,6 @@ public class SparkReceiverIOTest {
     TestOutputDoFn testDoFn = new TestOutputDoFn();
     p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
     p.run().waitUntilFinish(Duration.standardSeconds(10));
-    assertTrue(CustomReceiverWithoutOffset.getRecords().containsAll(testDoFn.getRecords()));
+    assertTrue(CustomReceiverWithoutOffset.getStoredRecords().containsAll(testDoFn.getRecords()));
   }
 }

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestOutputDoFn extends DoFn<String, String> {
-    private final List<String> records = new ArrayList<>();
+    private final static List<String> records = new ArrayList<>();
 
     @ProcessElement
     public void processElement(

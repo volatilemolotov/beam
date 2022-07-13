@@ -36,7 +36,7 @@ public class CustomReceiverWithOffset extends Receiver<String> implements HasOff
   private static final Logger LOG = LoggerFactory.getLogger(CustomReceiverWithOffset.class);
   private static final int TIMEOUT_MS = 500;
 
-  private static final List<String> records = new ArrayList<>();
+  private static final List<String> STORED_RECORDS = new ArrayList<>();
   private Long startOffset;
 
   CustomReceiverWithOffset() {
@@ -67,7 +67,7 @@ public class CustomReceiverWithOffset extends Receiver<String> implements HasOff
   private void receive() {
     Long currentOffset = startOffset;
     while (!isStopped()) {
-      records.add(currentOffset.toString());
+      STORED_RECORDS.add(currentOffset.toString());
       store((currentOffset++).toString());
       try {
         TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
@@ -77,7 +77,7 @@ public class CustomReceiverWithOffset extends Receiver<String> implements HasOff
     }
   }
 
-  public static List<String> getRecords() {
-    return records;
+  public static List<String> getStoredRecords() {
+    return STORED_RECORDS;
   }
 }
