@@ -22,7 +22,7 @@ import 'package:playground/modules/sdk/models/sdk.dart';
 class SetSdkMessage extends AbstractMessage {
   final SDK sdk;
 
-  static const type = 'SetSdkMessage';
+  static const type = 'SetSdk';
 
   const SetSdkMessage({
     required this.sdk,

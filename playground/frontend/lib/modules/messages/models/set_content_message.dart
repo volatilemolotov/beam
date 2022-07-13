@@ -20,14 +20,16 @@ import 'package:playground/modules/messages/models/abstract_message.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 class SetContentMessage extends AbstractMessage {
-  final SDK? sdk;
   final String? content;
+  final String? example;
+  final SDK? sdk;
 
-  static const type = 'SetContentMessage';
+  static const type = 'SetContent';
 
   const SetContentMessage({
-    this.sdk,
     this.content,
+    this.example,
+    this.sdk,
   });
 
   static SetContentMessage? fromMap(Map eventData) {
@@ -42,18 +44,22 @@ class SetContentMessage extends AbstractMessage {
   /// Use this when messages are known to be of this class and so miss `type`.
   static SetContentMessage fromMapNoCheck(Map eventData) {
     return SetContentMessage(
-      sdk: _tryParseSdk(eventData),
       content: _tryParseContent(eventData),
+      example: _tryParseExample(eventData),
+      sdk: _tryParseSdk(eventData),
     );
+  }
+
+  static String? _tryParseContent(Map map) {
+    return map['content']?.toString();
+  }
+
+  static String? _tryParseExample(Map map) {
+    return map['example']?.toString();
   }
 
   static SDK? _tryParseSdk(Map map) {
     return SDK.tryParse(map['sdk']);
-  }
-
-  static String? _tryParseContent(Map map) {
-    final code = map['content'];
-    return code?.toString();
   }
 
   @override
@@ -68,7 +74,8 @@ class SetContentMessage extends AbstractMessage {
     }
 
     return other is SetContentMessage &&
-        sdk == other.sdk &&
-        content == other.content;
+        content == other.content &&
+        example == other.example &&
+        sdk == other.sdk;
   }
 }

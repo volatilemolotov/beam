@@ -22,6 +22,7 @@ import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:highlight/languages/scala.dart';
 import 'package:playground/config.g.dart';
+import 'package:playground/constants/params.dart';
 
 enum SDK {
   java,
@@ -29,6 +30,10 @@ enum SDK {
   python,
   scio,
   ;
+
+  static SDK getDefault() {
+    return SDK.tryParse(Uri.base.queryParameters[kSdkParam]) ?? java;
+  }
 
   static SDK? tryParse(Object? value) {
     if (value is! String) {

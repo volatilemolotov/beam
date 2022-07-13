@@ -62,9 +62,16 @@ class GrpcExampleClient implements ExampleClient {
     return _runSafely(
       () => _defaultClient
           .getDefaultPrecompiledObject(
-              _getDefaultExampleRequestToGrpcRequest(request))
-          .then((response) =>
-              GetExampleResponse(_toExampleModel(response.precompiledObject))),
+            _getDefaultExampleRequestToGrpcRequest(request),
+          )
+          .then(
+            (response) => GetExampleResponse(
+              _toExampleModel(
+                request.sdk,
+                response.precompiledObject,
+              ),
+            ),
+          ),
     );
   }
 
@@ -75,9 +82,16 @@ class GrpcExampleClient implements ExampleClient {
     return _runSafely(
       () => _defaultClient
           .getPrecompiledObject(
-              grpc.GetPrecompiledObjectRequest()..cloudPath = request.path)
-          .then((response) =>
-              GetExampleResponse(_toExampleModel(response.precompiledObject))),
+            grpc.GetPrecompiledObjectRequest()..cloudPath = request.path,
+          )
+          .then(
+            (response) => GetExampleResponse(
+              _toExampleModel(
+                request.sdk,
+                response.precompiledObject,
+              ),
+            ),
+          ),
     );
   }
 
@@ -239,7 +253,7 @@ class GrpcExampleClient implements ExampleClient {
       List<CategoryModel> categoriesForSdk = [];
       for (var category in sdkMap.categories) {
         List<ExampleModel> examples = category.precompiledObjects
-            .map((example) => _toExampleModel(example))
+            .map((example) => _toExampleModel(sdk, example))
             .toList()
           ..sort();
         categoriesForSdk.add(CategoryModel(
@@ -253,8 +267,9 @@ class GrpcExampleClient implements ExampleClient {
     return sdkCategoriesMap;
   }
 
-  ExampleModel _toExampleModel(grpc.PrecompiledObject example) {
+  ExampleModel _toExampleModel(SDK sdk, grpc.PrecompiledObject example) {
     return ExampleModel(
+      sdk: sdk,
       name: example.name,
       description: example.description,
       type: _exampleTypeFromString(example.type),

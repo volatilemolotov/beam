@@ -50,13 +50,13 @@ class PlaygroundState with ChangeNotifier {
   StreamSubscription<RunCodeResult>? _runSubscription;
   StreamController<int>? _executionTime;
   OutputType? selectedOutputFilterType;
-  String? outputResult;
+  String outputResult = '';
 
   PlaygroundState({
     SDK? sdk,
     ExampleModel? selectedExample,
     CodeRepository? codeRepository,
-  }) : _sdk = sdk ?? SDK.java {
+  }) : _sdk = sdk ?? SDK.getDefault() {
     _getOrCreateSnippetEditingController(_sdk);
     snippetEditingController.selectedExample = selectedExample;
 

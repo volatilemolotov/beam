@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:playground/constants/params.dart';
 import 'package:playground/modules/analytics/analytics_service.dart';
@@ -25,7 +27,9 @@ import 'package:playground/modules/editor/repository/code_repository/code_reposi
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/grpc_example_client.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
+import 'package:playground/modules/messages/models/set_multi_content_message.dart';
 import 'package:playground/modules/output/models/output_placement_state.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/feedback_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
@@ -102,6 +106,10 @@ class PlaygroundPageProviders extends StatelessWidget {
     ExampleState exampleState,
     PlaygroundState playgroundState,
   ) async {
+    if (await _loadMultipleExamples(exampleState, playgroundState)) {
+      return;
+    }
+
     final example = _getEmbeddedExample();
 
     if (example.path.isEmpty) {
@@ -127,6 +135,7 @@ class PlaygroundPageProviders extends StatelessWidget {
     final examplePath = Uri.base.queryParameters[kExampleParam];
 
     return ExampleModel(
+      sdk: SDK.getDefault(),
       name: 'Embedded_Example',
       path: examplePath ?? '',
       description: '',
@@ -138,6 +147,10 @@ class PlaygroundPageProviders extends StatelessWidget {
     ExampleState exampleState,
     PlaygroundState playgroundState,
   ) async {
+    if (await _loadMultipleExamples(exampleState, playgroundState)) {
+      return;
+    }
+
     await exampleState.loadDefaultExamplesIfNot();
 
     final example = await _getExample(exampleState, playgroundState);
@@ -183,5 +196,50 @@ class PlaygroundPageProviders extends StatelessWidget {
       (example) => example.path == examplePath,
       orElse: () => exampleState.defaultExample!,
     );
+  }
+
+  Future<bool> _loadMultipleExamples(
+    ExampleState exampleState,
+    PlaygroundState playgroundState,
+  ) async {
+    final snippetsJson = Uri.base.queryParameters[kSnippetsParam];
+    if (snippetsJson == null) {
+      return false;
+    }
+
+    final snippetsList = jsonDecode(snippetsJson);
+    if (snippetsList is! List) {
+      return false;
+    }
+
+    final multiMessage = SetMultiContentMessage.fromContent(snippetsList);
+    final exampleFutures = <Future<ExampleModel>>[];
+
+    for (final message in multiMessage.content) {
+      final exampleName = message.example;
+      final sdk = message.sdk;
+
+      if (exampleName == null || sdk == null) {
+        continue;
+      }
+
+      final future = exampleState
+          .getExample(
+            exampleName,
+            sdk,
+          )
+          .then((example) => exampleState.loadExampleInfo(example, sdk));
+
+      exampleFutures.add(future);
+    }
+
+    final examples = await Future.wait(exampleFutures);
+
+    for (final example in examples) {
+      playgroundState.setExampleForSdk(example.sdk, example);
+    }
+
+    playgroundState.setSdk(SDK.getDefault());
+    return true;
   }
 }

@@ -24,7 +24,7 @@ import 'set_content_message.dart';
 class SetMultiContentMessage extends AbstractMessage {
   final List<SetContentMessage> content;
 
-  static const type = 'SetMultiContentMessage';
+  static const type = 'SetMultiContent';
 
   const SetMultiContentMessage({
     required this.content,
@@ -35,10 +35,11 @@ class SetMultiContentMessage extends AbstractMessage {
       return null;
     }
 
-    return SetMultiContentMessage(
-      content: _tryParseContent(map['content']),
-    );
+    return SetMultiContentMessage.fromContent(map['content']);
   }
+
+  SetMultiContentMessage.fromContent(Object? content)
+      : content = _tryParseContent(content);
 
   static List<SetContentMessage> _tryParseContent(Object? list) {
     if (list is! List) {

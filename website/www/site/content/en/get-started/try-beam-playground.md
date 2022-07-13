@@ -25,7 +25,12 @@ You can try the available Apache Beam examples at
 
 ## Beam Playground WordCount Example
 
-{{< playground "true" "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MinimalWordCount" "" "700px">}}
+{{< playground_tabs height="700px" >}}
+{{< playground_snippet language="java" example="SDK_JAVA/PRECOMPILED_OBJECT_TYPE_KATA/AggregationCount" >}}
+{{< playground_snippet language="py" example="SDK_PYTHON/PRECOMPILED_OBJECT_TYPE_KATA/AggregationCount" >}}
+{{< playground_snippet language="go" example="SDK_GO/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MinimalWordCount" >}}
+{{< playground_snippet language="scio" example="SDK_SCIO/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MinimalWordCount" >}}
+{{< /playground_tabs >}}
 
 ## How To Add New Examples
 

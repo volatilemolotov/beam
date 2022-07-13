@@ -17,8 +17,12 @@
  */
 
 import 'package:playground/modules/examples/models/example_model.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
+
+const _sdk = SDK.python;
 
 final ExampleModel exampleMock1 = ExampleModel(
+  sdk: _sdk,
   source: 'ex1',
   name: 'Example',
   type: ExampleType.example,
@@ -27,6 +31,7 @@ final ExampleModel exampleMock1 = ExampleModel(
 );
 
 final ExampleModel exampleMock2 = ExampleModel(
+  sdk: _sdk,
   source: 'ex2',
   name: 'Kata',
   type: ExampleType.kata,
@@ -35,6 +40,7 @@ final ExampleModel exampleMock2 = ExampleModel(
 );
 
 final ExampleModel exampleWithoutSourceMock = ExampleModel(
+  sdk: _sdk,
   name: 'Test example',
   type: ExampleType.example,
   description: 'description',
@@ -42,6 +48,7 @@ final ExampleModel exampleWithoutSourceMock = ExampleModel(
 );
 
 final ExampleModel exampleWithAllAdditionsMock = ExampleModel(
+  sdk: _sdk,
   name: 'Test example',
   type: ExampleType.example,
   description: 'description',

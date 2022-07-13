@@ -17,6 +17,8 @@
  */
 
 const kExampleParam = 'example';
+const kSdkParam = 'sdk';
+const kSnippetsParam = 'snippets';
 const kIsEditable = 'enabled';
 const kSourceCode = 'code';
 const kContextLine = 'line';
