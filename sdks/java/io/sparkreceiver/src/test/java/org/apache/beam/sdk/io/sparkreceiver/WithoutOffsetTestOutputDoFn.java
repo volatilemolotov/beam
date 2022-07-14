@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.beam.sdk.transforms.DoFn;
 
 public class WithoutOffsetTestOutputDoFn extends DoFn<String, String> {
-  private final static List<String> records = new ArrayList<>();
+  private static final List<String> records = new ArrayList<>();
 
   @ProcessElement
   public void processElement(@Element String input, OutputReceiver<String> output) {

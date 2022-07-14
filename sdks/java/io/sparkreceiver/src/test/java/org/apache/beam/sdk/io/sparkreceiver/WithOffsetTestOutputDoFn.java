@@ -17,21 +17,20 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import org.apache.beam.sdk.transforms.DoFn;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.beam.sdk.transforms.DoFn;
 
 public class WithOffsetTestOutputDoFn extends DoFn<String, String> {
-    private final static List<String> records = new ArrayList<>();
+  private static final List<String> records = new ArrayList<>();
 
-    @ProcessElement
-    public void processElement(@Element String input, DoFn.OutputReceiver<String> output) {
-        records.add(input);
-        output.output(input);
-    }
+  @ProcessElement
+  public void processElement(@Element String input, DoFn.OutputReceiver<String> output) {
+    records.add(input);
+    output.output(input);
+  }
 
-    public static List<String> getRecords() {
-        return records;
-    }
+  public static List<String> getRecords() {
+    return records;
+  }
 }

@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
 import org.apache.beam.runners.direct.DirectOptions;
 import org.apache.beam.runners.direct.DirectRunner;
 import org.apache.beam.sdk.Pipeline;
@@ -32,8 +33,6 @@ import org.joda.time.Duration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.util.List;
 
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
@@ -141,7 +140,6 @@ public class SparkReceiverIOTest {
             .withGetOffsetFn(Long::valueOf)
             .withSparkConsumer(new CustomSparkConsumer<>())
             .withSparkReceiverBuilder(receiverBuilder);
-
 
     WithoutOffsetTestOutputDoFn testDoFn = new WithoutOffsetTestOutputDoFn();
     List<String> storedRecords = CustomReceiverWithoutOffset.getStoredRecords();
