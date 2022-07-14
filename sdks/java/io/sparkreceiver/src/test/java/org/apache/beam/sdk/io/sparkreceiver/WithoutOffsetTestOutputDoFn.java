@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.beam.sdk.transforms.DoFn;
 
-public class TestOutputDoFn extends DoFn<String, String> {
-  private static final List<String> records = new ArrayList<>();
+public class WithoutOffsetTestOutputDoFn extends DoFn<String, String> {
+  private final static List<String> records = new ArrayList<>();
 
   @ProcessElement
   public void processElement(@Element String input, OutputReceiver<String> output) {
@@ -30,7 +30,7 @@ public class TestOutputDoFn extends DoFn<String, String> {
     output.output(input);
   }
 
-  public List<String> getRecords() {
+  public static List<String> getRecords() {
     return records;
   }
 }

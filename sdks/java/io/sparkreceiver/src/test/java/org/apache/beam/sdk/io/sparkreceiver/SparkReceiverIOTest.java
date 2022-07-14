@@ -33,6 +33,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.List;
+
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
 public class SparkReceiverIOTest {
@@ -113,10 +115,15 @@ public class SparkReceiverIOTest {
             .withGetOffsetFn(Long::valueOf)
             .withSparkReceiverBuilder(receiverBuilder);
 
-    TestOutputDoFn testDoFn = new TestOutputDoFn();
+    WithOffsetTestOutputDoFn testDoFn = new WithOffsetTestOutputDoFn();
+    List<String> storedRecords = CustomReceiverWithOffset.getStoredRecords();
+    List<String> outputRecords = WithOffsetTestOutputDoFn.getRecords();
+
     p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
     p.run().waitUntilFinish(Duration.standardSeconds(10));
-    assertTrue(CustomReceiverWithOffset.getStoredRecords().containsAll(testDoFn.getRecords()));
+
+    List<String> expectedRecords = storedRecords.subList(0, storedRecords.size() - 2);
+    assertTrue(outputRecords.containsAll(expectedRecords));
   }
 
   @Test
@@ -135,9 +142,15 @@ public class SparkReceiverIOTest {
             .withSparkConsumer(new CustomSparkConsumer<>())
             .withSparkReceiverBuilder(receiverBuilder);
 
-    TestOutputDoFn testDoFn = new TestOutputDoFn();
+
+    WithoutOffsetTestOutputDoFn testDoFn = new WithoutOffsetTestOutputDoFn();
+    List<String> storedRecords = CustomReceiverWithoutOffset.getStoredRecords();
+    List<String> outputRecords = WithoutOffsetTestOutputDoFn.getRecords();
+
     p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
     p.run().waitUntilFinish(Duration.standardSeconds(10));
-    assertTrue(CustomReceiverWithoutOffset.getStoredRecords().containsAll(testDoFn.getRecords()));
+
+    List<String> expectedRecords = storedRecords.subList(0, storedRecords.size() - 2);
+    assertTrue(outputRecords.containsAll(expectedRecords));
   }
 }
