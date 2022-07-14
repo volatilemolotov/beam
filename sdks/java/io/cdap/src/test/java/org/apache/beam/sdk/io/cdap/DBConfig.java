@@ -38,18 +38,17 @@ public class DBConfig extends ReferencePluginConfig {
   public static final String FIELD_NAMES = "fieldNames";
   public static final String FIELD_COUNT = "fieldCount";
   public static final String ORDER_BY = "orderBy";
-  public static final String KEY_CLASS_NAME = "keyClassName";
   public static final String VALUE_CLASS_NAME = "valueClassName";
 
   @Name(DB_URL)
   @Macro
   public String dbUrl;
 
-  @Name(DB_URL)
+  @Name(POSTGRES_USERNAME)
   @Macro
   public String pgUsername;
 
-  @Name(DB_URL)
+  @Name(POSTGRES_PASSWORD)
   @Macro
   public String pgPassword;
 

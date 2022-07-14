@@ -22,6 +22,7 @@ import static org.apache.beam.sdk.io.common.IOITHelper.readIOTestPipelineOptions
 import static org.apache.beam.sdk.io.common.TestRow.getExpectedHashForRowCount;
 
 import com.google.cloud.Timestamp;
+import io.cdap.plugin.common.Constants;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -53,6 +54,8 @@ import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.mapred.lib.db.DBInputFormat;
+import org.apache.hadoop.mapreduce.lib.db.DBOutputFormat;
 import org.apache.hadoop.util.StringUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -99,7 +102,7 @@ public class CdapIOIT {
 
     dataSource = DatabaseTestHelper.getPostgresDataSource(options);
     numberOfRows = options.getNumberOfRecords();
-    tableName = DatabaseTestHelper.getTestTableName("HadoopFormatIOIT");
+    tableName = DatabaseTestHelper.getTestTableName("CdapIOIT");
     if (!options.isWithTestcontainers()) {
       settings =
           InfluxDBSettings.builder()
@@ -155,7 +158,8 @@ public class CdapIOIT {
     DBConfig pluginConfig = new ConfigWrapper<>(DBConfig.class).withParams(params).build();
 
     return CdapIO.<TestRowDBWritable, NullWritable>write()
-        .withCdapPluginClass(DBBatchSink.class)
+        .withCdapPlugin(
+            Plugin.create(DBBatchSink.class, DBOutputFormat.class, DBOutputFormatProvider.class))
         .withPluginConfig(pluginConfig)
         .withKeyClass(TestRowDBWritable.class)
         .withValueClass(NullWritable.class)
@@ -166,7 +170,8 @@ public class CdapIOIT {
     DBConfig pluginConfig = new ConfigWrapper<>(DBConfig.class).withParams(params).build();
 
     return CdapIO.<LongWritable, TestRowDBWritable>read()
-        .withCdapPluginClass(DBBatchSource.class)
+        .withCdapPlugin(
+            Plugin.create(DBBatchSource.class, DBInputFormat.class, DBInputFormatProvider.class))
         .withPluginConfig(pluginConfig)
         .withKeyClass(LongWritable.class)
         .withValueClass(TestRowDBWritable.class);
@@ -179,6 +184,7 @@ public class CdapIOIT {
     params.put(DBConfig.POSTGRES_PASSWORD, options.getPostgresPassword());
     params.put(DBConfig.FIELD_NAMES, StringUtils.arrayToString(TEST_FIELD_NAMES));
     params.put(DBConfig.TABLE_NAME, tableName);
+    params.put(Constants.Reference.REFERENCE_NAME, "referenceName");
     return params;
   }
 
