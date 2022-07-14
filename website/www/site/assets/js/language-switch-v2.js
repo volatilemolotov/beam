@@ -30,16 +30,13 @@ $(document).ready(function() {
 
     function Switcher(conf) {
         const name = conf["name"];
-        const def = conf["default"];
-
-        const langs = [];
 
         return {
             ...conf,
+            "uniqueValues": new Set(),
             "selector": `[class^=${name}-]:not(.no-toggle)`, // Ex: [class^=language-]:not(.no-toggle)
-            "wrapper": `${name}-switcher`, // Parent wrapper-class. Ex: language-switcher
-            //"default": `${name}-${def}`, // Default type to display. Ex: language-java
-            "dbKey": name, // Local Storage Key. Ex: language
+            "wrapper": `${name}-switcher`, // Parent wrapper-class.
+            "localStorageKey": name,
 
             /**
              * @desc Generate bootstrapped like nav template,
@@ -84,6 +81,10 @@ $(document).ready(function() {
                     }
 
                     const values = _self.findNextSiblingsValues($(this));
+                    for (const value of values) {
+                        _self.uniqueValues.add(value);
+                    }
+
                     const tabsHtml = _self.navHtml(values);
                     console.log(tabsHtml);
                     $(this).before(tabsHtml);
@@ -118,8 +119,8 @@ $(document).ready(function() {
 
             "bindEvents": function() {
                 var _self = this;
-                $(`.${_self.wrapper} li`).click(function(event) { // Ex: .language-switcher li
-                    localStorage.setItem(_self.dbKey, $(this).data("value"));
+                $(`.${_self.wrapper} li`).click(function(event) {
+                    localStorage.setItem(_self.localStorageKey, $(this).data("value"));
 
                     // Set scroll to new position because Safari and Firefox
                     // can't do it automatically, only Chrome under the hood
@@ -131,41 +132,30 @@ $(document).ready(function() {
             },
 
             "toggle": function(isInitial) {
-                var value = localStorage.getItem(this.dbKey) || def;
-                var isValueSelected = false;
+                let value = localStorage.getItem(this.localStorageKey) || this.default;
+                let hasTabForValue = $(`.${this.wrapper} li[data-value="${value}"]`).length > 0; // Ex: .language-switcher li[data-value="java"]
 
-                // Adjusting active elements in navigation header.
-                $(`.${this.wrapper} li`).removeClass("active").each(function() { // Ex: .language-switcher li
-                    if ($(this).data("value") === value) {
-                        $(this).addClass("active");
-                        isValueSelected = true;
-                    }
-                });
-
-                if (!isValueSelected) {
+                if (!hasTabForValue) {
                     // if there's a code block for the default language,
                     // set the preferred language to the default language
-                    if (langs.includes(def)) {
-                        value = def;
+                    if (this.uniqueValues.has(this.default)) {
+                        value = this.default;
                     } else {
                         // otherwise set the preferred language to the first available
                         // language, so we don't have a page with no code blocks
-                        value = langs[0];
+                        value = [...this.uniqueValues][0];
                     }
-
-                    $(`.${this.wrapper} li`).each(function() { // Ex: .language-switcher li
-                        if ($(this).data("value") === value) {
-                            $(this).addClass("active");
-                        }
-                    });
                 }
+
+                $(`.${this.wrapper} li[data-value="${value}"]`).addClass("active");
+                $(`.${this.wrapper} li[data-value!="${value}"]`).removeClass("active");
 
                 // Swapping visibility of code blocks.
                 $(this.selector).hide(); // Ex: [class^=language-]:not(.no-toggle)
                 $("nav" + this.selector).show();
                 // make sure that runner and shell snippets are still visible after changing language
                 $("code" + this.selector).show();
-                $(`.${name}-${value}`).show(); // Ex: '.language-py'
+                $(`.${name}-${value}`).show();
 
                 //add refresh method because html elements are added/deleted after changing language
                 $('[data-spy="scroll"]').each(function () {
