@@ -17,10 +17,9 @@
  */
 
 import 'package:onmessage/onmessage.dart';
+import 'package:playground/modules/messages/handlers/message_handler.dart';
+import 'package:playground/modules/messages/parsers/message_parser.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
-
-import '../handlers/message_handler.dart';
-import '../parsers/message_parser.dart';
 
 class MessageListener {
   final PlaygroundState playgroundState;

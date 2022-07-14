@@ -18,8 +18,7 @@
 
 import 'package:collection/collection.dart';
 import 'package:playground/modules/messages/models/abstract_message.dart';
-
-import 'set_content_message.dart';
+import 'package:playground/modules/messages/models/set_content_message.dart';
 
 class SetMultiContentMessage extends AbstractMessage {
   final List<SetContentMessage> content;

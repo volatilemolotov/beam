@@ -45,15 +45,14 @@ $(document).ready(function() {
              * @return string - html template, which is bootstrapped nav tabs.
             */
             "navHtml": function (values) {
-                const _self = this;
-                var lists = "";
-                var classes = "";
+                let lists = "";
+                let classes = "";
 
-                values.forEach(function(value) {
-                    const title = _self.valueToTabTitle(value);
+                for (const value of values) {
+                    const title = this.valueToTabTitle(value);
                     classes += ` ${name}-${value}`;
                     lists += `<li class="langSwitch-content" data-value="${value}">${title}</li>`;
-                });
+                }
 
                 // Ex: language-switcher language-java language-py language-go
                 return `<div class="${this.wrapper + classes}"><ul class="nav nav-tabs">${lists}</ul></div>`;
