@@ -83,7 +83,5 @@ jobs:
       
       - name: DB Index creation
         run: gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
-        
-        
-        
-      
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
