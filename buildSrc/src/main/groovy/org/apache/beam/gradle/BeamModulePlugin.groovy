@@ -351,6 +351,8 @@ class BeamModulePlugin implements Plugin<Project> {
     Integer numParallelTests = 1
     // Whether the pipeline needs --sdk_location option
     boolean needsSdkLocation = false
+    // semi_persist_dir for SDK containers
+    String semiPersistDir = "/tmp"
     // classpath for running tests.
     FileCollection classpath
   }
@@ -387,7 +389,7 @@ class BeamModulePlugin implements Plugin<Project> {
 
     // Automatically use the official release version if we are performing a release
     // otherwise append '-SNAPSHOT'
-    project.version = '2.40.0'
+    project.version = '2.41.0'
     if (!isRelease(project)) {
       project.version += '-SNAPSHOT'
     }
@@ -673,7 +675,7 @@ class BeamModulePlugin implements Plugin<Project> {
         nemo_compiler_frontend_beam                 : "org.apache.nemo:nemo-compiler-frontend-beam:$nemo_version",
         netty_all                                   : "io.netty:netty-all:$netty_version",
         netty_handler                               : "io.netty:netty-handler:$netty_version",
-        netty_tcnative_boringssl_static             : "io.netty:netty-tcnative-boringssl-static:2.0.46.Final",
+        netty_tcnative_boringssl_static             : "io.netty:netty-tcnative-boringssl-static:2.0.47.Final",
         netty_transport_native_epoll                : "io.netty:netty-transport-native-epoll:$netty_version",
         postgres                                    : "org.postgresql:postgresql:$postgres_version",
         powermock                                   : "org.powermock:powermock-module-junit4:$powermock_version",
@@ -808,7 +810,7 @@ class BeamModulePlugin implements Plugin<Project> {
     // of commonly found dependencies. Because of this it is important that dependencies are added
     // to the correct configuration. Dependencies should fall into one of these four configurations:
     //  * implementation     - Required during compilation or runtime of the main source set.
-    //                         This configuration represents all dependencies that much also be shaded away
+    //                         This configuration represents all dependencies that must also be shaded away
     //                         otherwise the generated Maven pom will be missing this dependency.
     //  * shadow             - Required during compilation or runtime of the main source set.
     //                         Will become a runtime dependency of the generated Maven pom.
@@ -1083,6 +1085,12 @@ class BeamModulePlugin implements Plugin<Project> {
         maxErrors = 0
       }
       project.checkstyle { toolVersion = "8.23" }
+      // CheckStyle can be removed from the 'check' task by passing -PdisableCheckStyle=true on the Gradle
+      // command-line. This is useful for pre-commit which runs checkStyle separately.
+      def disableCheckStyle = project.hasProperty('disableCheckStyle') &&
+          project.disableCheckStyle == 'true'
+      project.checkstyleMain.enabled = !disableCheckStyle
+      project.checkstyleTest.enabled = !disableCheckStyle
 
       // Configures javadoc plugin and ensure check runs javadoc.
       project.tasks.withType(Javadoc) {
@@ -1173,7 +1181,7 @@ class BeamModulePlugin implements Plugin<Project> {
         options.errorprone.disableWarningsInGeneratedCode = true
         options.errorprone.excludedPaths = '(.*/)?(build/generated-src|build/generated.*avro-java|build/generated)/.*'
 
-        // TODO(BEAM-11936): Enable errorprone checks
+        // TODO(https://github.com/apache/beam/issues/20955): Enable errorprone checks
         options.errorprone.errorproneArgs.add("-Xep:AutoValueImmutableFields:OFF")
         options.errorprone.errorproneArgs.add("-Xep:AutoValueSubclassLeaked:OFF")
         options.errorprone.errorproneArgs.add("-Xep:BadImport:OFF")
@@ -1320,7 +1328,7 @@ class BeamModulePlugin implements Plugin<Project> {
           exclude "META-INF/*.RSA"
         } << configuration.shadowClosure)
 
-        // Ensure that shaded jar and test-jar are part of the their own configuration artifact sets
+        // Ensure that shaded jar and test-jar are part of their own configuration artifact sets
         project.artifacts.shadow project.shadowJar
         project.artifacts.shadowTest project.shadowTestJar
 
@@ -1780,7 +1788,7 @@ class BeamModulePlugin implements Plugin<Project> {
       }
     }
     def cleanUpTask = project.tasks.register('cleanUp') {
-      dependsOn ':runners:google-cloud-dataflow-java:cleanUpDockerImages'
+      dependsOn ':runners:google-cloud-dataflow-java:cleanUpDockerJavaImages'
     }
 
     // When applied in a module's build.gradle file, this closure provides task for running
@@ -1809,18 +1817,18 @@ class BeamModulePlugin implements Plugin<Project> {
 
         if (pipelineOptionsString && configuration.runner?.equalsIgnoreCase('dataflow')) {
           if (pipelineOptionsString.contains('use_runner_v2')) {
-            dependsOn ':runners:google-cloud-dataflow-java:buildAndPushDockerContainer'
+            dependsOn ':runners:google-cloud-dataflow-java:buildAndPushDockerJavaContainer'
           }
         }
 
-        // We construct the pipeline options during task execution time in order to get dockerImageName.
+        // We construct the pipeline options during task execution time in order to get dockerJavaImageName.
         doFirst {
           if (pipelineOptionsString && configuration.runner?.equalsIgnoreCase('dataflow')) {
             def dataflowRegion = project.findProperty('dataflowRegion') ?: 'us-central1'
             if (pipelineOptionsString.contains('use_runner_v2')) {
-              def dockerImageName = project.project(':runners:google-cloud-dataflow-java').ext.dockerImageName
+              def dockerJavaImageName = project.project(':runners:google-cloud-dataflow-java').ext.dockerJavaImageName
               allOptionsList.addAll([
-                "--sdkContainerImage=${dockerImageName}",
+                "--sdkContainerImage=${dockerJavaImageName}",
                 "--region=${dataflowRegion}"
               ])
             } else {
@@ -1851,7 +1859,7 @@ class BeamModulePlugin implements Plugin<Project> {
       project.afterEvaluate {
         // Ensure all tasks which use published docker images run before they are cleaned up
         project.tasks.each { t ->
-          if (t.dependsOn.contains(":runners:google-cloud-dataflow-java:buildAndPushDockerContainer")) {
+          if (t.dependsOn.contains(":runners:google-cloud-dataflow-java:buildAndPushDockerJavaContainer")) {
             t.finalizedBy cleanUpTask
           }
         }
@@ -2351,6 +2359,7 @@ class BeamModulePlugin implements Plugin<Project> {
           systemProperty "beamTestPipelineOptions", JsonOutput.toJson(config.javaPipelineOptions)
           systemProperty "expansionJar", expansionJar
           systemProperty "expansionPort", port
+          systemProperty "semiPersistDir", config.semiPersistDir
           classpath = config.classpath + project.files(
               project.project(":runners:core-construction-java").sourceSets.test.runtimeClasspath,
               project.project(":sdks:java:extensions:python").sourceSets.test.runtimeClasspath

@@ -872,12 +872,12 @@ public class DataflowRunner extends PipelineRunner<DataflowPipelineJob> {
   }
 
   protected RunnerApi.Pipeline applySdkEnvironmentOverrides(
-      RunnerApi.Pipeline pipeline, DataflowPipelineDebugOptions options) {
+      RunnerApi.Pipeline pipeline, DataflowPipelineOptions options) {
     String sdkHarnessContainerImageOverrides = options.getSdkHarnessContainerImageOverrides();
-    if (Strings.isNullOrEmpty(sdkHarnessContainerImageOverrides)) {
-      return pipeline;
-    }
-    String[] overrides = sdkHarnessContainerImageOverrides.split(",", -1);
+    String[] overrides =
+        Strings.isNullOrEmpty(sdkHarnessContainerImageOverrides)
+            ? new String[0]
+            : sdkHarnessContainerImageOverrides.split(",", -1);
     if (overrides.length % 2 != 0) {
       throw new RuntimeException(
           "invalid syntax for SdkHarnessContainerImageOverrides: "
@@ -898,8 +898,20 @@ public class DataflowRunner extends PipelineRunner<DataflowPipelineJob> {
           throw new RuntimeException("Error parsing environment docker payload.", e);
         }
         String containerImage = dockerPayload.getContainerImage();
+        boolean updated = false;
         for (int i = 0; i < overrides.length; i += 2) {
           containerImage = containerImage.replaceAll(overrides[i], overrides[i + 1]);
+          if (!containerImage.equals(dockerPayload.getContainerImage())) {
+            updated = true;
+          }
+        }
+        if (containerImage.startsWith("apache/beam")
+            && !updated
+            // don't update if the container image is already configured by DataflowRunner
+            && !containerImage.equals(getContainerImageForJob(options))) {
+          containerImage =
+              DataflowRunnerInfo.getDataflowRunnerInfo().getContainerImageBaseRepository()
+                  + containerImage.substring(containerImage.lastIndexOf("/"));
         }
         environmentBuilder.setPayload(
             RunnerApi.DockerPayload.newBuilder()
@@ -1038,10 +1050,51 @@ public class DataflowRunner extends PipelineRunner<DataflowPipelineJob> {
     return Environments.getArtifacts(pathsToStageBuilder.build());
   }
 
+  @VisibleForTesting
+  static boolean isMultiLanguagePipeline(Pipeline pipeline) {
+    class IsMultiLanguageVisitor extends PipelineVisitor.Defaults {
+      private boolean isMultiLanguage = false;
+
+      private void performMultiLanguageTest(Node node) {
+        if (node.getTransform() instanceof External.ExpandableTransform) {
+          isMultiLanguage = true;
+        }
+      }
+
+      @Override
+      public CompositeBehavior enterCompositeTransform(Node node) {
+        performMultiLanguageTest(node);
+        return super.enterCompositeTransform(node);
+      }
+
+      @Override
+      public void visitPrimitiveTransform(Node node) {
+        performMultiLanguageTest(node);
+        super.visitPrimitiveTransform(node);
+      }
+    }
+
+    IsMultiLanguageVisitor visitor = new IsMultiLanguageVisitor();
+    pipeline.traverseTopologically(visitor);
+
+    return visitor.isMultiLanguage;
+  }
+
   @Override
   public DataflowPipelineJob run(Pipeline pipeline) {
+    if (DataflowRunner.isMultiLanguagePipeline(pipeline)) {
+      List<String> experiments = firstNonNull(options.getExperiments(), Collections.emptyList());
+      if (!experiments.contains("use_runner_v2")) {
+        LOG.info(
+            "Automatically enabling Dataflow Runner v2 since the pipeline used cross-language"
+                + " transforms");
+        options.setExperiments(
+            ImmutableList.<String>builder().addAll(experiments).add("use_runner_v2").build());
+      }
+    }
     if (useUnifiedWorker(options)) {
-      List<String> experiments = options.getExperiments(); // non-null if useUnifiedWorker is true
+      List<String> experiments =
+          new ArrayList<>(options.getExperiments()); // non-null if useUnifiedWorker is true
       if (!experiments.contains("use_runner_v2")) {
         experiments.add("use_runner_v2");
       }
@@ -1062,8 +1115,7 @@ public class DataflowRunner extends PipelineRunner<DataflowPipelineJob> {
       options.setStreaming(true);
     }
 
-    if (!options.isStreaming()
-        && !ExperimentalOptions.hasExperiment(options, "disable_projection_pushdown")) {
+    if (!ExperimentalOptions.hasExperiment(options, "disable_projection_pushdown")) {
       ProjectionPushdownOptimizer.optimize(pipeline);
     }
 
@@ -2244,7 +2296,7 @@ public class DataflowRunner extends PipelineRunner<DataflowPipelineJob> {
           WriteFilesResult<DestinationT>,
           WriteFiles<UserT, DestinationT, OutputT>> {
 
-    // We pick 10 as a a default, as it works well with the default number of workers started
+    // We pick 10 as a default, as it works well with the default number of workers started
     // by Dataflow.
     static final int DEFAULT_NUM_SHARDS = 10;
     DataflowPipelineWorkerPoolOptions options;

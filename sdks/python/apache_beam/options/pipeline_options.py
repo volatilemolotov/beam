@@ -302,8 +302,9 @@ class PipelineOptions(HasDisplayData):
       Dictionary of all args and values.
     """
 
-    # TODO(BEAM-1319): PipelineOption sub-classes in the main session might be
-    # repeated. Pick last unique instance of each subclass to avoid conflicts.
+    # TODO(https://github.com/apache/beam/issues/18197): PipelineOption
+    # sub-classes in the main session might be repeated. Pick last unique
+    # instance of each subclass to avoid conflicts.
     subset = {}
     parser = _BeamArgumentParser()
     for cls in PipelineOptions.__subclasses__():
@@ -347,12 +348,15 @@ class PipelineOptions(HasDisplayData):
         del result[k]
 
     if overrides:
-      _LOGGER.warning("Discarding invalid overrides: %s", overrides)
+      if retain_unknown_options:
+        result.update(overrides)
+      else:
+        _LOGGER.warning("Discarding invalid overrides: %s", overrides)
 
     return result
 
   def display_data(self):
-    return self.get_all_options(True)
+    return self.get_all_options(drop_default=True, retain_unknown_options=True)
 
   def view_as(self, cls):
     # type: (Type[PipelineOptionsT]) -> PipelineOptionsT
@@ -962,6 +966,28 @@ class WorkerOptions(PipelineOptions):
             'separated by a comma where first value gives a regex to '
             'identify the container image to override and the second value '
             'gives the replacement container image.'))
+    parser.add_argument(
+        '--default_sdk_harness_log_level',
+        default=None,
+        help=(
+            'Controls the default log level of all loggers without a log level '
+            'override. Values can be either a labeled level or a number '
+            '(See https://docs.python.org/3/library/logging.html#levels). '
+            'Default log level is INFO.'))
+    parser.add_argument(
+        '--sdk_harness_log_level_overrides',
+        action='append',
+        default=None,
+        help=(
+            'Controls the log levels for specifically named loggers. The '
+            'expected format is a json string: \'{"module":"log_level",...}\'. '
+            'For example, by specifying the value \'{"a.b.c":"DEBUG"}\', '
+            'the logger underneath the module "a.b.c" will be configured to '
+            'output logs at the DEBUG level. Similarly, by specifying the '
+            'value \'{"a.b.c":"WARNING"}\' all loggers underneath the "a.b.c" '
+            'module will be configured to output logs at the WARNING level. '
+            'Also, note that when multiple overrides are specified, the exact '
+            'name followed by the closest parent takes precedence.'))
     parser.add_argument(
         '--use_public_ips',
         default=None,
