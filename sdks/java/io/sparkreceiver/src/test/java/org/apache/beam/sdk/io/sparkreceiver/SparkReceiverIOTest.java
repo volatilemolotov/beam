@@ -19,7 +19,6 @@ package org.apache.beam.sdk.io.sparkreceiver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import org.apache.beam.runners.direct.DirectOptions;
@@ -114,15 +113,14 @@ public class SparkReceiverIOTest {
             .withGetOffsetFn(Long::valueOf)
             .withSparkReceiverBuilder(receiverBuilder);
 
-    WithOffsetTestOutputDoFn testDoFn = new WithOffsetTestOutputDoFn();
     List<String> storedRecords = CustomReceiverWithOffset.getStoredRecords();
-    List<String> outputRecords = WithOffsetTestOutputDoFn.getRecords();
+    List<String> outputRecords = TestOutputDoFn.getRecords();
+    outputRecords.clear();
 
-    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
-    p.run().waitUntilFinish(Duration.standardSeconds(10));
+    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(new TestOutputDoFn()));
+    p.run().waitUntilFinish(Duration.standardSeconds(15));
 
-    List<String> expectedRecords = storedRecords.subList(0, storedRecords.size() - 2);
-    assertTrue(outputRecords.containsAll(expectedRecords));
+    assertEquals(outputRecords, storedRecords);
   }
 
   @Test
@@ -141,14 +139,13 @@ public class SparkReceiverIOTest {
             .withSparkConsumer(new CustomSparkConsumer<>())
             .withSparkReceiverBuilder(receiverBuilder);
 
-    WithoutOffsetTestOutputDoFn testDoFn = new WithoutOffsetTestOutputDoFn();
     List<String> storedRecords = CustomReceiverWithoutOffset.getStoredRecords();
-    List<String> outputRecords = WithoutOffsetTestOutputDoFn.getRecords();
+    List<String> outputRecords = TestOutputDoFn.getRecords();
+    outputRecords.clear();
 
-    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(testDoFn));
-    p.run().waitUntilFinish(Duration.standardSeconds(10));
+    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(new TestOutputDoFn()));
+    p.run().waitUntilFinish(Duration.standardSeconds(15));
 
-    List<String> expectedRecords = storedRecords.subList(0, storedRecords.size() - 2);
-    assertTrue(outputRecords.containsAll(expectedRecords));
+    assertEquals(storedRecords, outputRecords);
   }
 }

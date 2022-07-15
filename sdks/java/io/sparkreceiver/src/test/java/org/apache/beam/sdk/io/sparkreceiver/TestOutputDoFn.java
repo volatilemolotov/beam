@@ -21,16 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.beam.sdk.transforms.DoFn;
 
-public class WithOffsetTestOutputDoFn extends DoFn<String, String> {
-  private static final List<String> records = new ArrayList<>();
+public class TestOutputDoFn extends DoFn<String, String> {
+  private static final List<String> RECORDS = new ArrayList<>();
 
   @ProcessElement
   public void processElement(@Element String input, DoFn.OutputReceiver<String> output) {
-    records.add(input);
+    RECORDS.add(input);
     output.output(input);
   }
 
   public static List<String> getRecords() {
-    return records;
+    return RECORDS;
   }
 }

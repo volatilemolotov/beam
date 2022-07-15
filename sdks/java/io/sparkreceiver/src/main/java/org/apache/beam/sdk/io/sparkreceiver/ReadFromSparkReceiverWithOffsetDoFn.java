@@ -148,7 +148,6 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       }
       ((HasOffset) sparkReceiver).setStartOffset(startOffset);
       sparkReceiver.supervisor().startReceiver();
-      LOG.info("Spark receiver was started");
       try {
         TimeUnit.MILLISECONDS.sleep(START_POLL_TIMEOUT_MS);
       } catch (InterruptedException e) {

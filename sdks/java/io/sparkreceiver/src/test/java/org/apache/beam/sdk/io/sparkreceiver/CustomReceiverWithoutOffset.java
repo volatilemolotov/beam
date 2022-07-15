@@ -53,8 +53,10 @@ public class CustomReceiverWithoutOffset extends Receiver<String> {
   private void receive() {
     Long currentOffset = 0L;
     while (!isStopped()) {
-      STORED_RECORDS.add(currentOffset.toString());
-      store((currentOffset++).toString());
+      if (currentOffset <= 20) {
+        STORED_RECORDS.add(currentOffset.toString());
+        store((currentOffset++).toString());
+      }
       try {
         TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
       } catch (InterruptedException e) {
