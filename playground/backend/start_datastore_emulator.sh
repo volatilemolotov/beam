@@ -16,9 +16,7 @@
 
 # Launch db emulator
 DATASTORE_FULL_ADDRESS="${DATASTORE_EMULATOR_HOST:-"127.0.0.1:8888"}"
-echo $DATASTORE_FULL_ADDRESS
 DATASTORE_PORT="${DATASTORE_FULL_ADDRESS##*:}"
-echo $DATASTORE_PORT
 TEST_PROJECT_ID="test"
 
 waitport() {
@@ -38,7 +36,7 @@ if [ -z "$PID" ]; then
     --consistency=1 \
     --no-store-on-disk \
     >/tmp/mock-db-logs &
-   waitport "$DATASTORE_PORT"
+  waitport "$DATASTORE_PORT"
 else
   echo "There is an instance of Datastore emulator already running"
 fi
