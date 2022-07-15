@@ -23,13 +23,14 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/datastore"
-	localdb "beam.apache.org/playground/backend/internal/db/local"
+	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/db/schema"
 	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/utils"
 	"context"
+	"fmt"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 )
@@ -44,6 +45,11 @@ func runServer() error {
 		return err
 	}
 
+	props, err := environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
+	if err != nil {
+		return err
+	}
+
 	logger.SetupLogger(ctx, envService.ApplicationEnvs.LaunchSite(), envService.ApplicationEnvs.GoogleProjectId())
 
 	grpcServer := grpc.NewServer()
@@ -53,7 +59,8 @@ func runServer() error {
 		return err
 	}
 
-	var databaseClient db.Database
+	var dbClient db.Database
+	var entityMapper mapper.EntityMapper
 
 	// Examples catalog should be retrieved and saved to cache only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
@@ -63,20 +70,24 @@ func runServer() error {
 			return err
 		}
 
-		databaseClient, err = setupDB(ctx, &envService.ApplicationEnvs)
+		dbClient, err = datastore.New(ctx, envService.ApplicationEnvs.GoogleProjectId())
 		if err != nil {
 			return err
 		}
 
-		if err = setupDBStructure(ctx, databaseClient, &envService.ApplicationEnvs); err != nil {
+		if err = setupDBStructure(ctx, dbClient, &envService.ApplicationEnvs, props); err != nil {
 			return err
 		}
+
+		entityMapper = mapper.New(&envService.ApplicationEnvs, props)
 	}
 
 	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
 		env:          envService,
 		cacheService: cacheService,
-		db:           databaseClient,
+		db:           dbClient,
+		props:        props,
+		entityMapper: entityMapper,
 	})
 
 	errChan := make(chan error)
@@ -162,23 +173,18 @@ func setupExamplesCatalog(ctx context.Context, cacheService cache.Cache, bucketN
 	return nil
 }
 
-// setupDB constructs required database by application environment
-func setupDB(ctx context.Context, appEnv *environment.ApplicationEnvs) (db.Database, error) {
-	if appEnv.DbType() == environment.DatastoreDB {
-		return datastore.New(ctx, appEnv.GoogleProjectId())
-	}
-	return localdb.New()
-}
-
 // setupDBStructure initializes the data structure
-func setupDBStructure(ctx context.Context, db db.Database, appEnv *environment.ApplicationEnvs) error {
-	versions := []schema.Version{
-		new(migration.InitialStructure),
-	}
-	dbSchema := schema.New(ctx, db, appEnv, versions)
+func setupDBStructure(ctx context.Context, db db.Database, appEnv *environment.ApplicationEnvs, props *environment.Properties) error {
+	versions := []schema.Version{new(migration.InitialStructure)}
+	dbSchema := schema.New(ctx, db, appEnv, props, versions)
 	actualSchemaVersion, err := dbSchema.InitiateData()
 	if err != nil {
 		return err
+	}
+	if actualSchemaVersion == "" {
+		errMsg := "schema version must not be empty"
+		logger.Error(errMsg)
+		return fmt.Errorf(errMsg)
 	}
 	appEnv.SetSchemaVersion(actualSchemaVersion)
 	return nil

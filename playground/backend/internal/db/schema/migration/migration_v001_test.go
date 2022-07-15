@@ -62,6 +62,11 @@ func teardown() {
 }
 
 func TestInitialStructure_InitiateData(t *testing.T) {
+	appEnvs := environment.NewApplicationEnvs("/app", "", "", "", "", "../../../../../sdks.yaml", "../../../../.", nil, 0)
+	props, err := environment.NewProperties(appEnvs.PropertyPath())
+	if err != nil {
+		t.Errorf("InitiateData(): error during properties initialization, err: %s", err.Error())
+	}
 	tests := []struct {
 		name    string
 		dbArgs  *schema.DBArgs
@@ -72,7 +77,8 @@ func TestInitialStructure_InitiateData(t *testing.T) {
 			dbArgs: &schema.DBArgs{
 				Ctx:    ctx,
 				Db:     datastoreDb,
-				AppEnv: environment.NewApplicationEnvs("/app", "", "", "", "", "MOCK_SALT", "", "", "../../../../../sdks.yaml", nil, 0, "", 0, 11),
+				AppEnv: appEnvs,
+				Props:  props,
 			},
 			wantErr: false,
 		},
@@ -81,9 +87,9 @@ func TestInitialStructure_InitiateData(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			is := new(InitialStructure)
-			err := is.InitiateData(tt.dbArgs)
+			err = is.InitiateData(tt.dbArgs)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("InitiateData() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("InitiateData(): error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

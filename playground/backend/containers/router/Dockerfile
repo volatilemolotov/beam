@@ -69,19 +69,15 @@ ENV SERVER_PORT=8080
 ENV APP_WORK_DIR=/opt/playground/backend/
 ENV BEAM_SDK="SDK_UNSPECIFIED"
 ENV BUCKET_NAME="playground-precompiled-objects"
-ENV DB_TYPE=datastore
-ENV PLAYGROUND_SALT="Beam playground salt\n"
-ENV MAX_SNIPPET_SIZE=1000000
-ENV ID_LENGTH=11
-ENV ORIGIN=PG_USER
 ENV SDK_CONFIG=/opt/playground/backend/sdks.yaml
+ENV PROPERTY_PATH=/opt/playground/backend/
 
 # Copy build result
 COPY --from=build /go/bin/server_go_backend /opt/playground/backend/
 COPY --from=build /go/src/playground/backend/configs /opt/playground/backend/configs/
 
 COPY sdks.yaml /opt/playground/backend/sdks.yaml
+COPY src/properties.yaml /opt/playground/backend/properties.yaml
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
-

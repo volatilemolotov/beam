@@ -41,7 +41,9 @@ type playgroundController struct {
 	env          *environment.Environment
 	cacheService cache.Cache
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
-	db db.Database
+	db           db.Database
+	props        *environment.Properties
+	entityMapper mapper.EntityMapper
 
 	pb.UnimplementedPlaygroundServiceServer
 }
@@ -366,20 +368,19 @@ func (controller *playgroundController) SaveSnippet(ctx context.Context, info *p
 		return nil, errors.InvalidArgumentError(errorTitleSaveSnippet, "Snippet must have files")
 	}
 
-	entityMapper := mapper.New(&controller.env.ApplicationEnvs)
-	snippet := entityMapper.ToSnippet(info)
+	snippet := controller.entityMapper.ToSnippet(info)
 
 	for _, file := range info.Files {
 		if file.Content == "" {
 			logger.Error("SaveSnippet(): entity is empty")
 			return nil, errors.InvalidArgumentError(errorTitleSaveSnippet, "Snippet must have some content")
 		}
-		maxSnippetSize := controller.env.ApplicationEnvs.MaxSnippetSize()
-		if len(file.Content) > maxSnippetSize {
+		maxSnippetSize := controller.props.MaxSnippetSize
+		if len(file.Content) > int(maxSnippetSize) {
 			logger.Errorf("SaveSnippet(): entity is too large. Max entity size: %d symbols", maxSnippetSize)
 			return nil, errors.InvalidArgumentError(errorTitleSaveSnippet, "Snippet size is more than %d symbols", maxSnippetSize)
 		}
-		snippet.Files = append(snippet.Files, entityMapper.ToFileEntity(info, file))
+		snippet.Files = append(snippet.Files, controller.entityMapper.ToFileEntity(info, file))
 	}
 
 	id, err := snippet.ID()

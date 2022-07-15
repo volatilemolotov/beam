@@ -26,44 +26,16 @@ type InitialStructure struct {
 }
 
 func (is *InitialStructure) InitiateData(args *schema.DBArgs) error {
-	description := "Data initialization: file snippet, schema versions, SDK"
-	//init snippets
-	dummyStr := "dummy"
-	idInfo := entity.IDMeta{
-		IdLength: args.AppEnv.IdLength(),
-		Salt:     args.AppEnv.PlaygroundSalt(),
-	}
-	snip := &entity.Snippet{
-		IDMeta: &idInfo,
-		Snippet: &entity.SnippetEntity{
-			OwnerId:  dummyStr,
-			PipeOpts: dummyStr,
-		},
-		Files: []*entity.FileEntity{
-			{
-				Name:    dummyStr,
-				Content: dummyStr,
-			},
-		},
-	}
-	snipId, err := snip.ID()
-	if err != nil {
-		return err
-	}
-	if err = args.Db.PutSnippet(args.Ctx, snipId, snip); err != nil {
-		return err
-	}
-
 	//init schema versions
-	schemaEntity := &entity.SchemaEntity{Descr: description}
-	if err = args.Db.PutSchemaVersion(args.Ctx, is.GetVersion(), schemaEntity); err != nil {
+	schemaEntity := &entity.SchemaEntity{Descr: is.GetDescription()}
+	if err := args.Db.PutSchemaVersion(args.Ctx, is.GetVersion(), schemaEntity); err != nil {
 		return err
 	}
 
 	//init sdks
 	var sdkEntities []*entity.SDKEntity
 	sdkConfig := new(SdkConfig)
-	if err = utils.ReadYamlFile(args.AppEnv.SdkConfigPath(), sdkConfig); err != nil {
+	if err := utils.ReadYamlFile(args.AppEnv.SdkConfigPath(), sdkConfig); err != nil {
 		return err
 	}
 	for _, sdk := range pb.Sdk_name {
@@ -76,7 +48,7 @@ func (is *InitialStructure) InitiateData(args *schema.DBArgs) error {
 			DefaultExample: defaultExample,
 		})
 	}
-	if err = args.Db.PutSDKs(args.Ctx, sdkEntities); err != nil {
+	if err := args.Db.PutSDKs(args.Ctx, sdkEntities); err != nil {
 		return err
 	}
 
@@ -113,4 +85,8 @@ func getDefaultExample(config *SdkConfig, sdk string) string {
 
 func (is *InitialStructure) GetVersion() string {
 	return "0.0.1"
+}
+
+func (is InitialStructure) GetDescription() string {
+	return "Data initialization: a schema version, SDKs"
 }

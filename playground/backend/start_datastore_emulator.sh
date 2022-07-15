@@ -20,7 +20,7 @@ DATASTORE_PORT="${DATASTORE_FULL_ADDRESS##*:}"
 TEST_PROJECT_ID="test"
 
 waitport() {
-  while ! nc -z localhost "$1"; do
+  while ! nc -z 127.0.0.1 "$1"; do
     echo "waiting for datastore emulator to start..."
     sleep 1
   done
@@ -35,8 +35,8 @@ if [ -z "$PID" ]; then
     --project="${TEST_PROJECT_ID}" \
     --consistency=1 \
     --no-store-on-disk \
-    > /tmp/mock-db-logs &
-    waitport "$DATASTORE_PORT"
+    >/tmp/mock-db-logs &
+  waitport "$DATASTORE_PORT"
 else
   echo "There is an instance of Datastore emulator already running"
 fi

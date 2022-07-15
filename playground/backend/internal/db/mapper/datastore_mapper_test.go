@@ -21,15 +21,19 @@ import (
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/utils"
+	"os"
 	"testing"
 )
 
-var testable *EntityMapper
+var testable *DatastoreMapper
 
 func TestMain(m *testing.M) {
-	appEnv := environment.NewApplicationEnvs("/app", "", "", "", "", "MOCK_SALT", "", "PG_USER", "", nil, 0, "", 1000, 11)
+	appEnv := environment.NewApplicationEnvs("/app", "", "", "", "", "", "../../../.", nil, 0)
 	appEnv.SetSchemaVersion("MOCK_SCHEMA")
-	testable = New(appEnv)
+	props, _ := environment.NewProperties(appEnv.PropertyPath())
+	testable = New(appEnv, props)
+	exitValue := m.Run()
+	os.Exit(exitValue)
 }
 
 func TestEntityMapper_ToSnippet(t *testing.T) {
@@ -47,16 +51,23 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 			},
 			expected: &entity.Snippet{
 				IDMeta: &entity.IDMeta{
-					Salt:     "MOCK_SALT",
+					Salt:     "Beam playground salt",
 					IdLength: 11,
 				},
-				//OwnerId property will be used in Tour of Beam project
 				Snippet: &entity.SnippetEntity{
 					SchVer:        utils.GetNameKey(datastoreDb.SchemaKind, "MOCK_SCHEMA", datastoreDb.Namespace, nil),
 					Sdk:           utils.GetNameKey(datastoreDb.SdkKind, "SDK_JAVA", datastoreDb.Namespace, nil),
 					PipeOpts:      "MOCK_OPTIONS",
-					Origin:        entity.Origin(entity.OriginValue["PG_USER"]),
+					Origin:        "PG_USER",
 					NumberOfFiles: 1,
+				},
+				Files: []*entity.FileEntity{
+					{
+						Name:     "MOCK_NAME",
+						Content:  "MOCK_CONTENT",
+						CntxLine: 1,
+						IsMain:   true,
+					},
 				},
 			},
 		},
@@ -67,9 +78,55 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 			result := testable.ToSnippet(tt.input)
 			if result.IdLength != tt.expected.IdLength ||
 				result.Salt != tt.expected.Salt ||
-				result.Files[0].IsMain != true ||
-				result.Files[0].Content != tt.expected.Files[0].Content ||
-				result.Files[0].Name != tt.expected.Files[0].Name {
+				result.Snippet.PipeOpts != tt.expected.Snippet.PipeOpts ||
+				result.Snippet.NumberOfFiles != 1 ||
+				result.Snippet.Origin != "PG_USER" {
+				t.Error("Unexpected result")
+			}
+		})
+	}
+}
+
+func TestEntityMapper_ToFileEntity(t *testing.T) {
+	type args struct {
+		info *pb.SaveSnippetRequest
+		file *pb.SnippetFile
+	}
+	tests := []struct {
+		name     string
+		args     args
+		expected *entity.FileEntity
+	}{
+		{
+			name: "File entity mapper in the usual case",
+			args: args{
+				info: &pb.SaveSnippetRequest{
+					Files:           []*pb.SnippetFile{{Name: "MOCK_NAME", Content: "MOCK_CONTENT"}},
+					Sdk:             pb.Sdk_SDK_JAVA,
+					PipelineOptions: "MOCK_OPTIONS",
+				},
+				file: &pb.SnippetFile{
+					Name:    "MOCK_NAME",
+					Content: "MOCK_CONTENT",
+					IsMain:  true,
+				},
+			},
+			expected: &entity.FileEntity{
+				Name:     "main.java",
+				Content:  "MOCK_CONTENT",
+				CntxLine: 1,
+				IsMain:   true,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := testable.ToFileEntity(tt.args.info, tt.args.file)
+			if result.IsMain != tt.expected.IsMain ||
+				result.Name != tt.expected.Name ||
+				result.Content != tt.expected.Content ||
+				result.CntxLine != tt.expected.CntxLine {
 				t.Error("Unexpected result")
 			}
 		})
