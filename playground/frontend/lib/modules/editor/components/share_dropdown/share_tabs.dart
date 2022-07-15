@@ -17,38 +17,25 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/output/components/output_area.dart';
 import 'package:playground/modules/output/components/output_header/output_header.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
 
 const kTabsCount = 2;
 
-class Output extends StatefulWidget {
-  final bool isEmbedded;
-  final bool showGraph;
-
-  Output({
-    required this.isEmbedded,
-    required PlaygroundState playgroundState,
-  })  : showGraph = playgroundState.graphAvailable,
-        super(
-          key: ValueKey(
-            '${playgroundState.sdk}_${playgroundState.selectedExample?.path}',
-          ),
-        );
+class ShareTabs extends StatefulWidget {
+  const ShareTabs({super.key});
 
   @override
-  State<Output> createState() => _OutputState();
+  State<ShareTabs> createState() => _ShareTabsState();
 }
 
-class _OutputState extends State<Output> with SingleTickerProviderStateMixin {
+class _ShareTabsState extends State<ShareTabs>
+    with SingleTickerProviderStateMixin {
   late final TabController tabController;
   int selectedTab = 0;
 
   @override
   void initState() {
-    final tabsCount = widget.showGraph ? kTabsCount : kTabsCount - 1;
-    tabController = TabController(vsync: this, length: tabsCount);
+    tabController = TabController(vsync: this, length: kTabsCount);
     tabController.addListener(_onTabChange);
     super.initState();
   }
@@ -72,14 +59,11 @@ class _OutputState extends State<Output> with SingleTickerProviderStateMixin {
       children: [
         TabHeader(
           tabController: tabController,
-          showOutputPlacements: !widget.isEmbedded,
-          showGraph: widget.showGraph,
+          showOutputPlacements: false,
+          showGraph: false,
         ),
         Expanded(
-          child: OutputArea(
-            tabController: tabController,
-            showGraph: widget.showGraph,
-          ),
+          child: Container(),
         ),
       ],
     );
