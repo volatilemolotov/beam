@@ -21,8 +21,12 @@ import 'package:playground/constants/params.dart';
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
+import 'package:playground/modules/examples/repositories/models/save_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
 import 'package:playground/modules/sdk/models/sdk.dart';
 
 class ExampleState with ChangeNotifier {
@@ -31,6 +35,7 @@ class ExampleState with ChangeNotifier {
   Map<SDK, ExampleModel> defaultExamplesMap = {};
   ExampleModel? defaultExample;
   bool isSelectorOpened = false;
+  Map<SDK, ExampleModel>? sharedFilesMap;
 
   ExampleState(this._exampleRepository);
 
@@ -77,6 +82,33 @@ class ExampleState with ChangeNotifier {
     return _exampleRepository.getExampleGraph(
       GetExampleRequestWrapper(id, sdk),
     );
+  }
+
+  Future<void> getSharedExample(String id) async {
+    GetSnippetResponse result = await _exampleRepository.getSnippet(
+      GetSnippetRequestWrapper(id),
+    );
+    sharedFilesMap = {
+      result.sdk: ExampleModel(
+        name: result.files.first.name,
+        path: '',
+        description: '',
+        type: ExampleType.example,
+        source: result.files.first.code,
+        pipelineOptions: result.pipelineOptions,
+      ),
+    };
+    notifyListeners();
+  }
+
+  Future<String> getShareLink(
+    List<SharedFile> files,
+    SDK sdk,
+    String pipelineOptions,
+  ) async {
+    String id = await _exampleRepository
+        .saveSnippet(SaveSnippetRequestWrapper(files, sdk, pipelineOptions));
+    return '${Uri.base.toString().split('?')[0]}?snippetId=$id';
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {

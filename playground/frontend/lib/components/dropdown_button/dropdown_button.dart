@@ -19,26 +19,40 @@
 import 'package:flutter/material.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/examples/models/selector_size_model.dart';
+import 'package:playground/utils/dropdown_utils.dart';
 
 const int kAnimationDurationInMilliseconds = 80;
 const Offset kAnimationBeginOffset = Offset(0.0, -0.02);
 const Offset kAnimationEndOffset = Offset(0.0, 0.0);
-const double kAdditionalDyAlignment = 50.0;
+
+enum DropdownAlignment {
+  left,
+  right,
+}
 
 class AppDropdownButton extends StatefulWidget {
   final Widget buttonText;
   final Widget Function(void Function()) createDropdown;
   final double height;
   final double width;
+  final Widget? leading;
+  final Color? buttonColor;
+  final bool withArrowDown;
+  final DropdownAlignment dropdownAlign;
+  final Color? dropdownBackgroundColor;
 
   const AppDropdownButton({
-    Key? key,
+    super.key,
     required this.buttonText,
     required this.createDropdown,
     required this.height,
     required this.width,
-  }) : super(key: key);
+    this.leading,
+    this.buttonColor,
+    this.dropdownBackgroundColor,
+    this.withArrowDown = true,
+    this.dropdownAlign = DropdownAlignment.left,
+  });
 
   @override
   State<AppDropdownButton> createState() => _AppDropdownButtonState();
@@ -76,7 +90,7 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
     return Container(
       height: kContainerHeight,
       decoration: BoxDecoration(
-        color: ThemeColors.of(context).greyColor,
+        color: widget.buttonColor ?? ThemeColors.of(context).greyColor,
         borderRadius: BorderRadius.circular(kSmBorderRadius),
       ),
       child: TextButton(
@@ -88,8 +102,16 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
+              widget.leading != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(right: kMdSpacing),
+                      child: widget.leading,
+                    )
+                  : const SizedBox(),
               widget.buttonText,
-              const Icon(Icons.keyboard_arrow_down),
+              widget.withArrowDown
+                  ? const Icon(Icons.keyboard_arrow_down)
+                  : const SizedBox(),
             ],
           ),
         ),
@@ -98,7 +120,11 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
   }
 
   OverlayEntry createDropdown() {
-    SelectorPositionModel posModel = findSelectorPositionData();
+    Offset dropdownOffset = findDropdownOffset(
+      alignment: widget.dropdownAlign,
+      selectorKey: selectorKey,
+      widgetWidth: widget.width,
+    );
 
     return OverlayEntry(
       builder: (context) {
@@ -115,8 +141,8 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
               ),
             ),
             Positioned(
-              left: posModel.xAlignment,
-              top: posModel.yAlignment + kAdditionalDyAlignment,
+              left: dropdownOffset.dx,
+              top: dropdownOffset.dy,
               child: SlideTransition(
                 position: offsetAnimation,
                 child: Material(
@@ -126,7 +152,8 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
                     height: widget.height,
                     width: widget.width,
                     decoration: BoxDecoration(
-                      color: Theme.of(context).backgroundColor,
+                      color: widget.dropdownBackgroundColor ??
+                          Theme.of(context).backgroundColor,
                       borderRadius: BorderRadius.circular(kMdBorderRadius),
                     ),
                     child: widget.createDropdown(_close),
@@ -138,16 +165,6 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
         );
       },
     );
-  }
-
-  SelectorPositionModel findSelectorPositionData() {
-    RenderBox? rBox =
-        selectorKey.currentContext?.findRenderObject() as RenderBox;
-    SelectorPositionModel positionModel = SelectorPositionModel(
-      xAlignment: rBox.localToGlobal(Offset.zero).dx,
-      yAlignment: rBox.localToGlobal(Offset.zero).dy,
-    );
-    return positionModel;
   }
 
   void _close() {

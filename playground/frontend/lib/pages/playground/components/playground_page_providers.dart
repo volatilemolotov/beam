@@ -26,6 +26,7 @@ import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/grpc_example_client.dart';
 import 'package:playground/modules/examples/repositories/example_repository.dart';
 import 'package:playground/modules/output/models/output_placement_state.dart';
+import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/feedback_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
@@ -102,6 +103,11 @@ class PlaygroundPageProviders extends StatelessWidget {
     ExampleState exampleState,
     PlaygroundState playgroundState,
   ) async {
+    if (_getSnippetId().isNotEmpty) {
+      _getSnippet(playgroundState, exampleState);
+      return;
+    }
+
     final example = _getEmbeddedExample();
 
     if (example.path.isEmpty) {
@@ -140,6 +146,11 @@ class PlaygroundPageProviders extends StatelessWidget {
   ) async {
     await exampleState.loadDefaultExamplesIfNot();
 
+    if (_getSnippetId().isNotEmpty) {
+      _getSnippet(playgroundState, exampleState);
+      return;
+    }
+
     final example = await _getExample(exampleState, playgroundState);
 
     if (example == null) {
@@ -154,11 +165,44 @@ class PlaygroundPageProviders extends StatelessWidget {
     playgroundState.setExample(exampleWithInfo);
   }
 
+  String _getSnippetId() {
+    return Uri.base.queryParameters[kSnippetId] ?? '';
+  }
+
+  void _getSnippet(
+    PlaygroundState playgroundState,
+    ExampleState exampleState,
+  ) {
+    exampleState.getSharedExample(_getSnippetId());
+    playgroundState.setSdk(exampleState.sharedFilesMap!.keys.first);
+    playgroundState.setExample(exampleState.sharedFilesMap!.values.first);
+  }
+
   Future<ExampleModel?> _getExample(
     ExampleState exampleState,
     PlaygroundState playground,
   ) async {
     final examplePath = Uri.base.queryParameters[kExampleParam];
+    final snippetId = Uri.base.queryParameters[kSnippetId];
+
+    if (exampleState.defaultExamplesMap.isEmpty) {
+      exampleState.loadDefaultExamples();
+    }
+
+    if (snippetId?.isNotEmpty ?? false) {
+      exampleState.getSharedExample(snippetId!);
+      if (exampleState.sharedFilesMap == null) {
+        return ExampleModel(
+          name: kEmptyExampleName,
+          path: '',
+          description: '',
+          type: ExampleType.example,
+        );
+      }
+      playground.setSdk(exampleState.sharedFilesMap!.keys.first);
+      playground.setExample(exampleState.sharedFilesMap!.values.first);
+      return exampleState.sharedFilesMap!.values.first;
+    }
 
     if (examplePath?.isEmpty ?? true) {
       return exampleState.defaultExamplesMap[playground.sdk];

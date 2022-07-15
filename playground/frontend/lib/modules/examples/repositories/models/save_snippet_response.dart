@@ -16,11 +16,8 @@
  * limitations under the License.
  */
 
-const kExampleParam = 'example';
-const kIsEditableParam = 'editable';
-const kSourceCode = 'code';
-const kContextLine = 'line';
-const kIsEmbedded = 'embedded';
-const kSnippetId = 'snippetId';
+class SaveSnippetResponse {
+  final String id;
 
-const kQuickStartCategoryName = 'quick start';
+  const SaveSnippetResponse(this.id);
+}

@@ -16,12 +16,13 @@
  * limitations under the License.
  */
 
-class SelectorPositionModel {
-  final double xAlignment;
-  final double yAlignment;
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-  const SelectorPositionModel({
-    required this.xAlignment,
-    required this.yAlignment,
-  });
+class SaveSnippetRequestWrapper {
+  final List<SharedFile> files;
+  final SDK sdk;
+  final String pipelineOptions;
+
+  SaveSnippetRequestWrapper(this.files, this.sdk, this.pipelineOptions);
 }

@@ -16,11 +16,13 @@
  * limitations under the License.
  */
 
-const kExampleParam = 'example';
-const kIsEditableParam = 'editable';
-const kSourceCode = 'code';
-const kContextLine = 'line';
-const kIsEmbedded = 'embedded';
-const kSnippetId = 'snippetId';
+import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
 
-const kQuickStartCategoryName = 'quick start';
+class GetSnippetResponse {
+  final List<SharedFile> files;
+  final SDK sdk;
+  final String pipelineOptions;
+
+  GetSnippetResponse(this.files, this.sdk, this.pipelineOptions);
+}

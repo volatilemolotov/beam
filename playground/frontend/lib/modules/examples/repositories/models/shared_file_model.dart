@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-const kExampleParam = 'example';
-const kIsEditableParam = 'editable';
-const kSourceCode = 'code';
-const kContextLine = 'line';
-const kIsEmbedded = 'embedded';
-const kSnippetId = 'snippetId';
+class SharedFile {
+  final String code;
+  final bool isMain;
+  final String name;
 
-const kQuickStartCategoryName = 'quick start';
+  const SharedFile(this.code, this.isMain, this.name);
+}
