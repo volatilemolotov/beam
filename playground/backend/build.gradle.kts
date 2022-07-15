@@ -56,6 +56,15 @@ val startDatastoreEmulator by tasks.registering {
     }
 }
 
+val startDatastoreEmulatorAsScript by tasks.registering {
+        doLast {
+            exec {
+                executable("sh")
+                args("start_datastore_emulator.sh")
+            }
+        }
+}
+
 val stopDatastoreEmulator by tasks.registering {
     doLast {
         exec {
@@ -76,7 +85,8 @@ val test by tasks.registering {
     }
 }
 
-test { dependsOn(startDatastoreEmulator) }
+//test { dependsOn(startDatastoreEmulator) }
+test { dependsOn(startDatastoreEmulatorAsScript) }
 test { finalizedBy(stopDatastoreEmulator) }
 
 task("removeUnusedSnippet") {
