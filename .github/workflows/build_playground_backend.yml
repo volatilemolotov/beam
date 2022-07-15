@@ -47,6 +47,9 @@ jobs:
         with:
             install_components: 'beta,cloud-datastore-emulator'
 
+      - name: Check GCP components
+        run: gcloud components list
+
       - name: Run PreCommit
         run: ./gradlew playground:backend:precommit
       - name: install npm
@@ -80,7 +83,7 @@ jobs:
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
         run: ./gradlew playground:terraform:deployBackend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
-      
+
       - name: DB Index creation
         run: |
          gcloud auth activate-service-account --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
