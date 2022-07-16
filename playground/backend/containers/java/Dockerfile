@@ -46,6 +46,7 @@ ENV SERVER_PORT=8080
 ENV APP_WORK_DIR=/opt/playground/backend/
 ENV BEAM_SDK="SDK_JAVA"
 ENV BUCKET_NAME="playground-precompiled-objects"
+ENV PROPERTY_PATH=/opt/playground/backend/
 
 # Copy build result
 COPY --from=build /go/bin/server_java_backend /opt/playground/backend/
@@ -88,6 +89,7 @@ ENV HTTP_PROXY="http://127.0.0.1:8081"
 ENV HTTPS_PROXY="http://127.0.0.1:8081"
 
 COPY entrypoint.sh /
+COPY src/properties.yaml /opt/playground/backend/properties.yaml
 
 # Create a user group `appgroup` and a user `appuser`
 RUN groupadd --gid 20000 appgroup \
