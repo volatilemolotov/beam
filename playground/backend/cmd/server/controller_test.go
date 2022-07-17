@@ -120,7 +120,7 @@ func setup() *grpc.Server {
 	if err = os.Setenv("SDK_CONFIG", "../../../sdks.yaml"); err != nil {
 		panic(err)
 	}
-	if err = os.Setenv("PROPERTY_PATH", "../../."); err != nil {
+	if err = os.Setenv("PROPERTY_PATH", "../../properties.yaml"); err != nil {
 		panic(err)
 	}
 

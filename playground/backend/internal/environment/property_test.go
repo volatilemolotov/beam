@@ -30,7 +30,7 @@ func TestNew(t *testing.T) {
 		},
 		{
 			name:         "Property constructor: in the usual case",
-			appPropsPath: "../../.",
+			appPropsPath: "../../properties.yaml",
 			wantErr:      false,
 		},
 	}

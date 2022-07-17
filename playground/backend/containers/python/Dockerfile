@@ -43,7 +43,7 @@ ENV SERVER_PORT=8080
 ENV APP_WORK_DIR=/opt/playground/backend/
 ENV BEAM_SDK="SDK_PYTHON"
 ENV BUCKET_NAME="playground-precompiled-objects"
-ENV PROPERTY_PATH=/opt/playground/backend/
+ENV PROPERTY_PATH=/opt/playground/backend/properties.yaml
 
 # Copy build result
 COPY --from=build /go/bin/server_python_backend /opt/playground/backend/

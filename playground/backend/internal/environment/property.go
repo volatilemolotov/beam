@@ -17,13 +17,6 @@ package environment
 
 import "github.com/spf13/viper"
 
-const (
-	//configName is the name for the config file.
-	configName = "properties"
-	//configType is the type of the configuration returned by the remote source, e.g. "json", "yaml", "env" and so on.
-	configType = "yaml"
-)
-
 //Properties contains all properties that needed to run backend processes.
 type Properties struct {
 	// Salt is the salt to generate the hash to avoid whatever problems a collision may cause.
@@ -39,9 +32,7 @@ type Properties struct {
 }
 
 func NewProperties(configPath string) (*Properties, error) {
-	viper.AddConfigPath(configPath)
-	viper.SetConfigName(configName)
-	viper.SetConfigType(configType)
+	viper.SetConfigFile(configPath)
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, err
 	}

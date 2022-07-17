@@ -65,7 +65,7 @@ const (
 	SDKConfigPathKey              = "SDK_CONFIG"
 	defaultSDKConfigPath          = "../sdks.yaml"
 	propertyPathKey               = "PROPERTY_PATH"
-	defaultPropertyPath           = "."
+	defaultPropertyPath           = "properties.yaml"
 )
 
 // Environment operates with environment structures: NetworkEnvs, BeamEnvs, ApplicationEnvs

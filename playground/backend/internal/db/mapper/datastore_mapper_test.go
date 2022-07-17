@@ -28,7 +28,7 @@ import (
 var testable *DatastoreMapper
 
 func TestMain(m *testing.M) {
-	appEnv := environment.NewApplicationEnvs("/app", "", "", "", "", "", "../../../.", nil, 0)
+	appEnv := environment.NewApplicationEnvs("/app", "", "", "", "", "", "../../../properties.yaml", nil, 0)
 	appEnv.SetSchemaVersion("MOCK_SCHEMA")
 	props, _ := environment.NewProperties(appEnv.PropertyPath())
 	testable = New(appEnv, props)
