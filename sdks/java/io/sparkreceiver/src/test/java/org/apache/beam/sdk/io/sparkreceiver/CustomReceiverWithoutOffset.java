@@ -36,6 +36,7 @@ public class CustomReceiverWithoutOffset extends Receiver<String> {
   private static final Logger LOG = LoggerFactory.getLogger(CustomReceiverWithoutOffset.class);
   private static final int TIMEOUT_MS = 500;
   private static final List<String> STORED_RECORDS = new ArrayList<>();
+  private static final int RECORDS_COUNT = 20;
 
   CustomReceiverWithoutOffset() {
     super(StorageLevel.MEMORY_AND_DISK_2());
@@ -53,7 +54,7 @@ public class CustomReceiverWithoutOffset extends Receiver<String> {
   private void receive() {
     Long currentOffset = 0L;
     while (!isStopped()) {
-      if (currentOffset <= 20) {
+      if (currentOffset <= RECORDS_COUNT) {
         STORED_RECORDS.add(currentOffset.toString());
         store((currentOffset++).toString());
       }
