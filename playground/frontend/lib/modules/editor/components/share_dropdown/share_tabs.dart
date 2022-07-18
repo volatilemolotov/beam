@@ -17,55 +17,47 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/output/components/output_header/output_header.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tab_body.dart';
+import 'package:playground/modules/output/models/output_placement_state.dart';
+import 'package:playground/pages/playground/states/playground_state.dart';
+import 'package:provider/provider.dart';
 
-const kTabsCount = 2;
+class ShareTabs extends StatelessWidget {
+  final TabController tabController;
 
-class ShareTabs extends StatefulWidget {
-  const ShareTabs({super.key});
-
-  @override
-  State<ShareTabs> createState() => _ShareTabsState();
-}
-
-class _ShareTabsState extends State<ShareTabs>
-    with SingleTickerProviderStateMixin {
-  late final TabController tabController;
-  int selectedTab = 0;
-
-  @override
-  void initState() {
-    tabController = TabController(vsync: this, length: kTabsCount);
-    tabController.addListener(_onTabChange);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    tabController.removeListener(_onTabChange);
-    tabController.dispose();
-    super.dispose();
-  }
-
-  void _onTabChange() {
-    setState(() {
-      selectedTab = tabController.index;
-    });
-  }
+  const ShareTabs({super.key, required this.tabController});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TabHeader(
-          tabController: tabController,
-          showOutputPlacements: false,
-          showGraph: false,
-        ),
-        Expanded(
-          child: Container(),
-        ),
-      ],
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
+    return Container(
+      color: Theme.of(context).backgroundColor,
+      child: Consumer2<PlaygroundState, OutputPlacementState>(
+        builder: (context, playgroundState, placementState, child) {
+          return TabBarView(
+            controller: tabController,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              ShareTabBody(
+                buttonText: appLocale.showAndCopyLink,
+                descriptionText: appLocale.clickForLink,
+                copiedText: appLocale.linkCopied,
+                loadingText: appLocale.loadingLink,
+                isCopyLinkTab: true,
+              ),
+              ShareTabBody(
+                buttonText: 'Copy Iframe',
+                descriptionText: 'Click for the iframe code',
+                copiedText: 'Iframe code copied!',
+                loadingText: 'Iframe is loading...',
+                isCopyLinkTab: false,
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

@@ -20,19 +20,17 @@ import 'package:flutter/material.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/output/components/output_header/output_placements.dart';
 
-import 'output_tabs.dart';
-
 class TabHeader extends StatelessWidget {
   final TabController tabController;
   final bool showOutputPlacements;
-  final bool showGraph;
+  final Widget tabsWidget;
 
   const TabHeader({
-    Key? key,
+    super.key,
     required this.tabController,
+    required this.tabsWidget,
     this.showOutputPlacements = true,
-    this.showGraph = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +44,7 @@ class TabHeader extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            OutputTabs(tabController: tabController, showGraph: showGraph),
+            tabsWidget,
             showOutputPlacements ? const OutputPlacements() : const SizedBox(),
           ],
         ),

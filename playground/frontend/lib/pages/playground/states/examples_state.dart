@@ -101,14 +101,14 @@ class ExampleState with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String> getShareLink(
+  Future<String> getSnippetId(
     List<SharedFile> files,
     SDK sdk,
     String pipelineOptions,
   ) async {
     String id = await _exampleRepository
         .saveSnippet(SaveSnippetRequestWrapper(files, sdk, pipelineOptions));
-    return '${Uri.base.toString().split('?')[0]}?snippetId=$id';
+    return id;
   }
 
   Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {
