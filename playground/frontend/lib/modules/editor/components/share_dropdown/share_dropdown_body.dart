@@ -17,148 +17,58 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:playground/config/theme.dart';
-import 'package:playground/constants/font_weight.dart';
-import 'package:playground/constants/params.dart';
-import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/editor/components/share_dropdown/link_text_field.dart';
-import 'package:playground/modules/editor/components/share_dropdown/share_link_field.dart';
-import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
-import 'package:playground/pages/playground/states/examples_state.dart';
-import 'package:playground/pages/playground/states/playground_state.dart';
-import 'package:provider/provider.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs.dart';
+import 'package:playground/modules/output/components/output_header/tab_header.dart';
 
-const kLoadingIndicatorSize = 20.0;
+import 'share_tabs_headers.dart';
+
+const kTabsCount = 2;
 
 class ShareDropdownBody extends StatefulWidget {
-  final VoidCallback close;
-
-  const ShareDropdownBody({super.key, required this.close});
+  const ShareDropdownBody({super.key});
 
   @override
   State<ShareDropdownBody> createState() => _ShareDropdownBodyState();
 }
 
-class _ShareDropdownBodyState extends State<ShareDropdownBody> {
-  final TextEditingController textEditingController = TextEditingController();
-  bool isPressed = false;
+class _ShareDropdownBodyState extends State<ShareDropdownBody>
+    with SingleTickerProviderStateMixin {
+  late final TabController tabController;
+  int selectedTab = 0;
+
+  @override
+  void initState() {
+    tabController = TabController(vsync: this, length: kTabsCount);
+    tabController.addListener(_onTabChange);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    tabController.removeListener(_onTabChange);
+    tabController.dispose();
+    super.dispose();
+  }
+
+  void _onTabChange() {
+    setState(() {
+      selectedTab = tabController.index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
-
-    return Consumer2<ExampleState, PlaygroundState>(
-      builder: (context, exampleState, playgroundState, child) => Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: kXlSpacing,
-          horizontal: kXlSpacing,
+    return Column(
+      children: [
+        TabHeader(
+          tabController: tabController,
+          showOutputPlacements: false,
+          tabsWidget: ShareTabsHeaders(tabController: tabController),
         ),
-        child: Center(
-          child: isPressed
-              ? FutureBuilder(
-                  future: exampleState.getShareLink(
-                    [SharedFile(playgroundState.source, true, '')],
-                    playgroundState.sdk,
-                    playgroundState.pipelineOptions,
-                  ),
-                  builder: (context, snapshot) {
-                    return _buildButton(playgroundState, snapshot, appLocale);
-                  },
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(appLocale.clickForLink),
-                    GestureDetector(
-                      onTap: () async {
-                        setState(() {
-                          isPressed = true;
-                        });
-                      },
-                      child: ShareLinkField(
-                        isPressed: isPressed,
-                        child: Text(
-                          appLocale.showAndCopyLink,
-                          style: TextStyle(
-                            fontSize: kLabelFontSize,
-                            fontWeight: kBoldWeight,
-                            color: ThemeColors.of(context).primary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        Expanded(
+          child: ShareTabs(tabController: tabController),
         ),
-      ),
+      ],
     );
-  }
-
-  Widget _buildButton(
-    PlaygroundState playgroundState,
-    AsyncSnapshot snapshot,
-    AppLocalizations appLocale,
-  ) {
-    if (playgroundState.isExampleChanged) {
-      if (snapshot.hasData) {
-        setAndCopyLinkText(snapshot.data.toString());
-
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(appLocale.linkCopied),
-            ShareLinkField(
-              isPressed: isPressed,
-              child: LinkTextField(
-                textEditingController: textEditingController,
-              ),
-            ),
-          ],
-        );
-      } else {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Text(appLocale.loadingLink),
-            ShareLinkField(
-              isPressed: isPressed,
-              child: SizedBox(
-                height: kLoadingIndicatorSize,
-                width: kLoadingIndicatorSize,
-                child: CircularProgressIndicator(
-                  color: ThemeColors.of(context).primary,
-                ),
-              ),
-            ),
-          ],
-        );
-      }
-    } else {
-      setAndCopyLinkText(
-        '${Uri.base.toString().split('?')[0]}?$kExampleParam=${playgroundState.selectedExample!.path}',
-      );
-
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Text(appLocale.linkCopied),
-          ShareLinkField(
-            isPressed: isPressed,
-            child: LinkTextField(
-              textEditingController: textEditingController,
-            ),
-          ),
-        ],
-      );
-    }
-  }
-
-  void setAndCopyLinkText(String link) async {
-    textEditingController.text = link;
-    await Clipboard.setData(ClipboardData(
-      text: textEditingController.text,
-    ));
   }
 }
