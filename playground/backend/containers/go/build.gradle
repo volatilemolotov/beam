@@ -71,9 +71,12 @@ docker {
 }
 
 dockerClean {
+  println("dockerClean. Test log")
   // Disable gradle cache
   outputs.upToDateWhen { false }
 }
+
+dockerClean.outputs.upToDateWhen { false }
 
 // Ensure that we build the required resources and copy and file dependencies from related projects
 dockerPrepare.dependsOn copyDockerfileDependencies
