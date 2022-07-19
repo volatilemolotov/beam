@@ -34,7 +34,6 @@ dependencies {
 }
 
 task copyDockerfileDependencies(type: Copy) {
-   outputs.upToDateWhen { false }
    copy {
       from '../../../backend/'
       into 'build/src'
