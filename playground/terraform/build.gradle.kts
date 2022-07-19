@@ -247,7 +247,6 @@ tasks {
 
 /* set Docker Registry to params from Inf */
 task("setDockerRegistry") {
-    outputs.upToDateWhen { false }
     group = "deploy"
     //get Docker Registry
     dependsOn(":playground:terraform:terraformInit")
@@ -380,7 +379,6 @@ task("deployFrontend") {
 /* build, push, deploy Backend app */
 task("deployBackend") {
     // Disable gradle cache
-    outputs.upToDateWhen { false }
     group = "deploy"
     description = "deploy Backend app"
     //TODO please add default tag from project_environment property

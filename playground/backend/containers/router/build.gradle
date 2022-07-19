@@ -66,11 +66,6 @@ docker {
                            "golang:1.16-bullseye" ])
 }
 
-dockerClean {
-  // Disable gradle cache
-  outputs.upToDateWhen { false }
-}
-
 task dockerComposeLocalUp() {
     dependsOn ':playground:backend:containers:router:docker'
     doLast {
