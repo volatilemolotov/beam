@@ -247,6 +247,7 @@ tasks {
 
 /* set Docker Registry to params from Inf */
 task("setDockerRegistry") {
+    outputs.upToDateWhen { false }
     group = "deploy"
     //get Docker Registry
     dependsOn(":playground:terraform:terraformInit")
