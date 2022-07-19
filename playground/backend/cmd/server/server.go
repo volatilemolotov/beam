@@ -69,8 +69,7 @@ func runServer() error {
 
 		props, err = environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
 		if err != nil {
-			return fmt.Errorf("test error. property file is missing, path: %s, err: %s", envService.ApplicationEnvs.PropertyPath(), err.Error())
-			//return err
+			return err
 		}
 
 		dbClient, err = datastore.New(ctx, envService.ApplicationEnvs.GoogleProjectId())
@@ -200,8 +199,6 @@ func setupDBStructure(ctx context.Context, db db.Database, appEnv *environment.A
 }
 
 func main() {
-	fmt.Println("Server running. Test log")
-	fmt.Println("Server running. Test log")
 	fmt.Println("Server running. Test log")
 	err := runServer()
 	if err != nil {
