@@ -34,6 +34,7 @@ dependencies {
 }
 
 task copyDockerfileDependencies(type: Copy) {
+   outputs.upToDateWhen { false }
    copy {
       from '../../../backend/'
       into 'build/src'
@@ -58,6 +59,7 @@ task copyDockerfileDependencies(type: Copy) {
 }
 
 docker {
+  outputs.upToDateWhen { false }
   name containerImageName(
           name: project.docker_image_default_repo_prefix + "playground-backend-go",
           root: project.rootProject.hasProperty(["docker-repository-root"]) ?
@@ -71,7 +73,7 @@ docker {
 }
 
 dockerClean {
-    outputs.upToDateWhen { true }
+    outputs.upToDateWhen { false }
 }
 
 // Ensure that we build the required resources and copy and file dependencies from related projects
