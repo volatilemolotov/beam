@@ -77,5 +77,10 @@ docker {
                              "golang:1.17-bullseye" ])
 }
 
+dockerClean {
+  // Disable gradle cache
+  outputs.upToDateWhen { false }
+}
+
 // Ensure that we build the required resources and copy and file dependencies from related projects
 dockerPrepare.dependsOn copyDockerfileDependencies
