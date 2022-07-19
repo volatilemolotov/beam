@@ -199,7 +199,6 @@ func setupDBStructure(ctx context.Context, db db.Database, appEnv *environment.A
 }
 
 func main() {
-	fmt.Println("Server running. Test log")
 	err := runServer()
 	if err != nil {
 		panic(err)
