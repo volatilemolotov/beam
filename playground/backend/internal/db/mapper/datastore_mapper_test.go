@@ -132,3 +132,10 @@ func TestEntityMapper_ToFileEntity(t *testing.T) {
 		})
 	}
 }
+
+func TestNew(t *testing.T) {
+	appEnv := testable.appEnv
+	if appEnv.WorkingDir() != "/app" {
+		t.Error("Unexpected result")
+	}
+}

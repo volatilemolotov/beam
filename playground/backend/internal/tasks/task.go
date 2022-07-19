@@ -18,7 +18,7 @@ func New(ctx context.Context) *ScheduledTask {
 }
 
 func (st *ScheduledTask) StartRemovingExtraSnippets(cron string, dayDiff int32, db db.Database) error {
-	_, err := st.taskScheduler.ScheduleWithCron(func(ctx context.Context) {
+	task, err := st.taskScheduler.ScheduleWithCron(func(ctx context.Context) {
 		logger.Info("ScheduledTask: StartRemovingExtraSnippets() is running...\n")
 		startDate := time.Now()
 		if err := db.DeleteUnusedSnippets(ctx, dayDiff); err != nil {
@@ -30,6 +30,9 @@ func (st *ScheduledTask) StartRemovingExtraSnippets(cron string, dayDiff int32, 
 
 	if err != nil {
 		logger.Errorf("ScheduledTask: StartRemovingExtraSnippets() error during task running, err: %s\n", err.Error())
+		if !task.IsCancelled() {
+			task.Cancel()
+		}
 		return err
 	}
 	return nil
