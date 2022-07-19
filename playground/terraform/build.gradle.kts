@@ -378,7 +378,6 @@ task("deployFrontend") {
 
 /* build, push, deploy Backend app */
 task("deployBackend") {
-    // Disable gradle cache
     group = "deploy"
     description = "deploy Backend app"
     //TODO please add default tag from project_environment property
