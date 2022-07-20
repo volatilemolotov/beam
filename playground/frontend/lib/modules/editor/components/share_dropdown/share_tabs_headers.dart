@@ -17,10 +17,12 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/constants/sizes.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../../../constants/sizes.dart';
+const kTabBarWidth = 180.0;
 
 class ShareTabsHeaders extends StatelessWidget {
   final TabController tabController;
@@ -32,32 +34,30 @@ class ShareTabsHeaders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations appLocale = AppLocalizations.of(context)!;
+
     return Consumer<PlaygroundState>(builder: (context, state, child) {
       return SizedBox(
-        width: 150,
+        width: kTabBarWidth,
         child: TabBar(
           controller: tabController,
           tabs: <Widget>[
             Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
+              padding: const EdgeInsets.only(bottom: kMdSpacing),
               child: Wrap(
                 direction: Axis.horizontal,
                 alignment: WrapAlignment.center,
                 spacing: kMdSpacing,
-                children: const [
-                  Text('Link'),
-                ],
+                children: [Text(appLocale.link)],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
+              padding: const EdgeInsets.only(bottom: kMdSpacing),
               child: Wrap(
                 direction: Axis.horizontal,
                 alignment: WrapAlignment.center,
                 spacing: kMdSpacing,
-                children: const [
-                  Text('Embed'),
-                ],
+                children: [Text(appLocale.embed)],
               ),
             ),
           ],
