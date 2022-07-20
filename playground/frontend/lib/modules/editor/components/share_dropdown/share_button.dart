@@ -22,7 +22,7 @@ import 'package:playground/components/dropdown_button/dropdown_button.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/modules/editor/components/share_dropdown/share_dropdown_body.dart';
 
-const _kShareDropdownHeight = 150.0;
+const _kShareDropdownHeight = 140.0;
 const _kShareDropdownWidth = 460.0;
 const _kButtonColorOpacity = 0.2;
 
