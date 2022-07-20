@@ -16,6 +16,7 @@
 package datastore
 
 import (
+	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -32,6 +33,7 @@ const (
 	SchemaKind  = "pg_schema_versions"
 	SdkKind     = "pg_sdks"
 	FileKind    = "pg_files"
+	ExampleKind = "pg_examples"
 )
 
 type Datastore struct {
@@ -144,7 +146,7 @@ func (d *Datastore) PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
 	}
 	var keys []*datastore.Key
 	for _, sdk := range sdks {
-		keys = append(keys, utils.GetNameKey(SdkKind, sdk.Name, Namespace, nil))
+		keys = append(keys, getSdkKey(sdk.Name))
 	}
 	if _, err := d.Client.PutMulti(ctx, keys, sdks); err != nil {
 		logger.Errorf("Datastore: PutSDK(): error during entity saving, err: %s\n", err.Error())
@@ -186,11 +188,39 @@ func (d *Datastore) GetFiles(ctx context.Context, snipId string, numberOfFiles i
 
 //GetSDK returns the sdk entity by an identifier
 func (d *Datastore) GetSDK(ctx context.Context, id string) (*entity.SDKEntity, error) {
-	sdkId := utils.GetNameKey(SdkKind, id, Namespace, nil)
+	sdkKey := getSdkKey(id)
 	sdk := new(entity.SDKEntity)
-	if err := d.Client.Get(ctx, sdkId, sdk); err != nil {
+	if err := d.Client.Get(ctx, sdkKey, sdk); err != nil {
 		logger.Errorf("Datastore: GetSDK(): error during sdk getting, err: %s\n", err.Error())
 		return nil, err
 	}
 	return sdk, nil
+}
+
+//GetCatalog returns all examples for the specified sdk
+func (d *Datastore) GetCatalog(ctx context.Context, sdk string) ([]*pb.Categories, error) {
+	sdkKey := getSdkKey(sdk)
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("Datastore: GetCatalog(): error during the transaction creating, err: %s\n", err.Error())
+		return nil, err
+	}
+	exampleQuery := datastore.NewQuery(ExampleKind).
+		Namespace(Namespace).
+		Filter("sdk = ", sdkKey).
+		Transaction(tx)
+	var examples []*entity.ExampleEntity
+	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, examples)
+	if err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("Datastore: GetCatalog(): error during the catalog getting, err: %s\n", err.Error())
+		return nil, err
+	}
+
+}
+
+func getSdkKey(sdk string) *datastore.Key {
+	return utils.GetNameKey(SdkKind, sdk, Namespace, nil)
 }

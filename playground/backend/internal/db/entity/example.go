@@ -13,35 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package db
+package entity
 
-import (
-	"beam.apache.org/playground/backend/internal/db/entity"
-	"context"
-)
+import "cloud.google.com/go/datastore"
 
-type Database interface {
-	SnippetDatabase
-	CatalogDatabase
-	ExampleDatabase
-}
-
-type ExampleDatabase interface {
-	GetCatalog(ctx context.Context, sdk string)
-}
-
-type SnippetDatabase interface {
-	PutSnippet(ctx context.Context, id string, snip *entity.Snippet) error
-
-	GetSnippet(ctx context.Context, id string) (*entity.SnippetEntity, error)
-
-	GetFiles(ctx context.Context, snipId string, numberOfFiles int) ([]*entity.FileEntity, error)
-}
-
-type CatalogDatabase interface {
-	PutSchemaVersion(ctx context.Context, id string, schema *entity.SchemaEntity) error
-
-	PutSDKs(ctx context.Context, sdks []*entity.SDKEntity) error
-
-	GetSDK(ctx context.Context, id string) (*entity.SDKEntity, error)
+type ExampleEntity struct {
+	Name       string         `datastore:"name"`
+	Sdk        *datastore.Key `datastore:"sdk"`
+	Descr      string         `datastore:"descr"`
+	Tags       []string       `datastore:"tags"`
+	Cats       []string       `datastore:"cats"`
+	Complexity int8           `datastore:"complexity"`
+	Path       string         `datastore:"path"`
+	Origin     string         `datastore:"origin"`
+	SchVer     *datastore.Key `datastore:"schVer"`
 }
