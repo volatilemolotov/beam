@@ -13,13 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dataflowlib
+package entity
 
-import (
-	pipepb "github.com/apache/beam/sdks/v2/go/pkg/beam/model/pipeline_v1"
-)
-
-// Fixup proto pipeline with Dataflow quirks.
-func Fixup(p *pipepb.Pipeline) (*pipepb.Pipeline, error) {
-	return p, nil
+type IDMeta struct {
+	Salt     string
+	IdLength int8
 }
