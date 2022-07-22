@@ -105,14 +105,10 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
   }
 
   @Setup
-  public void setup() throws Exception {
-    // Start to track record size and offset gap per bundle.
-  }
+  public void setup() throws Exception {}
 
   @Teardown
   public void teardown() throws Exception {
-    // Closeables close
-    LOG.debug("Teardown");
     sparkConsumer.stop();
   }
 
@@ -128,16 +124,15 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
       if (record != null) {
         Long offset = getOffsetFn.apply(record);
         if (!tracker.tryClaim(offset)) {
-          LOG.info("Stop for restriction: {}", tracker.currentRestriction().toString());
+          LOG.debug("Stop for restriction: {}", tracker.currentRestriction().toString());
           return ProcessContinuation.stop();
         }
         Instant currentTimeStamp = Instant.now();
         ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(currentTimeStamp);
         receiver.outputWithTimestamp(record, currentTimeStamp);
-        LOG.info("Record {} was outputted with timestamp {}", record, currentTimeStamp);
       }
     }
-    LOG.info("Resume for restriction: {}", tracker.currentRestriction().toString());
+    LOG.debug("Resume for restriction: {}", tracker.currentRestriction().toString());
     return ProcessContinuation.resume().withResumeDelay(Duration.millis(CONTINUE_POLL_TIMEOUT_MS));
   }
 
