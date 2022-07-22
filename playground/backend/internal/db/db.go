@@ -16,8 +16,10 @@
 package db
 
 import (
-	"beam.apache.org/playground/backend/internal/db/entity"
 	"context"
+
+	"beam.apache.org/playground/backend/internal/db/dto"
+	"beam.apache.org/playground/backend/internal/db/entity"
 )
 
 type Database interface {
@@ -27,7 +29,7 @@ type Database interface {
 }
 
 type ExampleDatabase interface {
-	GetCatalog(ctx context.Context, sdk string)
+	GetCatalog(ctx context.Context, sdk string) (*dto.SdkToCategories, error)
 }
 
 type SnippetDatabase interface {

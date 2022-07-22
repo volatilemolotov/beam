@@ -16,14 +16,17 @@
 package datastore
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/db/entity"
-	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/utils"
-	"cloud.google.com/go/datastore"
 	"context"
 	"fmt"
 	"time"
+
+	"cloud.google.com/go/datastore"
+
+	"beam.apache.org/playground/backend/internal/db/dto"
+	"beam.apache.org/playground/backend/internal/db/entity"
+	"beam.apache.org/playground/backend/internal/db/mapper"
+	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
@@ -37,7 +40,8 @@ const (
 )
 
 type Datastore struct {
-	Client *datastore.Client
+	Client         *datastore.Client
+	ResponseMapper mapper.ResponseMapper
 }
 
 func New(ctx context.Context, projectId string) (*Datastore, error) {
@@ -46,8 +50,8 @@ func New(ctx context.Context, projectId string) (*Datastore, error) {
 		logger.Errorf("Datastore: connection to store: error during connection, err: %s\n", err.Error())
 		return nil, err
 	}
-
-	return &Datastore{Client: client}, nil
+	pcMapper := mapper.NewPrecompiledObjectMapper()
+	return &Datastore{Client: client, ResponseMapper: pcMapper}, nil
 }
 
 // PutSnippet puts the snippet entity to datastore
@@ -198,7 +202,7 @@ func (d *Datastore) GetSDK(ctx context.Context, id string) (*entity.SDKEntity, e
 }
 
 //GetCatalog returns all examples for the specified sdk
-func (d *Datastore) GetCatalog(ctx context.Context, sdk string) ([]*pb.Categories, error) {
+func (d *Datastore) GetCatalog(ctx context.Context, sdk string) (*dto.SdkToCategories, error) {
 	sdkKey := getSdkKey(sdk)
 	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
 	if err != nil {
@@ -209,6 +213,7 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdk string) ([]*pb.Categorie
 		Namespace(Namespace).
 		Filter("sdk = ", sdkKey).
 		Transaction(tx)
+
 	var examples []*entity.ExampleEntity
 	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, examples)
 	if err != nil {
@@ -219,6 +224,16 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdk string) ([]*pb.Categorie
 		return nil, err
 	}
 
+	var snippets []*entity.SnippetEntity
+	if err = tx.GetMulti(exampleKeys, snippets); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("Datastore: GetFiles(): error during file getting, err: %s\n", err.Error())
+		return nil, err
+	}
+
+	return d.ResponseMapper.ToSdkToCategories(examples, snippets), nil
 }
 
 func getSdkKey(sdk string) *datastore.Key {

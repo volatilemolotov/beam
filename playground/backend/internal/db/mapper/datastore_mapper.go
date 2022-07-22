@@ -16,12 +16,13 @@
 package mapper
 
 import (
+	"time"
+
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	datastoreDb "beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/utils"
-	"time"
 )
 
 type DatastoreMapper struct {
@@ -29,7 +30,7 @@ type DatastoreMapper struct {
 	props  *environment.Properties
 }
 
-func New(appEnv *environment.ApplicationEnvs, props *environment.Properties) *DatastoreMapper {
+func NewDatastoreMapper(appEnv *environment.ApplicationEnvs, props *environment.Properties) *DatastoreMapper {
 	return &DatastoreMapper{appEnv: appEnv, props: props}
 }
 

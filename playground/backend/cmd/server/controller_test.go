@@ -15,6 +15,24 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"io/fs"
+	"log"
+	"net"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+
+	"github.com/google/uuid"
+	"go.uber.org/goleak"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/test/bufconn"
+
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
@@ -26,22 +44,6 @@ import (
 	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/utils"
-	"context"
-	"fmt"
-	"github.com/google/uuid"
-	"go.uber.org/goleak"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/test/bufconn"
-	"io/fs"
-	"log"
-	"net"
-	"os"
-	"path/filepath"
-	"reflect"
-	"strings"
-	"testing"
-	"time"
 )
 
 const (
@@ -154,7 +156,7 @@ func setup() *grpc.Server {
 	}
 	appEnv.SetSchemaVersion(actualSchemaVersion)
 
-	entityMapper := mapper.New(appEnv, props)
+	entityMapper := mapper.NewDatastoreMapper(appEnv, props)
 
 	pb.RegisterPlaygroundServiceServer(s, &playgroundController{
 		env:          environment.NewEnvironment(*networkEnv, *sdkEnv, *appEnv),
