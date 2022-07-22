@@ -16,15 +16,17 @@
 package redis
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/cache"
-	"beam.apache.org/playground/backend/internal/logger"
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
-	"time"
+
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/cache"
+	"beam.apache.org/playground/backend/internal/logger"
 )
 
 type Cache struct {

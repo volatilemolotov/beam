@@ -16,17 +16,19 @@
 package redis
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/cache"
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"github.com/go-redis/redismock/v8"
-	"github.com/google/uuid"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/go-redis/redis/v8"
+	"github.com/go-redis/redismock/v8"
+	"github.com/google/uuid"
+
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/cache"
 )
 
 func TestRedisCache_GetValue(t *testing.T) {

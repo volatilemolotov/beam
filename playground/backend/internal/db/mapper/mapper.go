@@ -27,6 +27,6 @@ type EntityMapper interface {
 }
 
 type ResponseMapper interface {
-	ToSdkToCategories(examples []*entity.ExampleEntity, snippets []*entity.SnippetEntity) *dto.SdkToCategories
-	ToObjectInfo(example *entity.ExampleEntity, snippet *entity.SnippetEntity) *dto.ObjectInfo
+	ToSdkToCategories(catalogDTO *dto.CatalogDTO, targetCategory string) *dto.SdkToCategories
+	ToObjectInfo(exampleDTO *dto.ExampleDTO) *dto.ObjectInfo
 }

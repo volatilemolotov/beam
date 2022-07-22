@@ -15,11 +15,13 @@
 
 package dto
 
-import pb "beam.apache.org/playground/backend/internal/api/v1"
+import (
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/db/entity"
+)
 
 type ObjectInfo struct {
 	Name            string
-	CloudPath       string
 	Description     string                   `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Type            pb.PrecompiledObjectType `protobuf:"varint,4,opt,name=type,proto3,enum=api.v1.PrecompiledObjectType" json:"type,omitempty"`
 	Categories      []string                 `json:"categories,omitempty"`
@@ -33,3 +35,34 @@ type ObjectInfo struct {
 type PrecompiledObjects []ObjectInfo
 type CategoryToPrecompiledObjects map[string]PrecompiledObjects
 type SdkToCategories map[string]CategoryToPrecompiledObjects
+
+type CatalogDTO struct {
+	Examples              []*entity.ExampleEntity
+	Snippets              []*entity.SnippetEntity
+	Files                 []*entity.FileEntity
+	DefaultPrecompiledObj *pb.PrecompiledObject
+	Sdk                   string
+}
+
+type ExampleDTO struct {
+	Example               *entity.ExampleEntity
+	Snippet               *entity.SnippetEntity
+	Files                 []*entity.FileEntity
+	DefaultPrecompiledObj *pb.PrecompiledObject
+}
+
+func (e *ExampleDTO) HasMultiFiles() bool {
+	return e.Snippet.NumberOfFiles > 1
+}
+
+func (e *ExampleDTO) IsDefault() bool {
+	return e.Example.Name == e.DefaultPrecompiledObj.Name
+}
+
+func (e *ExampleDTO) GetType() pb.PrecompiledObjectType {
+	return pb.PrecompiledObjectType(pb.PrecompiledObjectType_value[e.Example.Type])
+}
+
+func (e *ExampleDTO) GetContextLine() int32 {
+	return e.Files[0].CntxLine
+}

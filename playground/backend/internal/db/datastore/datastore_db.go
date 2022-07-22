@@ -22,6 +22,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 
+	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/db/dto"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/mapper"
@@ -202,7 +203,7 @@ func (d *Datastore) GetSDK(ctx context.Context, id string) (*entity.SDKEntity, e
 }
 
 //GetCatalog returns all examples for the specified sdk
-func (d *Datastore) GetCatalog(ctx context.Context, sdk string) (*dto.SdkToCategories, error) {
+func (d *Datastore) GetCatalog(ctx context.Context, sdk string, defaultPrecompiledObj *pb.PrecompiledObject) (*dto.SdkToCategories, error) {
 	sdkKey := getSdkKey(sdk)
 	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
 	if err != nil {
@@ -214,26 +215,51 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdk string) (*dto.SdkToCateg
 		Filter("sdk = ", sdkKey).
 		Transaction(tx)
 
+	//Retrieving examples
 	var examples []*entity.ExampleEntity
 	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, examples)
 	if err != nil {
 		if rollBackErr := tx.Rollback(); rollBackErr != nil {
 			err = rollBackErr
 		}
-		logger.Errorf("Datastore: GetCatalog(): error during the catalog getting, err: %s\n", err.Error())
+		logger.Errorf("Datastore: GetCatalog(): error during the getting examples, err: %s\n", err.Error())
 		return nil, err
 	}
 
+	//Retrieving snippets
 	var snippets []*entity.SnippetEntity
 	if err = tx.GetMulti(exampleKeys, snippets); err != nil {
 		if rollBackErr := tx.Rollback(); rollBackErr != nil {
 			err = rollBackErr
 		}
-		logger.Errorf("Datastore: GetFiles(): error during file getting, err: %s\n", err.Error())
+		logger.Errorf("Datastore: GetCatalog(): error during the getting snippets, err: %s\n", err.Error())
 		return nil, err
 	}
 
-	return d.ResponseMapper.ToSdkToCategories(examples, snippets), nil
+	//Retrieving files
+	var files []*entity.FileEntity
+	var fileKeys []*datastore.Key
+	for snpIndx, snippet := range snippets {
+		for fileIndx := 0; fileIndx < snippet.NumberOfFiles; fileIndx++ {
+			fileKey := getSdkKey(fmt.Sprintf("%s_%d", exampleKeys[snpIndx].Name, fileIndx))
+			fileKeys = append(fileKeys, fileKey)
+		}
+	}
+	if err = tx.GetMulti(fileKeys, files); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("Datastore: GetCatalog(): error during the getting files, err: %s\n", err.Error())
+		return nil, err
+	}
+
+	return d.ResponseMapper.ToSdkToCategories(&dto.CatalogDTO{
+		Examples:              examples,
+		Snippets:              snippets,
+		Files:                 files,
+		DefaultPrecompiledObj: defaultPrecompiledObj,
+		Sdk:                   sdk,
+	}, ""), nil
 }
 
 func getSdkKey(sdk string) *datastore.Key {

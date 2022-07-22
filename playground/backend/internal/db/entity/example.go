@@ -25,6 +25,7 @@ type ExampleEntity struct {
 	Cats       []string       `datastore:"cats"`
 	Complexity int8           `datastore:"complexity"`
 	Path       string         `datastore:"path"`
+	Type       string         `datastore:"type"`
 	Origin     string         `datastore:"origin"`
 	SchVer     *datastore.Key `datastore:"schVer"`
 }
