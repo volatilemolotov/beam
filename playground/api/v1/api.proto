@@ -156,16 +156,15 @@ message CancelResponse {
 
 // PrecompiledObject represents one PrecompiledObject with its information
 message PrecompiledObject{
-  string cloud_path = 1;
-  string name = 2;
-  string description = 3;
-  PrecompiledObjectType type = 4;
-  string pipeline_options = 5;
+  string name = 1;
+  string description = 2;
+  PrecompiledObjectType type = 3;
+  string pipeline_options = 4;
   // Link to the example in the Beam repository
-  string link = 6;
-  bool multifile = 7;
-  int32 context_line = 8;
-  bool default_example = 9;
+  string link = 5;
+  bool multifile = 6;
+  int32 context_line = 7;
+  bool default_example = 8;
 }
 
 // Categories represent the array of messages with sdk and categories at this sdk
@@ -184,29 +183,34 @@ message GetPrecompiledObjectsRequest{
   string category = 2;
 }
 
-// GetPrecompiledObjectRequest contains information of the needed PrecompiledObject.
+// GetPrecompiledObjectRequest contains information of the PrecompiledObject SDK and its name.
 message GetPrecompiledObjectRequest{
-  string cloud_path = 1;
+  Sdk sdk = 1;
+  string name = 2;
 }
 
-// GetPrecompiledObjectCodeRequest contains information of the PrecompiledObject uuid.
+// GetPrecompiledObjectCodeRequest contains information of the PrecompiledObject SDK and its name.
 message GetPrecompiledObjectCodeRequest{
-  string cloud_path = 1;
+  Sdk sdk = 1;
+  string name = 2;
 }
 
-// GetPrecompiledObjectOutputRequest contains information of the PrecompiledObject uuid.
+// GetPrecompiledObjectOutputRequest contains information of the PrecompiledObject SDK and its name.
 message GetPrecompiledObjectOutputRequest{
-  string cloud_path = 1;
+  Sdk sdk = 1;
+  string name = 2;
 }
 
-// GetPrecompiledObjectLogsRequest contains information of the PrecompiledObject uuid.
+// GetPrecompiledObjectLogsRequest contains information of the PrecompiledObject SDK and its name.
 message GetPrecompiledObjectLogsRequest{
-  string cloud_path = 1;
+  Sdk sdk = 1;
+  string name = 2;
 }
 
-// GetPrecompiledObjectGraphRequest contains information of the PrecompiledObject cloud path.
+// GetPrecompiledObjectGraphRequest contains information of the PrecompiledObject SDK and its name.
 message GetPrecompiledObjectGraphRequest{
-  string cloud_path = 1;
+  Sdk sdk = 1;
+  string name = 2;
 }
 
 // GetDefaultPrecompiledObjectRequest contains information of the needed PrecompiledObject sdk.
@@ -314,10 +318,10 @@ service PlaygroundService {
   // Cancel code processing
   rpc Cancel(CancelRequest) returns (CancelResponse);
 
-  // Get all precompiled objects from the cloud storage.
+  // Get all precompiled objects from the cloud datastore.
   rpc GetPrecompiledObjects(GetPrecompiledObjectsRequest) returns (GetPrecompiledObjectsResponse);
 
-  // Get precompiled object from the cloud storage.
+  // Get precompiled object from the cloud datastore.
   rpc GetPrecompiledObject(GetPrecompiledObjectRequest) returns (GetPrecompiledObjectResponse);
 
   // Get the code of an PrecompiledObject.

@@ -983,21 +983,19 @@ class CancelResponse extends $pb.GeneratedMessage {
 
 class PrecompiledObject extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PrecompiledObject', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
-    ..aOS(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
-    ..e<PrecompiledObjectType>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: PrecompiledObjectType.PRECOMPILED_OBJECT_TYPE_UNSPECIFIED, valueOf: PrecompiledObjectType.valueOf, enumValues: PrecompiledObjectType.values)
-    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pipelineOptions')
-    ..aOS(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'link')
-    ..aOB(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'multifile')
-    ..a<$core.int>(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contextLine', $pb.PbFieldType.O3)
-    ..aOB(9, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'defaultExample')
+    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'description')
+    ..e<PrecompiledObjectType>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'type', $pb.PbFieldType.OE, defaultOrMaker: PrecompiledObjectType.PRECOMPILED_OBJECT_TYPE_UNSPECIFIED, valueOf: PrecompiledObjectType.valueOf, enumValues: PrecompiledObjectType.values)
+    ..aOS(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'pipelineOptions')
+    ..aOS(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'link')
+    ..aOB(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'multifile')
+    ..a<$core.int>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'contextLine', $pb.PbFieldType.O3)
+    ..aOB(8, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'defaultExample')
     ..hasRequiredFields = false
   ;
 
   PrecompiledObject._() : super();
   factory PrecompiledObject({
-    $core.String? cloudPath,
     $core.String? name,
     $core.String? description,
     PrecompiledObjectType? type,
@@ -1008,9 +1006,6 @@ class PrecompiledObject extends $pb.GeneratedMessage {
     $core.bool? defaultExample,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
-    }
     if (name != null) {
       _result.name = name;
     }
@@ -1059,85 +1054,76 @@ class PrecompiledObject extends $pb.GeneratedMessage {
   static PrecompiledObject? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  $core.String get name => $_getSZ(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set name($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasName() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearName() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.String get name => $_getSZ(1);
+  $core.String get description => $_getSZ(1);
   @$pb.TagNumber(2)
-  set name($core.String v) { $_setString(1, v); }
+  set description($core.String v) { $_setString(1, v); }
   @$pb.TagNumber(2)
-  $core.bool hasName() => $_has(1);
+  $core.bool hasDescription() => $_has(1);
   @$pb.TagNumber(2)
-  void clearName() => clearField(2);
+  void clearDescription() => clearField(2);
 
   @$pb.TagNumber(3)
-  $core.String get description => $_getSZ(2);
+  PrecompiledObjectType get type => $_getN(2);
   @$pb.TagNumber(3)
-  set description($core.String v) { $_setString(2, v); }
+  set type(PrecompiledObjectType v) { setField(3, v); }
   @$pb.TagNumber(3)
-  $core.bool hasDescription() => $_has(2);
+  $core.bool hasType() => $_has(2);
   @$pb.TagNumber(3)
-  void clearDescription() => clearField(3);
+  void clearType() => clearField(3);
 
   @$pb.TagNumber(4)
-  PrecompiledObjectType get type => $_getN(3);
+  $core.String get pipelineOptions => $_getSZ(3);
   @$pb.TagNumber(4)
-  set type(PrecompiledObjectType v) { setField(4, v); }
+  set pipelineOptions($core.String v) { $_setString(3, v); }
   @$pb.TagNumber(4)
-  $core.bool hasType() => $_has(3);
+  $core.bool hasPipelineOptions() => $_has(3);
   @$pb.TagNumber(4)
-  void clearType() => clearField(4);
+  void clearPipelineOptions() => clearField(4);
 
   @$pb.TagNumber(5)
-  $core.String get pipelineOptions => $_getSZ(4);
+  $core.String get link => $_getSZ(4);
   @$pb.TagNumber(5)
-  set pipelineOptions($core.String v) { $_setString(4, v); }
+  set link($core.String v) { $_setString(4, v); }
   @$pb.TagNumber(5)
-  $core.bool hasPipelineOptions() => $_has(4);
+  $core.bool hasLink() => $_has(4);
   @$pb.TagNumber(5)
-  void clearPipelineOptions() => clearField(5);
+  void clearLink() => clearField(5);
 
   @$pb.TagNumber(6)
-  $core.String get link => $_getSZ(5);
+  $core.bool get multifile => $_getBF(5);
   @$pb.TagNumber(6)
-  set link($core.String v) { $_setString(5, v); }
+  set multifile($core.bool v) { $_setBool(5, v); }
   @$pb.TagNumber(6)
-  $core.bool hasLink() => $_has(5);
+  $core.bool hasMultifile() => $_has(5);
   @$pb.TagNumber(6)
-  void clearLink() => clearField(6);
+  void clearMultifile() => clearField(6);
 
   @$pb.TagNumber(7)
-  $core.bool get multifile => $_getBF(6);
+  $core.int get contextLine => $_getIZ(6);
   @$pb.TagNumber(7)
-  set multifile($core.bool v) { $_setBool(6, v); }
+  set contextLine($core.int v) { $_setSignedInt32(6, v); }
   @$pb.TagNumber(7)
-  $core.bool hasMultifile() => $_has(6);
+  $core.bool hasContextLine() => $_has(6);
   @$pb.TagNumber(7)
-  void clearMultifile() => clearField(7);
+  void clearContextLine() => clearField(7);
 
   @$pb.TagNumber(8)
-  $core.int get contextLine => $_getIZ(7);
+  $core.bool get defaultExample => $_getBF(7);
   @$pb.TagNumber(8)
-  set contextLine($core.int v) { $_setSignedInt32(7, v); }
+  set defaultExample($core.bool v) { $_setBool(7, v); }
   @$pb.TagNumber(8)
-  $core.bool hasContextLine() => $_has(7);
+  $core.bool hasDefaultExample() => $_has(7);
   @$pb.TagNumber(8)
-  void clearContextLine() => clearField(8);
-
-  @$pb.TagNumber(9)
-  $core.bool get defaultExample => $_getBF(8);
-  @$pb.TagNumber(9)
-  set defaultExample($core.bool v) { $_setBool(8, v); }
-  @$pb.TagNumber(9)
-  $core.bool hasDefaultExample() => $_has(8);
-  @$pb.TagNumber(9)
-  void clearDefaultExample() => clearField(9);
+  void clearDefaultExample() => clearField(8);
 }
 
 class Categories_Category extends $pb.GeneratedMessage {
@@ -1313,17 +1299,22 @@ class GetPrecompiledObjectsRequest extends $pb.GeneratedMessage {
 
 class GetPrecompiledObjectRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetPrecompiledObjectRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..e<Sdk>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..hasRequiredFields = false
   ;
 
   GetPrecompiledObjectRequest._() : super();
   factory GetPrecompiledObjectRequest({
-    $core.String? cloudPath,
+    Sdk? sdk,
+    $core.String? name,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (sdk != null) {
+      _result.sdk = sdk;
+    }
+    if (name != null) {
+      _result.name = name;
     }
     return _result;
   }
@@ -1349,28 +1340,42 @@ class GetPrecompiledObjectRequest extends $pb.GeneratedMessage {
   static GetPrecompiledObjectRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  Sdk get sdk => $_getN(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set sdk(Sdk v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasSdk() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearSdk() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
 }
 
 class GetPrecompiledObjectCodeRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetPrecompiledObjectCodeRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..e<Sdk>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..hasRequiredFields = false
   ;
 
   GetPrecompiledObjectCodeRequest._() : super();
   factory GetPrecompiledObjectCodeRequest({
-    $core.String? cloudPath,
+    Sdk? sdk,
+    $core.String? name,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (sdk != null) {
+      _result.sdk = sdk;
+    }
+    if (name != null) {
+      _result.name = name;
     }
     return _result;
   }
@@ -1396,28 +1401,42 @@ class GetPrecompiledObjectCodeRequest extends $pb.GeneratedMessage {
   static GetPrecompiledObjectCodeRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  Sdk get sdk => $_getN(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set sdk(Sdk v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasSdk() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearSdk() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
 }
 
 class GetPrecompiledObjectOutputRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetPrecompiledObjectOutputRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..e<Sdk>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..hasRequiredFields = false
   ;
 
   GetPrecompiledObjectOutputRequest._() : super();
   factory GetPrecompiledObjectOutputRequest({
-    $core.String? cloudPath,
+    Sdk? sdk,
+    $core.String? name,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (sdk != null) {
+      _result.sdk = sdk;
+    }
+    if (name != null) {
+      _result.name = name;
     }
     return _result;
   }
@@ -1443,28 +1462,42 @@ class GetPrecompiledObjectOutputRequest extends $pb.GeneratedMessage {
   static GetPrecompiledObjectOutputRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  Sdk get sdk => $_getN(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set sdk(Sdk v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasSdk() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearSdk() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
 }
 
 class GetPrecompiledObjectLogsRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetPrecompiledObjectLogsRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..e<Sdk>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..hasRequiredFields = false
   ;
 
   GetPrecompiledObjectLogsRequest._() : super();
   factory GetPrecompiledObjectLogsRequest({
-    $core.String? cloudPath,
+    Sdk? sdk,
+    $core.String? name,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (sdk != null) {
+      _result.sdk = sdk;
+    }
+    if (name != null) {
+      _result.name = name;
     }
     return _result;
   }
@@ -1490,28 +1523,42 @@ class GetPrecompiledObjectLogsRequest extends $pb.GeneratedMessage {
   static GetPrecompiledObjectLogsRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  Sdk get sdk => $_getN(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set sdk(Sdk v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasSdk() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearSdk() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
 }
 
 class GetPrecompiledObjectGraphRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetPrecompiledObjectGraphRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'api.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'cloudPath')
+    ..e<Sdk>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'sdk', $pb.PbFieldType.OE, defaultOrMaker: Sdk.SDK_UNSPECIFIED, valueOf: Sdk.valueOf, enumValues: Sdk.values)
+    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name')
     ..hasRequiredFields = false
   ;
 
   GetPrecompiledObjectGraphRequest._() : super();
   factory GetPrecompiledObjectGraphRequest({
-    $core.String? cloudPath,
+    Sdk? sdk,
+    $core.String? name,
   }) {
     final _result = create();
-    if (cloudPath != null) {
-      _result.cloudPath = cloudPath;
+    if (sdk != null) {
+      _result.sdk = sdk;
+    }
+    if (name != null) {
+      _result.name = name;
     }
     return _result;
   }
@@ -1537,13 +1584,22 @@ class GetPrecompiledObjectGraphRequest extends $pb.GeneratedMessage {
   static GetPrecompiledObjectGraphRequest? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cloudPath => $_getSZ(0);
+  Sdk get sdk => $_getN(0);
   @$pb.TagNumber(1)
-  set cloudPath($core.String v) { $_setString(0, v); }
+  set sdk(Sdk v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasCloudPath() => $_has(0);
+  $core.bool hasSdk() => $_has(0);
   @$pb.TagNumber(1)
-  void clearCloudPath() => clearField(1);
+  void clearSdk() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.String get name => $_getSZ(1);
+  @$pb.TagNumber(2)
+  set name($core.String v) { $_setString(1, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasName() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearName() => clearField(2);
 }
 
 class GetDefaultPrecompiledObjectRequest extends $pb.GeneratedMessage {
