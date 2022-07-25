@@ -24,5 +24,9 @@ class GetSnippetResponse {
   final SDK sdk;
   final String pipelineOptions;
 
-  GetSnippetResponse(this.files, this.sdk, this.pipelineOptions);
+  const GetSnippetResponse({
+    required this.files,
+    required this.sdk,
+    required this.pipelineOptions,
+  });
 }

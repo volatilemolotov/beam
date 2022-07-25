@@ -24,5 +24,9 @@ class SaveSnippetRequestWrapper {
   final SDK sdk;
   final String pipelineOptions;
 
-  SaveSnippetRequestWrapper(this.files, this.sdk, this.pipelineOptions);
+  const SaveSnippetRequestWrapper({
+    required this.files,
+    required this.sdk,
+    required this.pipelineOptions,
+  });
 }

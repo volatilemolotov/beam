@@ -17,7 +17,9 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/output/components/output_area.dart';
+import 'package:playground/modules/output/components/output_header/output_placements.dart';
 import 'package:playground/modules/output/components/output_header/tab_header.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 
@@ -72,13 +74,21 @@ class _OutputState extends State<Output> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TabHeader(
-          tabController: tabController,
-          showOutputPlacements: !widget.isEmbedded,
-          tabsWidget: OutputTabs(
-            tabController: tabController,
-            showGraph: widget.showGraph,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TabHeader(
+              tabController: tabController,
+              tabsWidget: OutputTabs(
+                tabController: tabController,
+                showGraph: widget.showGraph,
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(right: kXlSpacing),
+              child: OutputPlacements(),
+            ),
+          ],
         ),
         Expanded(
           child: OutputArea(

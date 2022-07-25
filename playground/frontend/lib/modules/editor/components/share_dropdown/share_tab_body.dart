@@ -20,37 +20,17 @@
 
 import 'package:flutter/material.dart';
 import 'package:playground/constants/sizes.dart';
-import 'package:playground/modules/editor/components/share_dropdown/link_text_field.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
 
-import 'link_text_field.dart';
-
-class ShareTabBody extends StatefulWidget {
-  final String descriptionText;
-  final bool isCopyLinkTab;
-  final String snippetIdParam;
+class ShareTabBody extends StatelessWidget {
+  final List<Widget> children;
 
   const ShareTabBody({
     super.key,
-    required this.descriptionText,
-    required this.isCopyLinkTab,
-    required this.snippetIdParam,
+    required this.children,
   });
-
-  @override
-  State<ShareTabBody> createState() => _ShareTabBodyState();
-}
-
-class _ShareTabBodyState extends State<ShareTabBody> {
-  final TextEditingController textEditingController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _setLinks();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,29 +43,10 @@ class _ShareTabBodyState extends State<ShareTabBody> {
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Text(widget.descriptionText),
-              LinkTextField(
-                textEditingController: textEditingController,
-              ),
-            ],
+            children: children,
           ),
         ),
       ),
     );
-  }
-
-  void _setLinks() {
-    String baseUrl = Uri.base.toString().split('?')[0];
-    if (widget.isCopyLinkTab) {
-      textEditingController.text = '$baseUrl?${widget.snippetIdParam}';
-    } else {
-      textEditingController.text =
-          '''<iframe src="${baseUrl}embedded?enabled=true&${widget.snippetIdParam}"
-          width="90%"
-          height=600px
-          allow="clipboard-write">
-          </iframe>''';
-    }
   }
 }

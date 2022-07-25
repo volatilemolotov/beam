@@ -24,13 +24,13 @@ import 'package:playground/modules/editor/repository/code_repository/code_client
 import 'package:playground/modules/examples/models/category_model.dart';
 import 'package:playground/modules/examples/models/example_model.dart';
 import 'package:playground/modules/examples/repositories/example_client/example_client.dart';
-import 'package:playground/modules/examples/repositories/models/get_snippet_request.dart';
-import 'package:playground/modules/examples/repositories/models/get_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_code_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_example_response.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_request.dart';
 import 'package:playground/modules/examples/repositories/models/get_list_of_examples_response.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_request.dart';
+import 'package:playground/modules/examples/repositories/models/get_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/save_snippet_request.dart';
 import 'package:playground/modules/examples/repositories/models/save_snippet_response.dart';
 import 'package:playground/modules/examples/repositories/models/shared_file_model.dart';
@@ -146,11 +146,13 @@ class GrpcExampleClient implements ExampleClient {
     GetSnippetRequestWrapper request,
   ) {
     return _runSafely(
-      () => _defaultClient.getSnippet(_getSnippetRequestToGrpcRequest(request)).then(
+      () => _defaultClient
+          .getSnippet(_getSnippetRequestToGrpcRequest(request))
+          .then(
             (response) => GetSnippetResponse(
-              _convertToSharedFileList(response.files),
-              _getAppSdk(response.sdk),
-              response.pipelineOptions,
+              files: _convertToSharedFileList(response.files),
+              sdk: _getAppSdk(response.sdk),
+              pipelineOptions: response.pipelineOptions,
             ),
           ),
     );
@@ -161,8 +163,10 @@ class GrpcExampleClient implements ExampleClient {
     SaveSnippetRequestWrapper request,
   ) {
     return _runSafely(
-      () => _defaultClient.saveSnippet(_saveSnippetRequestToGrpcRequest(request)).then(
-            (response) => SaveSnippetResponse(response.id),
+      () => _defaultClient
+          .saveSnippet(_saveSnippetRequestToGrpcRequest(request))
+          .then(
+            (response) => SaveSnippetResponse(id: response.id),
           ),
     );
   }
@@ -319,9 +323,9 @@ class GrpcExampleClient implements ExampleClient {
 
     for (grpc.SnippetFile item in snippetFileList) {
       sharedFilesList.add(SharedFile(
-        item.content,
-        item.isMain,
-        item.name,
+        code: item.content,
+        isMain: item.isMain,
+        name: item.name,
       ));
     }
 

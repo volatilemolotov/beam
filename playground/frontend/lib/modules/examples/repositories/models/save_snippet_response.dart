@@ -19,5 +19,5 @@
 class SaveSnippetResponse {
   final String id;
 
-  const SaveSnippetResponse(this.id);
+  const SaveSnippetResponse({required this.id});
 }

@@ -165,7 +165,9 @@ class _ExampleSelectorState extends State<ExampleSelector>
                             ),
                             child: exampleState.sdkCategories == null ||
                                     playgroundState.selectedExample == null
-                                ? const LoadingIndicator(size: kContainerHeight)
+                                ? const LoadingIndicator(
+                                    size: kMdLoadingIndicatorSize,
+                                  )
                                 : _buildDropdownContent(
                                     context, playgroundState),
                           ),

@@ -17,12 +17,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/share_dropdown/share_tabs.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs/share_tabs.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs_headers.dart';
 import 'package:playground/modules/output/components/output_header/tab_header.dart';
 
-import 'share_tabs_headers.dart';
-
-const kTabsCount = 2;
+const _kTabsCount = 2;
 
 class ShareDropdownBody extends StatefulWidget {
   const ShareDropdownBody({super.key});
@@ -38,7 +37,7 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody>
 
   @override
   void initState() {
-    tabController = TabController(vsync: this, length: kTabsCount);
+    tabController = TabController(vsync: this, length: _kTabsCount);
     tabController.addListener(_onTabChange);
     super.initState();
   }
@@ -62,7 +61,6 @@ class _ShareDropdownBodyState extends State<ShareDropdownBody>
       children: [
         TabHeader(
           tabController: tabController,
-          showOutputPlacements: false,
           tabsWidget: ShareTabsHeaders(tabController: tabController),
         ),
         Expanded(

@@ -102,12 +102,12 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              widget.leading != null
-                  ? Padding(
+              widget.leading == null
+                  ? const SizedBox()
+                  : Padding(
                       padding: const EdgeInsets.only(right: kMdSpacing),
                       child: widget.leading,
-                    )
-                  : const SizedBox(),
+                    ),
               widget.buttonText,
               widget.withArrowDown
                   ? const Icon(Icons.keyboard_arrow_down)

@@ -166,7 +166,7 @@ class PlaygroundPageProviders extends StatelessWidget {
   }
 
   String _getSnippetId() {
-    return Uri.base.queryParameters[kSnippetId] ?? '';
+    return Uri.base.queryParameters[kSnippetIdParam] ?? '';
   }
 
   void _getSnippet(
@@ -183,7 +183,7 @@ class PlaygroundPageProviders extends StatelessWidget {
     PlaygroundState playground,
   ) async {
     final examplePath = Uri.base.queryParameters[kExampleParam];
-    final snippetId = Uri.base.queryParameters[kSnippetId];
+    final snippetId = Uri.base.queryParameters[kSnippetIdParam];
 
     if (exampleState.defaultExamplesMap.isEmpty) {
       exampleState.loadDefaultExamples();

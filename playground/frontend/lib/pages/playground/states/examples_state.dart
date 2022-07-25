@@ -86,7 +86,7 @@ class ExampleState with ChangeNotifier {
 
   Future<void> getSharedExample(String id) async {
     GetSnippetResponse result = await _exampleRepository.getSnippet(
-      GetSnippetRequestWrapper(id),
+      GetSnippetRequestWrapper(id: id),
     );
     sharedFilesMap = {
       result.sdk: ExampleModel(
@@ -106,8 +106,11 @@ class ExampleState with ChangeNotifier {
     SDK sdk,
     String pipelineOptions,
   ) async {
-    String id = await _exampleRepository
-        .saveSnippet(SaveSnippetRequestWrapper(files, sdk, pipelineOptions));
+    String id = await _exampleRepository.saveSnippet(SaveSnippetRequestWrapper(
+      files: files,
+      sdk: sdk,
+      pipelineOptions: pipelineOptions,
+    ));
     return id;
   }
 

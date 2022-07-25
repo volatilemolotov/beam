@@ -27,6 +27,7 @@ class LoadingIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
+      heightFactor: 1,
       child: SizedBox(
         height: size,
         width: size,

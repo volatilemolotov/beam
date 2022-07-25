@@ -17,31 +17,37 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/share_dropdown/tab_name_widget.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs/example_tabs.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs/snippet_tabs.dart';
+import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class ShareTabsHeaders extends StatelessWidget {
+class ShareTabs extends StatelessWidget {
   final TabController tabController;
 
-  const ShareTabsHeaders({
-    super.key,
-    required this.tabController,
-  });
+  const ShareTabs({super.key, required this.tabController});
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
-
-    return Consumer<PlaygroundState>(builder: (context, state, child) {
-      return TabBar(
-        controller: tabController,
-        tabs: <Widget>[
-          TabNameWidget(tabName: appLocale.link),
-          TabNameWidget(tabName: appLocale.embed),
-        ],
-      );
-    });
+    return Container(
+      color: Theme.of(context).backgroundColor,
+      child: Consumer2<PlaygroundState, ExampleState>(
+        builder: (context, playgroundState, exampleState, _) {
+          if (playgroundState.isExampleChanged) {
+            return SnippetTabs(
+              exampleState: exampleState,
+              playgroundState: playgroundState,
+              tabController: tabController,
+            );
+          } else {
+            return ExampleTabs(
+              playgroundState: playgroundState,
+              tabController: tabController,
+            );
+          }
+        },
+      ),
+    );
   }
 }

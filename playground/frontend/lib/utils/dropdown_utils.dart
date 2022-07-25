@@ -26,19 +26,20 @@ Offset findDropdownOffset({
   DropdownAlignment alignment = DropdownAlignment.left,
   double widgetWidth = 0,
 }) {
-  RenderBox? rBox = selectorKey.currentContext?.findRenderObject() as RenderBox;
+  RenderBox? rBox =
+      selectorKey.currentContext?.findRenderObject() as RenderBox?;
 
   switch (alignment) {
     case DropdownAlignment.left:
       return Offset(
-        rBox.localToGlobal(Offset.zero).dx,
+        rBox!.localToGlobal(Offset.zero).dx,
         rBox.localToGlobal(Offset.zero).dy +
             rBox.size.height +
             kAdditionalDyAlignment,
       );
     case DropdownAlignment.right:
       return Offset(
-        rBox.localToGlobal(Offset.zero).dx - (widgetWidth - rBox.size.width),
+        rBox!.localToGlobal(Offset.zero).dx - (widgetWidth - rBox.size.width),
         rBox.localToGlobal(Offset.zero).dy +
             rBox.size.height +
             kAdditionalDyAlignment,

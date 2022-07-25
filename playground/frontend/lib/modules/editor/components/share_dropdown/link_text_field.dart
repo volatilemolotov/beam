@@ -22,19 +22,26 @@ import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
 
-const kTextFieldMaxHeight = 45.0;
+const _kTextFieldMaxHeight = 45.0;
 
 class LinkTextField extends StatefulWidget {
-  final TextEditingController textEditingController;
+  final String text;
 
-  const LinkTextField({super.key, required this.textEditingController});
+  const LinkTextField({super.key, required this.text});
 
   @override
   State<LinkTextField> createState() => _LinkTextFieldState();
 }
 
 class _LinkTextFieldState extends State<LinkTextField> {
-  bool isPressed = false;
+  final TextEditingController textEditingController = TextEditingController();
+  bool _isPressed = false;
+
+  @override
+  initState() {
+    super.initState();
+    textEditingController.text = widget.text;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,31 +54,15 @@ class _LinkTextFieldState extends State<LinkTextField> {
         margin: const EdgeInsets.symmetric(horizontal: kMdSpacing),
         child: Center(
           child: TextFormField(
-            controller: widget.textEditingController,
+            controller: textEditingController,
             decoration: InputDecoration(
-              constraints: const BoxConstraints(maxHeight: kTextFieldMaxHeight),
+              constraints: const BoxConstraints(
+                maxHeight: _kTextFieldMaxHeight,
+              ),
               border: InputBorder.none,
               suffixIcon: MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: GestureDetector(
-                  onTap: () {
-                    copyLinkText();
-                    setState(() {
-                      isPressed = true;
-                    });
-                  },
-                  child: isPressed
-                      ? Icon(
-                          Icons.check,
-                          color: ThemeColors.of(context).grey1Color,
-                          size: kIconSizeMd,
-                        )
-                      : Icon(
-                          Icons.file_copy_outlined,
-                          color: ThemeColors.of(context).grey1Color,
-                          size: kIconSizeSm,
-                        ),
-                ),
+                child: _buildCopyButton(),
               ),
             ),
             readOnly: true,
@@ -86,9 +77,27 @@ class _LinkTextFieldState extends State<LinkTextField> {
     );
   }
 
-  void copyLinkText() async {
-    await Clipboard.setData(ClipboardData(
-      text: widget.textEditingController.text,
-    ));
+  Widget _buildCopyButton() {
+    return GestureDetector(
+      onTap: () {
+        _copyLinkText();
+        setState(() {
+          _isPressed = true;
+        });
+      },
+      child: _isPressed
+          ? const Icon(
+              Icons.check,
+              size: kIconSizeMd,
+            )
+          : const Icon(
+              Icons.file_copy_outlined,
+              size: kIconSizeSm,
+            ),
+    );
+  }
+
+  Future<void> _copyLinkText() async {
+    await Clipboard.setData(ClipboardData(text: widget.text));
   }
 }

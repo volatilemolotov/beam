@@ -16,14 +16,21 @@
  * limitations under the License.
  */
 
-class SharedFile {
-  final String code;
-  final bool isMain;
-  final String name;
+import 'package:flutter/material.dart';
+import 'package:playground/constants/sizes.dart';
 
-  const SharedFile({
-    required this.code,
-    this.name = '',
-    this.isMain = false,
-  });
+class TabNameWidget extends StatelessWidget {
+  final String tabName;
+
+  const TabNameWidget({Key? key, required this.tabName}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      direction: Axis.horizontal,
+      alignment: WrapAlignment.center,
+      spacing: kMdSpacing,
+      children: [Text(tabName)],
+    );
+  }
 }

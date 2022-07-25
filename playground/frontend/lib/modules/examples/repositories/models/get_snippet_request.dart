@@ -19,5 +19,5 @@
 class GetSnippetRequestWrapper {
   final String id;
 
-  GetSnippetRequestWrapper(this.id);
+  const GetSnippetRequestWrapper({required this.id});
 }
