@@ -20,23 +20,23 @@ import (
 	"fmt"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	cache2 "beam.apache.org/playground/backend/internal/cache"
+	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/logger"
 )
 
 type CacheComponent struct {
-	cache cache2.Cache
+	cache cache.Cache
 	db    db.Database
 }
 
-func NewService(cache cache2.Cache, db db.Database) *CacheComponent {
+func NewService(cache cache.Cache, db db.Database) *CacheComponent {
 	return &CacheComponent{cache: cache, db: db}
 }
 
 // GetSdkCatalogFromCacheOrDatastore returns the sdk catalog from the cache
-// - If there is no sdk catalog in the cache, gets the sdk catalog from the Datastore and saves it to the cache
+// - If there is no sdk catalog in the cache, gets the sdk catalog from the Cloud Datastore and saves it to the cache
 func (cp *CacheComponent) GetSdkCatalogFromCacheOrDatastore(ctx context.Context) ([]*entity.SDKEntity, error) {
 	sdks, err := cp.cache.GetSdkCatalog(ctx)
 	if err != nil {
@@ -53,6 +53,8 @@ func (cp *CacheComponent) GetSdkCatalogFromCacheOrDatastore(ctx context.Context)
 	return sdks, nil
 }
 
+// GetCatalogFromCacheOrDatastore returns the example catalog from cache
+// - If there is no catalog in the cache, gets the catalog from the Cloud Datastore and saves it to the cache
 func (cp *CacheComponent) GetCatalogFromCacheOrDatastore(ctx context.Context) ([]*pb.Categories, error) {
 	catalog, err := cp.cache.GetCatalog(ctx)
 	if err != nil {
@@ -73,6 +75,8 @@ func (cp *CacheComponent) GetCatalogFromCacheOrDatastore(ctx context.Context) ([
 	return catalog, nil
 }
 
+// GetDefaultPrecompiledObjectFromCacheOrDatastore returns the default example from cache by sdk
+// - If there is no a default example in the cache, gets the default example from the Cloud Datastore and saves it to the cache
 func (cp *CacheComponent) GetDefaultPrecompiledObjectFromCacheOrDatastore(ctx context.Context, sdk pb.Sdk) (*pb.PrecompiledObject, error) {
 	defaultExample, err := cp.cache.GetDefaultPrecompiledObject(ctx, sdk)
 	if err != nil {

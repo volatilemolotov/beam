@@ -45,7 +45,7 @@ func (pom *PrecompiledObjectMapper) ToObjectInfo(exampleDTO *dto.ExampleDTO) *dt
 	}
 }
 
-func (pom *PrecompiledObjectMapper) ToArrayCategories(catalogDTO *dto.CatalogDTO, targetCategory string) []*pb.Categories {
+func (pom *PrecompiledObjectMapper) ToArrayCategories(catalogDTO *dto.CatalogDTO) []*pb.Categories {
 	sdkToExample := catalogDTO.GetSdkCatalogAsMap()
 	numberOfExamples := len(catalogDTO.Examples)
 	sdkToCategories := make(dto.SdkToCategories, 0)
@@ -60,9 +60,7 @@ func (pom *PrecompiledObjectMapper) ToArrayCategories(catalogDTO *dto.CatalogDTO
 			DefaultExampleName: sdkToExample[example.Sdk.Name],
 		})
 		for _, objCategory := range objInfo.Categories {
-			if targetCategory == "" || targetCategory == objCategory {
-				appendPrecompiledObject(*objInfo, &sdkToCategories, objCategory, example.Sdk.Name)
-			}
+			appendPrecompiledObject(*objInfo, &sdkToCategories, objCategory, example.Sdk.Name)
 		}
 	}
 	sdkCategories := make([]*pb.Categories, 0)

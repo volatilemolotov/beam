@@ -27,7 +27,7 @@ type EntityMapper interface {
 }
 
 type ResponseMapper interface {
-	ToArrayCategories(catalogDTO *dto.CatalogDTO, targetCategory string) []*pb.Categories
+	ToArrayCategories(catalogDTO *dto.CatalogDTO) []*pb.Categories
 	ToObjectInfo(exampleDTO *dto.ExampleDTO) *dto.ObjectInfo
 	ToDefaultPrecompiledObjects(defaultExamplesDTO *dto.DefaultExamplesDTO) map[pb.Sdk]*pb.PrecompiledObject
 	ToPrecompiledObj(exampleDTO *dto.ExampleDTO) *pb.PrecompiledObject
