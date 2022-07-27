@@ -23,7 +23,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:playground/config/locale.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/l10n/l10n.dart';
-import 'package:playground/modules/editor/components/editor_themes.dart';
 import 'package:playground/pages/playground/components/playground_page_providers.dart';
 import 'package:playground/pages/playground/playground_page.dart';
 import 'package:playground/pages/routes.dart';

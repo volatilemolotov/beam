@@ -62,4 +62,3 @@ Map<String, TextStyle> _createThemeStyles(ThemeColors colors) {
     'strong': const TextStyle(fontWeight: FontWeight.bold),
   };
 }
-
