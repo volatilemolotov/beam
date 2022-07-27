@@ -108,7 +108,7 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
                   child: widget.leading,
                 ),
               widget.buttonText,
-              if (widget.showArrow) const Icon(Icons.keyboard_arrow_down)
+              if (widget.showArrow) const Icon(Icons.keyboard_arrow_down),
             ],
           ),
         ),
@@ -150,7 +150,6 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
                     width: widget.width,
                     decoration: BoxDecoration(
                       color: ThemeColors.of(context).background,
-                      //color: Colors.yellowAccent,
                       borderRadius: BorderRadius.circular(kMdBorderRadius),
                     ),
                     child: widget.createDropdown(_close),
