@@ -17,9 +17,8 @@
  */
 
 import 'package:flutter/material.dart';
-
-import '../config/theme.dart';
-import '../constants/sizes.dart';
+import 'package:playground/config/theme.dart';
+import 'package:playground/constants/sizes.dart';
 
 /// Replaces the Flutter's Divider which is buggy with HTML renderer,
 /// see https://github.com/flutter/flutter/issues/46339

@@ -101,6 +101,7 @@ class PlaygroundState with ChangeNotifier {
 
   void setExample(ExampleModel example) {
     _selectedExample = example;
+    setSdk(example.sdk, notify: false);
     _pipelineOptions = example.pipelineOptions ?? '';
     codeController.text = example.source ?? '';
     _result = null;
@@ -109,10 +110,13 @@ class PlaygroundState with ChangeNotifier {
     notifyListeners();
   }
 
-  void setSdk(SDK sdk) {
+  void setSdk(SDK sdk, {bool notify = true}) {
     _sdk = sdk;
     codeController.language = sdk.highlightMode;
-    notifyListeners();
+
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   set source(String source) {

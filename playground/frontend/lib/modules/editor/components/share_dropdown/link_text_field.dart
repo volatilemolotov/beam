@@ -34,7 +34,7 @@ class LinkTextField extends StatefulWidget {
 }
 
 class _LinkTextFieldState extends State<LinkTextField> {
-  final TextEditingController textEditingController = TextEditingController();
+  final textEditingController = TextEditingController();
   bool _isPressed = false;
 
   @override
@@ -78,8 +78,8 @@ class _LinkTextFieldState extends State<LinkTextField> {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
-        onTap: () {
-          _copyLinkText();
+        onTap: () async {
+          await _copyLinkText();
           setState(() {
             _isPressed = true;
           });

@@ -32,8 +32,8 @@ class ThemeSwitchNotifier extends ChangeNotifier {
   late SharedPreferences _preferences;
   ThemeMode themeMode = ThemeMode.light;
 
-  final _darkThemeColors = ThemeColors(isDark: true);
-  final _lightThemeColors = ThemeColors(isDark: false);
+  static const _darkThemeColors = ThemeColors.fromBrightness(isDark: true);
+  static const _lightThemeColors = ThemeColors.fromBrightness(isDark: false);
 
   ThemeColors get themeColors {
     switch (themeMode) {
@@ -44,8 +44,8 @@ class ThemeSwitchNotifier extends ChangeNotifier {
     }
   }
 
-  final _darkCodeTheme = createTheme(ThemeColors(isDark: true));
-  final _lightCodeTheme = createTheme(ThemeColors(isDark: false));
+  final _darkCodeTheme = createTheme(_darkThemeColors);
+  final _lightCodeTheme = createTheme(_lightThemeColors);
 
   CodeThemeData get codeTheme {
     switch (themeMode) {
@@ -256,6 +256,11 @@ class ThemeColors {
     Color? dropdownButtonColor,
   })  : _background = background,
         _dropdownButton = dropdownButtonColor;
+
+  const ThemeColors.fromBrightness({
+    required this.isDark,
+  })  : _background = null,
+        _dropdownButton = null;
 
   ThemeColors copyWith({
     Color? background,

@@ -29,6 +29,7 @@ const Offset kAnimationEndOffset = Offset(0.0, 0.0);
 enum DropdownAlignment {
   /// Align the left edges of the button and its dropdown.
   left,
+
   /// Align the right edges of the button and its dropdown.
   right,
 }
@@ -39,7 +40,7 @@ class AppDropdownButton extends StatefulWidget {
   final double height;
   final double width;
   final Widget? leading;
-  final bool withArrowDown;
+  final bool showArrow;
   final DropdownAlignment dropdownAlign;
 
   const AppDropdownButton({
@@ -49,7 +50,7 @@ class AppDropdownButton extends StatefulWidget {
     required this.height,
     required this.width,
     this.leading,
-    this.withArrowDown = true,
+    this.showArrow = true,
     this.dropdownAlign = DropdownAlignment.left,
   });
 
@@ -101,16 +102,13 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
             alignment: WrapAlignment.center,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              widget.leading == null
-                  ? const SizedBox()
-                  : Padding(
-                      padding: const EdgeInsets.only(right: kMdSpacing),
-                      child: widget.leading,
-                    ),
+              if (widget.leading != null)
+                Padding(
+                  padding: const EdgeInsets.only(right: kMdSpacing),
+                  child: widget.leading,
+                ),
               widget.buttonText,
-              widget.withArrowDown
-                  ? const Icon(Icons.keyboard_arrow_down)
-                  : const SizedBox(),
+              if (widget.showArrow) const Icon(Icons.keyboard_arrow_down)
             ],
           ),
         ),
@@ -119,7 +117,7 @@ class _AppDropdownButtonState extends State<AppDropdownButton>
   }
 
   OverlayEntry createDropdown() {
-    Offset dropdownOffset = findDropdownOffset(
+    final dropdownOffset = findDropdownOffset(
       alignment: widget.dropdownAlign,
       key: selectorKey,
       widgetWidth: widget.width,

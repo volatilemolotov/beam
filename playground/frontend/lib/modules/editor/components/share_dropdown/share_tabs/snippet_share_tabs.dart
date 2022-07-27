@@ -41,7 +41,7 @@ class SnippetShareTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
+    final appLocale = AppLocalizations.of(context)!;
 
     return FutureBuilder(
       future: exampleState.getSnippetId(

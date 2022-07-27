@@ -35,7 +35,7 @@ class ExampleState with ChangeNotifier {
   Map<SDK, ExampleModel> defaultExamplesMap = {};
   ExampleModel? defaultExample;
   bool isSelectorOpened = false;
-  Map<SDK, ExampleModel>? sharedFilesMap;
+  ExampleModel? sharedExample;
 
   ExampleState(this._exampleRepository);
 
@@ -84,20 +84,19 @@ class ExampleState with ChangeNotifier {
     );
   }
 
-  Future<void> getSharedExample(String id) async {
+  Future<void> loadSharedExample(String id) async {
     GetSnippetResponse result = await _exampleRepository.getSnippet(
       GetSnippetRequestWrapper(id: id),
     );
-    sharedFilesMap = {
-      result.sdk: ExampleModel(
-        name: result.files.first.name,
-        path: '',
-        description: '',
-        type: ExampleType.example,
-        source: result.files.first.code,
-        pipelineOptions: result.pipelineOptions,
-      ),
-    };
+    sharedExample = ExampleModel(
+      sdk: result.sdk,
+      name: result.files.first.name,
+      path: '',
+      description: '',
+      type: ExampleType.example,
+      source: result.files.first.code,
+      pipelineOptions: result.pipelineOptions,
+    );
     notifyListeners();
   }
 
@@ -114,18 +113,18 @@ class ExampleState with ChangeNotifier {
     return id;
   }
 
-  Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {
+  Future<ExampleModel> loadExampleInfo(ExampleModel example) async {
     if (example.isInfoFetched()) {
       return example;
     }
 
     //GRPC GetPrecompiledGraph errors hotfix
     if (example.name == 'MinimalWordCount' &&
-        (sdk == SDK.go || sdk == SDK.scio)) {
+        (example.sdk == SDK.go || example.sdk == SDK.scio)) {
       final exampleData = await Future.wait([
-        getExampleSource(example.path, sdk),
-        getExampleOutput(example.path, sdk),
-        getExampleLogs(example.path, sdk),
+        getExampleSource(example.path, example.sdk),
+        getExampleOutput(example.path, example.sdk),
+        getExampleLogs(example.path, example.sdk),
       ]);
       example.setSource(exampleData[0]);
       example.setOutputs(exampleData[1]);
@@ -134,10 +133,10 @@ class ExampleState with ChangeNotifier {
     }
 
     final exampleData = await Future.wait([
-      getExampleSource(example.path, sdk),
-      getExampleOutput(example.path, sdk),
-      getExampleLogs(example.path, sdk),
-      getExampleGraph(example.path, sdk)
+      getExampleSource(example.path, example.sdk),
+      getExampleOutput(example.path, example.sdk),
+      getExampleLogs(example.path, example.sdk),
+      getExampleGraph(example.path, example.sdk)
     ]);
     example.setSource(exampleData[0]);
     example.setOutputs(exampleData[1]);
@@ -182,7 +181,7 @@ class ExampleState with ChangeNotifier {
     final futures = <Future<void>>[];
 
     for (var entry in defaultExamplesMap.entries) {
-      final exampleFuture = loadExampleInfo(entry.value, entry.key)
+      final exampleFuture = loadExampleInfo(entry.value)
           .then((value) => defaultExamplesMap[entry.key] = value);
       futures.add(exampleFuture);
     }

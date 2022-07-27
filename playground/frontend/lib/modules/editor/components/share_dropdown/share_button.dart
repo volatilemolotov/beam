@@ -31,10 +31,10 @@ class ShareButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
-
+    final appLocale = AppLocalizations.of(context)!;
     final parentThemeData = ThemeColors.of(context);
-    final themeData = ThemeColors.of(context).copyWith(
+
+    final themeData = parentThemeData.copyWith(
       background: parentThemeData.secondaryBackground,
       dropdownButton: parentThemeData.primary.withOpacity(_kButtonColorOpacity),
     );
@@ -43,10 +43,7 @@ class ShareButton extends StatelessWidget {
       data: themeData,
       child: AppDropdownButton(
         buttonText: Text(appLocale.shareMyCode),
-        // buttonColor:
-        //     ThemeColors.of(context).primary.withOpacity(_kButtonColorOpacity),
-        //dropdownBackgroundColor: ThemeColors.of(context).secondaryBackground,
-        withArrowDown: false,
+        showArrow: false,
         leading: Icon(
           Icons.share_outlined,
           color: ThemeColors.of(context).primary,

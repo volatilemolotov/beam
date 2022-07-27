@@ -30,7 +30,7 @@ class ToggleThemeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
+    final appLocale = AppLocalizations.of(context)!;
 
     return Consumer<ThemeSwitchNotifier>(builder: (context, notifier, child) {
       final text = notifier.isDarkMode ? appLocale.lightMode : appLocale.darkMode;

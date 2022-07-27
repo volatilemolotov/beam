@@ -35,7 +35,8 @@ class ExampleShareTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
+    final appLocale = AppLocalizations.of(context)!;
+    final examplePath = playgroundState.selectedExample!.path;
 
     return TabBarView(
       controller: tabController,
@@ -46,7 +47,7 @@ class ExampleShareTabs extends StatelessWidget {
             Text(appLocale.linkReady),
             LinkTextField(
               text: ShareCodeUtils.examplePathToPlaygroundUrl(
-                examplePath: playgroundState.selectedExample!.path,
+                examplePath: examplePath,
                 view: PlaygroundView.standalone,
               ).toString(),
             ),
@@ -57,7 +58,7 @@ class ExampleShareTabs extends StatelessWidget {
             Text(appLocale.iframeCodeReady),
             LinkTextField(
               text: ShareCodeUtils.examplePathToIframeCode(
-                examplePath: playgroundState.selectedExample!.path,
+                examplePath: examplePath,
               ),
             ),
           ],

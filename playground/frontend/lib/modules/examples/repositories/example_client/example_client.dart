@@ -33,7 +33,8 @@ abstract class ExampleClient {
   );
 
   Future<GetExampleCodeResponse> getExampleSource(
-      GetExampleRequestWrapper request);
+    GetExampleRequestWrapper request,
+  );
 
   Future<GetExampleResponse> getDefaultExample(
     GetExampleRequestWrapper request,

@@ -83,10 +83,10 @@ void main() {
       final state = PlaygroundState(sdk: SDK.go);
       state.addListener(() {
         expect(state.sdk, SDK.go);
-        expect(state.source, exampleMock1.source);
-        expect(state.selectedExample, exampleMock1);
+        expect(state.source, exampleMockGo.source);
+        expect(state.selectedExample, exampleMockGo);
       });
-      state.setExample(exampleMock1);
+      state.setExample(exampleMockGo);
     },
   );
 
