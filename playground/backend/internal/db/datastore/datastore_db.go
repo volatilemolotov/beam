@@ -27,7 +27,6 @@ import (
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
@@ -45,14 +44,13 @@ type Datastore struct {
 	ResponseMapper mapper.ResponseMapper
 }
 
-func New(ctx context.Context, projectId string) (*Datastore, error) {
+func New(ctx context.Context, responseMapper mapper.ResponseMapper, projectId string) (*Datastore, error) {
 	client, err := datastore.NewClient(ctx, projectId)
 	if err != nil {
 		logger.Errorf("Datastore: connection to store: error during connection, err: %s\n", err.Error())
 		return nil, err
 	}
-	pcMapper := mapper.NewPrecompiledObjectMapper()
-	return &Datastore{Client: client, ResponseMapper: pcMapper}, nil
+	return &Datastore{Client: client, ResponseMapper: responseMapper}, nil
 }
 
 // PutSnippet puts the snippet entity to datastore
@@ -61,7 +59,7 @@ func (d *Datastore) PutSnippet(ctx context.Context, snipId string, snip *entity.
 		logger.Errorf("Datastore: PutSnippet(): snippet is nil")
 		return nil
 	}
-	snipKey := utils.GetNameKey(SnippetKind, snipId, Namespace, nil)
+	snipKey := getSnippetKey(snipId)
 	tx, err := d.Client.NewTransaction(ctx)
 	if err != nil {
 		logger.Errorf("Datastore: PutSnippet(): error during the transaction creating, err: %s\n", err.Error())
@@ -77,8 +75,7 @@ func (d *Datastore) PutSnippet(ctx context.Context, snipId string, snip *entity.
 
 	var fileKeys []*datastore.Key
 	for index := range snip.Files {
-		fileId := fmt.Sprintf("%s_%d", snipId, index)
-		fileKeys = append(fileKeys, utils.GetNameKey(FileKind, fileId, Namespace, nil))
+		fileKeys = append(fileKeys, getFileKey(fmt.Sprintf("%s_%d", snipId, index)))
 	}
 
 	if _, err = tx.PutMulti(fileKeys, snip.Files); err != nil {
@@ -99,7 +96,7 @@ func (d *Datastore) PutSnippet(ctx context.Context, snipId string, snip *entity.
 
 // GetSnippet returns the snippet entity by identifier
 func (d *Datastore) GetSnippet(ctx context.Context, id string) (*entity.SnippetEntity, error) {
-	key := utils.GetNameKey(SnippetKind, id, Namespace, nil)
+	key := getSnippetKey(id)
 	snip := new(entity.SnippetEntity)
 	tx, err := d.Client.NewTransaction(ctx)
 	if err != nil {
@@ -135,7 +132,7 @@ func (d *Datastore) PutSchemaVersion(ctx context.Context, id string, schema *ent
 		logger.Errorf("Datastore: PutSchemaVersion(): schema version is nil")
 		return nil
 	}
-	key := utils.GetNameKey(SchemaKind, id, Namespace, nil)
+	key := getSchemaVerKey(id)
 	if _, err := d.Client.Put(ctx, key, schema); err != nil {
 		logger.Errorf("Datastore: PutSchemaVersion(): error during entity saving, err: %s\n", err.Error())
 		return err
@@ -172,9 +169,8 @@ func (d *Datastore) GetFiles(ctx context.Context, snipId string, numberOfFiles i
 		return nil, err
 	}
 	var fileKeys []*datastore.Key
-	for i := 0; i < numberOfFiles; i++ {
-		fileId := fmt.Sprintf("%s_%d", snipId, i)
-		fileKeys = append(fileKeys, utils.GetNameKey(FileKind, fileId, Namespace, nil))
+	for fileIndx := 0; fileIndx < numberOfFiles; fileIndx++ {
+		fileKeys = append(fileKeys, getFileKey(fmt.Sprintf("%s_%d", snipId, fileIndx)))
 	}
 	var files = make([]*entity.FileEntity, numberOfFiles)
 	if err = tx.GetMulti(fileKeys, files); err != nil {
@@ -191,33 +187,36 @@ func (d *Datastore) GetFiles(ctx context.Context, snipId string, numberOfFiles i
 	return files, nil
 }
 
-//GetSDK returns the sdk entity by an identifier
-func (d *Datastore) GetSDK(ctx context.Context, id string) (*entity.SDKEntity, error) {
-	sdkKey := getSdkKey(id)
-	sdk := new(entity.SDKEntity)
-	if err := d.Client.Get(ctx, sdkKey, sdk); err != nil {
-		logger.Errorf("Datastore: GetSDK(): error during sdk getting, err: %s\n", err.Error())
+//GetSDKs returns sdk entities by an identifier
+func (d *Datastore) GetSDKs(ctx context.Context) ([]*entity.SDKEntity, error) {
+	var sdkKeys []*datastore.Key
+	for sdkName := range pb.Sdk_value {
+		if sdkName != pb.Sdk_SDK_UNSPECIFIED.String() {
+			sdkKeys = append(sdkKeys, getSdkKey(sdkName))
+		}
+	}
+	var sdks = make([]*entity.SDKEntity, len(sdkKeys))
+	if err := d.Client.GetMulti(ctx, sdkKeys, sdks); err != nil {
+		logger.Errorf("Datastore: GetSDKs(): error during the getting sdks, err: %s\n", err.Error())
 		return nil, err
 	}
-	return sdk, nil
+	for sdkIndex, sdk := range sdks {
+		sdk.Name = sdkKeys[sdkIndex].Name
+	}
+	return sdks, nil
 }
 
-//GetCatalog returns all examples for the specified sdk
-func (d *Datastore) GetCatalog(ctx context.Context, sdk string, defaultPrecompiledObj *pb.PrecompiledObject) (*dto.SdkToCategories, error) {
-	sdkKey := getSdkKey(sdk)
+//GetCatalog returns all examples
+func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEntity) ([]*pb.Categories, error) {
 	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
 	if err != nil {
 		logger.Errorf("Datastore: GetCatalog(): error during the transaction creating, err: %s\n", err.Error())
 		return nil, err
 	}
-	exampleQuery := datastore.NewQuery(ExampleKind).
-		Namespace(Namespace).
-		Filter("sdk = ", sdkKey).
-		Transaction(tx)
-
+	exampleQuery := datastore.NewQuery(ExampleKind).Namespace(Namespace).Transaction(tx)
 	//Retrieving examples
 	var examples []*entity.ExampleEntity
-	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, examples)
+	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, &examples)
 	if err != nil {
 		if rollBackErr := tx.Rollback(); rollBackErr != nil {
 			err = rollBackErr
@@ -227,8 +226,12 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdk string, defaultPrecompil
 	}
 
 	//Retrieving snippets
-	var snippets []*entity.SnippetEntity
-	if err = tx.GetMulti(exampleKeys, snippets); err != nil {
+	var snippetKeys []*datastore.Key
+	for _, exampleKey := range exampleKeys {
+		snippetKeys = append(snippetKeys, getSnippetKey(exampleKey.Name))
+	}
+	snippets := make([]*entity.SnippetEntity, len(snippetKeys))
+	if err = tx.GetMulti(snippetKeys, snippets); err != nil {
 		if rollBackErr := tx.Rollback(); rollBackErr != nil {
 			err = rollBackErr
 		}
@@ -237,14 +240,14 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdk string, defaultPrecompil
 	}
 
 	//Retrieving files
-	var files []*entity.FileEntity
 	var fileKeys []*datastore.Key
 	for snpIndx, snippet := range snippets {
 		for fileIndx := 0; fileIndx < snippet.NumberOfFiles; fileIndx++ {
-			fileKey := getSdkKey(fmt.Sprintf("%s_%d", exampleKeys[snpIndx].Name, fileIndx))
+			fileKey := getFileKey(fmt.Sprintf("%s_%d", exampleKeys[snpIndx].Name, fileIndx))
 			fileKeys = append(fileKeys, fileKey)
 		}
 	}
+	files := make([]*entity.FileEntity, len(fileKeys))
 	if err = tx.GetMulti(fileKeys, files); err != nil {
 		if rollBackErr := tx.Rollback(); rollBackErr != nil {
 			err = rollBackErr
@@ -253,15 +256,126 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdk string, defaultPrecompil
 		return nil, err
 	}
 
-	return d.ResponseMapper.ToSdkToCategories(&dto.CatalogDTO{
-		Examples:              examples,
-		Snippets:              snippets,
-		Files:                 files,
-		DefaultPrecompiledObj: defaultPrecompiledObj,
-		Sdk:                   sdk,
+	return d.ResponseMapper.ToArrayCategories(&dto.CatalogDTO{
+		Examples:   examples,
+		Snippets:   snippets,
+		Files:      files,
+		SdkCatalog: sdkCatalog,
 	}, ""), nil
 }
 
-func getSdkKey(sdk string) *datastore.Key {
-	return utils.GetNameKey(SdkKind, sdk, Namespace, nil)
+//GetDefaultExamples returns the default examples
+func (d *Datastore) GetDefaultExamples(ctx context.Context, sdks []*entity.SDKEntity) (map[pb.Sdk]*pb.PrecompiledObject, error) {
+	var exampleKeys []*datastore.Key
+	for _, sdk := range sdks {
+		exampleKeys = append(exampleKeys, getExampleKey(fmt.Sprintf("%s_%s", sdk.Name, sdk.DefaultExample)))
+	}
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("error during the transaction creating, err: %s\n", err.Error())
+		return nil, err
+	}
+	//Retrieving examples
+	var examplesWithNils = make([]*entity.ExampleEntity, len(exampleKeys))
+	if err = tx.GetMulti(exampleKeys, examplesWithNils); err != nil {
+		if errors, ok := err.(datastore.MultiError); ok {
+			for _, errVal := range errors {
+				if errVal == datastore.ErrNoSuchEntity {
+					goto outsideExamples
+				}
+			}
+		}
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during the getting default examples, err: %s\n", err.Error())
+		return nil, err
+	}
+outsideExamples:
+	examples := make([]*entity.ExampleEntity, 0)
+	for _, exampleVal := range examplesWithNils {
+		if exampleVal != nil {
+			examples = append(examples, exampleVal)
+		}
+	}
+	//Retrieving snippets
+	var snippetKeys []*datastore.Key
+	for _, exampleKey := range exampleKeys {
+		snippetKeys = append(snippetKeys, getSnippetKey(exampleKey.Name))
+	}
+	snippetsWithNils := make([]*entity.SnippetEntity, len(snippetKeys))
+	if err = tx.GetMulti(snippetKeys, snippetsWithNils); err != nil {
+		if errors, ok := err.(datastore.MultiError); ok {
+			for _, errVal := range errors {
+				if errVal == datastore.ErrNoSuchEntity {
+					goto outsideSnippets
+				}
+			}
+		}
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during the getting snippets, err: %s\n", err.Error())
+		return nil, err
+	}
+outsideSnippets:
+	snippets := make([]*entity.SnippetEntity, 0)
+	for _, snipVal := range snippetsWithNils {
+		if snipVal != nil {
+			snippets = append(snippets, snipVal)
+		}
+	}
+
+	//Retrieving files
+	var fileKeys []*datastore.Key
+	for snpIndx, snippet := range snippets {
+		for fileIndx := 0; fileIndx < snippet.NumberOfFiles; fileIndx++ {
+			fileKey := getFileKey(fmt.Sprintf("%s_%s_%d", examples[snpIndx].Sdk.Name, examples[snpIndx].Name, fileIndx))
+			fileKeys = append(fileKeys, fileKey)
+		}
+	}
+	files := make([]*entity.FileEntity, len(fileKeys))
+	if err = tx.GetMulti(fileKeys, files); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during the getting files, err: %s\n", err.Error())
+		return nil, err
+	}
+
+	return d.ResponseMapper.ToDefaultPrecompiledObjects(&dto.DefaultExamplesDTO{
+		Examples: examples,
+		Snippets: snippets,
+		Files:    files,
+	}), nil
+}
+
+func getExampleKey(id string) *datastore.Key {
+	return getNameKey(ExampleKind, id, Namespace, nil)
+}
+
+func getSdkKey(id string) *datastore.Key {
+	return getNameKey(SdkKind, id, Namespace, nil)
+}
+
+func getFileKey(id string) *datastore.Key {
+	return getNameKey(FileKind, id, Namespace, nil)
+}
+
+func getSchemaVerKey(id string) *datastore.Key {
+	return getNameKey(SchemaKind, id, Namespace, nil)
+}
+
+func getSnippetKey(id string) *datastore.Key {
+	return getNameKey(SnippetKind, id, Namespace, nil)
+}
+
+// GetNameKey returns the datastore key
+func getNameKey(kind, id, namespace string, parentId *datastore.Key) *datastore.Key {
+	key := datastore.NameKey(kind, id, nil)
+	if parentId != nil {
+		key.Parent = parentId
+	}
+	key.Namespace = namespace
+	return key
 }

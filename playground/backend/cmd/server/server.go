@@ -29,11 +29,13 @@ import (
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/datastore"
+	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/db/schema"
 	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/service"
 	"beam.apache.org/playground/backend/internal/utils"
 )
 
@@ -59,38 +61,41 @@ func runServer() error {
 	var dbClient db.Database
 	var entityMapper mapper.EntityMapper
 	var props *environment.Properties
+	var cacheProxyService *service.CacheService
 
 	// Examples catalog should be retrieved and saved to cache only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	if envService.BeamSdkEnvs.ApacheBeamSdk == pb.Sdk_SDK_UNSPECIFIED {
-		err = setupExamplesCatalog(ctx, cacheService, envService.ApplicationEnvs.BucketName())
+		props, err := environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
 		if err != nil {
 			return err
 		}
-
-		props, err = environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
+		dbClient, err = datastore.New(ctx, mapper.NewPrecompiledObjectMapper(), envService.ApplicationEnvs.GoogleProjectId())
 		if err != nil {
 			return err
 		}
-
-		dbClient, err = datastore.New(ctx, envService.ApplicationEnvs.GoogleProjectId())
-		if err != nil {
-			return err
-		}
-
 		if err = setupDBStructure(ctx, dbClient, &envService.ApplicationEnvs, props); err != nil {
 			return err
 		}
-
+		sdks, err := setupSdkCatalog(ctx, cacheService, dbClient)
+		if err != nil {
+			return err
+		}
+		err = setupExamplesCatalogFromDatastore(ctx, cacheService, dbClient, sdks)
+		if err != nil {
+			return err
+		}
 		entityMapper = mapper.NewDatastoreMapper(&envService.ApplicationEnvs, props)
+		cacheProxyService = service.NewService(cacheService, dbClient)
 	}
 
 	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
-		env:          envService,
-		cacheService: cacheService,
-		db:           dbClient,
-		props:        props,
-		entityMapper: entityMapper,
+		env:               envService,
+		cacheService:      cacheService,
+		db:                dbClient,
+		props:             props,
+		entityMapper:      entityMapper,
+		cacheProxyService: cacheProxyService,
 	})
 
 	errChan := make(chan error)
@@ -114,6 +119,28 @@ func runServer() error {
 	}
 }
 
+// setupSdkCatalog saves the sdk catalog from the cloud datastore to the cache
+func setupSdkCatalog(ctx context.Context, cacheService cache.Cache, db db.Database) ([]*entity.SDKEntity, error) {
+	sdks, err := db.GetSDKs(ctx)
+	if err != nil {
+		logger.Errorf("setupSdkCatalog() error during getting the sdk catalog, err: %s", err.Error())
+		return nil, err
+	}
+	sdkNames := pb.Sdk_value
+	delete(sdkNames, pb.Sdk_SDK_UNSPECIFIED.String())
+	if len(sdks) != len(sdkNames) {
+		errMsg := "setupSdkCatalog() database doesn't have all sdks"
+		logger.Error(errMsg)
+		return nil, fmt.Errorf(errMsg)
+	}
+	if err = cacheService.SetSdkCatalog(ctx, sdks); err != nil {
+		logger.Errorf("setupSdkCatalog() error during setting sdk catalog to the cache, err: %s", err.Error())
+		return nil, err
+	}
+	return sdks, nil
+}
+
+// setupEnvironment constructs the environment required by the app
 func setupEnvironment() (*environment.Environment, error) {
 	networkEnvs, err := environment.GetNetworkEnvsFromOsEnvs()
 	if err != nil {
@@ -168,6 +195,28 @@ func setupExamplesCatalog(ctx context.Context, cacheService cache.Cache, bucketN
 		return err
 	}
 	for sdk, precompiledObject := range defaultPrecompiledObjects {
+		if err := cacheService.SetDefaultPrecompiledObject(ctx, sdk, precompiledObject); err != nil {
+			logger.Errorf("GetPrecompiledObjects(): cache error: %s", err.Error())
+			return err
+		}
+	}
+	return nil
+}
+
+// setupExamplesCatalogFromDatastore saves precompiled objects catalog from the cloud datastore to the cache
+func setupExamplesCatalogFromDatastore(ctx context.Context, cacheService cache.Cache, db db.Database, sdks []*entity.SDKEntity) error {
+	catalog, err := db.GetCatalog(ctx, sdks)
+	if err != nil {
+		return err
+	}
+	if err = cacheService.SetCatalog(ctx, catalog); err != nil {
+		logger.Errorf("GetPrecompiledObjects(): cache error: %s", err.Error())
+	}
+	defaultExamples, err := db.GetDefaultExamples(ctx, sdks)
+	if err != nil {
+		return err
+	}
+	for sdk, precompiledObject := range defaultExamples {
 		if err := cacheService.SetDefaultPrecompiledObject(ctx, sdk, precompiledObject); err != nil {
 			logger.Errorf("GetPrecompiledObjects(): cache error: %s", err.Error())
 			return err

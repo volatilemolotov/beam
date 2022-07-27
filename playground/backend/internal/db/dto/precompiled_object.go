@@ -22,6 +22,7 @@ import (
 
 type ObjectInfo struct {
 	Name            string
+	CloudPath       string
 	Description     string                   `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	Type            pb.PrecompiledObjectType `protobuf:"varint,4,opt,name=type,proto3,enum=api.v1.PrecompiledObjectType" json:"type,omitempty"`
 	Categories      []string                 `json:"categories,omitempty"`
@@ -37,18 +38,31 @@ type CategoryToPrecompiledObjects map[string]PrecompiledObjects
 type SdkToCategories map[string]CategoryToPrecompiledObjects
 
 type CatalogDTO struct {
-	Examples              []*entity.ExampleEntity
-	Snippets              []*entity.SnippetEntity
-	Files                 []*entity.FileEntity
-	DefaultPrecompiledObj *pb.PrecompiledObject
-	Sdk                   string
+	Examples   []*entity.ExampleEntity
+	Snippets   []*entity.SnippetEntity
+	Files      []*entity.FileEntity
+	SdkCatalog []*entity.SDKEntity
+}
+
+type DefaultExamplesDTO struct {
+	Examples []*entity.ExampleEntity
+	Snippets []*entity.SnippetEntity
+	Files    []*entity.FileEntity
+}
+
+func (c *CatalogDTO) GetSdkCatalogAsMap() map[string]string {
+	sdkToExample := make(map[string]string)
+	for _, sdk := range c.SdkCatalog {
+		sdkToExample[sdk.Name] = sdk.DefaultExample
+	}
+	return sdkToExample
 }
 
 type ExampleDTO struct {
-	Example               *entity.ExampleEntity
-	Snippet               *entity.SnippetEntity
-	Files                 []*entity.FileEntity
-	DefaultPrecompiledObj *pb.PrecompiledObject
+	Example            *entity.ExampleEntity
+	Snippet            *entity.SnippetEntity
+	Files              []*entity.FileEntity
+	DefaultExampleName string
 }
 
 func (e *ExampleDTO) HasMultiFiles() bool {
@@ -56,7 +70,7 @@ func (e *ExampleDTO) HasMultiFiles() bool {
 }
 
 func (e *ExampleDTO) IsDefault() bool {
-	return e.Example.Name == e.DefaultPrecompiledObj.Name
+	return e.Example.Name == e.DefaultExampleName
 }
 
 func (e *ExampleDTO) GetType() pb.PrecompiledObjectType {

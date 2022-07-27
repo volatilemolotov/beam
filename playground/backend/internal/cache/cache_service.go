@@ -13,21 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package mapper
+package cache
 
-import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/db/dto"
-	"beam.apache.org/playground/backend/internal/db/entity"
-)
-
-type EntityMapper interface {
-	ToSnippet(info *pb.SaveSnippetRequest) *entity.Snippet
-	ToFileEntity(info *pb.SaveSnippetRequest, file *pb.SnippetFile) *entity.FileEntity
-}
-
-type ResponseMapper interface {
-	ToArrayCategories(catalogDTO *dto.CatalogDTO, targetCategory string) []*pb.Categories
-	ToObjectInfo(exampleDTO *dto.ExampleDTO) *dto.ObjectInfo
-	ToDefaultPrecompiledObjects(defaultExamplesDTO *dto.DefaultExamplesDTO) map[pb.Sdk]*pb.PrecompiledObject
+type Service struct {
 }

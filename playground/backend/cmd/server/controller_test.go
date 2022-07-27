@@ -103,7 +103,7 @@ func setup() *grpc.Server {
 			panic(err)
 		}
 	}
-	dbClient, err = datastoreDb.New(ctx, datastoreEmulatorProjectId)
+	dbClient, err = datastoreDb.New(ctx, mapper.NewPrecompiledObjectMapper(), datastoreEmulatorProjectId)
 	if err != nil {
 		panic(err)
 	}

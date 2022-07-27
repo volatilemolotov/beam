@@ -15,6 +15,10 @@
 package main
 
 import (
+	"context"
+
+	"github.com/google/uuid"
+
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
@@ -24,10 +28,9 @@ import (
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/service"
 	"beam.apache.org/playground/backend/internal/setup_tools/life_cycle"
 	"beam.apache.org/playground/backend/internal/utils"
-	"context"
-	"github.com/google/uuid"
 )
 
 const (
@@ -41,9 +44,10 @@ type playgroundController struct {
 	env          *environment.Environment
 	cacheService cache.Cache
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
-	db           db.Database
-	props        *environment.Properties
-	entityMapper mapper.EntityMapper
+	db                db.Database
+	props             *environment.Properties
+	entityMapper      mapper.EntityMapper
+	cacheProxyService *service.CacheService
 
 	pb.UnimplementedPlaygroundServiceServer
 }
@@ -271,7 +275,7 @@ func (controller *playgroundController) Cancel(ctx context.Context, info *pb.Can
 // - If there is no catalog in the cache, gets the catalog from the Storage and saves it to the cache
 // - If SDK or category is specified in the request, gets the catalog from the cache and filters it by SDK and category
 func (controller *playgroundController) GetPrecompiledObjects(ctx context.Context, info *pb.GetPrecompiledObjectsRequest) (*pb.GetPrecompiledObjectsResponse, error) {
-	catalog, err := utils.GetCatalogFromCacheOrStorage(ctx, controller.cacheService, controller.env.ApplicationEnvs.BucketName())
+	catalog, err := controller.cacheProxyService.GetCatalogFromCacheOrDatastore(ctx)
 	if err != nil {
 		logger.Errorf("GetPrecompiledObjects(): error during getting catalog: %s", err.Error())
 		return nil, errors.InternalError("Error during getting Precompiled Objects", "Error with cloud connection")
@@ -348,7 +352,7 @@ func (controller *playgroundController) GetDefaultPrecompiledObject(ctx context.
 		logger.Errorf("GetDefaultPrecompiledObject(): unimplemented sdk: %s\n", info.Sdk)
 		return nil, errors.InvalidArgumentError("Error during preparing", "Sdk is not implemented yet: %s", info.Sdk.String())
 	}
-	precompiledObject, err := utils.GetDefaultPrecompiledObject(ctx, info.Sdk, controller.cacheService, controller.env.ApplicationEnvs.BucketName())
+	precompiledObject, err := controller.cacheProxyService.GetDefaultPrecompiledObjectFromCacheOrDatastore(ctx, info.Sdk)
 	if err != nil {
 		logger.Errorf("GetDefaultPrecompiledObject(): error during getting catalog: %s", err.Error())
 		return nil, errors.InternalError("Error during getting Precompiled Objects", "Error with cloud connection")

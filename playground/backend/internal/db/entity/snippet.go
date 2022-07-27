@@ -16,14 +16,18 @@
 package entity
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
+	"io"
 	"sort"
 	"strings"
 	"time"
 
 	"cloud.google.com/go/datastore"
 
-	"beam.apache.org/playground/backend/internal/utils"
+	"beam.apache.org/playground/backend/internal/errors"
+	"beam.apache.org/playground/backend/internal/logger"
 )
 
 type FileEntity struct {
@@ -65,9 +69,26 @@ func (s *Snippet) ID() (string, error) {
 			contentBuilder.WriteString(fmt.Sprintf("%v%s", s.Snippet.Sdk, strings.TrimSpace(s.Snippet.PipeOpts)))
 		}
 	}
-	id, err := utils.ID(s.Salt, contentBuilder.String(), s.IdLength)
+	id, err := generateId(s.Salt, contentBuilder.String(), s.IdLength)
 	if err != nil {
 		return "", err
 	}
 	return id, nil
+}
+
+func generateId(salt, content string, length int8) (string, error) {
+	hash := sha256.New()
+	if _, err := io.WriteString(hash, salt); err != nil {
+		logger.Errorf("ID(): error during K generation: %s", err.Error())
+		return "", errors.InternalError("Error during K generation", "Error writing K and salt")
+	}
+	hash.Write([]byte(content))
+	sum := hash.Sum(nil)
+	b := make([]byte, base64.URLEncoding.EncodedLen(len(sum)))
+	base64.URLEncoding.Encode(b, sum)
+	hashLen := int(length)
+	for hashLen <= len(b) && b[hashLen-1] == '_' {
+		hashLen++
+	}
+	return string(b)[:hashLen], nil
 }

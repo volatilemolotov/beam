@@ -16,14 +16,17 @@
 package datastore
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/db/entity"
-	"beam.apache.org/playground/backend/internal/utils"
-	"cloud.google.com/go/datastore"
 	"context"
 	"os"
 	"testing"
 	"time"
+
+	"cloud.google.com/go/datastore"
+
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/db/entity"
+	"beam.apache.org/playground/backend/internal/db/mapper"
+	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
@@ -51,7 +54,7 @@ func setup() {
 	}
 	ctx = context.Background()
 	var err error
-	datastoreDb, err = New(ctx, datastoreEmulatorProjectId)
+	datastoreDb, err = New(ctx, mapper.NewPrecompiledObjectMapper(), datastoreEmulatorProjectId)
 	if err != nil {
 		panic(err)
 	}
@@ -331,10 +334,9 @@ func TestDatastore_GetFiles(t *testing.T) {
 	}
 }
 
-func TestDatastore_GetSDK(t *testing.T) {
+func TestDatastore_GetSDKs(t *testing.T) {
 	type args struct {
 		ctx context.Context
-		id  string
 	}
 	sdks := getSDKs()
 	tests := []struct {
@@ -344,17 +346,17 @@ func TestDatastore_GetSDK(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "GetSDK() in the usual case",
+			name: "GetSDKs() in the usual case",
 			prepare: func() {
 				_ = datastoreDb.PutSDKs(ctx, sdks)
 			},
-			args:    args{ctx: ctx, id: pb.Sdk_SDK_GO.String()},
+			args:    args{ctx: ctx},
 			wantErr: false,
 		},
 		{
-			name:    "GetSDK() when sdk is missing",
+			name:    "GetSDKs() when sdks are missing",
 			prepare: func() {},
-			args:    args{ctx: ctx, id: pb.Sdk_SDK_GO.String()},
+			args:    args{ctx: ctx},
 			wantErr: true,
 		},
 	}
@@ -362,13 +364,13 @@ func TestDatastore_GetSDK(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.prepare()
-			sdkEntity, err := datastoreDb.GetSDK(tt.args.ctx, tt.args.id)
+			sdkEntities, err := datastoreDb.GetSDKs(tt.args.ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetSDK() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetSDKs() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err == nil {
-				if sdkEntity.DefaultExample != "MOCK_EXAMPLE" {
-					t.Error("GetSDK() unexpected result")
+				if len(sdkEntities) != 4 {
+					t.Error("GetSDK unexpected result, should be four entities")
 				}
 				for _, sdk := range sdks {
 					cleanData(t, SdkKind, sdk.Name, nil)
@@ -397,7 +399,7 @@ func TestNew(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := New(ctx, datastoreEmulatorProjectId)
+			_, err := New(ctx, mapper.NewPrecompiledObjectMapper(), datastoreEmulatorProjectId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}

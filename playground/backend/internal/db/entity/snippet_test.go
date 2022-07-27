@@ -16,7 +16,8 @@
 package entity
 
 import (
-	"beam.apache.org/playground/backend/internal/utils"
+	"cloud.google.com/go/datastore"
+
 	"testing"
 )
 
@@ -31,7 +32,7 @@ func TestSnippet_ID(t *testing.T) {
 			name: "Snippet ID() in the usual case",
 			snip: &Snippet{
 				Snippet: &SnippetEntity{
-					Sdk:      utils.GetNameKey("pg_sdks", "SDK_GO", "Playground", nil),
+					Sdk:      getNameKey("pg_sdks", "SDK_GO", "Playground", nil),
 					PipeOpts: "MOCK_OPTIONS",
 				},
 				Files: []*FileEntity{{
@@ -66,4 +67,14 @@ func TestSnippet_ID(t *testing.T) {
 			}
 		})
 	}
+}
+
+// getNameKey returns the datastore key
+func getNameKey(kind, id, namespace string, parentId *datastore.Key) *datastore.Key {
+	key := datastore.NameKey(kind, id, nil)
+	if parentId != nil {
+		key.Parent = parentId
+	}
+	key.Namespace = namespace
+	return key
 }
