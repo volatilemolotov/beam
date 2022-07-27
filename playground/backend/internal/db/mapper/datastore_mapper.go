@@ -39,8 +39,8 @@ func (m *DatastoreMapper) ToSnippet(info *pb.SaveSnippetRequest) *entity.Snippet
 		IDMeta: &entity.IDMeta{Salt: m.props.Salt, IdLength: m.props.IdLength},
 		//OwnerId property will be used in Tour of Beam project
 		Snippet: &entity.SnippetEntity{
-			SchVer:        utils.GetNameKey("pg_schema_versions", m.appEnv.SchemaVersion(), "Playground", nil),
-			Sdk:           utils.GetNameKey("pg_sdks", info.Sdk.String(), "Playground", nil),
+			SchVer:        utils.GetSchemaVerKey(m.appEnv.SchemaVersion()),
+			Sdk:           utils.GetSdkKey(info.Sdk.String()),
 			PipeOpts:      info.PipelineOptions,
 			Created:       nowDate,
 			LVisited:      nowDate,

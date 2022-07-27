@@ -16,27 +16,30 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"strings"
 
 	"github.com/google/uuid"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/code_processing"
+	"beam.apache.org/playground/backend/internal/components"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/service"
 	"beam.apache.org/playground/backend/internal/setup_tools/life_cycle"
 	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
-	errorTitleGetSnippet  = "Error during getting a snippet"
-	errorTitleSaveSnippet = "Error during saving a snippet"
+	errorTitleGetSnippet       = "Error during getting snippet"
+	errorTitleSaveSnippet      = "Error during saving snippet"
+	errorTitleGetExample       = "Error during getting example"
+	errorTitleGetExampleCode   = "Error during getting example code"
+	errorTitleGetExampleOutput = "Error during getting example output"
+	errorTitleGetExampleLogs   = "Error during getting example logs"
+	errorTitleGetExampleGraph  = "Error during getting example graph"
 )
 
 // playgroundController processes `gRPC' requests from clients.
@@ -45,10 +48,10 @@ type playgroundController struct {
 	env          *environment.Environment
 	cacheService cache.Cache
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
-	db                db.Database
-	props             *environment.Properties
-	entityMapper      mapper.EntityMapper
-	cacheProxyService *service.CacheService
+	db             db.Database
+	props          *environment.Properties
+	entityMapper   mapper.EntityMapper
+	cacheComponent *components.CacheComponent
 
 	pb.UnimplementedPlaygroundServiceServer
 }
@@ -276,7 +279,7 @@ func (controller *playgroundController) Cancel(ctx context.Context, info *pb.Can
 // - If there is no catalog in the cache, gets the catalog from the Storage and saves it to the cache
 // - If SDK or category is specified in the request, gets the catalog from the cache and filters it by SDK and category
 func (controller *playgroundController) GetPrecompiledObjects(ctx context.Context, info *pb.GetPrecompiledObjectsRequest) (*pb.GetPrecompiledObjectsResponse, error) {
-	catalog, err := controller.cacheProxyService.GetCatalogFromCacheOrDatastore(ctx)
+	catalog, err := controller.cacheComponent.GetCatalogFromCacheOrDatastore(ctx)
 	if err != nil {
 		logger.Errorf("GetPrecompiledObjects(): error during getting catalog: %s", err.Error())
 		return nil, errors.InternalError("Error during getting Precompiled Objects", "Error with cloud connection")
@@ -288,13 +291,15 @@ func (controller *playgroundController) GetPrecompiledObjects(ctx context.Contex
 
 // GetPrecompiledObject returns precompiled object from the bucket
 func (controller *playgroundController) GetPrecompiledObject(ctx context.Context, info *pb.GetPrecompiledObjectRequest) (*pb.GetPrecompiledObjectResponse, error) {
-	cloudPathParams := strings.Split(info.CloudPath, "/")
-	if len(cloudPathParams) < 3 {
-		//TODO
+	exampleId, err := utils.GetExampleID(info.GetCloudPath())
+	if err != nil {
+		return nil, errors.InvalidArgumentError(errorTitleGetExample, err.Error())
 	}
-	exampleId := fmt.Sprintf("%s_%s", cloudPathParams[0], cloudPathParams[2])
-	sdk, _ := controller.cacheProxyService.GetSdkCatalogFromCacheOrDatastore(ctx)
-	precompiledObject, err := controller.db.GetExample(ctx, exampleId, sdk)
+	sdks, err := controller.cacheComponent.GetSdkCatalogFromCacheOrDatastore(ctx)
+	if err != nil {
+		return nil, errors.InternalError(errorTitleGetExample, err.Error())
+	}
+	precompiledObject, err := controller.db.GetExample(ctx, exampleId, sdks)
 	if err != nil {
 		return nil, errors.InternalError("Error during getting Precompiled Object", "Error with cloud connection")
 	}
@@ -305,11 +310,10 @@ func (controller *playgroundController) GetPrecompiledObject(ctx context.Context
 
 // GetPrecompiledObjectCode returns the code of the specific example
 func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Context, info *pb.GetPrecompiledObjectCodeRequest) (*pb.GetPrecompiledObjectCodeResponse, error) {
-	cloudPathParams := strings.Split(info.CloudPath, "/")
-	if len(cloudPathParams) < 3 {
-		//TODO
+	exampleId, err := utils.GetExampleID(info.GetCloudPath())
+	if err != nil {
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleCode, err.Error())
 	}
-	exampleId := fmt.Sprintf("%s_%s", cloudPathParams[0], cloudPathParams[2])
 	codeString, err := controller.db.GetExampleCode(ctx, exampleId)
 	if err != nil {
 		logger.Errorf("GetPrecompiledObjectCode(): cloud storage error: %s", err.Error())
@@ -321,11 +325,10 @@ func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Con
 
 // GetPrecompiledObjectOutput returns the output of the compiled and run example
 func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.Context, info *pb.GetPrecompiledObjectOutputRequest) (*pb.GetPrecompiledObjectOutputResponse, error) {
-	cloudPathParams := strings.Split(info.CloudPath, "/")
-	if len(cloudPathParams) < 3 {
-		//TODO
+	exampleId, err := utils.GetExampleID(info.GetCloudPath())
+	if err != nil {
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleOutput, err.Error())
 	}
-	exampleId := fmt.Sprintf("%s_%s", cloudPathParams[0], cloudPathParams[2])
 	output, err := controller.db.GetExampleOutput(ctx, exampleId)
 	if err != nil {
 		logger.Errorf("GetPrecompiledObjectOutput(): cloud storage error: %s", err.Error())
@@ -337,11 +340,10 @@ func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.C
 
 // GetPrecompiledObjectLogs returns the logs of the compiled and run example
 func (controller *playgroundController) GetPrecompiledObjectLogs(ctx context.Context, info *pb.GetPrecompiledObjectLogsRequest) (*pb.GetPrecompiledObjectLogsResponse, error) {
-	cloudPathParams := strings.Split(info.CloudPath, "/")
-	if len(cloudPathParams) < 3 {
-		//TODO
+	exampleId, err := utils.GetExampleID(info.GetCloudPath())
+	if err != nil {
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleLogs, err.Error())
 	}
-	exampleId := fmt.Sprintf("%s_%s", cloudPathParams[0], cloudPathParams[2])
 	logs, err := controller.db.GetExampleLogs(ctx, exampleId)
 	if err != nil {
 		logger.Errorf("GetPrecompiledObjectLogs(): cloud storage error: %s", err.Error())
@@ -353,11 +355,10 @@ func (controller *playgroundController) GetPrecompiledObjectLogs(ctx context.Con
 
 // GetPrecompiledObjectGraph returns the graph of the compiled and run example
 func (controller *playgroundController) GetPrecompiledObjectGraph(ctx context.Context, info *pb.GetPrecompiledObjectGraphRequest) (*pb.GetPrecompiledObjectGraphResponse, error) {
-	cloudPathParams := strings.Split(info.CloudPath, "/")
-	if len(cloudPathParams) < 3 {
-		//TODO
+	exampleId, err := utils.GetExampleID(info.GetCloudPath())
+	if err != nil {
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleGraph, err.Error())
 	}
-	exampleId := fmt.Sprintf("%s_%s", cloudPathParams[0], cloudPathParams[2])
 	graph, err := controller.db.GetExampleGraph(ctx, exampleId)
 	if err != nil {
 		logger.Errorf("GetPrecompiledObjectGraph(): cloud storage error: %s", err.Error())
@@ -374,7 +375,7 @@ func (controller *playgroundController) GetDefaultPrecompiledObject(ctx context.
 		logger.Errorf("GetDefaultPrecompiledObject(): unimplemented sdk: %s\n", info.Sdk)
 		return nil, errors.InvalidArgumentError("Error during preparing", "Sdk is not implemented yet: %s", info.Sdk.String())
 	}
-	precompiledObject, err := controller.cacheProxyService.GetDefaultPrecompiledObjectFromCacheOrDatastore(ctx, info.Sdk)
+	precompiledObject, err := controller.cacheComponent.GetDefaultPrecompiledObjectFromCacheOrDatastore(ctx, info.Sdk)
 	if err != nil {
 		logger.Errorf("GetDefaultPrecompiledObject(): error during getting catalog: %s", err.Error())
 		return nil, errors.InternalError("Error during getting Precompiled Objects", "Error with cloud connection")

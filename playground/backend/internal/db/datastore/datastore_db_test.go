@@ -24,6 +24,7 @@ import (
 	"cloud.google.com/go/datastore"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/constants"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -85,7 +86,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 					IdLength: 11,
 				},
 				Snippet: &entity.SnippetEntity{
-					Sdk:           utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
+					Sdk:           utils.GetSdkKey(pb.Sdk_SDK_GO.String()),
 					PipeOpts:      "MOCK_OPTIONS",
 					Origin:        "PG_USER",
 					OwnerId:       "",
@@ -110,8 +111,8 @@ func TestDatastore_PutSnippet(t *testing.T) {
 		})
 	}
 
-	cleanData(t, FileKind, "MOCK_ID_0", nil)
-	cleanData(t, SnippetKind, "MOCK_ID", nil)
+	cleanData(t, constants.FileKind, "MOCK_ID_0", nil)
+	cleanData(t, constants.SnippetKind, "MOCK_ID", nil)
 }
 
 func TestDatastore_GetSnippet(t *testing.T) {
@@ -141,7 +142,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 						IdLength: 11,
 					},
 					Snippet: &entity.SnippetEntity{
-						Sdk:           utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
+						Sdk:           utils.GetSdkKey(pb.Sdk_SDK_GO.String()),
 						PipeOpts:      "MOCK_OPTIONS",
 						Created:       nowDate,
 						Origin:        "PG_USER",
@@ -179,8 +180,8 @@ func TestDatastore_GetSnippet(t *testing.T) {
 		})
 	}
 
-	cleanData(t, FileKind, "MOCK_ID_0", nil)
-	cleanData(t, SnippetKind, "MOCK_ID", nil)
+	cleanData(t, constants.FileKind, "MOCK_ID_0", nil)
+	cleanData(t, constants.SnippetKind, "MOCK_ID", nil)
 }
 
 func TestDatastore_PutSDKs(t *testing.T) {
@@ -222,7 +223,7 @@ func TestDatastore_PutSDKs(t *testing.T) {
 	}
 
 	for _, sdk := range sdks {
-		cleanData(t, SdkKind, sdk.Name, nil)
+		cleanData(t, constants.SdkKind, sdk.Name, nil)
 	}
 }
 
@@ -266,7 +267,7 @@ func TestDatastore_PutSchemaVersion(t *testing.T) {
 		})
 	}
 
-	cleanData(t, SchemaKind, "MOCK_ID", nil)
+	cleanData(t, constants.SchemaKind, "MOCK_ID", nil)
 }
 
 func TestDatastore_GetFiles(t *testing.T) {
@@ -296,7 +297,7 @@ func TestDatastore_GetFiles(t *testing.T) {
 						IdLength: 11,
 					},
 					Snippet: &entity.SnippetEntity{
-						Sdk:           utils.GetNameKey(SdkKind, "SDK_GO", Namespace, nil),
+						Sdk:           utils.GetSdkKey(pb.Sdk_SDK_GO.String()),
 						PipeOpts:      "MOCK_OPTIONS",
 						Origin:        "PG_USER",
 						OwnerId:       "",
@@ -327,8 +328,8 @@ func TestDatastore_GetFiles(t *testing.T) {
 					files[0].IsMain != false {
 					t.Error("GetFiles() unexpected result")
 				}
-				cleanData(t, FileKind, "MOCK_ID_0", nil)
-				cleanData(t, SnippetKind, "MOCK_ID", nil)
+				cleanData(t, constants.FileKind, "MOCK_ID_0", nil)
+				cleanData(t, constants.SnippetKind, "MOCK_ID", nil)
 			}
 		})
 	}
@@ -373,7 +374,7 @@ func TestDatastore_GetSDKs(t *testing.T) {
 					t.Error("GetSDK unexpected result, should be four entities")
 				}
 				for _, sdk := range sdks {
-					cleanData(t, SdkKind, sdk.Name, nil)
+					cleanData(t, constants.SdkKind, sdk.Name, nil)
 				}
 			}
 		})
@@ -412,7 +413,7 @@ func cleanData(t *testing.T, kind, id string, parentId *datastore.Key) {
 	if parentId != nil {
 		key.Parent = parentId
 	}
-	key.Namespace = Namespace
+	key.Namespace = constants.Namespace
 	if err := datastoreDb.Client.Delete(ctx, key); err != nil {
 		t.Errorf("Error during data cleaning after the test, err: %s", err.Error())
 	}

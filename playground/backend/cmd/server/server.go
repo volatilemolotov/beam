@@ -27,6 +27,7 @@ import (
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/cache/redis"
 	"beam.apache.org/playground/backend/internal/cloud_bucket"
+	"beam.apache.org/playground/backend/internal/components"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
@@ -35,7 +36,6 @@ import (
 	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/service"
 	"beam.apache.org/playground/backend/internal/utils"
 )
 
@@ -61,41 +61,45 @@ func runServer() error {
 	var dbClient db.Database
 	var entityMapper mapper.EntityMapper
 	var props *environment.Properties
-	var cacheProxyService *service.CacheService
+	var cacheComponent *components.CacheComponent
 
 	// Examples catalog should be retrieved and saved to cache only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	if envService.BeamSdkEnvs.ApacheBeamSdk == pb.Sdk_SDK_UNSPECIFIED {
-		props, err := environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
+		props, err = environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
 		if err != nil {
 			return err
 		}
+
 		dbClient, err = datastore.New(ctx, mapper.NewPrecompiledObjectMapper(), envService.ApplicationEnvs.GoogleProjectId())
 		if err != nil {
 			return err
 		}
+
 		if err = setupDBStructure(ctx, dbClient, &envService.ApplicationEnvs, props); err != nil {
 			return err
 		}
+
 		sdks, err := setupSdkCatalog(ctx, cacheService, dbClient)
 		if err != nil {
 			return err
 		}
-		err = setupExamplesCatalogFromDatastore(ctx, cacheService, dbClient, sdks)
-		if err != nil {
+
+		if err = setupExamplesCatalogFromDatastore(ctx, cacheService, dbClient, sdks); err != nil {
 			return err
 		}
+
 		entityMapper = mapper.NewDatastoreMapper(&envService.ApplicationEnvs, props)
-		cacheProxyService = service.NewService(cacheService, dbClient)
+		cacheComponent = components.NewService(cacheService, dbClient)
 	}
 
 	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
-		env:               envService,
-		cacheService:      cacheService,
-		db:                dbClient,
-		props:             props,
-		entityMapper:      entityMapper,
-		cacheProxyService: cacheProxyService,
+		env:            envService,
+		cacheService:   cacheService,
+		db:             dbClient,
+		props:          props,
+		entityMapper:   entityMapper,
+		cacheComponent: cacheComponent,
 	})
 
 	errChan := make(chan error)

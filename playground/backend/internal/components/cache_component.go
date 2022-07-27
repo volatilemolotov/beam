@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package service
+package components
 
 import (
 	"context"
@@ -26,65 +26,65 @@ import (
 	"beam.apache.org/playground/backend/internal/logger"
 )
 
-type CacheService struct {
+type CacheComponent struct {
 	cache cache2.Cache
 	db    db.Database
 }
 
-func NewService(cache cache2.Cache, db db.Database) *CacheService {
-	return &CacheService{cache: cache, db: db}
+func NewService(cache cache2.Cache, db db.Database) *CacheComponent {
+	return &CacheComponent{cache: cache, db: db}
 }
 
 // GetSdkCatalogFromCacheOrDatastore returns the sdk catalog from the cache
 // - If there is no sdk catalog in the cache, gets the sdk catalog from the Datastore and saves it to the cache
-func (cs *CacheService) GetSdkCatalogFromCacheOrDatastore(ctx context.Context) ([]*entity.SDKEntity, error) {
-	sdks, err := cs.cache.GetSdkCatalog(ctx)
+func (cp *CacheComponent) GetSdkCatalogFromCacheOrDatastore(ctx context.Context) ([]*entity.SDKEntity, error) {
+	sdks, err := cp.cache.GetSdkCatalog(ctx)
 	if err != nil {
 		logger.Errorf("error during getting the sdk catalog from the cache, err: %s", err.Error())
-		sdks, err = cs.db.GetSDKs(ctx)
+		sdks, err = cp.db.GetSDKs(ctx)
 		if err != nil {
 			logger.Errorf("error during getting the sdk catalog from the cloud datastore, err: %s", err.Error())
 			return nil, err
 		}
-		if err = cs.cache.SetSdkCatalog(ctx, sdks); err != nil {
+		if err = cp.cache.SetSdkCatalog(ctx, sdks); err != nil {
 			logger.Errorf("error during setting the sdk catalog to the cache, err: %s", err.Error())
 		}
 	}
 	return sdks, nil
 }
 
-func (cs *CacheService) GetCatalogFromCacheOrDatastore(ctx context.Context) ([]*pb.Categories, error) {
-	catalog, err := cs.cache.GetCatalog(ctx)
+func (cp *CacheComponent) GetCatalogFromCacheOrDatastore(ctx context.Context) ([]*pb.Categories, error) {
+	catalog, err := cp.cache.GetCatalog(ctx)
 	if err != nil {
 		logger.Errorf("error during getting the catalog from the cache, err: %s", err.Error())
-		sdkCatalog, err := cs.GetSdkCatalogFromCacheOrDatastore(ctx)
+		sdkCatalog, err := cp.GetSdkCatalogFromCacheOrDatastore(ctx)
 		if err != nil {
 			logger.Errorf("error during getting the sdk catalog from the cache or datastore, err: %s", err.Error())
 			return nil, err
 		}
-		catalog, err = cs.db.GetCatalog(ctx, sdkCatalog)
+		catalog, err = cp.db.GetCatalog(ctx, sdkCatalog)
 		if err != nil {
 			return nil, err
 		}
-		if err = cs.cache.SetCatalog(ctx, catalog); err != nil {
+		if err = cp.cache.SetCatalog(ctx, catalog); err != nil {
 			logger.Errorf("SetCatalog(): cache error: %s", err.Error())
 		}
 	}
 	return catalog, nil
 }
 
-func (cs *CacheService) GetDefaultPrecompiledObjectFromCacheOrDatastore(ctx context.Context, sdk pb.Sdk) (*pb.PrecompiledObject, error) {
-	defaultExample, err := cs.cache.GetDefaultPrecompiledObject(ctx, sdk)
+func (cp *CacheComponent) GetDefaultPrecompiledObjectFromCacheOrDatastore(ctx context.Context, sdk pb.Sdk) (*pb.PrecompiledObject, error) {
+	defaultExample, err := cp.cache.GetDefaultPrecompiledObject(ctx, sdk)
 	if err != nil {
 		logger.Errorf("error during getting a default precompiled object, err: %s", err.Error())
-		sdks, err := cs.GetSdkCatalogFromCacheOrDatastore(ctx)
+		sdks, err := cp.GetSdkCatalogFromCacheOrDatastore(ctx)
 		if err != nil {
 			logger.Errorf("error during getting sdk catalog from the cache or the cloud datastore, err: %s", err.Error())
 			return nil, err
 		}
-		defaultExamples, err := cs.db.GetDefaultExamples(ctx, sdks)
+		defaultExamples, err := cp.db.GetDefaultExamples(ctx, sdks)
 		for sdk, defaultExample := range defaultExamples {
-			if err := cs.cache.SetDefaultPrecompiledObject(ctx, sdk, defaultExample); err != nil {
+			if err := cp.cache.SetDefaultPrecompiledObject(ctx, sdk, defaultExample); err != nil {
 				logger.Errorf("error during setting a default example to the cache: %s", err.Error())
 			}
 		}
