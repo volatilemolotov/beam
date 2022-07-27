@@ -95,6 +95,20 @@ func (pom *PrecompiledObjectMapper) ToDefaultPrecompiledObjects(defaultExamplesD
 	return result
 }
 
+func (pom *PrecompiledObjectMapper) ToPrecompiledObj(exampleDTO *dto.ExampleDTO) *pb.PrecompiledObject {
+	return &pb.PrecompiledObject{
+		CloudPath:       fmt.Sprintf("%s/%s/%s", exampleDTO.Example.Sdk.Name, exampleDTO.Example.Type, exampleDTO.Example.Name),
+		Name:            exampleDTO.Example.Name,
+		Description:     exampleDTO.Example.Descr,
+		Type:            exampleDTO.GetType(),
+		PipelineOptions: exampleDTO.Snippet.PipeOpts,
+		Link:            exampleDTO.Example.Path,
+		Multifile:       exampleDTO.HasMultiFiles(),
+		ContextLine:     exampleDTO.GetContextLine(),
+		DefaultExample:  exampleDTO.IsDefault(),
+	}
+}
+
 // appendPrecompiledObject add precompiled object to the common structure of precompiled objects
 func appendPrecompiledObject(objectInfo dto.ObjectInfo, sdkToCategories *dto.SdkToCategories, categoryName string, sdk string) {
 	categoryToPrecompiledObjects, ok := (*sdkToCategories)[sdk]

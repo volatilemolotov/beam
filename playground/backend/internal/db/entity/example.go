@@ -29,3 +29,7 @@ type ExampleEntity struct {
 	Origin     string         `datastore:"origin"`
 	SchVer     *datastore.Key `datastore:"schVer"`
 }
+
+type PrecompiledObjectEntity struct {
+	Content string `datastore:"content,noindex"`
+}

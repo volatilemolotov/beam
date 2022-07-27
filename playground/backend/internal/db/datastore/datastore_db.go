@@ -32,11 +32,12 @@ import (
 const (
 	Namespace = "Playground"
 
-	SnippetKind = "pg_snippets"
-	SchemaKind  = "pg_schema_versions"
-	SdkKind     = "pg_sdks"
-	FileKind    = "pg_files"
-	ExampleKind = "pg_examples"
+	SnippetKind  = "pg_snippets"
+	SchemaKind   = "pg_schema_versions"
+	SdkKind      = "pg_sdks"
+	FileKind     = "pg_files"
+	ExampleKind  = "pg_examples"
+	PCObjectKind = "pg_pc_objects"
 )
 
 type Datastore struct {
@@ -350,6 +351,128 @@ outsideSnippets:
 	}), nil
 }
 
+func (d *Datastore) GetExample(ctx context.Context, id string, sdks []*entity.SDKEntity) (*pb.PrecompiledObject, error) {
+	exampleKey := getExampleKey(id)
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("error during the transaction creating, err: %s\n", err.Error())
+		return nil, err
+	}
+
+	var example = new(entity.ExampleEntity)
+	if err = tx.Get(exampleKey, example); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting example by identifier, err: %s", err.Error())
+		return nil, err
+	}
+
+	snpKey := getSnippetKey(id)
+	var snippet = new(entity.SnippetEntity)
+	if err = tx.Get(snpKey, snippet); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting snippet by identifier, err: %s", err.Error())
+		return nil, err
+	}
+
+	fileKey := getFileKey(fmt.Sprintf("%s_%d", id, 0))
+	var file = new(entity.FileEntity)
+	if err = tx.Get(fileKey, file); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting file by identifier, err: %s", err.Error())
+		return nil, err
+	}
+
+	sdkToExample := make(map[string]string)
+	for _, sdk := range sdks {
+		sdkToExample[sdk.Name] = sdk.DefaultExample
+	}
+
+	return d.ResponseMapper.ToPrecompiledObj(&dto.ExampleDTO{
+		Example:            example,
+		Snippet:            snippet,
+		Files:              []*entity.FileEntity{file},
+		DefaultExampleName: sdkToExample[example.Sdk.Name],
+	}), err
+}
+
+func (d *Datastore) GetExampleCode(ctx context.Context, id string) (string, error) {
+	fileKey := getFileKey(fmt.Sprintf("%s_%d", id, 0))
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("error during the transaction creating, err: %s\n", err.Error())
+		return "", err
+	}
+	var file = new(entity.FileEntity)
+	if err = tx.Get(fileKey, file); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting file by identifier, err: %s", err.Error())
+		return "", err
+	}
+	return file.Content, nil
+}
+
+func (d *Datastore) GetExampleOutput(ctx context.Context, id string) (string, error) {
+	pcObjKey := getPCObjectKey(fmt.Sprintf("%s_%s", id, "OUTPUT"))
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("error during the transaction creating, err: %s\n", err.Error())
+		return "", err
+	}
+	var pcObj = new(entity.PrecompiledObjectEntity)
+	if err = tx.Get(pcObjKey, pcObj); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting example output by identifier, err: %s", err.Error())
+		return "", err
+	}
+	return pcObj.Content, nil
+}
+
+func (d *Datastore) GetExampleLogs(ctx context.Context, id string) (string, error) {
+	pcObjKey := getPCObjectKey(fmt.Sprintf("%s_%s", id, "LOG"))
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("error during the transaction creating, err: %s\n", err.Error())
+		return "", err
+	}
+	var pcObj = new(entity.PrecompiledObjectEntity)
+	if err = tx.Get(pcObjKey, pcObj); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting example logs by identifier, err: %s", err.Error())
+		return "", err
+	}
+	return pcObj.Content, nil
+}
+
+func (d *Datastore) GetExampleGraph(ctx context.Context, id string) (string, error) {
+	pcObjKey := getPCObjectKey(fmt.Sprintf("%s_%s", id, "GRAPH"))
+	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
+	if err != nil {
+		logger.Errorf("error during the transaction creating, err: %s\n", err.Error())
+		return "", err
+	}
+	var pcObj = new(entity.PrecompiledObjectEntity)
+	if err = tx.Get(pcObjKey, pcObj); err != nil {
+		if rollBackErr := tx.Rollback(); rollBackErr != nil {
+			err = rollBackErr
+		}
+		logger.Errorf("error during getting example graph by identifier, err: %s", err.Error())
+		return "", err
+	}
+	return pcObj.Content, nil
+}
+
 func getExampleKey(id string) *datastore.Key {
 	return getNameKey(ExampleKind, id, Namespace, nil)
 }
@@ -368,6 +491,10 @@ func getSchemaVerKey(id string) *datastore.Key {
 
 func getSnippetKey(id string) *datastore.Key {
 	return getNameKey(SnippetKind, id, Namespace, nil)
+}
+
+func getPCObjectKey(id string) *datastore.Key {
+	return getNameKey(PCObjectKind, id, Namespace, nil)
 }
 
 // GetNameKey returns the datastore key
