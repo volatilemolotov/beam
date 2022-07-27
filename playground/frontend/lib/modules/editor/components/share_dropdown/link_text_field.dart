@@ -47,7 +47,7 @@ class _LinkTextFieldState extends State<LinkTextField> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: ThemeColors.of(context).greyColor,
+        color: ThemeColors.of(context).dropdownButton,
         borderRadius: BorderRadius.circular(kSmBorderRadius),
       ),
       child: Container(
@@ -60,10 +60,7 @@ class _LinkTextFieldState extends State<LinkTextField> {
                 maxHeight: _kTextFieldMaxHeight,
               ),
               border: InputBorder.none,
-              suffixIcon: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: _buildCopyButton(),
-              ),
+              suffixIcon: _buildCopyButton(),
             ),
             readOnly: true,
             style: TextStyle(
@@ -78,22 +75,25 @@ class _LinkTextFieldState extends State<LinkTextField> {
   }
 
   Widget _buildCopyButton() {
-    return GestureDetector(
-      onTap: () {
-        _copyLinkText();
-        setState(() {
-          _isPressed = true;
-        });
-      },
-      child: _isPressed
-          ? const Icon(
-              Icons.check,
-              size: kIconSizeMd,
-            )
-          : const Icon(
-              Icons.file_copy_outlined,
-              size: kIconSizeSm,
-            ),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          _copyLinkText();
+          setState(() {
+            _isPressed = true;
+          });
+        },
+        child: _isPressed
+            ? const Icon(
+                Icons.check,
+                size: kIconSizeMd,
+              )
+            : const Icon(
+                Icons.file_copy_outlined,
+                size: kIconSizeSm,
+              ),
+      ),
     );
   }
 

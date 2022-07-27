@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:playground/components/horizontal_divider.dart';
 import 'package:playground/components/loading_indicator/loading_indicator.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/links.dart';
@@ -89,7 +90,7 @@ class _ExampleSelectorState extends State<ExampleSelector>
     return Container(
       height: kContainerHeight,
       decoration: BoxDecoration(
-        color: ThemeColors.of(context).greyColor,
+        color: ThemeColors.of(context).dropdownButton,
         borderRadius: BorderRadius.circular(kSmBorderRadius),
       ),
       child: Consumer<PlaygroundState>(
@@ -122,7 +123,7 @@ class _ExampleSelectorState extends State<ExampleSelector>
   }
 
   OverlayEntry createExamplesDropdown() {
-    Offset dropdownOffset = findDropdownOffset(selectorKey: selectorKey);
+    Offset dropdownOffset = findDropdownOffset(key: selectorKey);
 
     return OverlayEntry(
       builder: (context) {
@@ -163,13 +164,11 @@ class _ExampleSelectorState extends State<ExampleSelector>
                               borderRadius:
                                   BorderRadius.circular(kMdBorderRadius),
                             ),
-                            child: exampleState.sdkCategories == null ||
-                                    playgroundState.selectedExample == null
-                                ? const LoadingIndicator(
-                                    size: kMdLoadingIndicatorSize,
-                                  )
-                                : _buildDropdownContent(
-                                    context, playgroundState),
+                            child: _buildDropdownContent(
+                              context,
+                              exampleState,
+                              playgroundState,
+                            ),
                           ),
                         ),
                       ),
@@ -186,8 +185,16 @@ class _ExampleSelectorState extends State<ExampleSelector>
 
   Widget _buildDropdownContent(
     BuildContext context,
+    ExampleState exampleState,
     PlaygroundState playgroundState,
   ) {
+    if (exampleState.sdkCategories == null ||
+        playgroundState.selectedExample == null) {
+      return const LoadingIndicator(
+        size: kMdLoadingIndicatorSize,
+      );
+    }
+
     return Column(
       children: [
         SearchField(controller: textController),
@@ -198,12 +205,7 @@ class _ExampleSelectorState extends State<ExampleSelector>
           animationController: animationController,
           dropdown: examplesDropdown,
         ),
-        Divider(
-          height: kDividerHeight,
-          color: ThemeColors.of(context).greyColor,
-          indent: kLgSpacing,
-          endIndent: kLgSpacing,
-        ),
+        const HorizontalDivider(indent: kLgSpacing),
         SizedBox(
           width: double.infinity,
           child: TextButton(
@@ -219,7 +221,7 @@ class _ExampleSelectorState extends State<ExampleSelector>
             ),
             onPressed: () => launchUrl(Uri.parse(kAddExampleLink)),
           ),
-        )
+        ),
       ],
     );
   }

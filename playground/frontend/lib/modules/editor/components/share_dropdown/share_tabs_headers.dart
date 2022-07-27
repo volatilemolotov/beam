@@ -17,7 +17,7 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/share_dropdown/tab_name_widget.dart';
+import 'package:playground/modules/editor/components/share_dropdown/tab_title.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,8 +38,8 @@ class ShareTabsHeaders extends StatelessWidget {
       return TabBar(
         controller: tabController,
         tabs: <Widget>[
-          TabNameWidget(tabName: appLocale.link),
-          TabNameWidget(tabName: appLocale.embed),
+          TabTitle(text: appLocale.link),
+          TabTitle(text: appLocale.embed),
         ],
       );
     });

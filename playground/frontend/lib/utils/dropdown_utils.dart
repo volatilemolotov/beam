@@ -19,30 +19,30 @@
 import 'package:flutter/material.dart';
 import 'package:playground/components/dropdown_button/dropdown_button.dart';
 
-const double kAdditionalDyAlignment = 10.0;
+const _bottomToDropdown = 10.0;
 
+/// Returns the screen offset at which to show the dropdown.
+///
+/// [key] points to the button that triggers the dropdown.
+/// [widgetWidth] is important when aligning to the right.
 Offset findDropdownOffset({
-  required GlobalKey selectorKey,
+  required GlobalKey key,
   DropdownAlignment alignment = DropdownAlignment.left,
   double widgetWidth = 0,
 }) {
-  RenderBox? rBox =
-      selectorKey.currentContext?.findRenderObject() as RenderBox?;
+  final box = key.currentContext?.findRenderObject() as RenderBox?;
+
+  if (box == null) {
+    throw Exception('Cannot find render object for $key');
+  }
+
+  final buttonOffset = box.localToGlobal(Offset.zero);
+  final top = buttonOffset.dy + box.size.height + _bottomToDropdown;
 
   switch (alignment) {
     case DropdownAlignment.left:
-      return Offset(
-        rBox!.localToGlobal(Offset.zero).dx,
-        rBox.localToGlobal(Offset.zero).dy +
-            rBox.size.height +
-            kAdditionalDyAlignment,
-      );
+      return Offset(buttonOffset.dx, top);
     case DropdownAlignment.right:
-      return Offset(
-        rBox!.localToGlobal(Offset.zero).dx - (widgetWidth - rBox.size.width),
-        rBox.localToGlobal(Offset.zero).dy +
-            rBox.size.height +
-            kAdditionalDyAlignment,
-      );
+      return Offset(buttonOffset.dx + box.size.width - widgetWidth, top);
   }
 }

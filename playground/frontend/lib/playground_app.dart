@@ -34,38 +34,38 @@ class PlaygroundApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ThemeProvider()..init(),
-      builder: (context, _) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
-        return CodeTheme(
-          data: themeProvider.isDarkMode ? kDarkCodeTheme : kLightCodeTheme,
-          child: ChangeNotifierProvider<LocaleProvider>(
-            create: (context) => LocaleProvider(),
-            builder: (context, state) {
-              final localeProvider = Provider.of<LocaleProvider>(context);
-              return PlaygroundPageProviders(
-                child: MaterialApp(
-                  title: 'Apache Beam Playground',
-                  themeMode: themeProvider.themeMode,
-                  theme: kLightTheme,
-                  darkTheme: kDarkTheme,
-                  onGenerateRoute: Routes.generateRoute,
-                  home: const PlaygroundPage(),
-                  debugShowCheckedModeBanner: false,
-                  locale: localeProvider.locale,
-                  supportedLocales: L10n.locales,
-                  localizationsDelegates: const [
-                    AppLocalizations.delegate,
-                    GlobalMaterialLocalizations.delegate,
-                    GlobalWidgetsLocalizations.delegate,
-                  ],
-                ),
-              );
-            },
-          ),
-        );
-      },
+    return ThemeSwitchNotifierProvider(
+      child: Consumer<ThemeSwitchNotifier>(
+        builder: (context, themeSwitchNotifier, _) {
+          return CodeTheme(
+            data: themeSwitchNotifier.codeTheme,
+            child: ChangeNotifierProvider<LocaleProvider>(
+              create: (context) => LocaleProvider(),
+              builder: (context, state) {
+                final localeProvider = Provider.of<LocaleProvider>(context);
+                return PlaygroundPageProviders(
+                  child: MaterialApp(
+                    title: 'Apache Beam Playground',
+                    themeMode: themeSwitchNotifier.themeMode,
+                    theme: kLightTheme,
+                    darkTheme: kDarkTheme,
+                    onGenerateRoute: Routes.generateRoute,
+                    home: const PlaygroundPage(),
+                    debugShowCheckedModeBanner: false,
+                    locale: localeProvider.locale,
+                    supportedLocales: L10n.locales,
+                    localizationsDelegates: const [
+                      AppLocalizations.delegate,
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }

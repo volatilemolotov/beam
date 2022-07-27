@@ -23,6 +23,7 @@ import 'package:playground/constants/fonts.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:playground/modules/analytics/analytics_service.dart';
 
+import '../../../../components/horizontal_divider.dart';
 import 'feedback_dropdown_icon_button.dart';
 
 const double kTextFieldWidth = 365.0;
@@ -124,7 +125,7 @@ class FeedbackDropdownContent extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: kDividerHeight),
+          const HorizontalDivider(),
           Padding(
             padding: const EdgeInsets.only(
               top: kXlSpacing,

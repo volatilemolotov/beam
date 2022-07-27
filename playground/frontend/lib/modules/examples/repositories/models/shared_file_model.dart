@@ -23,7 +23,7 @@ class SharedFile {
 
   const SharedFile({
     required this.code,
+    required this.isMain,
     this.name = '',
-    this.isMain = false,
   });
 }

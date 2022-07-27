@@ -19,10 +19,10 @@
 import 'package:flutter/material.dart';
 import 'package:playground/constants/sizes.dart';
 
-class TabNameWidget extends StatelessWidget {
-  final String tabName;
+class TabTitle extends StatelessWidget {
+  final String text;
 
-  const TabNameWidget({Key? key, required this.tabName}) : super(key: key);
+  const TabTitle({Key? key, required this.text}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class TabNameWidget extends StatelessWidget {
       direction: Axis.horizontal,
       alignment: WrapAlignment.center,
       spacing: kMdSpacing,
-      children: [Text(tabName)],
+      children: [Text(text)],
     );
   }
 }

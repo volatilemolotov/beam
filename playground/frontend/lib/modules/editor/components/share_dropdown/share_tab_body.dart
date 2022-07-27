@@ -1,5 +1,3 @@
-// ignore_for_file: leading_newlines_in_multiline_strings
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -37,7 +35,6 @@ class ShareTabBody extends StatelessWidget {
     return Consumer2<ExampleState, PlaygroundState>(
       builder: (context, exampleState, playgroundState, child) => Padding(
         padding: const EdgeInsets.symmetric(
-          // vertical: kXlSpacing,
           horizontal: kXlSpacing,
         ),
         child: Center(

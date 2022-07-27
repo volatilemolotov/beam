@@ -27,12 +27,12 @@ import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:playground/utils/share_code_utils.dart';
 
-class SnippetTabs extends StatelessWidget {
+class SnippetShareTabs extends StatelessWidget {
   final ExampleState exampleState;
   final PlaygroundState playgroundState;
   final TabController tabController;
 
-  const SnippetTabs({
+  const SnippetShareTabs({
     super.key,
     required this.exampleState,
     required this.playgroundState,
@@ -52,34 +52,35 @@ class SnippetTabs extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const LoadingIndicator(size: kLgLoadingIndicatorSize);
-        } else {
-          return TabBarView(
-            controller: tabController,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              ShareTabBody(
-                children: [
-                  Text(appLocale.linkReady),
-                  LinkTextField(
-                    text: ShareCodeUtils.snippetIdToPlaygroundUrl(
-                      snippetId: snapshot.data.toString(),
-                    ),
-                  ),
-                ],
-              ),
-              ShareTabBody(
-                children: [
-                  Text(appLocale.iframeCodeReady),
-                  LinkTextField(
-                    text: ShareCodeUtils.snippetIdToIframeCode(
-                      snippetId: snapshot.data.toString(),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
         }
+
+        return TabBarView(
+          controller: tabController,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            ShareTabBody(
+              children: [
+                Text(appLocale.linkReady),
+                LinkTextField(
+                  text: ShareCodeUtils.snippetIdToPlaygroundUrl(
+                    snippetId: snapshot.data.toString(),
+                    view: PlaygroundView.standalone,
+                  ).toString(),
+                ),
+              ],
+            ),
+            ShareTabBody(
+              children: [
+                Text(appLocale.iframeCodeReady),
+                LinkTextField(
+                  text: ShareCodeUtils.snippetIdToIframeCode(
+                    snippetId: snapshot.data.toString(),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        );
       },
     );
   }

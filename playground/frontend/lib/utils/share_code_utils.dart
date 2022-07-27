@@ -1,5 +1,3 @@
-// ignore_for_file: leading_newlines_in_multiline_strings
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,40 +16,137 @@
  * limitations under the License.
  */
 
+import 'dart:convert';
+
 import 'package:playground/constants/params.dart';
 
-class ShareCodeUtils {
-  static String currentBaseUrl = Uri.base.toString().split('?')[0];
+enum PlaygroundView {
+  standalone,
+  embedded,
+  ;
 
-  static String snippetIdToPlaygroundUrl({required String snippetId}) {
-    return '$currentBaseUrl?$kSnippetIdParam=$snippetId';
+  String get path {
+    switch (this) {
+      case PlaygroundView.standalone:
+        return '/';
+      case PlaygroundView.embedded:
+        return '/embedded';
+    }
+  }
+}
+
+extension CopyWith on Uri {
+  Uri copyWith({
+    String? path,
+    Map<String, dynamic>? queryParameters,
+  }) {
+    return Uri(
+      scheme: scheme,
+      userInfo: userInfo,
+      host: host,
+      port: port,
+      path: path ?? this.path,
+      queryParameters: queryParameters ?? this.queryParameters,
+    );
+  }
+}
+
+class ShareCodeUtils {
+  static const _width = '90%';
+  static const _height = '600px';
+
+  static Uri snippetIdToPlaygroundUrl({
+    required String snippetId,
+    required PlaygroundView view,
+  }) {
+    return Uri.base.copyWith(
+      path: view.path,
+      queryParameters: _getSnippetQueryParameters(
+        snippetId: snippetId,
+        view: view,
+      ),
+    );
   }
 
-  static String examplePathToPlaygroundUrl({required String examplePath}) {
-    return '$currentBaseUrl?$kExampleParam=$examplePath';
+  static Map<String, dynamic> _getSnippetQueryParameters({
+    required String snippetId,
+    required PlaygroundView view,
+  }) {
+    switch (view) {
+      case PlaygroundView.standalone:
+        return {
+          kSnippetIdParam: snippetId,
+        };
+      case PlaygroundView.embedded:
+        return {
+          kIsEditableParam: '1',
+          kSnippetIdParam: snippetId,
+        };
+    }
+  }
+
+  static Uri examplePathToPlaygroundUrl({
+    required String examplePath,
+    required PlaygroundView view,
+  }) {
+    return Uri.base.copyWith(
+      path: view.path,
+      queryParameters: _getExampleQueryParameters(
+        examplePath: examplePath,
+        view: view,
+      ),
+    );
+  }
+
+  static Map<String, dynamic> _getExampleQueryParameters({
+    required String examplePath,
+    required PlaygroundView view,
+  }) {
+    switch (view) {
+      case PlaygroundView.standalone:
+        return {
+          kExampleParam: examplePath,
+        };
+      case PlaygroundView.embedded:
+        return {
+          kIsEditableParam: '1',
+          kExampleParam: examplePath,
+        };
+    }
   }
 
   static String snippetIdToIframeCode({
     required String snippetId,
-    String widthInPercents = '90%',
-    String heightInPixels = '600px',
   }) {
-    return '''<iframe src="${currentBaseUrl}embedded?editable=1&$kSnippetIdParam=$snippetId"
-          width="$widthInPercents"
-          height=$heightInPixels
-          allow="clipboard-write">
-          </iframe>''';
+    return _iframe(
+      src: snippetIdToPlaygroundUrl(
+        snippetId: snippetId,
+        view: PlaygroundView.embedded,
+      ),
+    );
   }
 
   static String examplePathToIframeCode({
     required String examplePath,
-    String widthInPercents = '90%',
-    String heightInPixels = '600px',
   }) {
-    return '''<iframe src="${currentBaseUrl}embedded?editable=1&$kExampleParam=$examplePath"
-          width="$widthInPercents"
-          height=$heightInPixels
-          allow="clipboard-write">
-          </iframe>''';
+    return _iframe(
+      src: examplePathToPlaygroundUrl(
+        examplePath: examplePath,
+        view: PlaygroundView.embedded,
+      ),
+    );
   }
+
+  static String _iframe({
+    required Uri src,
+  }) {
+    return '<iframe'
+        ' src="${Uri.encodeComponent(src.toString())}"'
+        ' width="${_htmlEscape(_width)}"'
+        ' height="${_htmlEscape(_height)}"'
+        ' allow="clipboard-write" '
+        '></iframe>';
+  }
+
+  static String _htmlEscape(String text) => const HtmlEscape().convert(text);
 }

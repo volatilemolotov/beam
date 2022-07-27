@@ -166,7 +166,9 @@ class GrpcExampleClient implements ExampleClient {
       () => _defaultClient
           .saveSnippet(_saveSnippetRequestToGrpcRequest(request))
           .then(
-            (response) => SaveSnippetResponse(id: response.id),
+            (response) => SaveSnippetResponse(
+              id: response.id,
+            ),
           ),
     );
   }

@@ -23,11 +23,11 @@ import 'package:playground/modules/editor/components/share_dropdown/share_tab_bo
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:playground/utils/share_code_utils.dart';
 
-class ExampleTabs extends StatelessWidget {
+class ExampleShareTabs extends StatelessWidget {
   final PlaygroundState playgroundState;
   final TabController tabController;
 
-  const ExampleTabs({
+  const ExampleShareTabs({
     super.key,
     required this.playgroundState,
     required this.tabController,
@@ -47,7 +47,8 @@ class ExampleTabs extends StatelessWidget {
             LinkTextField(
               text: ShareCodeUtils.examplePathToPlaygroundUrl(
                 examplePath: playgroundState.selectedExample!.path,
-              ),
+                view: PlaygroundView.standalone,
+              ).toString(),
             ),
           ],
         ),

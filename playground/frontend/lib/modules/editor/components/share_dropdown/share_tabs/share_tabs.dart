@@ -17,8 +17,8 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/modules/editor/components/share_dropdown/share_tabs/example_tabs.dart';
-import 'package:playground/modules/editor/components/share_dropdown/share_tabs/snippet_tabs.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs/example_share_tabs.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs/snippet_share_tabs.dart';
 import 'package:playground/pages/playground/states/examples_state.dart';
 import 'package:playground/pages/playground/states/playground_state.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +26,10 @@ import 'package:provider/provider.dart';
 class ShareTabs extends StatelessWidget {
   final TabController tabController;
 
-  const ShareTabs({super.key, required this.tabController});
+  const ShareTabs({
+    super.key,
+    required this.tabController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,18 +37,18 @@ class ShareTabs extends StatelessWidget {
       color: Theme.of(context).backgroundColor,
       child: Consumer2<PlaygroundState, ExampleState>(
         builder: (context, playgroundState, exampleState, _) {
-          if (playgroundState.isExampleChanged) {
-            return SnippetTabs(
-              exampleState: exampleState,
-              playgroundState: playgroundState,
-              tabController: tabController,
-            );
-          } else {
-            return ExampleTabs(
+          if (!playgroundState.isExampleChanged) {
+            return ExampleShareTabs(
               playgroundState: playgroundState,
               tabController: tabController,
             );
           }
+
+          return SnippetShareTabs(
+            exampleState: exampleState,
+            playgroundState: playgroundState,
+            tabController: tabController,
+          );
         },
       ),
     );

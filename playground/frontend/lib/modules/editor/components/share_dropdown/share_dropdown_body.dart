@@ -32,27 +32,12 @@ class ShareDropdownBody extends StatefulWidget {
 
 class _ShareDropdownBodyState extends State<ShareDropdownBody>
     with SingleTickerProviderStateMixin {
-  late final TabController tabController;
-  int selectedTab = 0;
-
-  @override
-  void initState() {
-    tabController = TabController(vsync: this, length: _kTabsCount);
-    tabController.addListener(_onTabChange);
-    super.initState();
-  }
+  late final tabController = TabController(vsync: this, length: _kTabsCount);
 
   @override
   void dispose() {
-    tabController.removeListener(_onTabChange);
     tabController.dispose();
     super.dispose();
-  }
-
-  void _onTabChange() {
-    setState(() {
-      selectedTab = tabController.index;
-    });
   }
 
   @override
