@@ -15,17 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.sdk.io.sparkreceiver;
 
-/**
- * Interface for any Spark {@link org.apache.spark.streaming.receiver.Receiver} that supports
- * reading from and to some offset.
- */
-public interface HasOffset {
+/** Benchmarks for core SDK utility classes. */
+@DefaultAnnotation(NonNull.class)
+package org.apache.beam.sdk.jmh.util;
 
-  /** @param offset inclusive start offset from which the reading should be started. */
-  void setStartOffset(Long offset);
-
-  /** @return exclusive end offset to which the reading from current page will occur. */
-  Long getEndOffset();
-}
+import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
+import org.checkerframework.checker.nullness.qual.NonNull;
