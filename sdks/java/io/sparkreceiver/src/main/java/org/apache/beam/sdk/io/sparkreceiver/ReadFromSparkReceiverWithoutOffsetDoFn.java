@@ -47,6 +47,7 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
   private final SerializableFunction<Instant, WatermarkEstimator<Instant>>
       createWatermarkEstimatorFn;
   private final SerializableFunction<V, Long> getOffsetFn;
+  private final SerializableFunction<V, Instant> getWatermarkFn;
   private final SparkConsumer<V> sparkConsumer;
 
   public ReadFromSparkReceiverWithoutOffsetDoFn(SparkReceiverIO.Read<V> transform) {
@@ -58,6 +59,10 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
     SerializableFunction<V, Long> getOffsetFn = transform.getGetOffsetFn();
     checkStateNotNull(getOffsetFn, "Get offset fn can't be null!");
     this.getOffsetFn = getOffsetFn;
+
+    SerializableFunction<V, Instant> getWatermarkFn = transform.getWatermarkFn();
+    checkStateNotNull(getWatermarkFn, "Watermark fn can't be null!");
+    this.getWatermarkFn = getWatermarkFn;
 
     SparkConsumer<V> sparkConsumer = transform.getSparkConsumer();
     checkStateNotNull(sparkConsumer, "Spark Consumer can't be null!");
@@ -127,7 +132,7 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
           LOG.debug("Stop for restriction: {}", tracker.currentRestriction().toString());
           return ProcessContinuation.stop();
         }
-        Instant currentTimeStamp = Instant.now();
+        Instant currentTimeStamp = getWatermarkFn.apply(record);
         ((ManualWatermarkEstimator<Instant>) watermarkEstimator).setWatermark(currentTimeStamp);
         receiver.outputWithTimestamp(record, currentTimeStamp);
       }
