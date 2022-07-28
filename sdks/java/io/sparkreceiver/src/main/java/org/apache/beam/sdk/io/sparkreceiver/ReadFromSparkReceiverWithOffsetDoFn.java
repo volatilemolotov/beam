@@ -183,7 +183,7 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
         Long offset = getOffsetFn.apply(record);
         if (!tracker.tryClaim(offset)) {
           sparkConsumer.stop();
-          LOG.debug("Stop for restriction: {}", tracker.currentRestriction().toString());
+          LOG.info("Stop for restriction: {}", tracker.currentRestriction().toString());
           return ProcessContinuation.stop();
         }
         Instant currentTimeStamp = Instant.now();
@@ -192,17 +192,17 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       }
     }
     sparkConsumer.stop();
-    LOG.debug("Resume for restriction: {}", tracker.currentRestriction().toString());
+    LOG.info("Resume for restriction: {}", tracker.currentRestriction().toString());
     return ProcessContinuation.resume();
   }
 
   private static Instant ensureTimestampWithinBounds(Instant timestamp) {
     if (timestamp.isBefore(BoundedWindow.TIMESTAMP_MIN_VALUE)) {
       timestamp = BoundedWindow.TIMESTAMP_MIN_VALUE;
-      LOG.debug("Timestamp was before MIN_VALUE({})", BoundedWindow.TIMESTAMP_MIN_VALUE);
+      LOG.info("Timestamp was before MIN_VALUE({})", BoundedWindow.TIMESTAMP_MIN_VALUE);
     } else if (timestamp.isAfter(BoundedWindow.TIMESTAMP_MAX_VALUE)) {
       timestamp = BoundedWindow.TIMESTAMP_MAX_VALUE;
-      LOG.debug("Timestamp was after MAX_VALUE({})", BoundedWindow.TIMESTAMP_MAX_VALUE);
+      LOG.info("Timestamp was after MAX_VALUE({})", BoundedWindow.TIMESTAMP_MAX_VALUE);
     }
     return timestamp;
   }
