@@ -119,6 +119,7 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
       WatermarkEstimator<Instant> watermarkEstimator,
       OutputReceiver<V> receiver) {
 
+    System.out.println("Process element");
     while (sparkConsumer.hasRecords()) {
       V record = sparkConsumer.poll();
       if (record != null) {

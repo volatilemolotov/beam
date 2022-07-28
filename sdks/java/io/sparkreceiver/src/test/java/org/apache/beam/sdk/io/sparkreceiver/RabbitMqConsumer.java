@@ -23,24 +23,25 @@ public class RabbitMqConsumer<V> implements SparkConsumer<V> {
 
   @Override
   public boolean hasRecords() {
-    LOG.info("Checking if queue has records = " + !queue.isEmpty());
+    System.out.println("Checking if queue has records = " + !queue.isEmpty());
     return !queue.isEmpty();
   }
 
   @Override
   public @Nullable V poll() {
+    System.out.println("Polling element from queue");
     final V v = (V) queue.poll();
-    LOG.info("Polling element from queue " + (v != null ? v.toString() : ""));
+    System.out.println("Polling element from queue " + (v != null ? v.toString() : ""));
     return v;
   }
 
   @Override
   public void start(Receiver<V> sparkReceiver) {
     try {
-      LOG.info("Starting consumer");
+      System.out.println("Starting consumer");
       this.sparkReceiver = sparkReceiver;
       new WrappedSupervisor(sparkReceiver, new SparkConf(), objects -> {
-        LOG.info("Moving message from receiver to consumer " + objects[0]);
+        System.out.println("Moving message from receiver to consumer " + objects[0]);
         queue.offer(objects[0]);
         return null;
       });
@@ -52,6 +53,7 @@ public class RabbitMqConsumer<V> implements SparkConsumer<V> {
 
   @Override
   public void stop() {
+    System.out.println("Stopping consumer");
     queue.clear();
     sparkReceiver.stop("Stopped");
   }

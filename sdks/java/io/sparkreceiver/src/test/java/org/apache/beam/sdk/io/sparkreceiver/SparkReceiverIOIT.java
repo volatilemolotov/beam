@@ -215,11 +215,11 @@ public class SparkReceiverIOIT {
     final ReceiverBuilder<String, RabbitMqReceiverWithoutOffset> receiverBuilder =
         new ReceiverBuilder<>(RabbitMqReceiverWithoutOffset.class).withConstructorArgs(
             options.getRabbitMqBootstrapServerAddress(),
-            maxNumRecords);
-//        new ReceiverBuilder<>(RabbitMqReceiverWithoutOffset.class).withConstructorArgs();
+            maxNumRecords,
+            options.getTopic());
 
     return SparkReceiverIO.<String>read()
-            .withSparkConsumer(new CustomSparkConsumer<>())
+            .withSparkConsumer(new RabbitMqConsumer<>())
             .withValueClass(String.class)
             .withGetOffsetFn(Long::valueOf)
             .withSparkReceiverBuilder(receiverBuilder);

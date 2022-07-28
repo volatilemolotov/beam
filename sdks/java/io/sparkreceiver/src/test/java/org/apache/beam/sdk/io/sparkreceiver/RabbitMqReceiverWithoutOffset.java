@@ -55,9 +55,11 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
   private Channel channel;
 
   private static final int TIMEOUT_MS = 500;
+  private static final List<String> STORED_RECORDS = new ArrayList<>();
   private static int MAX_NUM_RECORDS;
+  private static String QUEUE_NAME;
 
-  RabbitMqReceiverWithoutOffset(final String uri, final Integer maxNumRecords) throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
+  RabbitMqReceiverWithoutOffset(final String uri, final Integer maxNumRecords, final String queueName) throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
     super(StorageLevel.MEMORY_AND_DISK_2());
     connectionFactory = new ConnectionFactory();
     connectionFactory.setUri(uri);
@@ -69,18 +71,19 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
     connectionFactory.setRequestedChannelMax(0);
     connectionFactory.setRequestedFrameMax(0);
     MAX_NUM_RECORDS = maxNumRecords;
+    QUEUE_NAME = queueName;
   }
 
   @Override
   @SuppressWarnings("FutureReturnValueIgnored")
   public void onStart() {
     try {
-      LOG.info("Starting receiver");
+      System.out.println("Starting receiver");
       connection = connectionFactory.newConnection();
       channel = connection.createChannel();
-      channel.queueDeclare("TEST", false, false, false, null);
+      channel.queueDeclare(QUEUE_NAME, false, false, false, null);
       testConsumer = new TestConsumer(channel);
-      channel.basicConsume("TEST", true, testConsumer);
+      channel.basicConsume(QUEUE_NAME, true, testConsumer);
     } catch (TimeoutException | IOException e) {
       throw new RuntimeException(e);
     }
@@ -91,7 +94,7 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
   @Override
   public void onStop() {
     try {
-      LOG.info("Stopping receiver");
+      System.out.println("Stopping receiver");
       if (channel != null) {
         channel.close();
       }
@@ -104,9 +107,21 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
   }
 
   private void receive() {
+    int currentOffset = 0;
     while (!isStopped() && testConsumer.getReceived().size() < MAX_NUM_RECORDS) {
+      if (currentOffset < MAX_NUM_RECORDS && testConsumer.getReceived().size() > currentOffset) {
+        try {
+          final String message = testConsumer.getReceived().get(currentOffset);
+          System.out.println("Adding message to receiver's queue = " + message);
+          STORED_RECORDS.add(message);
+          store(message);
+          currentOffset++;
+        } catch (Exception e) {
+          System.out.println("Exception " + e.getMessage());
+        }
+      }
       try {
-        LOG.info("Receiving");
+        System.out.println("No messages in TestConsumer. Receiver is waiting");
         TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
       } catch (InterruptedException e) {
         LOG.error("Interrupted", e);
@@ -128,7 +143,7 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
     public void handleDelivery(
         String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
         throws IOException {
-      LOG.info("adding message to queue " + new String(body, StandardCharsets.UTF_8));
+      System.out.println("adding message to queue " + new String(body, StandardCharsets.UTF_8));
       received.add(new String(body, StandardCharsets.UTF_8));
     }
 
