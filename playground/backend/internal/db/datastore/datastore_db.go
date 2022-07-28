@@ -209,7 +209,7 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEnti
 	defer rollback(tx)
 
 	//Retrieving examples
-	exampleQuery := datastore.NewQuery(constants.ExampleKind).Namespace(constants.Namespace).Transaction(tx)
+	exampleQuery := datastore.NewQuery(constants.ExampleKind).Namespace(constants.Namespace)
 	var examples []*entity.ExampleEntity
 	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, &examples)
 	if err != nil {

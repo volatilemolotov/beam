@@ -16,15 +16,17 @@
 package local
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/cache"
 	"context"
 	"fmt"
-	"github.com/google/uuid"
-	"go.uber.org/goleak"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"go.uber.org/goleak"
+
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/cache"
 )
 
 func samePipelineIdSlices(x, y []uuid.UUID) bool {
@@ -451,7 +453,8 @@ func TestCache_GetCatalog(t *testing.T) {
 }
 
 func TestLocalCache_startGC(t *testing.T) {
-	defer goleak.VerifyNone(t)
+	ignoreOpenCensus := goleak.IgnoreTopFunction("go.opencensus.io/stats/view.(*worker).start")
+	defer goleak.VerifyNone(t, ignoreOpenCensus)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

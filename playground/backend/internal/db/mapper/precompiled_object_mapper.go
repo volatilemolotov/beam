@@ -33,7 +33,7 @@ func NewPrecompiledObjectMapper() *PrecompiledObjectMapper {
 func (pom *PrecompiledObjectMapper) ToObjectInfo(exampleDTO *dto.ExampleDTO) *dto.ObjectInfo {
 	return &dto.ObjectInfo{
 		Name:            exampleDTO.Example.Name,
-		CloudPath:       fmt.Sprintf("%s/%s/%s", exampleDTO.Example.Sdk.Name, exampleDTO.Example.Type, exampleDTO.Example.Name),
+		CloudPath:       getCloudPath(exampleDTO.Example),
 		Description:     exampleDTO.Example.Descr,
 		Type:            exampleDTO.GetType(),
 		Categories:      exampleDTO.Example.Cats,
@@ -79,7 +79,7 @@ func (pom *PrecompiledObjectMapper) ToDefaultPrecompiledObjects(defaultExamplesD
 	result := make(map[pb.Sdk]*pb.PrecompiledObject)
 	for exampleIndx, example := range defaultExamplesDTO.Examples {
 		result[pb.Sdk(pb.Sdk_value[example.Sdk.Name])] = &pb.PrecompiledObject{
-			CloudPath:       fmt.Sprintf("%s/%s/%s", example.Sdk.Name, example.Type, example.Name),
+			CloudPath:       getCloudPath(example),
 			Name:            example.Name,
 			Description:     example.Descr,
 			Type:            pb.PrecompiledObjectType(pb.PrecompiledObjectType_value[example.Type]),
@@ -95,7 +95,7 @@ func (pom *PrecompiledObjectMapper) ToDefaultPrecompiledObjects(defaultExamplesD
 
 func (pom *PrecompiledObjectMapper) ToPrecompiledObj(exampleDTO *dto.ExampleDTO) *pb.PrecompiledObject {
 	return &pb.PrecompiledObject{
-		CloudPath:       fmt.Sprintf("%s/%s/%s", exampleDTO.Example.Sdk.Name, exampleDTO.Example.Type, exampleDTO.Example.Name),
+		CloudPath:       getCloudPath(exampleDTO.Example),
 		Name:            exampleDTO.Example.Name,
 		Description:     exampleDTO.Example.Descr,
 		Type:            exampleDTO.GetType(),
@@ -142,4 +142,9 @@ func putPrecompiledObjectsToCategory(categoryName string, precompiledObjects *dt
 		})
 	}
 	sdkCategory.Categories = append(sdkCategory.Categories, &category)
+}
+
+// getCloudPath returns the cloud path by example entity
+func getCloudPath(example *entity.ExampleEntity) string {
+	return fmt.Sprintf("%s/%s/%s", example.Sdk.Name, example.Type, example.Name)
 }
