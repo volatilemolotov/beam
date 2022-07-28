@@ -344,6 +344,10 @@ func (d *Datastore) GetExample(ctx context.Context, id string, sdks []*entity.SD
 	exampleKey := utils.GetExampleKey(id)
 	var example = new(entity.ExampleEntity)
 	if err = tx.Get(exampleKey, example); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			logger.Warnf("error during getting example by identifier, err: %s", err.Error())
+			return nil, err
+		}
 		logger.Errorf("error during getting example by identifier, err: %s", err.Error())
 		return nil, err
 	}
@@ -386,7 +390,11 @@ func (d *Datastore) GetExampleCode(ctx context.Context, id string) (string, erro
 	fileKey := utils.GetFileKey(fmt.Sprintf("%s%s%d", id, constants.IDDelimiter, 0))
 	var file = new(entity.FileEntity)
 	if err = tx.Get(fileKey, file); err != nil {
-		logger.Errorf("error during getting file by identifier, err: %s", err.Error())
+		if err == datastore.ErrNoSuchEntity {
+			logger.Warnf("error during getting example code by identifier, err: %s", err.Error())
+			return "", err
+		}
+		logger.Errorf("error during getting example code by identifier, err: %s", err.Error())
 		return "", err
 	}
 	return file.Content, nil
@@ -403,6 +411,10 @@ func (d *Datastore) GetExampleOutput(ctx context.Context, id string) (string, er
 	pcObjKey := utils.GetPCObjectKey(fmt.Sprintf("%s%s%s", id, constants.IDDelimiter, constants.PCOutputType))
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			logger.Warnf("error during getting example output by identifier, err: %s", err.Error())
+			return "", err
+		}
 		logger.Errorf("error during getting example output by identifier, err: %s", err.Error())
 		return "", err
 	}
@@ -420,6 +432,10 @@ func (d *Datastore) GetExampleLogs(ctx context.Context, id string) (string, erro
 	pcObjKey := utils.GetPCObjectKey(fmt.Sprintf("%s%s%s", id, constants.IDDelimiter, constants.PCLogType))
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			logger.Warnf("error during getting example logs by identifier, err: %s", err.Error())
+			return "", err
+		}
 		logger.Errorf("error during getting example logs by identifier, err: %s", err.Error())
 		return "", err
 	}
@@ -437,6 +453,10 @@ func (d *Datastore) GetExampleGraph(ctx context.Context, id string) (string, err
 	pcObjKey := utils.GetPCObjectKey(fmt.Sprintf("%s%s%s", id, constants.IDDelimiter, constants.PCGraphType))
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
+		if err == datastore.ErrNoSuchEntity {
+			logger.Warnf("error during getting example graph by identifier, err: %s", err.Error())
+			return "", err
+		}
 		logger.Errorf("error during getting example graph by identifier, err: %s", err.Error())
 		return "", err
 	}

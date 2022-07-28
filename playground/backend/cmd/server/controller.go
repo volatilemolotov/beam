@@ -17,6 +17,7 @@ package main
 import (
 	"context"
 
+	"cloud.google.com/go/datastore"
 	"github.com/google/uuid"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -35,11 +36,15 @@ import (
 const (
 	errorTitleGetSnippet       = "Error during getting snippet"
 	errorTitleSaveSnippet      = "Error during saving snippet"
+	errorTitleGetCatalog       = "Error during getting catalog"
 	errorTitleGetExample       = "Error during getting example"
 	errorTitleGetExampleCode   = "Error during getting example code"
 	errorTitleGetExampleOutput = "Error during getting example output"
 	errorTitleGetExampleLogs   = "Error during getting example logs"
 	errorTitleGetExampleGraph  = "Error during getting example graph"
+
+	userBadCloudPathErrMsg    = "Invalid cloud path parameter"
+	userCloudConnectionErrMsg = "Cloud connection error"
 )
 
 // playgroundController processes `gRPC' requests from clients.
@@ -281,8 +286,7 @@ func (controller *playgroundController) Cancel(ctx context.Context, info *pb.Can
 func (controller *playgroundController) GetPrecompiledObjects(ctx context.Context, info *pb.GetPrecompiledObjectsRequest) (*pb.GetPrecompiledObjectsResponse, error) {
 	catalog, err := controller.cacheComponent.GetCatalogFromCacheOrDatastore(ctx)
 	if err != nil {
-		logger.Errorf("GetPrecompiledObjects(): error during getting catalog: %s", err.Error())
-		return nil, errors.InternalError("Error during getting Precompiled Objects", "Error with cloud connection")
+		return nil, errors.InternalError(errorTitleGetCatalog, userCloudConnectionErrMsg)
 	}
 	return &pb.GetPrecompiledObjectsResponse{
 		SdkCategories: utils.FilterCatalog(catalog, info.Sdk, info.Category),
@@ -293,7 +297,7 @@ func (controller *playgroundController) GetPrecompiledObjects(ctx context.Contex
 func (controller *playgroundController) GetPrecompiledObject(ctx context.Context, info *pb.GetPrecompiledObjectRequest) (*pb.GetPrecompiledObjectResponse, error) {
 	exampleId, err := utils.GetExampleID(info.GetCloudPath())
 	if err != nil {
-		return nil, errors.InvalidArgumentError(errorTitleGetExample, err.Error())
+		return nil, errors.InvalidArgumentError(errorTitleGetExample, userBadCloudPathErrMsg)
 	}
 	sdks, err := controller.cacheComponent.GetSdkCatalogFromCacheOrDatastore(ctx)
 	if err != nil {
@@ -301,23 +305,30 @@ func (controller *playgroundController) GetPrecompiledObject(ctx context.Context
 	}
 	precompiledObject, err := controller.db.GetExample(ctx, exampleId, sdks)
 	if err != nil {
-		return nil, errors.InternalError("Error during getting Precompiled Object", "Error with cloud connection")
+		switch err {
+		case datastore.ErrNoSuchEntity:
+			return nil, errors.NotFoundError(errorTitleGetExample, userCloudConnectionErrMsg)
+		default:
+			return nil, errors.InternalError(errorTitleGetExample, userCloudConnectionErrMsg)
+		}
 	}
-	return &pb.GetPrecompiledObjectResponse{
-		PrecompiledObject: precompiledObject,
-	}, nil
+	return &pb.GetPrecompiledObjectResponse{PrecompiledObject: precompiledObject}, nil
 }
 
 // GetPrecompiledObjectCode returns the code of the specific example
 func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Context, info *pb.GetPrecompiledObjectCodeRequest) (*pb.GetPrecompiledObjectCodeResponse, error) {
 	exampleId, err := utils.GetExampleID(info.GetCloudPath())
 	if err != nil {
-		return nil, errors.InvalidArgumentError(errorTitleGetExampleCode, err.Error())
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleCode, userBadCloudPathErrMsg)
 	}
 	codeString, err := controller.db.GetExampleCode(ctx, exampleId)
 	if err != nil {
-		logger.Errorf("GetPrecompiledObjectCode(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("Error during getting Precompiled Object's code", "Error with cloud connection")
+		switch err {
+		case datastore.ErrNoSuchEntity:
+			return nil, errors.NotFoundError(errorTitleGetExampleCode, userCloudConnectionErrMsg)
+		default:
+			return nil, errors.InternalError(errorTitleGetExampleCode, userCloudConnectionErrMsg)
+		}
 	}
 	response := pb.GetPrecompiledObjectCodeResponse{Code: codeString}
 	return &response, nil
@@ -327,12 +338,16 @@ func (controller *playgroundController) GetPrecompiledObjectCode(ctx context.Con
 func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.Context, info *pb.GetPrecompiledObjectOutputRequest) (*pb.GetPrecompiledObjectOutputResponse, error) {
 	exampleId, err := utils.GetExampleID(info.GetCloudPath())
 	if err != nil {
-		return nil, errors.InvalidArgumentError(errorTitleGetExampleOutput, err.Error())
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleOutput, userBadCloudPathErrMsg)
 	}
 	output, err := controller.db.GetExampleOutput(ctx, exampleId)
 	if err != nil {
-		logger.Errorf("GetPrecompiledObjectOutput(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("Error during getting Precompiled Object's output", "Error with cloud connection")
+		switch err {
+		case datastore.ErrNoSuchEntity:
+			return nil, errors.NotFoundError(errorTitleGetExampleOutput, userCloudConnectionErrMsg)
+		default:
+			return nil, errors.InternalError(errorTitleGetExampleOutput, userCloudConnectionErrMsg)
+		}
 	}
 	response := pb.GetPrecompiledObjectOutputResponse{Output: output}
 	return &response, nil
@@ -342,12 +357,16 @@ func (controller *playgroundController) GetPrecompiledObjectOutput(ctx context.C
 func (controller *playgroundController) GetPrecompiledObjectLogs(ctx context.Context, info *pb.GetPrecompiledObjectLogsRequest) (*pb.GetPrecompiledObjectLogsResponse, error) {
 	exampleId, err := utils.GetExampleID(info.GetCloudPath())
 	if err != nil {
-		return nil, errors.InvalidArgumentError(errorTitleGetExampleLogs, err.Error())
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleLogs, userBadCloudPathErrMsg)
 	}
 	logs, err := controller.db.GetExampleLogs(ctx, exampleId)
 	if err != nil {
-		logger.Errorf("GetPrecompiledObjectLogs(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("Error during getting Precompiled Object's logs", "Error with cloud connection")
+		switch err {
+		case datastore.ErrNoSuchEntity:
+			return nil, errors.NotFoundError(errorTitleGetExampleLogs, userCloudConnectionErrMsg)
+		default:
+			return nil, errors.InternalError(errorTitleGetExampleLogs, userCloudConnectionErrMsg)
+		}
 	}
 	response := pb.GetPrecompiledObjectLogsResponse{Output: logs}
 	return &response, nil
@@ -357,12 +376,16 @@ func (controller *playgroundController) GetPrecompiledObjectLogs(ctx context.Con
 func (controller *playgroundController) GetPrecompiledObjectGraph(ctx context.Context, info *pb.GetPrecompiledObjectGraphRequest) (*pb.GetPrecompiledObjectGraphResponse, error) {
 	exampleId, err := utils.GetExampleID(info.GetCloudPath())
 	if err != nil {
-		return nil, errors.InvalidArgumentError(errorTitleGetExampleGraph, err.Error())
+		return nil, errors.InvalidArgumentError(errorTitleGetExampleGraph, userBadCloudPathErrMsg)
 	}
 	graph, err := controller.db.GetExampleGraph(ctx, exampleId)
 	if err != nil {
-		logger.Errorf("GetPrecompiledObjectGraph(): cloud storage error: %s", err.Error())
-		return nil, errors.InternalError("Error during getting Precompiled Object's graph", "Error with cloud connection")
+		switch err {
+		case datastore.ErrNoSuchEntity:
+			return nil, errors.NotFoundError(errorTitleGetExampleGraph, userCloudConnectionErrMsg)
+		default:
+			return nil, errors.InternalError(errorTitleGetExampleGraph, userCloudConnectionErrMsg)
+		}
 	}
 	response := pb.GetPrecompiledObjectGraphResponse{Graph: graph}
 	return &response, nil

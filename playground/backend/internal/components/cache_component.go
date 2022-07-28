@@ -48,6 +48,7 @@ func (cp *CacheComponent) GetSdkCatalogFromCacheOrDatastore(ctx context.Context)
 		}
 		if err = cp.cache.SetSdkCatalog(ctx, sdks); err != nil {
 			logger.Errorf("error during setting the sdk catalog to the cache, err: %s", err.Error())
+			return nil, err
 		}
 	}
 	return sdks, nil
