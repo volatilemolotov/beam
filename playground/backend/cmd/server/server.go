@@ -23,7 +23,6 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 
-	datastore_test "beam.apache.org/playground/backend/cmd/datastore"
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
@@ -36,6 +35,7 @@ import (
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/db/schema"
 	"beam.apache.org/playground/backend/internal/db/schema/migration"
+	"beam.apache.org/playground/backend/internal/db/test_scripts"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -129,7 +129,7 @@ func runServer() error {
 
 func downloadCatalogsToDatastoreEmulator(ctx context.Context) {
 	if _, ok := os.LookupEnv("DATASTORE_EMULATOR_HOST"); ok {
-		datastore_test.DownloadCatalogsWithMockData(ctx)
+		test_scripts.DownloadCatalogsWithMockData(ctx)
 	}
 }
 

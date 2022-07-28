@@ -18,7 +18,7 @@
 	to the Cloud Datastore for local deployment and testing.
 	Please be aware that this is fictitious data.
 */
-package datastore_test
+package test_scripts
 
 import (
 	"context"
@@ -113,8 +113,8 @@ func createExampleEntity(name, sdk string) *entity.ExampleEntity {
 		Name:       name,
 		Sdk:        utils.GetSdkKey(sdk),
 		Descr:      "MOCK_DESCR",
-		Tags:       []string{"MOCK_TAG_1, MOCK_TAG_2, MOCK_TAG_3"},
-		Cats:       []string{"MOCK_CAT_1, MOCK_CAT_2, MOCK_CAT_3"},
+		Tags:       []string{"MOCK_TAG_1", "MOCK_TAG_2", "MOCK_TAG_3"},
+		Cats:       []string{"MOCK_CAT_1", "MOCK_CAT_2", "MOCK_CAT_3"},
 		Complexity: 10,
 		Path:       "MOCK_PATH",
 		Type:       "PRECOMPILED_OBJECT_TYPE_EXAMPLE",
