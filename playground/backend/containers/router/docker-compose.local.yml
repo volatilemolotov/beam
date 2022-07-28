@@ -16,6 +16,10 @@
 version: "2"
 
 services:
+  redis:
+    image: redis:7.0.4-alpine
+    ports:
+      - "6379:6379"
   datastore:
     build: "./datastore"
     environment:
@@ -28,7 +32,11 @@ services:
     environment:
       GOOGLE_CLOUD_PROJECT: project-test
       DATASTORE_EMULATOR_HOST: datastore:8081
+      CACHE_TYPE: remote
+      CACHE_ADDRESS: redis:6379
+      SDK_CONFIG: /opt/playground/backend/sdks-emulator.yaml
     ports:
       - "8080:8080"
     depends_on:
+      - redis
       - datastore

@@ -201,13 +201,6 @@ func (d *Datastore) GetSDKs(ctx context.Context) ([]*entity.SDKEntity, error) {
 
 //GetCatalog returns all examples
 func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEntity) ([]*pb.Categories, error) {
-	tx, err := d.Client.NewTransaction(ctx, datastore.ReadOnly)
-	if err != nil {
-		logger.Errorf(errorMsgTemplateCreatingTx, err.Error())
-		return nil, err
-	}
-	defer rollback(tx)
-
 	//Retrieving examples
 	exampleQuery := datastore.NewQuery(constants.ExampleKind).Namespace(constants.Namespace)
 	var examples []*entity.ExampleEntity
@@ -223,7 +216,7 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEnti
 		snippetKeys = append(snippetKeys, utils.GetSnippetKey(exampleKey.Name))
 	}
 	snippets := make([]*entity.SnippetEntity, len(snippetKeys))
-	if err = tx.GetMulti(snippetKeys, snippets); err != nil {
+	if err = d.Client.GetMulti(ctx, snippetKeys, snippets); err != nil {
 		logger.Errorf("Datastore: GetCatalog(): error during the getting snippets, err: %s\n", err.Error())
 		return nil, err
 	}
@@ -237,7 +230,7 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEnti
 		}
 	}
 	files := make([]*entity.FileEntity, len(fileKeys))
-	if err = tx.GetMulti(fileKeys, files); err != nil {
+	if err = d.Client.GetMulti(ctx, fileKeys, files); err != nil {
 		logger.Errorf("Datastore: GetCatalog(): error during the getting files, err: %s\n", err.Error())
 		return nil, err
 	}
@@ -281,6 +274,8 @@ func (d *Datastore) GetDefaultExamples(ctx context.Context, sdks []*entity.SDKEn
 			logger.Errorf("error during the getting default examples, err: %s\n", err.Error())
 			return nil, err
 		}
+	} else {
+		examples = examplesWithNils
 	}
 
 	if len(examples) == 0 {
@@ -310,6 +305,8 @@ func (d *Datastore) GetDefaultExamples(ctx context.Context, sdks []*entity.SDKEn
 			logger.Errorf("error during the getting snippets, err: %s\n", err.Error())
 			return nil, err
 		}
+	} else {
+		snippets = snippetsWithNils
 	}
 
 	//Retrieving files

@@ -18,10 +18,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 
+	datastore_test "beam.apache.org/playground/backend/cmd/datastore"
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
@@ -76,6 +78,8 @@ func runServer() error {
 			return err
 		}
 
+		downloadCatalogsToDatastoreEmulator(ctx)
+
 		if err = setupDBStructure(ctx, dbClient, &envService.ApplicationEnvs, props); err != nil {
 			return err
 		}
@@ -120,6 +124,12 @@ func runServer() error {
 			logger.Info("interrupt signal received; stopping...")
 			return nil
 		}
+	}
+}
+
+func downloadCatalogsToDatastoreEmulator(ctx context.Context) {
+	if _, ok := os.LookupEnv("DATASTORE_EMULATOR_HOST"); ok {
+		datastore_test.DownloadCatalogsWithMockData(ctx)
 	}
 }
 
