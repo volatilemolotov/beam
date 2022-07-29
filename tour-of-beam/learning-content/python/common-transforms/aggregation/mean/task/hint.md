@@ -1,0 +1,1 @@
+You can use `beam.combiners.Mean.Globally()` to return the mean of numbers from `PCollection`.

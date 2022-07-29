@@ -1,0 +1,1 @@
+You can use `beam.combiners.Count.Globally()` to return the count of numbers from `PCollection`.

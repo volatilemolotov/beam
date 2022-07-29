@@ -1,0 +1,1 @@
+You can use `beam.combiners.Top.Largest(2)` to return the maximum number from `PCollection`.

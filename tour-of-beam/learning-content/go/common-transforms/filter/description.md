@@ -5,9 +5,7 @@ You can filter the dataset by criteria. It can also be used for equality based.F
 
 ```
 import (
-	"github.com/apache/ 
-	
-	fbeam/sdks/go/pkg/beam"
+	"github.com/apache/fbeam/sdks/go/pkg/beam"
 	"github.com/apache/beam/sdks/go/pkg/beam/transforms/filter"
 )
 
@@ -17,6 +15,3 @@ func ApplyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
 	})
 }
 ```
-
-
-    
