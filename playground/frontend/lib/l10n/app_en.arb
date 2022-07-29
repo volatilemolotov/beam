@@ -231,20 +231,20 @@
   "@shareMyCode": {
     "description": "Text for the share button"
   },
-  "linkCopied": "Link Copied! Anyone on the Internet with this link can view your example.",
-  "@linkCopied": {
-    "description": "Text that appears when you copy link to your code sample"
+  "link": "Link",
+  "@link": {
+    "description": "Name of the Link tab in Share dropdown"
   },
-  "clickForLink": "Click the button to see the link and share your code",
-  "@clickForLink": {
-    "description": "Description for the share dropdown"
+  "embed": "Embed",
+  "@embed": {
+    "description": "Name of the Embed tab in Share dropdown"
   },
-  "showAndCopyLink": "Show and copy code link",
-  "@showAndCopyLink": {
-    "description": "Description for the copy link button"
+  "linkReady": "Link is ready! Anyone with this link can view your example.",
+  "@linkReady": {
+    "description": "Text that appears when user sees link to code sample"
   },
-  "loadingLink": "Loading link, please wait...",
-  "@loadingLink": {
-    "description": "Text that appears when you load link to your code sample"
+  "iframeCodeReady": "With this code you can embed Playground to your website.",
+  "@iframeCodeReady": {
+    "description": "Text that appears when user sees Playground iframe code"
   }
 }

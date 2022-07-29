@@ -22,7 +22,7 @@ import 'package:playground/components/dropdown_button/dropdown_button.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/modules/editor/components/share_dropdown/share_dropdown_body.dart';
 
-const _kShareDropdownHeight = 120.0;
+const _kShareDropdownHeight = 140.0;
 const _kShareDropdownWidth = 460.0;
 const _kButtonColorOpacity = 0.2;
 
@@ -31,22 +31,28 @@ class ShareButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AppLocalizations appLocale = AppLocalizations.of(context)!;
+    final appLocale = AppLocalizations.of(context)!;
+    final parentThemeData = ThemeColors.of(context);
 
-    return AppDropdownButton(
-      buttonText: Text(appLocale.shareMyCode),
-      buttonColor:
-          ThemeColors.of(context).primary.withOpacity(_kButtonColorOpacity),
-      dropdownBackgroundColor: ThemeColors.of(context).secondaryBackground,
-      withArrowDown: false,
-      leading: Icon(
-        Icons.share_outlined,
-        color: ThemeColors.of(context).primary,
+    final themeData = parentThemeData.copyWith(
+      background: parentThemeData.secondaryBackground,
+      dropdownButton: parentThemeData.primary.withOpacity(_kButtonColorOpacity),
+    );
+
+    return ThemeColorsProvider(
+      data: themeData,
+      child: AppDropdownButton(
+        buttonText: Text(appLocale.shareMyCode),
+        showArrow: false,
+        leading: Icon(
+          Icons.share_outlined,
+          color: ThemeColors.of(context).primary,
+        ),
+        height: _kShareDropdownHeight,
+        width: _kShareDropdownWidth,
+        dropdownAlign: DropdownAlignment.right,
+        createDropdown: (close) => const ShareDropdownBody(),
       ),
-      height: _kShareDropdownHeight,
-      width: _kShareDropdownWidth,
-      dropdownAlign: DropdownAlignment.right,
-      createDropdown: (close) => ShareDropdownBody(close: close),
     );
   }
 }

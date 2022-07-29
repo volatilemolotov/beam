@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 
+import 'dart:async';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:playground/constants/params.dart';
 import 'package:playground/modules/examples/models/category_model.dart';
@@ -35,19 +38,27 @@ class ExampleState with ChangeNotifier {
   Map<SDK, ExampleModel> defaultExamplesMap = {};
   ExampleModel? defaultExample;
   bool isSelectorOpened = false;
-  Map<SDK, ExampleModel>? sharedFilesMap;
+
+  final _allExamplesCompleter = Completer<void>();
+
+  Future<void> get allExamplesFuture => _allExamplesCompleter.future;
+
+  bool get hasExampleCatalog => !isEmbedded();
 
   ExampleState(this._exampleRepository);
 
-  init() {
-    if (!Uri.base.toString().contains(kIsEmbedded)) {
-      _loadCategories();
+  Future<void> init() async {
+    if (hasExampleCatalog) {
+      await Future.wait([
+        _loadCategories(),
+        loadDefaultExamplesIfNot(),
+      ]);
     }
   }
 
-  setSdkCategories(Map<SDK, List<CategoryModel>> map) {
+  void setSdkCategories(Map<SDK, List<CategoryModel>> map) {
     sdkCategories = map;
-    notifyListeners();
+    _allExamplesCompleter.complete();
   }
 
   List<CategoryModel>? getCategories(SDK sdk) {
@@ -84,45 +95,46 @@ class ExampleState with ChangeNotifier {
     );
   }
 
-  Future<void> getSharedExample(String id) async {
+  Future<ExampleModel> loadSharedExample(String id) async {
     GetSnippetResponse result = await _exampleRepository.getSnippet(
-      GetSnippetRequestWrapper(id),
+      GetSnippetRequestWrapper(id: id),
     );
-    sharedFilesMap = {
-      result.sdk: ExampleModel(
-        name: result.files.first.name,
-        path: '',
-        description: '',
-        type: ExampleType.example,
-        source: result.files.first.code,
-        pipelineOptions: result.pipelineOptions,
-      ),
-    };
-    notifyListeners();
+    return ExampleModel(
+      sdk: result.sdk,
+      name: result.files.first.name,
+      path: id,
+      description: '',
+      type: ExampleType.example,
+      source: result.files.first.code,
+      pipelineOptions: result.pipelineOptions,
+    );
   }
 
-  Future<String> getShareLink(
-    List<SharedFile> files,
-    SDK sdk,
-    String pipelineOptions,
-  ) async {
-    String id = await _exampleRepository
-        .saveSnippet(SaveSnippetRequestWrapper(files, sdk, pipelineOptions));
-    return '${Uri.base.toString().split('?')[0]}?snippetId=$id';
+  Future<String> getSnippetId({
+    required List<SharedFile> files,
+    required SDK sdk,
+    required String pipelineOptions,
+  }) async {
+    String id = await _exampleRepository.saveSnippet(SaveSnippetRequestWrapper(
+      files: files,
+      sdk: sdk,
+      pipelineOptions: pipelineOptions,
+    ));
+    return id;
   }
 
-  Future<ExampleModel> loadExampleInfo(ExampleModel example, SDK sdk) async {
+  Future<ExampleModel> loadExampleInfo(ExampleModel example) async {
     if (example.isInfoFetched()) {
       return example;
     }
 
     //GRPC GetPrecompiledGraph errors hotfix
     if (example.name == 'MinimalWordCount' &&
-        (sdk == SDK.go || sdk == SDK.scio)) {
+        (example.sdk == SDK.go || example.sdk == SDK.scio)) {
       final exampleData = await Future.wait([
-        getExampleSource(example.path, sdk),
-        getExampleOutput(example.path, sdk),
-        getExampleLogs(example.path, sdk),
+        getExampleSource(example.path, example.sdk),
+        getExampleOutput(example.path, example.sdk),
+        getExampleLogs(example.path, example.sdk),
       ]);
       example.setSource(exampleData[0]);
       example.setOutputs(exampleData[1]);
@@ -131,10 +143,10 @@ class ExampleState with ChangeNotifier {
     }
 
     final exampleData = await Future.wait([
-      getExampleSource(example.path, sdk),
-      getExampleOutput(example.path, sdk),
-      getExampleLogs(example.path, sdk),
-      getExampleGraph(example.path, sdk)
+      getExampleSource(example.path, example.sdk),
+      getExampleOutput(example.path, example.sdk),
+      getExampleLogs(example.path, example.sdk),
+      getExampleGraph(example.path, example.sdk)
     ]);
     example.setSource(exampleData[0]);
     example.setOutputs(exampleData[1]);
@@ -143,15 +155,15 @@ class ExampleState with ChangeNotifier {
     return example;
   }
 
-  _loadCategories() {
-    _exampleRepository
+  Future<void> _loadCategories() {
+    return _exampleRepository
         .getListOfExamples(
           GetListOfExamplesRequestWrapper(sdk: null, category: null),
         )
         .then((map) => setSdkCategories(map));
   }
 
-  changeSelectorVisibility() {
+  void changeSelectorVisibility() {
     isSelectorOpened = !isSelectorOpened;
     notifyListeners();
   }
@@ -179,7 +191,7 @@ class ExampleState with ChangeNotifier {
     final futures = <Future<void>>[];
 
     for (var entry in defaultExamplesMap.entries) {
-      final exampleFuture = loadExampleInfo(entry.value, entry.key)
+      final exampleFuture = loadExampleInfo(entry.value)
           .then((value) => defaultExamplesMap[entry.key] = value);
       futures.add(exampleFuture);
     }
@@ -194,5 +206,17 @@ class ExampleState with ChangeNotifier {
     }
 
     await loadDefaultExamples();
+  }
+
+  Future<ExampleModel?> getCatalogExampleByPath(String path) async {
+    await allExamplesFuture;
+
+    final allExamples = sdkCategories?.values
+        .expand((sdkCategory) => sdkCategory.map((e) => e.examples))
+        .expand((element) => element);
+
+    return allExamples?.firstWhereOrNull(
+      (e) => e.path == path,
+    );
   }
 }

@@ -17,30 +17,87 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:playground/config/theme.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
 
-class LinkTextField extends StatelessWidget {
-  final TextEditingController textEditingController;
+const _kTextFieldMaxHeight = 45.0;
 
-  const LinkTextField({super.key, required this.textEditingController});
+class LinkTextField extends StatefulWidget {
+  final String text;
+
+  const LinkTextField({super.key, required this.text});
+
+  @override
+  State<LinkTextField> createState() => _LinkTextFieldState();
+}
+
+class _LinkTextFieldState extends State<LinkTextField> {
+  final textEditingController = TextEditingController();
+  bool _isPressed = false;
+
+  @override
+  initState() {
+    super.initState();
+    textEditingController.text = widget.text;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: textEditingController,
-      decoration: const InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: kSmSpacing),
-        border: InputBorder.none,
-        isCollapsed: true,
+    return Container(
+      decoration: BoxDecoration(
+        color: ThemeColors.of(context).dropdownButton,
+        borderRadius: BorderRadius.circular(kSmBorderRadius),
       ),
-      readOnly: true,
-      style: TextStyle(
-        fontSize: kLabelFontSize,
-        fontWeight: kNormalWeight,
-        color: ThemeColors.of(context).primary,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: kMdSpacing),
+        child: Center(
+          child: TextFormField(
+            controller: textEditingController,
+            decoration: InputDecoration(
+              constraints: const BoxConstraints(
+                maxHeight: _kTextFieldMaxHeight,
+              ),
+              border: InputBorder.none,
+              suffixIcon: _buildCopyButton(),
+            ),
+            readOnly: true,
+            style: TextStyle(
+              fontSize: kLabelFontSize,
+              fontWeight: kNormalWeight,
+              color: ThemeColors.of(context).primary,
+            ),
+          ),
+        ),
       ),
     );
+  }
+
+  Widget _buildCopyButton() {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () async {
+          await _copyLinkText();
+          setState(() {
+            _isPressed = true;
+          });
+        },
+        child: _isPressed
+            ? const Icon(
+                Icons.check,
+                size: kIconSizeMd,
+              )
+            : const Icon(
+                Icons.file_copy_outlined,
+                size: kIconSizeSm,
+              ),
+      ),
+    );
+  }
+
+  Future<void> _copyLinkText() async {
+    await Clipboard.setData(ClipboardData(text: widget.text));
   }
 }

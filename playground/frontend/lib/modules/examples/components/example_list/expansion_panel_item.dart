@@ -41,22 +41,17 @@ class ExpansionPanelItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AnalyticsService analyticsService = AnalyticsService.get(context);
-
-    return Consumer2<PlaygroundState, ExampleState>(
-      builder: (context, playgroundState, exampleState, child) => MouseRegion(
+    return Consumer<PlaygroundState>(
+      builder: (context, playgroundState, child) => MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () async {
             if (playgroundState.selectedExample != example) {
-              closeDropdown(exampleState);
+              _closeDropdown(playgroundState.exampleState);
               AnalyticsService.get(context).trackSelectExample(example);
-              final exampleWithInfo = await exampleState.loadExampleInfo(
-                example,
-                playgroundState.sdk,
-              );
+              final exampleWithInfo =
+                  await playgroundState.exampleState.loadExampleInfo(example);
               playgroundState.setExample(exampleWithInfo);
-              analyticsService.trackSelectExample(exampleWithInfo);
             }
           },
           child: Container(
@@ -85,7 +80,7 @@ class ExpansionPanelItem extends StatelessWidget {
     );
   }
 
-  void closeDropdown(ExampleState exampleState) {
+  void _closeDropdown(ExampleState exampleState) {
     animationController.reverse();
     dropdown?.remove();
     exampleState.changeSelectorVisibility();

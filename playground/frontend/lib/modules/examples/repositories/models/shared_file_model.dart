@@ -21,5 +21,9 @@ class SharedFile {
   final bool isMain;
   final String name;
 
-  const SharedFile(this.code, this.isMain, this.name);
+  const SharedFile({
+    required this.code,
+    required this.isMain,
+    this.name = '',
+  });
 }
