@@ -1,0 +1,1 @@
+Given a list of integers ```PCollection```, print maximum number from ```PCollection```.

@@ -36,3 +36,14 @@ KV{🍆, 1.0}
 KV{🥕, 2.5}
 KV{🍅, 4.0}
 ```
+
+
+```
+PCollection<Long> numbers = Create.of(1L, 2L, 3L, 4L, 5L);
+PCollection<Long> bigNumbers = numbers.apply(Filter.greaterThan(1L));
+//PCollection will contain 2,3,4,5 at this point
+PCollection<Long> smallNumbers = numbers.apply(Filter.lessThanEq(3L));
+//PCollection will contain 2,3 at this point
+PCollection<Long> equalNumbers = numbers.apply(Filter.equal(3L));
+The result is a PCollection containing 3L.
+```

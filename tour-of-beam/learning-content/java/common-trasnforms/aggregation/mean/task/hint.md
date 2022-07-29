@@ -1,0 +1,1 @@
+You can use `Mean.globally()` to return the mean from `PCollection`.
