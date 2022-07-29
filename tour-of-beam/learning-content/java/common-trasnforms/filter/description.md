@@ -15,6 +15,12 @@ PCollection<String> filteredStrings = allStrings
         }));
 ```
 
+Output
+```
+Hello
+world
+```
+
 ### Built-in filters
 
 The Java SDK has several filter methods built-in like ```Filter.greaterThan``` and ```Filter.lessThenEq```. Using this filter, input ```PCollection``` can be filtered such that only elements whose value is greater than specified remain.
