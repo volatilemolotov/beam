@@ -49,72 +49,64 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RabbitMqReceiverWithoutOffset.class);
 
-  private final ConnectionFactory connectionFactory;
-  private TestConsumer testConsumer;
-  private Connection connection;
-  private Channel channel;
-
-  private static final int TIMEOUT_MS = 500;
+  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private static final List<String> STORED_RECORDS = new ArrayList<>();
-  private static int MAX_NUM_RECORDS;
+  private static final int TIMEOUT_MS = 500;
+  private static long MAX_NUM_RECORDS;
+  private static String RABBITMQ_URL;
   private static String QUEUE_NAME;
 
-  RabbitMqReceiverWithoutOffset(final String uri, final Integer maxNumRecords, final String queueName) throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
+  RabbitMqReceiverWithoutOffset(final String uri, final Long maxNumRecords, final String queueName) {
     super(StorageLevel.MEMORY_AND_DISK_2());
-    connectionFactory = new ConnectionFactory();
-    connectionFactory.setUri(uri);
-    connectionFactory.setAutomaticRecoveryEnabled(true);
-    connectionFactory.setConnectionTimeout(60000);
-    connectionFactory.setNetworkRecoveryInterval(5000);
-    connectionFactory.setRequestedHeartbeat(60);
-    connectionFactory.setTopologyRecoveryEnabled(true);
-    connectionFactory.setRequestedChannelMax(0);
-    connectionFactory.setRequestedFrameMax(0);
     MAX_NUM_RECORDS = maxNumRecords;
     QUEUE_NAME = queueName;
+    RABBITMQ_URL = uri;
   }
 
   @Override
   @SuppressWarnings("FutureReturnValueIgnored")
   public void onStart() {
-    try {
-      System.out.println("Starting receiver");
-      connection = connectionFactory.newConnection();
-      channel = connection.createChannel();
-      channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-      testConsumer = new TestConsumer(channel);
-      channel.basicConsume(QUEUE_NAME, true, testConsumer);
-    } catch (TimeoutException | IOException e) {
-      throw new RuntimeException(e);
-    }
-
     Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().build()).submit(this::receive);
   }
 
   @Override
   public void onStop() {
-    try {
-      System.out.println("Stopping receiver");
-      if (channel != null) {
-        channel.close();
-      }
-      if (connection != null) {
-        connection.close();
-      }
-    } catch (TimeoutException | IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   private void receive() {
     int currentOffset = 0;
-    while (!isStopped() && testConsumer.getReceived().size() < MAX_NUM_RECORDS) {
+
+    final TestConsumer testConsumer;
+    final Connection connection;
+    final Channel channel;
+
+    try {
+      System.out.println("Starting receiver");
+      final ConnectionFactory connectionFactory = new ConnectionFactory();
+      connectionFactory.setUri(RABBITMQ_URL);
+      connectionFactory.setAutomaticRecoveryEnabled(true);
+      connectionFactory.setConnectionTimeout(600000);
+      connectionFactory.setNetworkRecoveryInterval(5000);
+      connectionFactory.setRequestedHeartbeat(60);
+      connectionFactory.setTopologyRecoveryEnabled(true);
+      connectionFactory.setRequestedChannelMax(0);
+      connectionFactory.setRequestedFrameMax(0);
+      connection = connectionFactory.newConnection();
+      channel = connection.createChannel();
+      channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+      testConsumer = new TestConsumer(channel);
+      channel.basicConsume(QUEUE_NAME, true, testConsumer);
+    } catch (TimeoutException | IOException | URISyntaxException | NoSuchAlgorithmException | KeyManagementException e) {
+      throw new RuntimeException(e);
+    }
+
+    while (!isStopped()) {
       if (currentOffset < MAX_NUM_RECORDS && testConsumer.getReceived().size() > currentOffset) {
         try {
-          final String message = testConsumer.getReceived().get(currentOffset);
-          System.out.println("Adding message to receiver's queue = " + message);
-          STORED_RECORDS.add(message);
-          store(message);
+          final String stringMessage = testConsumer.getReceived().get(currentOffset);
+          System.out.println("Moving message from test consumer to receiver = " + stringMessage);
+          STORED_RECORDS.add(stringMessage);
+          store(stringMessage);
           currentOffset++;
         } catch (Exception e) {
           System.out.println("Exception " + e.getMessage());
@@ -125,6 +117,16 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
         TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
       } catch (InterruptedException e) {
         LOG.error("Interrupted", e);
+      }
+    }
+
+    if (isStopped()) {
+      try {
+        System.out.println("Stopping receiver");
+        channel.close();
+        connection.close();
+      } catch (TimeoutException | IOException e) {
+        throw new RuntimeException(e);
       }
     }
   }
@@ -141,10 +143,13 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
 
     @Override
     public void handleDelivery(
-        String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
-        throws IOException {
-      System.out.println("adding message to queue " + new String(body, StandardCharsets.UTF_8));
-      received.add(new String(body, StandardCharsets.UTF_8));
+        String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
+      try {
+        System.out.println("adding message to test consumer " + new String(body, StandardCharsets.UTF_8));
+        received.add(new String(body, StandardCharsets.UTF_8));
+      } catch (Exception e) {
+        System.out.println("Exception during reading from RabbitMQ " + e.getMessage());
+      }
     }
 
     /** Returns a thread safe unmodifiable view of received messages. */

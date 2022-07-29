@@ -23,15 +23,15 @@ public class RabbitMqConsumer<V> implements SparkConsumer<V> {
 
   @Override
   public boolean hasRecords() {
-    System.out.println("Checking if queue has records = " + !queue.isEmpty());
+    System.out.println("Checking if consumer queue has records = " + !queue.isEmpty());
     return !queue.isEmpty();
   }
 
   @Override
   public @Nullable V poll() {
-    System.out.println("Polling element from queue");
+    System.out.println("Polling element from consumer queue");
     final V v = (V) queue.poll();
-    System.out.println("Polling element from queue " + (v != null ? v.toString() : ""));
+    System.out.println("Polling element from consumer queue " + (v != null ? v.toString() : ""));
     return v;
   }
 
@@ -41,8 +41,10 @@ public class RabbitMqConsumer<V> implements SparkConsumer<V> {
       System.out.println("Starting consumer");
       this.sparkReceiver = sparkReceiver;
       new WrappedSupervisor(sparkReceiver, new SparkConf(), objects -> {
-        System.out.println("Moving message from receiver to consumer " + objects[0]);
-        queue.offer(objects[0]);
+        LOG.info("Converting message before move from receiver to consumer");
+        V record = (V) objects[0];
+        LOG.info("Moving message from receiver to consumer " + objects[0]);
+        queue.offer(record);
         return null;
       });
       sparkReceiver.supervisor().startReceiver();
