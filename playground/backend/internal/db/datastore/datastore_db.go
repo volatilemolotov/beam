@@ -74,7 +74,7 @@ func (d *Datastore) PutSnippet(ctx context.Context, snipId string, snip *entity.
 
 	var fileKeys []*datastore.Key
 	for index := range snip.Files {
-		fileKeys = append(fileKeys, utils.GetFileKey(fmt.Sprintf("%s_%d", snipId, index)))
+		fileKeys = append(fileKeys, utils.GetFileKey(snipId, index))
 	}
 
 	if _, err = tx.PutMulti(fileKeys, snip.Files); err != nil {
@@ -171,7 +171,7 @@ func (d *Datastore) GetFiles(ctx context.Context, snipId string, numberOfFiles i
 	}
 	var fileKeys []*datastore.Key
 	for fileIndx := 0; fileIndx < numberOfFiles; fileIndx++ {
-		fileKeys = append(fileKeys, utils.GetFileKey(fmt.Sprintf("%s_%d", snipId, fileIndx)))
+		fileKeys = append(fileKeys, utils.GetFileKey(snipId, fileIndx))
 	}
 	var files = make([]*entity.FileEntity, numberOfFiles)
 	if err = tx.GetMulti(fileKeys, files); err != nil {
@@ -226,7 +226,7 @@ func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEnti
 	var fileKeys []*datastore.Key
 	for snpIndx, snippet := range snippets {
 		for fileIndx := 0; fileIndx < snippet.NumberOfFiles; fileIndx++ {
-			fileKey := utils.GetFileKey(fmt.Sprintf("%s_%d", exampleKeys[snpIndx].Name, fileIndx))
+			fileKey := utils.GetFileKey(exampleKeys[snpIndx].Name, fileIndx)
 			fileKeys = append(fileKeys, fileKey)
 		}
 	}
@@ -256,7 +256,7 @@ func (d *Datastore) GetDefaultExamples(ctx context.Context, sdks []*entity.SDKEn
 	//Retrieving examples
 	var exampleKeys []*datastore.Key
 	for _, sdk := range sdks {
-		exampleKeys = append(exampleKeys, utils.GetExampleKey(fmt.Sprintf("%s_%s", sdk.Name, sdk.DefaultExample)))
+		exampleKeys = append(exampleKeys, utils.GetExampleKey(sdk.Name, sdk.DefaultExample))
 	}
 	var examplesWithNils = make([]*entity.ExampleEntity, len(exampleKeys))
 	examples := make([]*entity.ExampleEntity, 0)
@@ -314,7 +314,7 @@ func (d *Datastore) GetDefaultExamples(ctx context.Context, sdks []*entity.SDKEn
 	var fileKeys []*datastore.Key
 	for snpIndx, snippet := range snippets {
 		for fileIndx := 0; fileIndx < snippet.NumberOfFiles; fileIndx++ {
-			fileKey := utils.GetFileKey(fmt.Sprintf("%s_%s_%d", examples[snpIndx].Sdk.Name, examples[snpIndx].Name, fileIndx))
+			fileKey := utils.GetFileKey(examples[snpIndx].Sdk.Name, examples[snpIndx].Name, fileIndx)
 			fileKeys = append(fileKeys, fileKey)
 		}
 	}
@@ -357,7 +357,7 @@ func (d *Datastore) GetExample(ctx context.Context, id string, sdks []*entity.SD
 		return nil, err
 	}
 
-	fileKey := utils.GetFileKey(fmt.Sprintf("%s%s%d", id, constants.IDDelimiter, 0))
+	fileKey := utils.GetFileKey(id, 0)
 	var file = new(entity.FileEntity)
 	if err = tx.Get(fileKey, file); err != nil {
 		logger.Errorf("error during getting file by identifier, err: %s", err.Error())
@@ -385,7 +385,7 @@ func (d *Datastore) GetExampleCode(ctx context.Context, id string) (string, erro
 	}
 	defer rollback(tx)
 
-	fileKey := utils.GetFileKey(fmt.Sprintf("%s%s%d", id, constants.IDDelimiter, 0))
+	fileKey := utils.GetFileKey(id, 0)
 	var file = new(entity.FileEntity)
 	if err = tx.Get(fileKey, file); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -406,7 +406,7 @@ func (d *Datastore) GetExampleOutput(ctx context.Context, id string) (string, er
 	}
 	defer rollback(tx)
 
-	pcObjKey := utils.GetPCObjectKey(fmt.Sprintf("%s%s%s", id, constants.IDDelimiter, constants.PCOutputType))
+	pcObjKey := utils.GetPCObjectKey(id, constants.PCOutputType)
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -427,7 +427,7 @@ func (d *Datastore) GetExampleLogs(ctx context.Context, id string) (string, erro
 	}
 	defer rollback(tx)
 
-	pcObjKey := utils.GetPCObjectKey(fmt.Sprintf("%s%s%s", id, constants.IDDelimiter, constants.PCLogType))
+	pcObjKey := utils.GetPCObjectKey(id, constants.PCLogType)
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -448,7 +448,7 @@ func (d *Datastore) GetExampleGraph(ctx context.Context, id string) (string, err
 	}
 	defer rollback(tx)
 
-	pcObjKey := utils.GetPCObjectKey(fmt.Sprintf("%s%s%s", id, constants.IDDelimiter, constants.PCGraphType))
+	pcObjKey := utils.GetPCObjectKey(id, constants.PCGraphType)
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
 		if err == datastore.ErrNoSuchEntity {

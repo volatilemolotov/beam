@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
 	"testing"
 	"time"
 
@@ -90,7 +89,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 				Snippet: &entity.SnippetEntity{
 					Sdk:           utils.GetSdkKey(pb.Sdk_SDK_GO.String()),
 					PipeOpts:      "MOCK_OPTIONS",
-					Origin:        "PG_USER",
+					Origin:        constants.UserSnippetOrigin,
 					NumberOfFiles: 1,
 				},
 				Files: []*entity.FileEntity{{
@@ -146,7 +145,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 						Sdk:           utils.GetSdkKey(pb.Sdk_SDK_GO.String()),
 						PipeOpts:      "MOCK_OPTIONS",
 						Created:       nowDate,
-						Origin:        "PG_USER",
+						Origin:        constants.UserSnippetOrigin,
 						NumberOfFiles: 1,
 					},
 					Files: []*entity.FileEntity{{
@@ -172,7 +171,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 			if err == nil {
 				if snip.Sdk.Name != pb.Sdk_SDK_GO.String() ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != "PG_USER" ||
+					snip.Origin != constants.UserSnippetOrigin ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
@@ -761,7 +760,7 @@ func TestNew(t *testing.T) {
 }
 
 func saveExample(name, sdk string) {
-	_, _ = datastoreDb.Client.Put(ctx, utils.GetExampleKey(sdk+constants.IDDelimiter+name), &entity.ExampleEntity{
+	_, _ = datastoreDb.Client.Put(ctx, utils.GetExampleKey(sdk, name), &entity.ExampleEntity{
 		Name:       name,
 		Sdk:        utils.GetSdkKey(sdk),
 		Descr:      "MOCK_DESCR",
@@ -769,7 +768,7 @@ func saveExample(name, sdk string) {
 		Complexity: 20,
 		Path:       "MOCK_PATH",
 		Type:       "PRECOMPILED_OBJECT_TYPE_EXAMPLE",
-		Origin:     "PG_EXAMPLES",
+		Origin:     constants.ExampleOrigin,
 		SchVer:     utils.GetSchemaVerKey("MOCK_VERSION"),
 	})
 }
@@ -783,7 +782,7 @@ func saveSnippet(snipId, sdk string) {
 		Snippet: &entity.SnippetEntity{
 			Sdk:           utils.GetSdkKey(sdk),
 			PipeOpts:      "MOCK_OPTIONS",
-			Origin:        "PG_EXAMPLES",
+			Origin:        constants.ExampleOrigin,
 			NumberOfFiles: 1,
 		},
 		Files: []*entity.FileEntity{{
@@ -808,13 +807,13 @@ func savePCObjs(exampleId string) {
 func cleanPCObjs(t *testing.T, exampleId string) {
 	pcTypes := []string{constants.PCOutputType, constants.PCLogType, constants.PCGraphType}
 	for _, pcType := range pcTypes {
-		cleanData(t, constants.PCObjectKind, exampleId+constants.IDDelimiter+pcType, nil)
+		cleanData(t, constants.PCObjectKind, utils.GetIDWithDelimiter(exampleId, pcType), nil)
 	}
 }
 
 func cleanFiles(t *testing.T, exampleId string, numberOfFiles int) {
 	for fileIndx := 0; fileIndx < numberOfFiles; fileIndx++ {
-		cleanData(t, constants.FileKind, exampleId+constants.IDDelimiter+strconv.Itoa(fileIndx), nil)
+		cleanData(t, constants.FileKind, utils.GetIDWithDelimiter(exampleId, fileIndx), nil)
 	}
 }
 

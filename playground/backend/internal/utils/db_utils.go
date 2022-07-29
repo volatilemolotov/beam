@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"cloud.google.com/go/datastore"
@@ -46,27 +47,33 @@ func ID(salt, content string, length int8) (string, error) {
 	return string(b)[:hashLen], nil
 }
 
-func GetExampleKey(id string) *datastore.Key {
+func GetExampleKey(values ...interface{}) *datastore.Key {
+	id := GetIDWithDelimiter(values...)
 	return getNameKey(constants.ExampleKind, id, constants.Namespace, nil)
 }
 
-func GetSdkKey(id string) *datastore.Key {
+func GetSdkKey(values ...interface{}) *datastore.Key {
+	id := GetIDWithDelimiter(values...)
 	return getNameKey(constants.SdkKind, id, constants.Namespace, nil)
 }
 
-func GetFileKey(id string) *datastore.Key {
+func GetFileKey(values ...interface{}) *datastore.Key {
+	id := GetIDWithDelimiter(values...)
 	return getNameKey(constants.FileKind, id, constants.Namespace, nil)
 }
 
-func GetSchemaVerKey(id string) *datastore.Key {
+func GetSchemaVerKey(values ...interface{}) *datastore.Key {
+	id := GetIDWithDelimiter(values...)
 	return getNameKey(constants.SchemaKind, id, constants.Namespace, nil)
 }
 
-func GetSnippetKey(id string) *datastore.Key {
+func GetSnippetKey(values ...interface{}) *datastore.Key {
+	id := GetIDWithDelimiter(values...)
 	return getNameKey(constants.SnippetKind, id, constants.Namespace, nil)
 }
 
-func GetPCObjectKey(id string) *datastore.Key {
+func GetPCObjectKey(values ...interface{}) *datastore.Key {
+	id := GetIDWithDelimiter(values...)
 	return getNameKey(constants.PCObjectKind, id, constants.Namespace, nil)
 }
 
@@ -76,7 +83,20 @@ func GetExampleID(cloudPath string) (string, error) {
 		logger.Error("the wrong cloud path from a client")
 		return "", fmt.Errorf("cloud path doesn't have all options. The minimum size must be 3")
 	}
-	return fmt.Sprintf("%s%s%s", cloudPathParams[0], constants.IDDelimiter, cloudPathParams[2]), nil
+	return GetIDWithDelimiter(cloudPathParams[0], cloudPathParams[2]), nil
+}
+
+func GetIDWithDelimiter(values ...interface{}) string {
+	valuesAsStr := make([]string, 0)
+	for _, value := range values {
+		switch value.(type) {
+		case int:
+			valuesAsStr = append(valuesAsStr, strconv.Itoa(value.(int)))
+		default:
+			valuesAsStr = append(valuesAsStr, value.(string))
+		}
+	}
+	return strings.Join(valuesAsStr, constants.IDDelimiter)
 }
 
 // getNameKey returns the datastore key

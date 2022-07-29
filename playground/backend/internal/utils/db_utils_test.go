@@ -157,5 +157,47 @@ func TestGetExampleID(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestGetIDWithDelimiter(t *testing.T) {
+	tests := []struct {
+		name           string
+		values         []interface{}
+		expectedResult string
+	}{
+		{
+			name:           "Getting ID separated by a delimiter in the usual case",
+			values:         []interface{}{"SDK_JAVA", "MOCK_EXAMPLE"},
+			expectedResult: "SDK_JAVA_MOCK_EXAMPLE",
+		},
+		{
+			name:           "Getting ID separated by a delimiter when an input data has only one parameter",
+			values:         []interface{}{"MOCK_EXAMPLE"},
+			expectedResult: "MOCK_EXAMPLE",
+		},
+		{
+			name:           "Getting ID separated by a delimiter when an input data is empty",
+			values:         []interface{}{""},
+			expectedResult: "",
+		},
+		{
+			name:           "Getting ID separated by a delimiter when an input data is nil",
+			values:         nil,
+			expectedResult: "",
+		},
+		{
+			name:           "Getting ID separated by a delimiter when an input data has string and integer",
+			values:         []interface{}{"MOCK_EXAMPLE", 2},
+			expectedResult: "MOCK_EXAMPLE_2",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actualResult := GetIDWithDelimiter(tt.values...)
+			if actualResult != tt.expectedResult {
+				t.Errorf("GetIDWithDelimiter() unexpected result")
+			}
+		})
+	}
 }
