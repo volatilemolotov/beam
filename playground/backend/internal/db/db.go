@@ -25,6 +25,7 @@ import (
 type Database interface {
 	SnippetDatabase
 	CatalogDatabase
+	ExampleDatabase
 }
 
 type SnippetDatabase interface {

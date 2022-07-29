@@ -17,8 +17,9 @@ package constants
 
 //Cloud Datastore constants
 const (
-	Namespace   = "Playground"
-	IDDelimiter = "_"
+	Namespace          = "Playground"
+	IDDelimiter        = "_"
+	CloudPathDelimiter = "/"
 
 	SnippetKind  = "pg_snippets"
 	SchemaKind   = "pg_schema_versions"

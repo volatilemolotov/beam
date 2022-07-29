@@ -29,8 +29,6 @@ import (
 	"beam.apache.org/playground/backend/internal/logger"
 )
 
-const cloudPathDelimiter = "/"
-
 func ID(salt, content string, length int8) (string, error) {
 	hash := sha256.New()
 	if _, err := io.WriteString(hash, salt); err != nil {
@@ -73,7 +71,7 @@ func GetPCObjectKey(id string) *datastore.Key {
 }
 
 func GetExampleID(cloudPath string) (string, error) {
-	cloudPathParams := strings.Split(cloudPath, cloudPathDelimiter)
+	cloudPathParams := strings.Split(cloudPath, constants.CloudPathDelimiter)
 	if len(cloudPathParams) < 3 {
 		logger.Error("the wrong cloud path from a client")
 		return "", fmt.Errorf("cloud path doesn't have all options. The minimum size must be 3")
