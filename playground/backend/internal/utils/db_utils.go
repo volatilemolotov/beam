@@ -16,13 +16,20 @@
 package utils
 
 import (
-	"beam.apache.org/playground/backend/internal/errors"
-	"beam.apache.org/playground/backend/internal/logger"
-	"cloud.google.com/go/datastore"
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"io"
+	"strings"
+
+	"cloud.google.com/go/datastore"
+
+	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/errors"
+	"beam.apache.org/playground/backend/internal/logger"
 )
+
+const cloudPathDelimiter = "/"
 
 func ID(salt, content string, length int8) (string, error) {
 	hash := sha256.New()
@@ -41,8 +48,41 @@ func ID(salt, content string, length int8) (string, error) {
 	return string(b)[:hashLen], nil
 }
 
-// GetNameKey returns the datastore key
-func GetNameKey(kind, id, namespace string, parentId *datastore.Key) *datastore.Key {
+func GetExampleKey(id string) *datastore.Key {
+	return getNameKey(constants.ExampleKind, id, constants.Namespace, nil)
+}
+
+func GetSdkKey(id string) *datastore.Key {
+	return getNameKey(constants.SdkKind, id, constants.Namespace, nil)
+}
+
+func GetFileKey(id string) *datastore.Key {
+	return getNameKey(constants.FileKind, id, constants.Namespace, nil)
+}
+
+func GetSchemaVerKey(id string) *datastore.Key {
+	return getNameKey(constants.SchemaKind, id, constants.Namespace, nil)
+}
+
+func GetSnippetKey(id string) *datastore.Key {
+	return getNameKey(constants.SnippetKind, id, constants.Namespace, nil)
+}
+
+func GetPCObjectKey(id string) *datastore.Key {
+	return getNameKey(constants.PCObjectKind, id, constants.Namespace, nil)
+}
+
+func GetExampleID(cloudPath string) (string, error) {
+	cloudPathParams := strings.Split(cloudPath, cloudPathDelimiter)
+	if len(cloudPathParams) < 3 {
+		logger.Error("the wrong cloud path from a client")
+		return "", fmt.Errorf("cloud path doesn't have all options. The minimum size must be 3")
+	}
+	return fmt.Sprintf("%s%s%s", cloudPathParams[0], constants.IDDelimiter, cloudPathParams[2]), nil
+}
+
+// getNameKey returns the datastore key
+func getNameKey(kind, id, namespace string, parentId *datastore.Key) *datastore.Key {
 	key := datastore.NameKey(kind, id, nil)
 	if parentId != nil {
 		key.Parent = parentId
