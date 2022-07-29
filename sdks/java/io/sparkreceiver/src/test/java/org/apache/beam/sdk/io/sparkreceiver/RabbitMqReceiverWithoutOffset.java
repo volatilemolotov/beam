@@ -81,7 +81,7 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
     final Channel channel;
 
     try {
-      System.out.println("Starting receiver");
+      LOG.info("Starting receiver");
       final ConnectionFactory connectionFactory = new ConnectionFactory();
       connectionFactory.setUri(RABBITMQ_URL);
       connectionFactory.setAutomaticRecoveryEnabled(true);
@@ -100,29 +100,29 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
       throw new RuntimeException(e);
     }
 
-    while (!isStopped()) {
-      if (currentOffset < MAX_NUM_RECORDS && testConsumer.getReceived().size() > currentOffset) {
+    while (!isStopped() && currentOffset < MAX_NUM_RECORDS) {
+      if (currentOffset < testConsumer.getReceived().size()) {
         try {
           final String stringMessage = testConsumer.getReceived().get(currentOffset);
-          System.out.println("Moving message from test consumer to receiver = " + stringMessage);
+          LOG.info("Moving message from test consumer to receiver = " + stringMessage);
           STORED_RECORDS.add(stringMessage);
           store(stringMessage);
           currentOffset++;
         } catch (Exception e) {
-          System.out.println("Exception " + e.getMessage());
+          LOG.error("Exception " + e.getMessage());
         }
       }
       try {
-        System.out.println("No messages in TestConsumer. Receiver is waiting");
+        LOG.info("No messages in TestConsumer. Receiver is waiting");
         TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
       } catch (InterruptedException e) {
         LOG.error("Interrupted", e);
       }
     }
 
-    if (isStopped()) {
+    if (isStopped() || testConsumer.getReceived().size() == MAX_NUM_RECORDS) {
       try {
-        System.out.println("Stopping receiver");
+        LOG.info("Stopping receiver");
         channel.close();
         connection.close();
       } catch (TimeoutException | IOException e) {
@@ -145,10 +145,10 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
     public void handleDelivery(
         String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
       try {
-        System.out.println("adding message to test consumer " + new String(body, StandardCharsets.UTF_8));
+        LOG.info("adding message to test consumer " + new String(body, StandardCharsets.UTF_8));
         received.add(new String(body, StandardCharsets.UTF_8));
       } catch (Exception e) {
-        System.out.println("Exception during reading from RabbitMQ " + e.getMessage());
+        LOG.error("Exception during reading from RabbitMQ " + e.getMessage());
       }
     }
 

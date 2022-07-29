@@ -21,6 +21,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.receiver.Receiver;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,18 +39,23 @@ public class CustomSparkConsumer<V> implements SparkConsumer<V> {
 
   @Override
   public V poll() {
-    return (V) queue.poll();
+    final V v = (V) queue.poll();
+    LOG.info("Polling element from consumer queue " + (v != null ? v.toString() : ""));
+    return v;
   }
 
   @Override
   public void start(Receiver<V> sparkReceiver) {
     try {
+      Log.info("Starting consumer");
       this.sparkReceiver = sparkReceiver;
       new WrappedSupervisor(
           sparkReceiver,
           new SparkConf(),
           objects -> {
-            queue.offer(objects[0]);
+            V record = (V) objects[0];
+            LOG.info("Moving message from receiver to consumer " + objects[0]);
+            queue.offer(record);
             return null;
           });
       sparkReceiver.supervisor().startReceiver();
@@ -60,8 +66,11 @@ public class CustomSparkConsumer<V> implements SparkConsumer<V> {
 
   @Override
   public void stop() {
+    LOG.info("Stopping consumer");
     queue.clear();
-    sparkReceiver.stop("Stopped");
+    if (!sparkReceiver.isStopped()) {
+      sparkReceiver.stop("Stopped");
+    }
   }
 
   @Override

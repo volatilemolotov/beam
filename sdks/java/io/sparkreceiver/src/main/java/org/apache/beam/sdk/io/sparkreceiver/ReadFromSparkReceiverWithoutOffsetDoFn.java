@@ -17,8 +17,6 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
-
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.io.range.OffsetRange;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -35,6 +33,8 @@ import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
 /** A SplittableDoFn which reads from {@link Receiver} that doesn't implement {@link HasOffset}. */
 @UnboundedPerElement
@@ -73,7 +73,7 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
 
   @GetInitialRestriction
   public OffsetRange initialRestriction(@Element byte[] element) {
-    return new OffsetRange(0, Long.MAX_VALUE);
+    return new OffsetRange(0, Long.MAX_VALUE); // TODO add possibility to set value instead Long.MAX_VALUE
   }
 
   @GetInitialWatermarkEstimatorState
@@ -119,7 +119,6 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
       WatermarkEstimator<Instant> watermarkEstimator,
       OutputReceiver<V> receiver) {
 
-    System.out.println("Process element");
     while (sparkConsumer.hasRecords()) {
       V record = sparkConsumer.poll();
       if (record != null) {

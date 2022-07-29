@@ -88,6 +88,8 @@ public class SparkReceiverIOIT {
 
   private static final String TIMESTAMP = Timestamp.now().toString();
 
+  private static final String TEST_MESSAGE_PREFIX = "Test ";
+
   private static Options options;
 
   private static SyntheticSourceOptions sourceOptions;
@@ -141,7 +143,7 @@ public class SparkReceiverIOIT {
 
     @Description("Options for synthetic source.")
     @Validation.Required
-    @Default.String("{\"numRecords\": \"100\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
+    @Default.String("{\"numRecords\": \"10\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
     String getSourceOptions();
 
     void setSourceOptions(String sourceOptions);
@@ -182,8 +184,8 @@ public class SparkReceiverIOIT {
   private static class RabbitMqMessage {
     private final byte[] body;
 
-    public RabbitMqMessage(long recordNum) {
-      this.body = ("Test " + recordNum).getBytes(StandardCharsets.UTF_8);
+    public RabbitMqMessage(String record) {
+      this.body = record.getBytes(StandardCharsets.UTF_8);
     }
 
     public byte[] getBody() {
@@ -193,7 +195,7 @@ public class SparkReceiverIOIT {
 
   private void writeToRabbitMq(final long maxNumRecords) throws IOException, TimeoutException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
     final List<RabbitMqMessage> data = LongStream.range(0, maxNumRecords)
-        .mapToObj(RabbitMqMessage::new)
+        .mapToObj(number -> new RabbitMqMessage(TEST_MESSAGE_PREFIX + number))
         .collect(Collectors.toList());
 
     final ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -220,9 +222,9 @@ public class SparkReceiverIOIT {
             options.getQueue());
 
     return SparkReceiverIO.<String>read()
-            .withSparkConsumer(new RabbitMqConsumer<>())
+            .withSparkConsumer(new CustomSparkConsumer<>())
             .withValueClass(String.class)
-            .withGetOffsetFn(rabbitMqMessage -> Long.valueOf(rabbitMqMessage.substring("Test ".length())))
+            .withGetOffsetFn(rabbitMqMessage -> Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
             .withSparkReceiverBuilder(receiverBuilder);
   }
 
