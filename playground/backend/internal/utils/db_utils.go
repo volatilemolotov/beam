@@ -92,6 +92,14 @@ func GetIDWithDelimiter(values ...interface{}) string {
 		switch value.(type) {
 		case int:
 			valuesAsStr = append(valuesAsStr, strconv.Itoa(value.(int)))
+		case int8:
+			valuesAsStr = append(valuesAsStr, strconv.Itoa(int(value.(int8))))
+		case int16:
+			valuesAsStr = append(valuesAsStr, strconv.Itoa(int(value.(int16))))
+		case int32:
+			valuesAsStr = append(valuesAsStr, strconv.Itoa(int(value.(int32))))
+		case int64:
+			valuesAsStr = append(valuesAsStr, strconv.Itoa(int(value.(int64))))
 		default:
 			valuesAsStr = append(valuesAsStr, value.(string))
 		}
