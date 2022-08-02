@@ -16,24 +16,38 @@
  * limitations under the License.
  */
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 
-import '../../components/logo.dart';
-import '../../components/toggle_theme_button.dart';
+import '../config/theme/switch_notifier.dart';
+import '../constants/assets.dart';
+import '../constants/sizes.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class ToggleThemeButton extends StatelessWidget {
+  const ToggleThemeButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Logo(),
-        actions: const [
-          ToggleThemeButton(),
-        ],
-      ),
-      body: Container(),
+    return Consumer<ThemeSwitchNotifier>(
+      builder: (context, notifier, child) {
+        final text = notifier.isDarkMode ? 'lightMode'.tr() : 'darkMode'.tr();
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: kSmSpacing,
+            horizontal: kMdSpacing,
+          ),
+          child: TextButton.icon(
+            icon: SvgPicture.asset(kThemeModeAsset),
+            label: Text(text),
+            onPressed: () {
+              notifier.toggleTheme();
+            },
+          ),
+        );
+      },
     );
   }
 }

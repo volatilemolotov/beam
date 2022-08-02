@@ -19,6 +19,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+TextStyle getLogoFontStyle({TextStyle? textStyle}) {
+  return GoogleFonts.roboto(textStyle: textStyle);
+}
+
 TextTheme getBaseFontTheme(TextTheme theme) {
   return GoogleFonts.sourceSansProTextTheme(theme);
 }

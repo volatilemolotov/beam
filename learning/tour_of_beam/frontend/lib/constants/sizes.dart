@@ -35,3 +35,12 @@ const double kXlBorderRadius = 28;
 
 // elevation
 const double kElevation = 2;
+
+// icon sizes
+const double kIconSizeXs = 8;
+const double kIconSizeSm = 16;
+const double kIconSizeMd = 24;
+const double kIconSizeLg = 32;
+
+// font sizes
+const double kLogoFontSize = 18;

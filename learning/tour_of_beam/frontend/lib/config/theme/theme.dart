@@ -68,6 +68,14 @@ OutlinedButtonThemeData _createOutlineButtonTheme(Color textColor) {
   );
 }
 
+AppBarTheme _createAppBarTheme(Color backgroundColor) {
+  return AppBarTheme(
+    color: backgroundColor,
+    elevation: 1,
+    centerTitle: false,
+  );
+}
+
 final kLightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: kLightPrimary,
@@ -75,6 +83,7 @@ final kLightTheme = ThemeData(
   textTheme: _createTextTheme(kLightText),
   textButtonTheme: _createTextButtonTheme(kLightText),
   outlinedButtonTheme: _createOutlineButtonTheme(kLightText),
+  appBarTheme: _createAppBarTheme(kLightSecondaryBackground),
 );
 
 final kDarkTheme = ThemeData(
@@ -84,4 +93,5 @@ final kDarkTheme = ThemeData(
   textTheme: _createTextTheme(kDarkText),
   textButtonTheme: _createTextButtonTheme(kDarkText),
   outlinedButtonTheme: _createOutlineButtonTheme(kDarkText),
+  appBarTheme: _createAppBarTheme(kDarkSecondaryBackground),
 );

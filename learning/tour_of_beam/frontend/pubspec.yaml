@@ -31,6 +31,7 @@ dependencies:
   easy_localization_loader: ^1.0.0
   flutter:
     sdk: flutter
+  flutter_svg: ^1.0.3
   get_it: ^7.2.0
   google_fonts: ^3.0.1
   provider: ^6.0.3
@@ -46,3 +47,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/translations/en.yaml
+    - assets/png/
+    - assets/svg/
