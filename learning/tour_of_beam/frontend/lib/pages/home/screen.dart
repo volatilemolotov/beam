@@ -18,6 +18,10 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../config/theme/switch_notifier.dart';
+import '../../constants/sizes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -28,7 +32,26 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('pages.home.screen.title').tr(),
       ),
-      body: Container(),
+      body: Consumer<ThemeSwitchNotifier>(
+        builder: (context, notifier, child) {
+          final text = notifier.isDarkMode
+              ? 'appLocale.lightMode'
+              : 'appLocale.darkMode';
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: kSmSpacing,
+              horizontal: kMdSpacing,
+            ),
+            child: TextButton(
+              child: Text(text),
+              onPressed: () {
+                notifier.toggleTheme();
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 }
