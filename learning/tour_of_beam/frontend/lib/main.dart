@@ -19,8 +19,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:easy_localization_loader/easy_localization_loader.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_strategy/url_strategy.dart';
 
+import 'config/theme/theme.dart';
+import 'config/theme/theme_provider.dart';
 import 'locator.dart';
 import 'pages/home/screen.dart';
 
@@ -46,11 +49,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      localizationsDelegates: context.localizationDelegates,
-      supportedLocales: context.supportedLocales,
-      locale: context.locale,
-      home: const HomeScreen(),
+    return ChangeNotifierProvider(
+      create: (context) => ThemeProvider()..init(),
+      builder: (context, _) {
+        final themeProvider = Provider.of<ThemeProvider>(context);
+
+        return MaterialApp(
+          themeMode: themeProvider.themeMode,
+          theme: kLightTheme,
+          darkTheme: kDarkTheme,
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          home: const HomeScreen(),
+        );
+      },
     );
   }
 }
