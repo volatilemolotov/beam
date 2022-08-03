@@ -29,6 +29,7 @@ import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -42,6 +43,7 @@ public class SparkReceiverIOTest {
     ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
         new ReceiverBuilder<>(CustomReceiverWithoutOffset.class).withConstructorArgs();
     SerializableFunction<String, Long> offsetFn = Long::valueOf;
+    SerializableFunction<String, Instant> watermarkFn = Instant::parse;
     CustomSparkConsumer<String> sparkConsumer = new CustomSparkConsumer<>();
 
     SparkReceiverIO.Read<String> read =
@@ -49,6 +51,7 @@ public class SparkReceiverIOTest {
             .withSparkConsumer(sparkConsumer)
             .withValueClass(String.class)
             .withGetOffsetFn(offsetFn)
+            .withWatermarkFn(watermarkFn)
             .withSparkReceiverBuilder(receiverBuilder);
 
     assertEquals(sparkConsumer, read.getSparkConsumer());
@@ -68,6 +71,12 @@ public class SparkReceiverIOTest {
   public void testReadObjectCreationFailsIfGetOffsetFnIsNull() {
     assertThrows(
         IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withGetOffsetFn(null));
+  }
+
+  @Test
+  public void testReadObjectCreationFailsIfWatermarkFnIsNull() {
+    assertThrows(
+        IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withWatermarkFn(null));
   }
 
   @Test
@@ -111,6 +120,7 @@ public class SparkReceiverIOTest {
         SparkReceiverIO.<String>read()
             .withValueClass(String.class)
             .withGetOffsetFn(Long::valueOf)
+            .withWatermarkFn(Instant::parse)
             .withSparkReceiverBuilder(receiverBuilder);
 
     List<String> storedRecords = CustomReceiverWithOffset.getStoredRecords();
@@ -136,6 +146,7 @@ public class SparkReceiverIOTest {
         SparkReceiverIO.<String>read()
             .withValueClass(String.class)
             .withGetOffsetFn(Long::valueOf)
+            .withWatermarkFn(Instant::parse)
             .withSparkConsumer(new CustomSparkConsumer<>())
             .withSparkReceiverBuilder(receiverBuilder);
 

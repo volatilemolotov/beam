@@ -30,6 +30,7 @@ import org.apache.beam.sdk.values.PBegin;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,8 @@ public class SparkReceiverIO {
 
     abstract @Nullable SerializableFunction<V, Long> getGetOffsetFn();
 
+    abstract @Nullable SerializableFunction<V, Instant> getWatermarkFn();
+
     abstract @Nullable SparkConsumer<V> getSparkConsumer();
 
     abstract Builder<V> toBuilder();
@@ -67,6 +70,8 @@ public class SparkReceiverIO {
           ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder);
 
       abstract Builder<V> setGetOffsetFn(SerializableFunction<V, Long> getOffsetFn);
+
+      abstract Builder<V> setWatermarkFn(SerializableFunction<V, Instant> watermarkFn);
 
       abstract Builder<V> setSparkConsumer(SparkConsumer<V> sparkConsumer);
 
@@ -87,6 +92,11 @@ public class SparkReceiverIO {
     public Read<V> withGetOffsetFn(SerializableFunction<V, Long> getOffsetFn) {
       checkArgument(getOffsetFn != null, "Get offset function can not be null");
       return toBuilder().setGetOffsetFn(getOffsetFn).build();
+    }
+
+    public Read<V> withWatermarkFn(SerializableFunction<V, Instant> watermarkFn) {
+      checkArgument(watermarkFn != null, "Watermark function can not be null");
+      return toBuilder().setWatermarkFn(watermarkFn).build();
     }
 
     public Read<V> withSparkConsumer(SparkConsumer<V> sparkConsumer) {
