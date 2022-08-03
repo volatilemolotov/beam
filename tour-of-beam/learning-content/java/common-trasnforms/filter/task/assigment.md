@@ -1,1 +1,0 @@
-Given a list of integers print even numbers using ```Filter```. Write a separate function that takes a ```PCollection``` and returns a filtered ```PCollection```.

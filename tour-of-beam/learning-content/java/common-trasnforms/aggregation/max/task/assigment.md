@@ -1,1 +1,0 @@
-Given a list of integers ```PCollection```, print globally maximum from ```PCollection``` using ```Max```.

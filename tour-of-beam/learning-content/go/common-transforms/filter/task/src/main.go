@@ -15,10 +15,11 @@ func main() {
 
 	p, s := beam.NewPipelineWithRoot()
 
-	input := beam.Create(s, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	// List of elements
+    input := beam.Create(s, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
-    // The [input] need to be filtered with the function you wrote
-	output := input
+    // The [input] filtered with the applyTransform()
+    output := applyTransform(input)
 
 	debug.Print(s, output)
 
@@ -29,5 +30,11 @@ func main() {
 	}
 }
 
-// Write here function ApplyTransform(s beam.Scope, input beam.PCollection) beam.PCollection
+// The method filters the collection so that the numbers are even
+func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
+	return filter.Exclude(s, input, func(element int) bool {
+		return element % 2 == 1
+	})
+}
+
 

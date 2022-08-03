@@ -1,1 +1,0 @@
-You can use `stats.Max()` to return the maximum number from `PCollection`.

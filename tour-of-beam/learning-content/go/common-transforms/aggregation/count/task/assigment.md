@@ -1,1 +1,0 @@
-Given a list of integers ```PCollection```, print count of numbers from ```PCollection```.

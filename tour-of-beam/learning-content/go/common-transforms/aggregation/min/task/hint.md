@@ -1,1 +1,0 @@
-You can use `stats.Min()` to return the minimum number from `PCollection`.

@@ -1,1 +1,0 @@
-You can use `Sum.integersGlobally()` to return the sum from `PCollection`.

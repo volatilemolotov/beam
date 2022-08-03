@@ -1,1 +1,0 @@
-You can use ```Filter.by(SerializableFunction<Integer,Boolean>{...})``` to override the ```apply``` method, or you can use the lambda ```Filter.by(number->number%2==0)```

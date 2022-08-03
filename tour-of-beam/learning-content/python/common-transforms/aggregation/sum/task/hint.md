@@ -1,1 +1,0 @@
-You can use `beam.CombineGlobally(sum)` to return the sum of numbers from `PCollection`.

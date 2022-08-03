@@ -15,7 +15,7 @@ public class Task {
         // List of elements
         PCollection<Integer> numbers = pipeline.apply(Create.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 
-        // The [numbers] need to be filtered with the method you wrote
+        // The applyTransform() converts [numbers] to [output]
         PCollection<Double> output = (numbers);
 
         output.apply(Log.ofElements());
@@ -23,6 +23,8 @@ public class Task {
         pipeline.run();
     }
 
-    // Write here method applyTransform(PCollection collection) { ... }
-
+    // Mean.globally() to return the globally mean from `PCollection`
+    static PCollection<Double> applyTransform(PCollection<Integer> input) {
+        return input.apply(Mean.globally());
+    }
 }

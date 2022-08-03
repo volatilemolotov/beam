@@ -1,1 +1,0 @@
-You can use `stats.Sum()` to return the sum of numbers from `PCollection`.

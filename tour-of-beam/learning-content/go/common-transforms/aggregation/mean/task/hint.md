@@ -1,1 +1,0 @@
-You can use `stats.Mean()` to return the mean of numbers from `PCollection`.

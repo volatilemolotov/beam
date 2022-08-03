@@ -17,8 +17,8 @@ func main() {
     // List of elements
 	input := beam.Create(s, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
-	// The [input] need to be filtered with the function you wrote
-	output := input
+    // The applyTransform() converts [input] to [output]
+    output := input
 
 	debug.Print(s, output)
 
@@ -28,4 +28,7 @@ func main() {
 		log.Exitf(context.Background(), "Failed to execute job: %v", err)
 	}
 
-// Write here function applyTransform(s beam.Scope, input beam.PCollection) { ... }
+// Return the minimum of numbers from `PCollection`.
+func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
+	return stats.Min(s, input)
+}

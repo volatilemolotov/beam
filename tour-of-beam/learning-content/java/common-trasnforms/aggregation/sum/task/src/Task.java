@@ -15,7 +15,7 @@ public class Task {
         // List of elements
         PCollection<Integer> numbers = pipeline.apply(Create.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 
-        // The [numbers] need to be filtered with the method you wrote
+        // The applyTransform() converts [numbers] to [output]
         PCollection<Integer> output = (numbers);
 
         output.apply(Log.ofElements());
@@ -23,6 +23,9 @@ public class Task {
         pipeline.run();
     }
 
-    // Write here method applyTransform(PCollection collection) { ... }
+    // Sum.integersGlobally() to return the globally sum from `PCollection`
+    static PCollection<Integer> applyTransform(PCollection<Integer> input) {
+        return input.apply(Sum.integersGlobally());
+    }
 
 }

@@ -1,1 +1,0 @@
-You can use `beam.combiners.Top.Smallest(1)` to return the small number from `PCollection`.

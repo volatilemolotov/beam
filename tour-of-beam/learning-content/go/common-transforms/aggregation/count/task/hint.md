@@ -1,1 +1,0 @@
-You can use `stats.CountElms()` to return the count of numbers from `PCollection`.

@@ -1,1 +1,0 @@
-You can use `Min.integersGlobally()` to return the minimum from `PCollection`.

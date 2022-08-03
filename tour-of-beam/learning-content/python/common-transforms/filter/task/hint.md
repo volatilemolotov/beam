@@ -1,1 +1,0 @@
-You can use ```beam.Filter()``` which takes a function in which the filter logic is described.

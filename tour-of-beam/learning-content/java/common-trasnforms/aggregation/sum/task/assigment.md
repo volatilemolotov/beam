@@ -1,1 +1,0 @@
-Given a list of integers ```PCollection```, print globally sum from ```PCollection``` using ```Sum```.

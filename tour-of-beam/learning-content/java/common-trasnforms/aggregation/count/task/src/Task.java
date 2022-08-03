@@ -15,13 +15,17 @@ public class Task {
         PCollection<Integer> numbers =
                 pipeline.apply(Create.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
 
-        // The [numbers] need to be filtered with the method you wrote
-        PCollection<Integer> output = numbers;
+        // The applyTransform() converts [numbers] to [output]
+        PCollection<Integer> output = applyTransform(numbers);
 
         output.apply(Log.ofElements());
 
         pipeline.run();
     }
 
-    // Write here method applyTransform(PCollection collection) { ... }
+    // Count.globally() to return the globally count from `PCollection
+    static PCollection<Integer> applyTransform(PCollection<Integer> input) {
+        return input.apply(Count.globally());
+    }
+
 }

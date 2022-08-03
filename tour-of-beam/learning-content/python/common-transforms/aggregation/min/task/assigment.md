@@ -1,1 +1,0 @@
-Given a list of integers `PCollection`, output a numbers less than 1 from ```PCollection```.

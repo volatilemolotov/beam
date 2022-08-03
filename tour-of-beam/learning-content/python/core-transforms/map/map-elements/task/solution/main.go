@@ -1,12 +1,13 @@
 package main
 
 import (
+	"beam.apache.org/learning/katas/common_transforms/filter/filter/pkg/task"
 	"context"
 	"github.com/apache/beam/sdks/go/pkg/beam"
 	"github.com/apache/beam/sdks/go/pkg/beam/log"
 	"github.com/apache/beam/sdks/go/pkg/beam/x/beamx"
 	"github.com/apache/beam/sdks/go/pkg/beam/x/debug"
-    "github.com/apache/beam/sdks/go/pkg/beam/transforms/stats"
+    "github.com/apache/beam/sdks/go/pkg/beam/transforms/filter"
 )
 
 func main() {
@@ -14,11 +15,9 @@ func main() {
 
 	p, s := beam.NewPipelineWithRoot()
 
-    // List of elements
 	input := beam.Create(s, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
-    // The applyTransform() converts [input] to [output]
-	output := applyTransform(s, input)
+	output := task.ApplyTransform(s, input)
 
 	debug.Print(s, output)
 
@@ -27,8 +26,12 @@ func main() {
 	if err != nil {
 		log.Exitf(context.Background(), "Failed to execute job: %v", err)
 	}
-
-// Return the count of numbers from `PCollection`.
-func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
-	return stats.CountElms(s, input)
 }
+
+func ApplyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
+	return filter.Exclude(s, input, func(element int) bool {
+		return element % 2 == 1
+	})
+}
+
+

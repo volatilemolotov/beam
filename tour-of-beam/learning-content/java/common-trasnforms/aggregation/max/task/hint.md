@@ -1,1 +1,0 @@
-You can use `Max.integersGlobally()` to return the maximum from `PCollection`.
