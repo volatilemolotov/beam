@@ -32,7 +32,9 @@ class ToggleThemeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeSwitchNotifier>(
       builder: (context, notifier, child) {
-        final text = notifier.isDarkMode ? 'lightMode'.tr() : 'darkMode'.tr();
+        final text = notifier.isDarkMode
+            ? 'header.lightMode'.tr()
+            : 'header.darkMode'.tr();
 
         return Padding(
           padding: const EdgeInsets.symmetric(

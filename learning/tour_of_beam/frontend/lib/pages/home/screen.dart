@@ -18,22 +18,15 @@
 
 import 'package:flutter/material.dart';
 
-import '../../components/logo.dart';
-import '../../components/toggle_theme_button.dart';
+import '../../components/page_container.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Logo(),
-        actions: const [
-          ToggleThemeButton(),
-        ],
-      ),
-      body: Container(),
+    return PageContainer(
+      content: Row(),
     );
   }
 }
