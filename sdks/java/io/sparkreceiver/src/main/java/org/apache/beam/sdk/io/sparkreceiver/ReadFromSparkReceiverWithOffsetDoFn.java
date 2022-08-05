@@ -110,9 +110,11 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
     private final Queue<V> recordsQueue;
     private @Nullable Receiver<V> sparkReceiver;
     private final Long startOffset;
+    private final Long endOffset;
 
     public SparkConsumerWithOffset(Long startOffset) {
       this.startOffset = startOffset;
+      this.endOffset = Long.MAX_VALUE;
       this.recordsQueue = new ConcurrentLinkedQueue<>();
     }
 
@@ -156,6 +158,11 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
         sparkReceiver.stop("Stopped");
       }
       recordsQueue.clear();
+    }
+
+    @Override
+    public Long getEndOffset() {
+      return this.endOffset;
     }
   }
 

@@ -17,13 +17,14 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.receiver.Receiver;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.Option;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Imitation of {@link SparkConsumer} that stores records into static {@link Queue}. Used to test
@@ -36,6 +37,15 @@ public class CustomSparkConsumer<V> implements SparkConsumer<V> {
 
   private static final Queue<Object> queue = new ConcurrentLinkedQueue<>();
   private Receiver<V> sparkReceiver;
+  private final Long endOffset;
+
+  public CustomSparkConsumer() {
+    this.endOffset = Long.MAX_VALUE;
+  }
+
+  public CustomSparkConsumer(final Long endOffset) {
+    this.endOffset = endOffset;
+  }
 
   @Override
   public V poll() {
@@ -47,7 +57,7 @@ public class CustomSparkConsumer<V> implements SparkConsumer<V> {
   @Override
   public void start(Receiver<V> sparkReceiver) {
     try {
-      Log.info("Starting consumer");
+      LOG.info("Starting consumer");
       this.sparkReceiver = sparkReceiver;
       new WrappedSupervisor(
           sparkReceiver,
@@ -68,13 +78,22 @@ public class CustomSparkConsumer<V> implements SparkConsumer<V> {
   public void stop() {
     LOG.info("Stopping consumer");
     queue.clear();
-    if (!sparkReceiver.isStopped()) {
-      sparkReceiver.stop("Stopped");
+    try {
+      if (!sparkReceiver.supervisor().isReceiverStopped()) {
+        sparkReceiver.supervisor().stop("Receiver stopped", Option.empty());
+      }
+    } catch (Exception e) {
+      LOG.error("Exception during stopping consumer", e);
     }
   }
 
   @Override
   public boolean hasRecords() {
     return !queue.isEmpty();
+  }
+
+  @Override
+  public Long getEndOffset() {
+    return endOffset;
   }
 }

@@ -34,6 +34,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.RabbitMQContainer;
@@ -71,6 +73,8 @@ import static org.junit.Assert.assertEquals;
 @SuppressWarnings({"FieldCanBeLocal", "rawtypes", "unused"})
 @RunWith(JUnit4.class)
 public class SparkReceiverIOIT {
+
+  private static final Logger LOG = LoggerFactory.getLogger(SparkReceiverIOIT.class);
 
   private static final String READ_TIME_METRIC_NAME = "read_time";
 
@@ -222,7 +226,7 @@ public class SparkReceiverIOIT {
             options.getQueue());
 
     return SparkReceiverIO.<String>read()
-            .withSparkConsumer(new CustomSparkConsumer<>())
+            .withSparkConsumer(new CustomSparkConsumer<>(maxNumRecords))
             .withValueClass(String.class)
             .withGetOffsetFn(rabbitMqMessage -> Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
             .withSparkReceiverBuilder(receiverBuilder);
@@ -235,7 +239,7 @@ public class SparkReceiverIOIT {
       try {
         return Arrays.toString(input);
       } catch (Exception e) {
-        System.out.println("Error during RabbitMQ message conversion");
+        LOG.error("Error during RabbitMQ message conversion");
         throw e;
       }
     }
@@ -287,7 +291,7 @@ public class SparkReceiverIOIT {
   public void testSparkReceiverIOReadsInStreaming() throws IOException, TimeoutException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
 
     writeToRabbitMq(sourceOptions.numRecords);
-    System.out.println(sourceOptions.numRecords + " records were successfully written to RabbitMQ");
+    LOG.info(sourceOptions.numRecords + " records were successfully written to RabbitMQ");
 
     // Use streaming pipeline to read RabbitMQ records.
     readPipeline.getOptions().as(Options.class).setStreaming(true);

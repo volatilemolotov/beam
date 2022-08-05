@@ -73,7 +73,7 @@ public class ReadFromSparkReceiverWithoutOffsetDoFn<V> extends DoFn<byte[], V> {
 
   @GetInitialRestriction
   public OffsetRange initialRestriction(@Element byte[] element) {
-    return new OffsetRange(0, Long.MAX_VALUE); // TODO add possibility to set value instead Long.MAX_VALUE
+    return new OffsetRange(0L, this.sparkConsumer.getEndOffset()); // TODO add possibility to set value instead Long.MAX_VALUE
   }
 
   @GetInitialWatermarkEstimatorState

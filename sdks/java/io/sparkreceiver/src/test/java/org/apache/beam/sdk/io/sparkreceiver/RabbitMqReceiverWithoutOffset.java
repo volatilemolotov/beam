@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -51,7 +50,6 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
 
   @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
   private static final List<String> STORED_RECORDS = new ArrayList<>();
-  private static final int TIMEOUT_MS = 500;
   private static long MAX_NUM_RECORDS;
   private static String RABBITMQ_URL;
   private static String QUEUE_NAME;
@@ -111,12 +109,6 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
         } catch (Exception e) {
           LOG.error("Exception " + e.getMessage());
         }
-      }
-      try {
-        LOG.info("No messages in TestConsumer. Receiver is waiting");
-        TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
-      } catch (InterruptedException e) {
-        LOG.error("Interrupted", e);
       }
     }
 

@@ -35,4 +35,7 @@ public interface SparkConsumer<V> extends Serializable {
   void start(Receiver<V> sparkReceiver);
 
   void stop();
+
+  /** @return exclusive end offset to which the reading from current page will occur. */
+  Long getEndOffset();
 }

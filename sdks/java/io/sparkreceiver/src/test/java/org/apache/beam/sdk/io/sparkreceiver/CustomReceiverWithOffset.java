@@ -59,11 +59,6 @@ public class CustomReceiverWithOffset extends Receiver<String> implements HasOff
   @Override
   public void onStop() {}
 
-  @Override
-  public Long getEndOffset() {
-    return Long.MAX_VALUE;
-  }
-
   private void receive() {
     Long currentOffset = startOffset;
     while (!isStopped()) {
