@@ -218,7 +218,7 @@ public class SparkReceiverIOIT {
     }
   }
 
-  private SparkReceiverIO.Read<String> readFromRabbitMq(final long maxNumRecords) {
+  private SparkReceiverIO.Read<String> readFromRabbitMqWithoutOffset(final long maxNumRecords) {
     final ReceiverBuilder<String, RabbitMqReceiverWithoutOffset> receiverBuilder =
         new ReceiverBuilder<>(RabbitMqReceiverWithoutOffset.class).withConstructorArgs(
             options.getRabbitMqBootstrapServerAddress(),
@@ -230,6 +230,20 @@ public class SparkReceiverIOIT {
             .withValueClass(String.class)
             .withGetOffsetFn(rabbitMqMessage -> Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
             .withSparkReceiverBuilder(receiverBuilder);
+  }
+
+  private SparkReceiverIO.Read<String> readFromRabbitMqWithOffset(final long maxNumRecords) {
+    final ReceiverBuilder<String, RabbitMqReceiverWithOffset> receiverBuilder =
+        new ReceiverBuilder<>(RabbitMqReceiverWithOffset.class).withConstructorArgs(
+            options.getRabbitMqBootstrapServerAddress(),
+            maxNumRecords,
+            options.getQueue());
+
+    return SparkReceiverIO.<String>read()
+        .withSparkConsumer(new CustomSparkConsumer<>(maxNumRecords))
+        .withValueClass(String.class)
+        .withGetOffsetFn(rabbitMqMessage -> Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
+        .withSparkReceiverBuilder(receiverBuilder);
   }
 
   private static class MapRabbitMqRecordsToStrings extends SimpleFunction<byte[], String> {
@@ -296,7 +310,38 @@ public class SparkReceiverIOIT {
     // Use streaming pipeline to read RabbitMQ records.
     readPipeline.getOptions().as(Options.class).setStreaming(true);
     readPipeline
-        .apply("Read from unbounded RabbitMq", readFromRabbitMq(sourceOptions.numRecords))
+        .apply("Read from unbounded RabbitMq", readFromRabbitMqWithoutOffset(sourceOptions.numRecords))
+        .setCoder(StringUtf8Coder.of())
+        .apply(ParDo.of(new TestOutputDoFn()))
+        .apply("Measure read time", ParDo.of(new TimeMonitor<>(NAMESPACE, READ_TIME_METRIC_NAME)))
+        .apply("Counting element", ParDo.of(new CountingFn(NAMESPACE, READ_ELEMENT_METRIC_NAME)));
+
+    final PipelineResult readResult = readPipeline.run();
+    final PipelineResult.State readState =
+        readResult.waitUntilFinish(Duration.standardSeconds(options.getReadTimeout()));
+
+    cancelIfTimeout(readResult, readState);
+
+    assertEquals(
+        sourceOptions.numRecords,
+        readElementMetric(readResult));
+
+    if (!options.isWithTestcontainers()) {
+      Set<NamedTestResult> metrics = readMetrics(readResult);
+      IOITMetrics.publishToInflux(TEST_ID, TIMESTAMP, metrics, settings);
+    }
+  }
+
+  @Test
+  public void testSparkReceiverIOReadsInStreamingWithOffset() throws IOException, TimeoutException, URISyntaxException, NoSuchAlgorithmException, KeyManagementException {
+
+    writeToRabbitMq(sourceOptions.numRecords);
+    LOG.info(sourceOptions.numRecords + " records were successfully written to RabbitMQ");
+
+    // Use streaming pipeline to read RabbitMQ records.
+    readPipeline.getOptions().as(Options.class).setStreaming(true);
+    readPipeline
+        .apply("Read from unbounded RabbitMq", readFromRabbitMqWithOffset(sourceOptions.numRecords))
         .setCoder(StringUtf8Coder.of())
         .apply(ParDo.of(new TestOutputDoFn()))
         .apply("Measure read time", ParDo.of(new TimeMonitor<>(NAMESPACE, READ_TIME_METRIC_NAME)))
