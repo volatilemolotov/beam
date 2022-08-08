@@ -20,5 +20,7 @@ String _getPath(String fileName, String format) {
   return '$format/$fileName.$format';
 }
 
-final kBeamLogoAsset = _getPath('beam_logo', 'png');
-final kThemeModeAsset = _getPath('theme_mode', 'svg');
+final kBeamLogoAsset = _getPath('beam-logo', 'png');
+final kThemeModeAsset = _getPath('theme-mode', 'svg');
+final kWelcomeLaptopAsset = _getPath('welcome-laptop', 'png');
+final kWelcomeProgress0Asset = _getPath('welcome-progress-0', 'svg');
