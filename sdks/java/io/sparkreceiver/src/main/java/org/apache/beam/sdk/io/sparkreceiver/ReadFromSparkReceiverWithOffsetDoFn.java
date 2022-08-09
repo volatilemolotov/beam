@@ -112,9 +112,9 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
     private final Long startOffset;
     private final Long endOffset;
 
-    public SparkConsumerWithOffset(Long startOffset) {
+    public SparkConsumerWithOffset(Long startOffset, Long endOffset) {
       this.startOffset = startOffset;
-      this.endOffset = Long.MAX_VALUE;
+      this.endOffset = endOffset;
       this.recordsQueue = new ConcurrentLinkedQueue<>();
     }
 
@@ -181,7 +181,7 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       LOG.error("Can not build Spark Receiver", e);
       throw new IllegalStateException("Spark Receiver was not built!");
     }
-    sparkConsumer = new SparkConsumerWithOffset<>(tracker.currentRestriction().getFrom());
+    sparkConsumer = new SparkConsumerWithOffset<>(tracker.currentRestriction().getFrom(), tracker.currentRestriction().getTo());
     sparkConsumer.start(sparkReceiver);
 
     while (sparkConsumer.hasRecords()) {
