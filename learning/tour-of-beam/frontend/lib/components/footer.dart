@@ -26,41 +26,43 @@ import '../constants/links.dart';
 import '../constants/sizes.dart';
 
 class Footer extends StatelessWidget {
-  const Footer({super.key});
+  const Footer();
 
   @override
   Widget build(BuildContext context) {
+    final linkButtonStyle = TextButton.styleFrom(
+      textStyle: const TextStyle(
+        fontWeight: ProjectFontWeights.normal,
+      ),
+    );
+
     return Container(
       color: ThemeColors.of(context).secondaryBackground,
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: kSmSpacing,
-          horizontal: kXlSpacing,
+          vertical: ProjectSpacing.small,
+          horizontal: ProjectSpacing.xl,
         ),
         child: Wrap(
-          spacing: kXlSpacing,
+          spacing: ProjectSpacing.xl,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             TextButton(
-              style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontWeight: kNormalWeight),
-              ),
+              style: linkButtonStyle,
               onPressed: () {
-                launchUrl(Uri.parse(kReportIssueLink));
+                launchUrl(Uri.parse(ProjectLinks.reportIssue));
               },
-              child: Text('footer.reportIssue'.tr()),
+              child: const Text('ui.reportIssue').tr(),
             ),
             TextButton(
-              style: TextButton.styleFrom(
-                textStyle: const TextStyle(fontWeight: kNormalWeight),
-              ),
+              style: linkButtonStyle,
               onPressed: () {
-                launchUrl(Uri.parse(kPrivacyPolicyLink));
+                launchUrl(Uri.parse(ProjectLinks.privacyPolicy));
               },
-              child: const Text('footer.privacyPolicy').tr(),
+              child: const Text('ui.privacyPolicy').tr(),
             ),
-            const Text('footer.copyright').tr(),
+            const Text('ui.copyright').tr(),
           ],
         ),
       ),

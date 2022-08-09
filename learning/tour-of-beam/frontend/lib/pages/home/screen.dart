@@ -56,7 +56,7 @@ class _SdkSelection extends StatelessWidget {
           'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please sign in. \n\nPlease select the default language (you may change the language at any time):',
         ),
         const _SdkButtons(),
-        Image.asset(kWelcomeLaptopAsset),
+        Image.asset(ProjectAssets.welcomeLaptop),
       ],
     );
   }
@@ -74,14 +74,18 @@ class _SdkButtons extends StatelessWidget {
           children: ['Java', 'Python', 'Go']
               .map(
                 (e) => OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // TODO(nausharipov): select the language
+                  },
                   child: Text(e),
                 ),
               )
               .toList(),
         ),
         ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            // TODO(nausharipov): redirect
+          },
           child: const Text('Start your tour'),
         ),
       ],
@@ -125,7 +129,7 @@ class _ModuleHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SvgPicture.asset(kWelcomeProgress0Asset),
+        SvgPicture.asset(ProjectAssets.welcomeProgress0),
         const Text('Core Transforms'),
       ],
     );

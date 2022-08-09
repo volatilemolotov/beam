@@ -26,23 +26,22 @@ import '../constants/assets.dart';
 import '../constants/sizes.dart';
 
 class ToggleThemeButton extends StatelessWidget {
-  const ToggleThemeButton({super.key});
+  const ToggleThemeButton();
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ThemeSwitchNotifier>(
       builder: (context, notifier, child) {
-        final text = notifier.isDarkMode
-            ? 'header.lightMode'.tr()
-            : 'header.darkMode'.tr();
+        final text =
+            notifier.isDarkMode ? 'ui.lightMode'.tr() : 'ui.darkMode'.tr();
 
         return Padding(
           padding: const EdgeInsets.symmetric(
-            vertical: kSmSpacing,
-            horizontal: kMdSpacing,
+            vertical: ProjectSpacing.small,
+            horizontal: ProjectSpacing.medium,
           ),
           child: TextButton.icon(
-            icon: SvgPicture.asset(kThemeModeAsset),
+            icon: SvgPicture.asset(ProjectAssets.beamLogo),
             label: Text(text),
             onPressed: () {
               notifier.toggleTheme();

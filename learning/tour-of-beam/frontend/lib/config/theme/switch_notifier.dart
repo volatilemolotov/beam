@@ -25,7 +25,6 @@ import 'colors_provider.dart';
 const kThemeMode = 'theme_mode';
 
 class ThemeSwitchNotifier extends ChangeNotifier {
-  late SharedPreferences _preferences;
   ThemeMode themeMode = ThemeMode.light;
 
   static const _darkThemeColors = ThemeColors.fromBrightness(isDark: true);
@@ -34,20 +33,23 @@ class ThemeSwitchNotifier extends ChangeNotifier {
   ThemeColors get themeColors {
     if (themeMode == ThemeMode.dark) {
       return _darkThemeColors;
-    } else {
-      return _lightThemeColors;
     }
+    return _lightThemeColors;
   }
 
   void init() {
     _setPreferences();
   }
 
-  Future<void> _setPreferences() async {
-    _preferences = await SharedPreferences.getInstance();
-    themeMode = _preferences.getString(kThemeMode) == ThemeMode.dark.toString()
-        ? ThemeMode.dark
-        : ThemeMode.light;
+  void _setPreferences() {
+    SharedPreferences.getInstance().then(
+      (preferences) {
+        themeMode =
+            preferences.getString(kThemeMode) == ThemeMode.dark.toString()
+                ? ThemeMode.dark
+                : ThemeMode.light;
+      },
+    );
     notifyListeners();
   }
 
@@ -57,8 +59,12 @@ class ThemeSwitchNotifier extends ChangeNotifier {
 
   void toggleTheme() {
     themeMode = themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-    _preferences.setString(kThemeMode, themeMode.toString());
-    notifyListeners();
+    SharedPreferences.getInstance().then(
+      (preferences) {
+        preferences.setString(kThemeMode, themeMode.toString());
+        notifyListeners();
+      },
+    );
   }
 }
 

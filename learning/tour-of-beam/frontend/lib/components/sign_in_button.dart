@@ -22,18 +22,20 @@ import 'package:flutter/material.dart';
 import '../constants/sizes.dart';
 
 class SignInButton extends StatelessWidget {
-  const SignInButton({super.key});
+  const SignInButton();
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: kSmSpacing,
-        horizontal: kMdSpacing,
+        vertical: ProjectSpacing.small,
+        horizontal: ProjectSpacing.medium,
       ),
       child: TextButton(
-        child: const Text('header.signIn').tr(),
-        onPressed: () {},
+        child: const Text('ui.signIn').tr(),
+        onPressed: () {
+          // TODO(nausharipov): sign in
+        },
       ),
     );
   }

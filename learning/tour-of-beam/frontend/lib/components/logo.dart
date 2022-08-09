@@ -24,7 +24,7 @@ import '../constants/fonts.dart';
 import '../constants/sizes.dart';
 
 class Logo extends StatelessWidget {
-  const Logo({super.key});
+  const Logo();
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +33,19 @@ class Logo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
-          kBeamLogoAsset,
-          width: kIconSizeLg,
-          height: kIconSizeLg,
+          ProjectAssets.beamLogo,
+          width: ProjectIconSizes.large,
+          height: ProjectIconSizes.large,
         ),
         RichText(
           text: TextSpan(
             style: getLogoFontStyle(
               textStyle: const TextStyle(
-                fontSize: kLogoFontSize,
-                fontWeight: kLightWeight,
+                fontSize: ProjectFontSizes.logo,
+                fontWeight: ProjectFontWeights.light,
               ),
             ),
-            children: <TextSpan>[
+            children: [
               TextSpan(
                 text: 'Tour of',
                 style: TextStyle(

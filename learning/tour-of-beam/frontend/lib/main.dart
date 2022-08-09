@@ -31,12 +31,13 @@ void main() async {
   setPathUrlStrategy();
   await EasyLocalization.ensureInitialized();
   await initializeServiceLocator();
+  const Locale englishLocale = Locale('en');
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en')],
-      startLocale: const Locale('en'),
-      fallbackLocale: const Locale('en'),
+      supportedLocales: const [englishLocale],
+      startLocale: englishLocale,
+      fallbackLocale: englishLocale,
       path: 'assets/translations',
       assetLoader: YamlAssetLoader(),
       child: const MyApp(),
@@ -45,7 +46,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp();
 
   @override
   Widget build(BuildContext context) {

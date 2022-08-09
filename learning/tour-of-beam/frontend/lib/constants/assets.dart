@@ -20,7 +20,13 @@ String _getPath(String fileName, String format) {
   return '$format/$fileName.$format';
 }
 
-final kBeamLogoAsset = _getPath('beam-logo', 'png');
-final kThemeModeAsset = _getPath('theme-mode', 'svg');
-final kWelcomeLaptopAsset = _getPath('welcome-laptop', 'png');
-final kWelcomeProgress0Asset = _getPath('welcome-progress-0', 'svg');
+const _pngFormat = 'png';
+const _svgFormat = 'svg';
+
+// ignore_for_file: avoid_classes_with_only_static_members
+class ProjectAssets {
+  static final beamLogo = _getPath('beam-logo', _pngFormat);
+  static final themeMode = _getPath('theme-mode', _svgFormat);
+  static final welcomeLaptop = _getPath('welcome-laptop', _pngFormat);
+  static final welcomeProgress0 = _getPath('welcome-progress-0', _svgFormat);
+}

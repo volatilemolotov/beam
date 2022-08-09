@@ -16,31 +16,37 @@
  * limitations under the License.
  */
 
-// spacings
-const double kZeroSpacing = 0;
-const double kSmSpacing = 4;
-const double kMdSpacing = 8;
-const double kLgSpacing = 12;
-const double kXlSpacing = 16;
-const double kXxlSpacing = 36;
+class ProjectSpacing {
+  static const double zero = 0;
+  static const double small = 4;
+  static const double medium = 8;
+  static const double large = 12;
+  static const double xl = 16;
+  static const double xxl = 36;
+}
 
-// sizes
-const double kFooterHeight = 32;
+class ProjectSizes {
+  static const double footerHeight = 32;
+}
 
-// border radius
-const double kSmBorderRadius = 4;
-const double kMdBorderRadius = 6;
-const double kLgBorderRadius = 8;
-const double kXlBorderRadius = 28;
+class ProjectBorderRadius {
+  static const double small = 4;
+  static const double medium = 6;
+  static const double large = 8;
+  static const double xl = 28;
+}
 
-// elevation
-const double kElevation = 2;
+class ProjectElevation {
+  static const double medium = 2;
+}
 
-// icon sizes
-const double kIconSizeXs = 8;
-const double kIconSizeSm = 16;
-const double kIconSizeMd = 24;
-const double kIconSizeLg = 32;
+class ProjectIconSizes {
+  static const double xs = 8;
+  static const double small = 16;
+  static const double medium = 24;
+  static const double large = 32;
+}
 
-// font sizes
-const double kLogoFontSize = 18;
+class ProjectFontSizes {
+  static const double logo = 18;
+}

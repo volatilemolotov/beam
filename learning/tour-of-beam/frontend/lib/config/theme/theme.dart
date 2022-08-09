@@ -38,7 +38,7 @@ TextTheme _createTextTheme(Color textColor) {
       bodyText2: TextStyle(),
       caption: TextStyle(),
       overline: TextStyle(),
-      button: TextStyle(fontWeight: kBoldWeight),
+      button: TextStyle(fontWeight: ProjectFontWeights.bold),
     ).apply(
       bodyColor: textColor,
       displayColor: textColor,
@@ -51,7 +51,9 @@ TextButtonThemeData _createTextButtonTheme(Color textColor) {
     style: TextButton.styleFrom(
       primary: textColor,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(kLgBorderRadius)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(ProjectBorderRadius.large),
+        ),
       ),
     ),
   );
@@ -62,7 +64,9 @@ OutlinedButtonThemeData _createOutlineButtonTheme(Color textColor) {
     style: OutlinedButton.styleFrom(
       primary: textColor,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(kSmBorderRadius)),
+        borderRadius: BorderRadius.all(
+          Radius.circular(ProjectBorderRadius.small),
+        ),
       ),
     ),
   );
@@ -78,20 +82,20 @@ AppBarTheme _createAppBarTheme(Color backgroundColor) {
 
 final kLightTheme = ThemeData(
   brightness: Brightness.light,
-  primaryColor: kLightPrimary,
-  backgroundColor: kLightPrimaryBackground,
-  textTheme: _createTextTheme(kLightText),
-  textButtonTheme: _createTextButtonTheme(kLightText),
-  outlinedButtonTheme: _createOutlineButtonTheme(kLightText),
-  appBarTheme: _createAppBarTheme(kLightSecondaryBackground),
+  primaryColor: ProjectLightThemeColors.primary,
+  backgroundColor: ProjectLightThemeColors.primaryBackground,
+  textTheme: _createTextTheme(ProjectLightThemeColors.text),
+  textButtonTheme: _createTextButtonTheme(ProjectLightThemeColors.text),
+  outlinedButtonTheme: _createOutlineButtonTheme(ProjectLightThemeColors.text),
+  appBarTheme: _createAppBarTheme(ProjectLightThemeColors.secondaryBackground),
 );
 
 final kDarkTheme = ThemeData(
   brightness: Brightness.dark,
-  primaryColor: kDarkPrimary,
-  backgroundColor: kDarkPrimaryBackground,
-  textTheme: _createTextTheme(kDarkText),
-  textButtonTheme: _createTextButtonTheme(kDarkText),
-  outlinedButtonTheme: _createOutlineButtonTheme(kDarkText),
-  appBarTheme: _createAppBarTheme(kDarkSecondaryBackground),
+  primaryColor: ProjectDarkThemeColors.primary,
+  backgroundColor: ProjectDarkThemeColors.primaryBackground,
+  textTheme: _createTextTheme(ProjectDarkThemeColors.text),
+  textButtonTheme: _createTextButtonTheme(ProjectDarkThemeColors.text),
+  outlinedButtonTheme: _createOutlineButtonTheme(ProjectDarkThemeColors.text),
+  appBarTheme: _createAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
 );

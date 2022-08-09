@@ -67,20 +67,26 @@ class ThemeColors {
     );
   }
 
-  Color get divider => isDark ? kDarkGrey : kLightGrey;
+  Color get divider =>
+      isDark ? ProjectDarkThemeColors.grey : ProjectLightThemeColors.grey;
 
-  Color get primary => isDark ? kLightPrimary : kDarkPrimary;
+  Color get primary =>
+      isDark ? ProjectDarkThemeColors.primary : ProjectLightThemeColors.primary;
 
-  Color get primaryBackgroundTextColor => Colors.white;
+  Color get primaryBackgroundTextColor => ProjectColors.white;
 
-  Color get lightGreyBackgroundTextColor => Colors.black;
+  Color get lightGreyBackgroundTextColor => ProjectColors.black;
 
-  Color get secondaryBackground =>
-      isDark ? kDarkSecondaryBackground : kLightSecondaryBackground;
+  Color get secondaryBackground => isDark
+      ? ProjectDarkThemeColors.secondaryBackground
+      : ProjectLightThemeColors.secondaryBackground;
 
   Color get background =>
       _background ??
-      (isDark ? kDarkPrimaryBackground : kLightPrimaryBackground);
+      (isDark
+          ? ProjectDarkThemeColors.primaryBackground
+          : ProjectLightThemeColors.primaryBackground);
 
-  Color get textColor => isDark ? kDarkText : kLightText;
+  Color get textColor =>
+      isDark ? ProjectDarkThemeColors.text : ProjectLightThemeColors.text;
 }

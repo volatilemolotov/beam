@@ -18,16 +18,23 @@
 
 import 'package:flutter/material.dart';
 
-// Light Theme base colors
-const Color kLightPrimaryBackground = Colors.white;
-const Color kLightSecondaryBackground = Color(0xFFFCFCFC);
-const Color kLightGrey = Color(0xFFE5E5E5);
-const Color kLightText = Color(0xFF242639);
-const Color kLightPrimary = Color(0xFFE74D1A);
+class ProjectColors {
+  static const white = Colors.white;
+  static const black = Colors.black;
+}
 
-// Dark Theme base colors
-const Color kDarkPrimaryBackground = Color(0xFF18181B);
-const Color kDarkSecondaryBackground = Color(0xFF2E2E34);
-const Color kDarkGrey = Color(0xFF3F3F46);
-const Color kDarkText = Color(0xFFFFFFFF);
-const Color kDarkPrimary = Color(0xFFF26628);
+class ProjectLightThemeColors {
+  static const primaryBackground = Colors.white;
+  static const secondaryBackground = Color(0xFFFCFCFC);
+  static const grey = Color(0xFFE5E5E5);
+  static const text = Color(0xFF242639);
+  static const primary = Color(0xFFE74D1A);
+}
+
+class ProjectDarkThemeColors {
+  static const primaryBackground = Color(0xFF18181B);
+  static const secondaryBackground = Color(0xFF2E2E34);
+  static const grey = Color(0xFF3F3F46);
+  static const text = Color(0xFFFFFFFF);
+  static const primary = Color(0xFFF26628);
+}

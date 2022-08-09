@@ -15,15 +15,10 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-header:
+ui:
   signIn: 'Sign in'
   darkMode: 'Dark Mode'
   lightMode: 'Light Mode'
-footer:
-  feedback:
-    isEnjoyingTob: 'Enjoying Tour of Beam?'
-    enjoyingLabel: 'Good Experience'
-    notEnjoyingLabel: 'Bad Experience'
   reportIssue: 'Report issue in Jira'
   privacyPolicy: 'Privacy Policy'
   copyright: '© The Apache Software Foundation'

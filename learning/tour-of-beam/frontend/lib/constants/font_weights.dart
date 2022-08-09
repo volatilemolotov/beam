@@ -16,9 +16,11 @@
  * limitations under the License.
  */
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/painting.dart';
 
-const FontWeight kLightWeight = FontWeight.w300;
-const FontWeight kNormalWeight = FontWeight.normal;
-const FontWeight kMediumWeight = FontWeight.w600;
-const FontWeight kBoldWeight = FontWeight.bold;
+class ProjectFontWeights {
+  static const light = FontWeight.w300;
+  static const normal = FontWeight.normal;
+  static const medium = FontWeight.w600;
+  static const bold = FontWeight.bold;
+}

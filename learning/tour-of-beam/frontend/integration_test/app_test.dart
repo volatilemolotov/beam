@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:tour_of_beam/components/toggle_theme_button.dart';
@@ -29,12 +30,12 @@ void main() {
       app.main();
       await tester.pumpAndSettle();
       final Finder switchToDarkModeButton =
-          find.widgetWithText(ToggleThemeButton, 'Dark Mode');
+          find.widgetWithText(ToggleThemeButton, 'ui.darkMode'.tr());
       expect(switchToDarkModeButton, findsOneWidget);
       await tester.tap(switchToDarkModeButton);
       await tester.pumpAndSettle();
       expect(
-        find.widgetWithText(ToggleThemeButton, 'Light Mode'),
+        find.widgetWithText(ToggleThemeButton, 'ui.lightMode'.tr()),
         findsOneWidget,
       );
     });
