@@ -48,9 +48,9 @@ class ThemeSwitchNotifier extends ChangeNotifier {
             preferences.getString(kThemeMode) == ThemeMode.dark.toString()
                 ? ThemeMode.dark
                 : ThemeMode.light;
+        notifyListeners();
       },
     );
-    notifyListeners();
   }
 
   bool get isDarkMode {
