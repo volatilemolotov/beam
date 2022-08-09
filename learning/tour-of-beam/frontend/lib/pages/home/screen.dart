@@ -67,6 +67,7 @@ class _SdkButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(nausharipov): make it responsive
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
