@@ -40,11 +40,11 @@ class Footer extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: ProjectSpacing.small,
-          horizontal: ProjectSpacing.xl,
+          vertical: ProjectSpacing.size4,
+          horizontal: ProjectSpacing.size16,
         ),
         child: Wrap(
-          spacing: ProjectSpacing.xl,
+          spacing: ProjectSpacing.size16,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             TextButton(

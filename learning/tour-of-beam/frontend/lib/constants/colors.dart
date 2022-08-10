@@ -21,6 +21,8 @@ import 'package:flutter/material.dart';
 class ProjectColors {
   static const white = Colors.white;
   static const black = Colors.black;
+  static const greyCBCBCB = Color(0xFFCBCBCB);
+  static const greyA0A4AB = Color(0xFFCBCBCB);
 }
 
 class ProjectLightThemeColors {

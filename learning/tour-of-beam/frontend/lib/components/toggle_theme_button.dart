@@ -37,8 +37,8 @@ class ToggleThemeButton extends StatelessWidget {
 
         return Padding(
           padding: const EdgeInsets.symmetric(
-            vertical: ProjectSpacing.small,
-            horizontal: ProjectSpacing.medium,
+            vertical: ProjectSpacing.size4,
+            horizontal: ProjectSpacing.size8,
           ),
           child: TextButton.icon(
             icon: SvgPicture.asset(ProjectAssets.beamLogo),

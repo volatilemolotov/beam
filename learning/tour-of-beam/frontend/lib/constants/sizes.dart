@@ -18,15 +18,13 @@
 
 class ProjectSpacing {
   static const double zero = 0;
-  static const double small = 4;
-  static const double medium = 8;
-  static const double large = 12;
-  static const double xl = 16;
-  static const double xxl = 36;
-}
-
-class ProjectSizes {
-  static const double footerHeight = 32;
+  static const double size4 = 4;
+  static const double size8 = 8;
+  static const double size12 = 12;
+  static const double size16 = 16;
+  static const double size20 = 20;
+  static const double size32 = 32;
+  static const double size36 = 36;
 }
 
 class ProjectBorderRadius {
@@ -36,17 +34,9 @@ class ProjectBorderRadius {
   static const double xl = 28;
 }
 
-class ProjectElevation {
-  static const double medium = 2;
-}
-
 class ProjectIconSizes {
   static const double xs = 8;
   static const double small = 16;
   static const double medium = 24;
   static const double large = 32;
-}
-
-class ProjectFontSizes {
-  static const double logo = 18;
 }

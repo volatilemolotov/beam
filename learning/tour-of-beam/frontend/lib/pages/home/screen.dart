@@ -21,6 +21,8 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../components/page_container.dart';
 import '../../constants/assets.dart';
+import '../../constants/colors.dart';
+import '../../constants/sizes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen();
@@ -30,13 +32,10 @@ class HomeScreen extends StatelessWidget {
     return PageContainer(
       content: SingleChildScrollView(
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
-            Expanded(
-              child: _SdkSelection(),
-            ),
-            Expanded(
-              child: _TourSummary(),
-            ),
+            Expanded(child: _SdkSelection()),
+            Expanded(child: _TourSummary()),
           ],
         ),
       ),
@@ -49,18 +48,55 @@ class _SdkSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        border: Border(
+          right: BorderSide(
+            color: ProjectColors.greyCBCBCB,
+          ),
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 60, 50, 20),
+            child: Column(
+              children: const [
+                _IntroText(),
+                SizedBox(height: ProjectSpacing.size32),
+                _SdkButtons(),
+              ],
+            ),
+          ),
+          Image.asset(ProjectAssets.welcomeLaptop),
+        ],
+      ),
+    );
+  }
+}
+
+class _IntroText extends StatelessWidget {
+  const _IntroText();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Welcome to the Tour of Beam!',
           style: Theme.of(context).textTheme.displayMedium,
         ),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 32),
+          height: 2,
+          color: ProjectColors.greyA0A4AB,
+          constraints: const BoxConstraints(maxWidth: 150),
+        ),
         Text(
           'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please sign in. \n\nPlease select the default language (you may change the language at any time):',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
-        const _SdkButtons(),
-        Image.asset(ProjectAssets.welcomeLaptop),
       ],
     );
   }
@@ -103,42 +139,62 @@ class _TourSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: ['Core Transforms']
-          .map(
-            (e) => const _Module(),
-          )
-          .toList(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: ProjectSpacing.size20,
+        horizontal: 27,
+      ),
+      child: Column(
+        children: ['Core Transforms', 'Common Transforms']
+            .map(
+              (e) => _Module(title: e),
+            )
+            .toList(),
+      ),
     );
   }
 }
 
 class _Module extends StatelessWidget {
-  const _Module();
+  final String title;
+  const _Module({required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
-        _ModuleHeader(),
-        _ModuleBody(),
+      children: [
+        _ModuleHeader(title: title),
+        const _ModuleBody(),
       ],
     );
   }
 }
 
 class _ModuleHeader extends StatelessWidget {
-  const _ModuleHeader();
+  final String title;
+  const _ModuleHeader({required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        SvgPicture.asset(ProjectAssets.welcomeProgress0),
-        Text(
-          'Core Transforms',
-          style: Theme.of(context).textTheme.titleLarge,
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(ProjectSpacing.size4),
+              child: SvgPicture.asset(ProjectAssets.welcomeProgress0),
+            ),
+            const SizedBox(
+              width: ProjectSpacing.size16,
+            ),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          ],
         ),
+        const Text('Medium level'),
       ],
     );
   }
@@ -150,18 +206,24 @@ class _ModuleBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 17),
+      margin: const EdgeInsets.only(left: 21),
       decoration: const BoxDecoration(
         border: Border(
-          left: BorderSide(),
+          left: BorderSide(
+            color: ProjectColors.greyCBCBCB,
+          ),
         ),
       ),
+      padding: const EdgeInsets.only(left: 39, top: 10),
       child: Column(
         children: const [
           Text(
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam velit purus, tincidunt id velit vitae, mattis dictum velit. Nunc sit amet nunc at turpis eleifend commodo ac ut libero. Aenean rutrum rutrum nulla ut efficitur. Vestibulum pulvinar eros dictum lectus volutpat dignissim vitae quis nisi. Maecenas sem erat, elementum in euismod ut, interdum ac massa.',
           ),
-          Divider(),
+          SizedBox(height: ProjectSpacing.size16),
+          Divider(
+            color: ProjectColors.greyCBCBCB,
+          ),
         ],
       ),
     );
