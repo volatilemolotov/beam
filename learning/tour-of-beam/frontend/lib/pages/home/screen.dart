@@ -51,9 +51,13 @@ class _SdkSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Text('Welcome to the Tour of Beam!'),
-        const Text(
+        Text(
+          'Welcome to the Tour of Beam!',
+          style: Theme.of(context).textTheme.displayMedium,
+        ),
+        Text(
           'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please sign in. \n\nPlease select the default language (you may change the language at any time):',
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
         const _SdkButtons(),
         Image.asset(ProjectAssets.welcomeLaptop),
@@ -131,7 +135,10 @@ class _ModuleHeader extends StatelessWidget {
     return Row(
       children: [
         SvgPicture.asset(ProjectAssets.welcomeProgress0),
-        const Text('Core Transforms'),
+        Text(
+          'Core Transforms',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
       ],
     );
   }

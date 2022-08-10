@@ -19,8 +19,6 @@
 import 'package:flutter/material.dart';
 
 import '../constants/assets.dart';
-import '../constants/font_weights.dart';
-import '../constants/fonts.dart';
 import '../constants/sizes.dart';
 
 class Logo extends StatelessWidget {
@@ -39,17 +37,12 @@ class Logo extends StatelessWidget {
         ),
         RichText(
           text: TextSpan(
-            style: getLogoFontStyle(
-              textStyle: const TextStyle(
-                fontSize: ProjectFontSizes.logo,
-                fontWeight: ProjectFontWeights.light,
-              ),
-            ),
+            style: Theme.of(context).textTheme.displaySmall,
             children: [
               TextSpan(
                 text: 'Tour of',
                 style: TextStyle(
-                  color: theme.textTheme.bodyText1?.color,
+                  color: theme.textTheme.labelLarge?.color,
                 ),
               ),
               TextSpan(

@@ -21,7 +21,6 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config/theme/colors_provider.dart';
-import '../constants/font_weights.dart';
 import '../constants/links.dart';
 import '../constants/sizes.dart';
 
@@ -32,7 +31,7 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     final linkButtonStyle = TextButton.styleFrom(
       textStyle: const TextStyle(
-        fontWeight: ProjectFontWeights.normal,
+        fontWeight: FontWeight.normal,
       ),
     );
 

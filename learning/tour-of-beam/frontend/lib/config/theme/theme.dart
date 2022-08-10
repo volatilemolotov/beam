@@ -17,32 +17,74 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../constants/colors.dart';
-import '../../constants/font_weights.dart';
-import '../../constants/fonts.dart';
 import '../../constants/sizes.dart';
 
+final kLightTheme = ThemeData(
+  fontFamily: _mainFontFamily,
+  brightness: Brightness.light,
+  primaryColor: ProjectLightThemeColors.primary,
+  backgroundColor: ProjectLightThemeColors.primaryBackground,
+  textTheme: _createTextTheme(ProjectLightThemeColors.text),
+  textButtonTheme: _createTextButtonTheme(ProjectLightThemeColors.text),
+  outlinedButtonTheme: _createOutlineButtonTheme(ProjectLightThemeColors.text),
+  appBarTheme: _createAppBarTheme(ProjectLightThemeColors.secondaryBackground),
+);
+
+final kDarkTheme = ThemeData(
+  fontFamily: _mainFontFamily,
+  brightness: Brightness.dark,
+  primaryColor: ProjectDarkThemeColors.primary,
+  backgroundColor: ProjectDarkThemeColors.primaryBackground,
+  textTheme: _createTextTheme(ProjectDarkThemeColors.text),
+  textButtonTheme: _createTextButtonTheme(ProjectDarkThemeColors.text),
+  outlinedButtonTheme: _createOutlineButtonTheme(ProjectDarkThemeColors.text),
+  appBarTheme: _createAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
+);
+
+final _mainFontFamily = GoogleFonts.sourceSansPro().fontFamily;
+
 TextTheme _createTextTheme(Color textColor) {
-  return getBaseFontTheme(
-    const TextTheme(
-      headline1: TextStyle(),
-      headline2: TextStyle(),
-      headline3: TextStyle(),
-      headline4: TextStyle(),
-      headline5: TextStyle(),
-      headline6: TextStyle(),
-      subtitle1: TextStyle(),
-      subtitle2: TextStyle(),
-      bodyText1: TextStyle(),
-      bodyText2: TextStyle(),
-      caption: TextStyle(),
-      overline: TextStyle(),
-      button: TextStyle(fontWeight: ProjectFontWeights.bold),
-    ).apply(
-      bodyColor: textColor,
-      displayColor: textColor,
+  return const TextTheme(
+    displayLarge: TextStyle(),
+    displayMedium: TextStyle(
+      fontSize: 48,
+      fontWeight: FontWeight.w900,
     ),
+    displaySmall: TextStyle(
+      fontFamily: 'Roboto_regular',
+      fontSize: 18,
+      fontWeight: FontWeight.w300,
+    ),
+    headlineLarge: TextStyle(),
+    headlineMedium: TextStyle(),
+    headlineSmall: TextStyle(),
+    titleLarge: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+    ),
+    titleMedium: TextStyle(),
+    titleSmall: TextStyle(),
+    labelLarge: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+    ),
+    labelMedium: TextStyle(),
+    labelSmall: TextStyle(),
+    bodyLarge: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.w400,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w400,
+    ),
+    bodySmall: TextStyle(),
+  ).apply(
+    bodyColor: textColor,
+    displayColor: textColor,
   );
 }
 
@@ -79,23 +121,3 @@ AppBarTheme _createAppBarTheme(Color backgroundColor) {
     centerTitle: false,
   );
 }
-
-final kLightTheme = ThemeData(
-  brightness: Brightness.light,
-  primaryColor: ProjectLightThemeColors.primary,
-  backgroundColor: ProjectLightThemeColors.primaryBackground,
-  textTheme: _createTextTheme(ProjectLightThemeColors.text),
-  textButtonTheme: _createTextButtonTheme(ProjectLightThemeColors.text),
-  outlinedButtonTheme: _createOutlineButtonTheme(ProjectLightThemeColors.text),
-  appBarTheme: _createAppBarTheme(ProjectLightThemeColors.secondaryBackground),
-);
-
-final kDarkTheme = ThemeData(
-  brightness: Brightness.dark,
-  primaryColor: ProjectDarkThemeColors.primary,
-  backgroundColor: ProjectDarkThemeColors.primaryBackground,
-  textTheme: _createTextTheme(ProjectDarkThemeColors.text),
-  textButtonTheme: _createTextButtonTheme(ProjectDarkThemeColors.text),
-  outlinedButtonTheme: _createOutlineButtonTheme(ProjectDarkThemeColors.text),
-  appBarTheme: _createAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
-);
