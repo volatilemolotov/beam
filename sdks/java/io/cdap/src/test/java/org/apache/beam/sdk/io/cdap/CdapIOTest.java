@@ -29,20 +29,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.cdap.plugin.sendgrid.batch.source.SendGridSource;
+import io.cdap.plugin.sendgrid.batch.source.SendGridSourceConfig;
+import io.cdap.plugin.sendgrid.common.helpers.IBaseObject;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraBatchSource;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSourceConfig;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSplitArgument;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
 import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.io.cdap.context.BatchSinkContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
+import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,9 +75,19 @@ public class CdapIOTest {
       ImmutableMap.<String, Object>builder()
           .put("authType", "basic")
           .put("referenceName", "referenceName")
-          .put("authUsername", "20211570@turan-edu.kz+testdrive")
-          .put("authPassword", "Akarys2001#")
+          .put("authUsername", System.getenv("ZUORA_USERNAME"))
+          .put("authPassword", System.getenv("ZUORA_PASSWORD"))
           .put("baseObjects", "Orders")
+          .build();
+
+  private static final ImmutableMap<String, Object> TEST_SENDGRID_PARAMS_MAP =
+      ImmutableMap.<String, Object>builder()
+          .put("authType", "api")
+          .put("referenceName", "referenceName")
+          .put("sendGridApiKey", System.getenv("SENDGRID_API_KEY"))
+          .put("dataSourceTypes", "MarketingCampaign")
+          .put("dataSourceMarketing", "Senders")
+          .put("dataSourceFields", "id,nickname")
           .build();
 
   @Before
@@ -143,6 +159,45 @@ public class CdapIOTest {
               List<KV<ZuoraSplitArgument, BaseObject>> list =
                   (List<KV<ZuoraSplitArgument, BaseObject>>) iterable;
               assertEquals(expectedRecordsCount, list.size());
+              return null;
+            }
+        );
+
+    p.run();
+  }
+
+  @Test
+  public void testReadFromSendGrid() {
+    SendGridSourceConfig sourceConfig = new ConfigWrapper<>(SendGridSourceConfig.class)
+        .withParams(TEST_SENDGRID_PARAMS_MAP)
+        .build();
+
+    CdapIO.Read<NullWritable, IBaseObject> reader =
+        CdapIO.<NullWritable, IBaseObject>read()
+            .withCdapPluginClass(SendGridSource.class)
+            .withPluginConfig(sourceConfig)
+            .withKeyClass(NullWritable.class)
+            .withValueClass(IBaseObject.class);
+
+    assertNotNull(reader.getPluginConfig());
+    assertNotNull(reader.getCdapPlugin());
+    assertFalse(reader.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
+
+    PCollection<KV<NullWritable, IBaseObject>> input = p.apply(reader).setCoder(
+        KvCoder.of(
+            NullableCoder.of(WritableCoder.of(NullWritable.class)),
+            SerializableCoder.of(IBaseObject.class)
+        )
+    );
+
+    PAssert.that(input)
+        .satisfies(
+            (iterable) -> {
+              List<KV<NullWritable, IBaseObject>> list =
+                  (List<KV<NullWritable, IBaseObject>>) iterable;
+              assertEquals(2, list.size());
+              assertEquals("tommy", list.get(1).getValue().asMap().get("nickname"));
               return null;
             }
         );

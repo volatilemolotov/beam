@@ -28,6 +28,9 @@ import io.cdap.plugin.hubspot.source.batch.HubspotInputFormatProvider;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormat;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormatProvider;
+import io.cdap.plugin.sendgrid.batch.source.SendGridInputFormat;
+import io.cdap.plugin.sendgrid.batch.source.SendGridInputFormatProvider;
+import io.cdap.plugin.sendgrid.batch.source.SendGridSource;
 import io.cdap.plugin.servicenow.source.ServiceNowInputFormat;
 import io.cdap.plugin.servicenow.source.ServiceNowSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
@@ -54,6 +57,8 @@ public class MappingUtils {
       return Plugin.create(pluginClass, ServiceNowInputFormat.class, SourceInputFormatProvider.class);
     } else if (pluginClass.equals(ZuoraBatchSource.class)) {
       return Plugin.create(pluginClass, ZuoraInputFormat.class, ZuoraInputFormatProvider.class);
+    } else if (pluginClass.equals(SendGridSource.class)) {
+      return Plugin.create(pluginClass, SendGridInputFormat.class, SendGridInputFormatProvider.class);
     }
     throw new UnsupportedOperationException(
         String.format("Given plugin class '%s' is not supported!", pluginClass.getName()));
