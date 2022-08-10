@@ -18,6 +18,7 @@
 package org.apache.beam.sdk.io.cdap;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
@@ -27,6 +28,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import io.cdap.plugin.zuora.plugin.batch.source.ZuoraBatchSource;
+import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSourceConfig;
+import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSplitArgument;
+import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
+import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.io.cdap.context.BatchSinkContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
 import org.apache.beam.sdk.testing.PAssert;
@@ -55,6 +63,15 @@ public class CdapIOTest {
       ImmutableMap.<String, Object>builder()
           .put(EmployeeConfig.OBJECT_TYPE, "employee")
           .put(Constants.Reference.REFERENCE_NAME, "referenceName")
+          .build();
+
+  private static final ImmutableMap<String, Object> TEST_ZUORA_PARAMS_MAP =
+      ImmutableMap.<String, Object>builder()
+          .put("authType", "basic")
+          .put("referenceName", "referenceName")
+          .put("authUsername", "20211570@turan-edu.kz+testdrive")
+          .put("authPassword", "Akarys2001#")
+          .put("baseObjects", "Orders")
           .build();
 
   @Before
@@ -92,6 +109,47 @@ public class CdapIOTest {
     assertEquals(String.class, read.getKeyClass());
     assertEquals(String.class, read.getValueClass());
   }
+
+  @Test
+  public void testReadFromZuora() {
+    ZuoraSourceConfig zuoraSourceConfig = new ConfigWrapper<>(ZuoraSourceConfig.class)
+        .withParams(TEST_ZUORA_PARAMS_MAP)
+        .build();
+
+    CdapIO.Read<ZuoraSplitArgument, BaseObject> reader =
+        CdapIO.<ZuoraSplitArgument, BaseObject>read()
+            .withCdapPluginClass(ZuoraBatchSource.class)
+            .withPluginConfig(zuoraSourceConfig)
+            .withKeyClass(ZuoraSplitArgument.class)
+            .withValueClass(BaseObject.class);
+
+    assertNotNull(reader.getPluginConfig());
+    assertNotNull(reader.getCdapPlugin());
+    assertFalse(reader.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
+
+    PCollection<KV<ZuoraSplitArgument, BaseObject>> input = p.apply(reader).setCoder(
+        KvCoder.of(
+            SerializableCoder.of(ZuoraSplitArgument.class),
+            SerializableCoder.of(BaseObject.class)
+        )
+    );
+
+    int expectedRecordsCount = 336;
+
+    PAssert.that(input)
+        .satisfies(
+            (iterable) -> {
+              List<KV<ZuoraSplitArgument, BaseObject>> list =
+                  (List<KV<ZuoraSplitArgument, BaseObject>>) iterable;
+              assertEquals(expectedRecordsCount, list.size());
+              return null;
+            }
+        );
+
+    p.run();
+  }
+
 
   @Test
   public void testReadObjectCreationFailsIfCdapPluginClassIsNull() {

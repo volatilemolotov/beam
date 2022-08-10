@@ -33,6 +33,9 @@ import io.cdap.plugin.servicenow.source.ServiceNowSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskInputFormat;
 import io.cdap.plugin.zendesk.source.batch.ZendeskInputFormatProvider;
+import io.cdap.plugin.zuora.plugin.batch.source.ZuoraBatchSource;
+import io.cdap.plugin.zuora.plugin.batch.source.ZuoraInputFormat;
+import io.cdap.plugin.zuora.plugin.batch.source.ZuoraInputFormatProvider;
 
 public class MappingUtils {
 
@@ -48,8 +51,9 @@ public class MappingUtils {
     } else if (pluginClass.equals(HubspotBatchSink.class)) {
       return Plugin.create(pluginClass, HubspotOutputFormat.class, SourceInputFormatProvider.class);
     } else if (pluginClass.equals(ServiceNowSource.class)) {
-      return Plugin.create(
-          pluginClass, ServiceNowInputFormat.class, SourceInputFormatProvider.class);
+      return Plugin.create(pluginClass, ServiceNowInputFormat.class, SourceInputFormatProvider.class);
+    } else if (pluginClass.equals(ZuoraBatchSource.class)) {
+      return Plugin.create(pluginClass, ZuoraInputFormat.class, ZuoraInputFormatProvider.class);
     }
     throw new UnsupportedOperationException(
         String.format("Given plugin class '%s' is not supported!", pluginClass.getName()));
