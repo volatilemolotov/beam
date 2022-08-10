@@ -16,17 +16,18 @@
  * limitations under the License.
  */
 
-String _getPath(String fileName, String format) {
-  return '$format/$fileName.$format';
+String _getPngPath(String fileName) {
+  return 'png/$fileName.png';
 }
 
-const _pngFormat = 'png';
-const _svgFormat = 'svg';
+String _getSvgPath(String fileName) {
+  return 'svg/$fileName.svg';
+}
 
 // ignore_for_file: avoid_classes_with_only_static_members
 class ProjectAssets {
-  static final beamLogo = _getPath('beam-logo', _pngFormat);
-  static final themeMode = _getPath('theme-mode', _svgFormat);
-  static final welcomeLaptop = _getPath('welcome-laptop', _pngFormat);
-  static final welcomeProgress0 = _getPath('welcome-progress-0', _svgFormat);
+  static final beamLogo = _getPngPath('beam-logo');
+  static final themeMode = _getSvgPath('theme-mode');
+  static final welcomeLaptop = _getPngPath('welcome-laptop');
+  static final welcomeProgress0 = _getSvgPath('welcome-progress-0');
 }
