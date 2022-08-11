@@ -44,7 +44,7 @@ job(jobName) {
   String kubeconfig = common.getKubeconfigLocationForNamespace(namespace)
   Kubernetes k8s = Kubernetes.create(delegate, kubeconfig, namespace)
 
-  k8s.apply(common.makePathAbsolute("src/.test-infra/kubernetes/rabbit/rabbit.yaml"))
+  k8s.apply(common.makePathAbsolute("src/.test-infra/kubernetes/rabbit/rabbitmq.yaml"))
   String rabbitMqHostName = "LOAD_BALANCER_IP"
   k8s.loadBalancerIP("rabbit", rabbitMqHostName)
 
@@ -65,7 +65,7 @@ job(jobName) {
           influxDatabase                : InfluxDBCredentialsHelper.InfluxDBDatabaseName,
           influxHost                    : InfluxDBCredentialsHelper.InfluxDBHostUrl,
           rabbitMqBootstrapServerAddress: rabbitMqHostName,
-          rabbitTopic                   : 'beam',
+          queueName                     : 'beam',
           readTimeout                   : '900',
           numWorkers                    : '5',
           autoscalingAlgorithm          : 'NONE'

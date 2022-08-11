@@ -17,28 +17,23 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.Envelope;
+import com.rabbitmq.stream.Environment;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.createStream;
+import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.getConsumer;
+import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.getEnvironment;
 
 /**
  * Imitation of Spark {@link Receiver} for RabbitMQ that implements {@link HasOffset} interface. Used to
@@ -52,13 +47,13 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
   private static final List<String> STORED_RECORDS = new ArrayList<>();
   private static long MAX_NUM_RECORDS;
   private static String RABBITMQ_URL;
-  private static String QUEUE_NAME;
+  private static String STREAM_NAME;
   private static Long startOffset;
 
-  RabbitMqReceiverWithOffset(final String uri, final Long maxNumRecords, final String queueName) {
+  RabbitMqReceiverWithOffset(final String uri, final Long maxNumRecords, final String streamName) {
     super(StorageLevel.MEMORY_AND_DISK_2());
     MAX_NUM_RECORDS = maxNumRecords;
-    QUEUE_NAME = queueName;
+    STREAM_NAME = streamName;
     RABBITMQ_URL = uri;
   }
 
@@ -81,80 +76,64 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
   private void receive() {
     long currentOffset = startOffset;
+    final Queue<String> received = new ConcurrentLinkedQueue<>();
+    final AtomicInteger messageConsumed = new AtomicInteger((int) currentOffset);
 
-    final TestConsumer testConsumer;
-    final Connection connection;
-    final Channel channel;
-
-    try {
-      LOG.info("Starting receiver");
-      final ConnectionFactory connectionFactory = new ConnectionFactory();
-      connectionFactory.setUri(RABBITMQ_URL);
-      connectionFactory.setAutomaticRecoveryEnabled(true);
-      connectionFactory.setConnectionTimeout(600000);
-      connectionFactory.setNetworkRecoveryInterval(5000);
-      connectionFactory.setRequestedHeartbeat(60);
-      connectionFactory.setTopologyRecoveryEnabled(true);
-      connectionFactory.setRequestedChannelMax(0);
-      connectionFactory.setRequestedFrameMax(0);
-      connection = connectionFactory.newConnection();
-      channel = connection.createChannel();
-      channel.queueDeclare(QUEUE_NAME, false, false, false, null);
-      testConsumer = new TestConsumer(channel);
-      channel.basicConsume(QUEUE_NAME, true, testConsumer);
-    } catch (TimeoutException | IOException | URISyntaxException | NoSuchAlgorithmException | KeyManagementException e) {
-      throw new RuntimeException(e);
+    LOG.info("Starting receiver");
+    try (final Environment environment = getEnvironment(RABBITMQ_URL)) {
+      createStream(environment, STREAM_NAME);
+      getConsumer(environment, STREAM_NAME, messageConsumed.get(), received);
     }
 
-    while (!isStopped() && currentOffset < MAX_NUM_RECORDS) {
-      if (currentOffset < testConsumer.getReceived().size()) {
+    while (!isStopped() && messageConsumed.get() < MAX_NUM_RECORDS) {
+//      if (currentOffset < testConsumer.getReceived().size()) {
         try {
-          final String stringMessage = testConsumer.getReceived().get((int) currentOffset);
+          final String stringMessage = received.poll();
           LOG.info("Moving message from test consumer to receiver = " + stringMessage);
           STORED_RECORDS.add(stringMessage);
           store(stringMessage);
-          currentOffset++;
+          messageConsumed.incrementAndGet();
         } catch (Exception e) {
           LOG.error("Exception " + e.getMessage());
         }
-      }
+//      }
     }
 
-    if (isStopped() || testConsumer.getReceived().size() == MAX_NUM_RECORDS) {
-      try {
-        LOG.info("Stopping receiver");
-        channel.close();
-        connection.close();
-      } catch (TimeoutException | IOException e) {
-        throw new RuntimeException(e);
-      }
-    }
+//    if (isStopped() || testConsumer.getReceived().size() == MAX_NUM_RECORDS) {
+//      try {
+//        LOG.info("Stopping receiver");
+//        channel.close();
+//        connection.close();
+//      } catch (TimeoutException | IOException e) {
+//        throw new RuntimeException(e);
+//      }
+//    }
   }
 
-  /** A simple RabbitMQ {@code Consumer} that stores all received messages. */
-  static class TestConsumer extends DefaultConsumer {
-
-    private final List<String> received;
-
-    public TestConsumer(Channel channel) {
-      super(channel);
-      this.received = Collections.synchronizedList(new ArrayList<>());
-    }
-
-    @Override
-    public void handleDelivery(
-        String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-      try {
-        LOG.info("adding message to test consumer " + new String(body, StandardCharsets.UTF_8));
-        received.add(new String(body, StandardCharsets.UTF_8));
-      } catch (Exception e) {
-        LOG.error("Exception during reading from RabbitMQ " + e.getMessage());
-      }
-    }
-
-    /** Returns a thread safe unmodifiable view of received messages. */
-    public List<String> getReceived() {
-      return Collections.unmodifiableList(received);
-    }
-  }
+//  /** A simple RabbitMQ {@code Consumer} that stores all received messages. */
+//  static class TestConsumer extends DefaultConsumer {
+//
+//    private final List<String> received;
+//
+//    public TestConsumer(Channel channel) {
+//      super(channel);
+//      this.received = Collections.synchronizedList(new ArrayList<>());
+//    }
+//
+//    @Override
+//    public void handleDelivery(
+//        String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
+//      try {
+//        LOG.info("adding message to test consumer " + new String(body, StandardCharsets.UTF_8));
+//        received.add(new String(body, StandardCharsets.UTF_8));
+//      } catch (Exception e) {
+//        LOG.error("Exception during reading from RabbitMQ " + e.getMessage());
+//      }
+//    }
+//
+//    /** Returns a thread safe unmodifiable view of received messages. */
+//    public List<String> getReceived() {
+//      return Collections.unmodifiableList(received);
+//    }
+//  }
 }
