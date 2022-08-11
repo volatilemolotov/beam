@@ -17,19 +17,25 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
+import com.rabbitmq.stream.Consumer;
 import com.rabbitmq.stream.Environment;
+import com.rabbitmq.stream.OffsetSpecification;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.createStream;
 import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.getConsumer;
@@ -83,10 +89,13 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
     try (final Environment environment = getEnvironment(RABBITMQ_URL)) {
       createStream(environment, STREAM_NAME);
       getConsumer(environment, STREAM_NAME, messageConsumed.get(), received);
+    } catch (Exception e) {
+      LOG.error("Exception during consumer creation", e);
+//      throw e;
     }
 
     while (!isStopped() && messageConsumed.get() < MAX_NUM_RECORDS) {
-//      if (currentOffset < testConsumer.getReceived().size()) {
+      if (!received.isEmpty()) {
         try {
           final String stringMessage = received.poll();
           LOG.info("Moving message from test consumer to receiver = " + stringMessage);
@@ -96,7 +105,7 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
         } catch (Exception e) {
           LOG.error("Exception " + e.getMessage());
         }
-//      }
+      }
     }
 
 //    if (isStopped() || testConsumer.getReceived().size() == MAX_NUM_RECORDS) {

@@ -149,8 +149,9 @@ public class SparkReceiverIOIT {
             .withAdminPassword(null)
             .withPluginsEnabled("rabbitmq_stream")
             .withExposedPorts(5552, 5672, 15672)
-            .withUser(RABBITMQ_USERNAME, RABBITMQ_PASSWORD, ImmutableSet.of("administrator"))
-            .withPermission("/", RABBITMQ_USERNAME, ".*", ".*", ".*");
+            .withEnv("RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS", "-rabbitmq_stream advertised_host localhost");
+//            .withUser(RABBITMQ_USERNAME, RABBITMQ_PASSWORD, ImmutableSet.of("administrator"))
+//            .withPermission("/", RABBITMQ_USERNAME, ".*", ".*", ".*");
     rabbitMqContainer.start();
     options.setRabbitMqBootstrapServerAddress(
         getBootstrapServers(
@@ -159,7 +160,7 @@ public class SparkReceiverIOIT {
   }
 
   private static String getBootstrapServers(String host, String port) {
-    return String.format("rabbitmq-stream://%s:%s", host, port);
+    return String.format("rabbitmq-stream://guest:guest@%s:%s", host, port);
   }
 
   /** Pipeline options specific for this test. */
@@ -168,7 +169,7 @@ public class SparkReceiverIOIT {
 
     @Description("Options for synthetic source.")
     @Validation.Required
-    @Default.String("{\"numRecords\": \"10\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
+    @Default.String("{\"numRecords\": \"50\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
     String getSourceOptions();
 
     void setSourceOptions(String sourceOptions);
@@ -216,9 +217,19 @@ public class SparkReceiverIOIT {
       createStream(environment, options.getStreamName());
       final Producer producer = getProducer(environment, options.getStreamName());
       data.forEach(text -> {
-        final Message message = getMessage(producer, text, 0L);
-        producer.send(message, confirmationStatus -> confirmLatch.countDown());
+        System.out.println("trying to send message to RabbitMQ");
+        LOG.info("trying to send message to RabbitMQ");
+        final Message message = getMessage(producer, text, Long.parseLong(text.substring(5)));
+        producer.send(message, confirmationStatus -> {
+          confirmLatch.countDown();
+          System.out.println("sending messages to RabbitMQ " + confirmationStatus.isConfirmed());
+          LOG.info("sending messages to RabbitMQ " + confirmationStatus.isConfirmed());
+        });
+        System.out.println("sending messages to RabbitMQ. CountdownLatch = " + confirmLatch.getCount());
+        LOG.info("sending messages to RabbitMQ. CountdownLatch = " + confirmLatch.getCount());
       });
+    } catch (Exception e) {
+      System.err.println("Error during sending messages to RabbitMQ: " + e.getMessage());
     }
   }
 

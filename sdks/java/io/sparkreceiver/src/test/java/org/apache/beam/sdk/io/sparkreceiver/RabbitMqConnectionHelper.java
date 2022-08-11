@@ -1,5 +1,6 @@
 package org.apache.beam.sdk.io.sparkreceiver;
 
+import com.rabbitmq.stream.Address;
 import com.rabbitmq.stream.Consumer;
 import com.rabbitmq.stream.Environment;
 import com.rabbitmq.stream.Message;
@@ -17,9 +18,16 @@ public class RabbitMqConnectionHelper {
 
   private static final Logger LOG = LoggerFactory.getLogger(RabbitMqConnectionHelper.class);
 
+  @SuppressWarnings("StringSplitter")
   public static Environment getEnvironment(final String serverAddress) {
+    final String hostPort = serverAddress.split("rabbitmq-stream://guest:guest@")[1];
+    final String host = hostPort.split(":")[0];
+    final int port = Integer.parseInt(hostPort.split(":")[1]);
     return Environment.builder()
+        .addressResolver(address -> new Address(host, port))
         .uri(serverAddress)
+        .host(host)
+        .port(port)
         .build();
   }
 
@@ -48,6 +56,8 @@ public class RabbitMqConnectionHelper {
     return environment.consumerBuilder()
         .stream(streamName) // the stream to consume from
         .offset(OffsetSpecification.offset(currentOffset)) // start consuming at the beginning
+//        .name("myApp")
+//        .manualTrackingStrategy().builder()
         .messageHandler(getMessageHandler(received))
         .build();
   }
@@ -59,6 +69,7 @@ public class RabbitMqConnectionHelper {
       try {
         final String sMessage = new String(message.getBodyAsBinary(), StandardCharsets.UTF_8);
         LOG.info("adding message to test consumer " + sMessage);
+//        System.out.println("adding message to test consumer " + sMessage);
         received.add(sMessage);
       } catch (Exception e) {
         LOG.error("Exception during reading from RabbitMQ " + e.getMessage());

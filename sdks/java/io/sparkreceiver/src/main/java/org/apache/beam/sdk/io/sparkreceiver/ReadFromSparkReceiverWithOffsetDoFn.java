@@ -46,7 +46,7 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(ReadFromSparkReceiverWithOffsetDoFn.class);
-  private static final int START_POLL_TIMEOUT_MS = 1000;
+  private static final int START_POLL_TIMEOUT_MS = 5000;
 
   private final SerializableFunction<Instant, WatermarkEstimator<Instant>>
       createWatermarkEstimatorFn;
