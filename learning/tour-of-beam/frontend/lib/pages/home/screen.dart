@@ -16,10 +16,12 @@
  * limitations under the License.
  */
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../components/page_container.dart';
+import '../../config/theme/colors_provider.dart';
 import '../../constants/assets.dart';
 import '../../constants/colors.dart';
 import '../../constants/sizes.dart';
@@ -96,9 +98,31 @@ class _IntroText extends StatelessWidget {
           color: ProjectColors.greyA0A4AB,
           constraints: const BoxConstraints(maxWidth: 150),
         ),
-        Text(
-          'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please sign in. \n\nPlease select the default language (you may change the language at any time):',
-          style: Theme.of(context).textTheme.bodyLarge,
+        RichText(
+          text: TextSpan(
+            style: Theme.of(context).textTheme.bodyLarge,
+            children: [
+              const TextSpan(
+                text:
+                    'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please',
+              ),
+              TextSpan(
+                text: ' sign in',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyLarge!
+                    .copyWith(color: ThemeColors.of(context).primary),
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    // TODO(nausharipov): sign in
+                  },
+              ),
+              const TextSpan(
+                text:
+                    '. \n\nPlease select the default language (you may change the language at any time):',
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -142,7 +166,7 @@ class _SdkButtons extends StatelessWidget {
           onPressed: () {
             // TODO(nausharipov): redirect
           },
-          child: const Text('Start your tour'),
+          child: const Text('Start learning'),
         ),
       ],
     );
