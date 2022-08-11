@@ -175,6 +175,14 @@ class _SdkButtons extends StatelessWidget {
 class _TourSummary extends StatelessWidget {
   const _TourSummary();
 
+  static const List<String> _modules = [
+    'Core Transforms',
+    'Common Transforms',
+    'IO',
+    'Windowing',
+    'Triggers',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -183,9 +191,12 @@ class _TourSummary extends StatelessWidget {
         horizontal: 27,
       ),
       child: Column(
-        children: ['Core Transforms', 'Common Transforms']
+        children: _modules
             .map(
-              (e) => _Module(title: e),
+              (module) => _Module(
+                title: module,
+                isLast: module == _modules.last,
+              ),
             )
             .toList(),
       ),
@@ -195,14 +206,19 @@ class _TourSummary extends StatelessWidget {
 
 class _Module extends StatelessWidget {
   final String title;
-  const _Module({required this.title});
+  final bool isLast;
+
+  const _Module({
+    required this.title,
+    required this.isLast,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         _ModuleHeader(title: title),
-        const _ModuleBody(),
+        if (isLast) const _LastModuleBody() else const _ModuleBody(),
       ],
     );
   }
@@ -248,13 +264,16 @@ class _ModuleHeader extends StatelessWidget {
   }
 }
 
+const EdgeInsets _moduleLeftMargin = EdgeInsets.only(left: 21);
+const EdgeInsets _modulePadding = EdgeInsets.only(left: 39, top: 10);
+
 class _ModuleBody extends StatelessWidget {
   const _ModuleBody();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 21),
+      margin: _moduleLeftMargin,
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
@@ -262,7 +281,7 @@ class _ModuleBody extends StatelessWidget {
           ),
         ),
       ),
-      padding: const EdgeInsets.only(left: 39, top: 10),
+      padding: _modulePadding,
       child: Column(
         children: [
           const Text(
@@ -273,6 +292,21 @@ class _ModuleBody extends StatelessWidget {
             color: ThemeColors.of(context).divider,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LastModuleBody extends StatelessWidget {
+  const _LastModuleBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: _moduleLeftMargin,
+      padding: _modulePadding,
+      child: const Text(
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam velit purus, tincidunt id velit vitae, mattis dictum velit. Nunc sit amet nunc at turpis eleifend commodo ac ut libero. Aenean rutrum rutrum nulla ut efficitur. Vestibulum pulvinar eros dictum lectus volutpat dignissim vitae quis nisi. Maecenas sem erat, elementum in euismod ut, interdum ac massa.',
       ),
     );
   }
