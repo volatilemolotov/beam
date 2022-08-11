@@ -89,4 +89,8 @@ class ThemeColors {
 
   Color get textColor =>
       isDark ? ProjectDarkThemeColors.text : ProjectLightThemeColors.text;
+
+  Color get progressBackgroundColor =>
+      // TODO(nausharipov): reuse these colors after discussion with Anna
+      isDark ? Color(0xffFFFFFF) : Color(0xff242639);
 }

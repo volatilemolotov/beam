@@ -222,9 +222,7 @@ class _ModuleHeader extends StatelessWidget {
               padding: const EdgeInsets.all(ProjectSpacing.size4),
               child: SvgPicture.asset(
                 ProjectAssets.welcomeProgress0,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? ProjectColors.greyDFE1E3
-                    : null,
+                color: ThemeColors.of(context).progressBackgroundColor,
               ),
             ),
             const SizedBox(width: ProjectSpacing.size16),
@@ -247,10 +245,10 @@ class _ModuleBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(left: 21),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
-            color: ProjectColors.greyCBCBCB,
+            color: ThemeColors.of(context).divider,
           ),
         ),
       ),

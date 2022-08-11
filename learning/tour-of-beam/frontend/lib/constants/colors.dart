@@ -21,23 +21,23 @@ import 'package:flutter/material.dart';
 class ProjectColors {
   static const white = Colors.white;
   static const black = Colors.black;
-  static const greyCBCBCB = Color(0xFFCBCBCB);
-  static const greyA0A4AB = Color(0xFFCBCBCB);
-  static const greyDFE1E3 = Color(0xFFDFE1E3);
+  static const greyCBCBCB = Color(0xffCBCBCB);
+  static const greyA0A4AB = Color(0xffCBCBCB);
+  static const greyDFE1E3 = Color(0xffDFE1E3);
 }
 
 class ProjectLightThemeColors {
   static const primaryBackground = Colors.white;
-  static const secondaryBackground = Color(0xFFFCFCFC);
-  static const grey = Color(0xFFE5E5E5);
-  static const text = Color(0xFF242639);
-  static const primary = Color(0xFFE74D1A);
+  static const secondaryBackground = Color(0xffFEFDFD);
+  static const grey = Color(0xffE5E5E5);
+  static const text = Color(0xff242639);
+  static const primary = Color(0xffE74D1A);
 }
 
 class ProjectDarkThemeColors {
-  static const primaryBackground = Color(0xFF18181B);
-  static const secondaryBackground = Color(0xFF2E2E34);
-  static const grey = Color(0xFF3F3F46);
-  static const text = Color(0xFFFFFFFF);
-  static const primary = Color(0xFFF26628);
+  static const primaryBackground = Color(0xff18181B);
+  static const secondaryBackground = Color(0xff2E2E34);
+  static const grey = Color(0xff3F3F46);
+  static const text = Color(0xffFFFFFF);
+  static const primary = Color(0xffF26628);
 }
