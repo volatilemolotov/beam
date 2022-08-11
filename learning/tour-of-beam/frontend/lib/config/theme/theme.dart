@@ -67,7 +67,10 @@ TextTheme _getTextTheme(Color textColor) {
       ),
       headlineLarge: TextStyle(),
       headlineMedium: TextStyle(),
-      headlineSmall: TextStyle(),
+      headlineSmall: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+      ),
       titleLarge: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w600,

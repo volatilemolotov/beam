@@ -28,8 +28,8 @@ class SignInButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: ProjectSpacing.size4,
-        horizontal: ProjectSpacing.size8,
+        vertical: ProjectSizes.size4,
+        horizontal: ProjectSizes.size8,
       ),
       child: TextButton(
         child: const Text('ui.signIn').tr(),

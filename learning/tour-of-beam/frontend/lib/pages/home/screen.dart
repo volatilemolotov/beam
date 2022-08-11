@@ -20,6 +20,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../components/difficulty.dart';
 import '../../components/page_container.dart';
 import '../../config/theme/colors_provider.dart';
 import '../../constants/assets.dart';
@@ -66,7 +67,7 @@ class _SdkSelection extends StatelessWidget {
             child: Column(
               children: const [
                 _IntroText(),
-                SizedBox(height: ProjectSpacing.size32),
+                SizedBox(height: ProjectSizes.size32),
                 _SdkButtons(),
               ],
             ),
@@ -178,7 +179,7 @@ class _TourSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: ProjectSpacing.size20,
+        vertical: ProjectSizes.size20,
         horizontal: 27,
       ),
       child: Column(
@@ -219,20 +220,29 @@ class _ModuleHeader extends StatelessWidget {
         Row(
           children: [
             Padding(
-              padding: const EdgeInsets.all(ProjectSpacing.size4),
+              padding: const EdgeInsets.all(ProjectSizes.size4),
               child: SvgPicture.asset(
                 ProjectAssets.welcomeProgress0,
                 color: ThemeColors.of(context).progressBackgroundColor,
               ),
             ),
-            const SizedBox(width: ProjectSpacing.size16),
+            const SizedBox(width: ProjectSizes.size16),
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ],
         ),
-        const Text('Medium level'),
+        Row(
+          children: [
+            Text(
+              'Medium level',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(width: ProjectSizes.size6),
+            const Difficulty(level: DifficultyLevel.medium),
+          ],
+        ),
       ],
     );
   }
@@ -254,13 +264,13 @@ class _ModuleBody extends StatelessWidget {
       ),
       padding: const EdgeInsets.only(left: 39, top: 10),
       child: Column(
-        children: const [
-          Text(
+        children: [
+          const Text(
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam velit purus, tincidunt id velit vitae, mattis dictum velit. Nunc sit amet nunc at turpis eleifend commodo ac ut libero. Aenean rutrum rutrum nulla ut efficitur. Vestibulum pulvinar eros dictum lectus volutpat dignissim vitae quis nisi. Maecenas sem erat, elementum in euismod ut, interdum ac massa.',
           ),
-          SizedBox(height: ProjectSpacing.size16),
+          const SizedBox(height: ProjectSizes.size16),
           Divider(
-            color: ProjectColors.greyCBCBCB,
+            color: ThemeColors.of(context).divider,
           ),
         ],
       ),

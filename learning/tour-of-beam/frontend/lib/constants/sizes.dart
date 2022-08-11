@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-class ProjectSpacing {
+class ProjectSizes {
   static const double zero = 0;
   static const double size4 = 4;
+  static const double size6 = 6;
   static const double size8 = 8;
   static const double size12 = 12;
   static const double size16 = 16;

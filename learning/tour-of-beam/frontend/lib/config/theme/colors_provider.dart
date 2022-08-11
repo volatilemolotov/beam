@@ -92,5 +92,5 @@ class ThemeColors {
 
   Color get progressBackgroundColor =>
       // TODO(nausharipov): reuse these colors after discussion with Anna
-      isDark ? Color(0xffFFFFFF) : Color(0xff242639);
+      isDark ? const Color(0xffFFFFFF) : const Color(0xff242639);
 }
