@@ -52,12 +52,10 @@ class _SdkSelection extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: Theme.of(context).brightness == Brightness.dark
-            ? ProjectDarkThemeColors.primaryBackground
-            : ProjectLightThemeColors.primaryBackground,
-        border: const Border(
+        color: ThemeColors.of(context).background,
+        border: Border(
           right: BorderSide(
-            color: ProjectColors.greyCBCBCB,
+            color: ThemeColors.of(context).divider,
           ),
         ),
       ),

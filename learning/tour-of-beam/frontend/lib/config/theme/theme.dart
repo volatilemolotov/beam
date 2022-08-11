@@ -63,7 +63,7 @@ TextTheme _getTextTheme(Color textColor) {
       displaySmall: TextStyle(
         fontFamily: 'Roboto_regular',
         fontSize: 18,
-        fontWeight: FontWeight.w300,
+        fontWeight: FontWeight.w400,
       ),
       headlineLarge: TextStyle(),
       headlineMedium: TextStyle(),
