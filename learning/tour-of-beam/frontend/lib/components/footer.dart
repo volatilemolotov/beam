@@ -36,7 +36,12 @@ class Footer extends StatelessWidget {
     );
 
     return Container(
-      color: ThemeColors.of(context).secondaryBackground,
+      decoration: BoxDecoration(
+        color: ThemeColors.of(context).secondaryBackground,
+        border: Border(
+          top: BorderSide(color: ThemeColors.of(context).divider),
+        ),
+      ),
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(
