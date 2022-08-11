@@ -23,7 +23,6 @@ import '../../constants/colors.dart';
 import '../../constants/sizes.dart';
 
 final kLightTheme = ThemeData(
-  fontFamily: _mainFontFamily,
   brightness: Brightness.light,
   primaryColor: ProjectLightThemeColors.primary,
   scaffoldBackgroundColor: ProjectLightThemeColors.secondaryBackground,
@@ -39,7 +38,6 @@ final kLightTheme = ThemeData(
 );
 
 final kDarkTheme = ThemeData(
-  fontFamily: _mainFontFamily,
   brightness: Brightness.dark,
   primaryColor: ProjectDarkThemeColors.primary,
   scaffoldBackgroundColor: ProjectDarkThemeColors.secondaryBackground,
@@ -54,47 +52,51 @@ final kDarkTheme = ThemeData(
   appBarTheme: _getAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
 );
 
-final _mainFontFamily = GoogleFonts.sourceSansPro().fontFamily;
+TextTheme _getBaseFontTheme(TextTheme theme) {
+  return GoogleFonts.sourceSansProTextTheme(theme);
+}
 
 TextTheme _getTextTheme(Color textColor) {
-  return const TextTheme(
-    displayLarge: TextStyle(),
-    displayMedium: TextStyle(
-      fontSize: 48,
-      fontWeight: FontWeight.w900,
+  return _getBaseFontTheme(
+    const TextTheme(
+      displayLarge: TextStyle(),
+      displayMedium: TextStyle(
+        fontSize: 48,
+        fontWeight: FontWeight.w900,
+      ),
+      displaySmall: TextStyle(
+        fontFamily: 'Roboto_regular',
+        fontSize: 18,
+        fontWeight: FontWeight.w300,
+      ),
+      headlineLarge: TextStyle(),
+      headlineMedium: TextStyle(),
+      headlineSmall: TextStyle(),
+      titleLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: TextStyle(),
+      titleSmall: TextStyle(),
+      labelLarge: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+      labelMedium: TextStyle(),
+      labelSmall: TextStyle(),
+      bodyLarge: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+      bodySmall: TextStyle(),
+    ).apply(
+      bodyColor: textColor,
+      displayColor: textColor,
     ),
-    displaySmall: TextStyle(
-      fontFamily: 'Roboto_regular',
-      fontSize: 18,
-      fontWeight: FontWeight.w300,
-    ),
-    headlineLarge: TextStyle(),
-    headlineMedium: TextStyle(),
-    headlineSmall: TextStyle(),
-    titleLarge: TextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
-    ),
-    titleMedium: TextStyle(),
-    titleSmall: TextStyle(),
-    labelLarge: TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w600,
-    ),
-    labelMedium: TextStyle(),
-    labelSmall: TextStyle(),
-    bodyLarge: TextStyle(
-      fontSize: 24,
-      fontWeight: FontWeight.w400,
-    ),
-    bodyMedium: TextStyle(
-      fontSize: 13,
-      fontWeight: FontWeight.w400,
-    ),
-    bodySmall: TextStyle(),
-  ).apply(
-    bodyColor: textColor,
-    displayColor: textColor,
   );
 }
 
