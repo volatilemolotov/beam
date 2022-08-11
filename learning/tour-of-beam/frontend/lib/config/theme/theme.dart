@@ -52,12 +52,8 @@ final kDarkTheme = ThemeData(
   appBarTheme: _getAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
 );
 
-TextTheme _getBaseFontTheme(TextTheme theme) {
-  return GoogleFonts.sourceSansProTextTheme(theme);
-}
-
 TextTheme _getTextTheme(Color textColor) {
-  return _getBaseFontTheme(
+  return GoogleFonts.sourceSansProTextTheme(
     const TextTheme(
       displayLarge: TextStyle(),
       displayMedium: TextStyle(
