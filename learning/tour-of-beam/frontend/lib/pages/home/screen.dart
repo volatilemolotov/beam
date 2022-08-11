@@ -65,6 +65,7 @@ class _SdkSelection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(50, 60, 50, 20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 _IntroText(),
                 SizedBox(height: ProjectSizes.size32),
@@ -135,15 +136,13 @@ class _SdkButtons extends StatelessWidget {
   Widget build(BuildContext context) {
     const String sdk = 'Java';
 
-    // TODO(nausharipov): make it responsive
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
       children: [
-        Row(
+        Wrap(
           children: ['Java', 'Python', 'Go']
               .map(
                 (e) => Padding(
-                  padding: const EdgeInsets.only(right: 15),
+                  padding: const EdgeInsets.only(right: 15, bottom: 10),
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       side: sdk == e
@@ -233,21 +232,25 @@ class _ModuleHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(ProjectSizes.size4),
-              child: SvgPicture.asset(
-                ProjectAssets.welcomeProgress0,
-                color: ThemeColors.of(context).progressBackgroundColor,
+        Expanded(
+          child: Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(ProjectSizes.size4),
+                child: SvgPicture.asset(
+                  ProjectAssets.welcomeProgress0,
+                  color: ThemeColors.of(context).progressBackgroundColor,
+                ),
               ),
-            ),
-            const SizedBox(width: ProjectSizes.size16),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ],
+              const SizedBox(width: ProjectSizes.size16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+            ],
+          ),
         ),
         Row(
           children: [
