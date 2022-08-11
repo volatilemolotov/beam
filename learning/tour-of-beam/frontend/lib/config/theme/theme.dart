@@ -26,27 +26,37 @@ final kLightTheme = ThemeData(
   fontFamily: _mainFontFamily,
   brightness: Brightness.light,
   primaryColor: ProjectLightThemeColors.primary,
+  scaffoldBackgroundColor: ProjectLightThemeColors.secondaryBackground,
   backgroundColor: ProjectLightThemeColors.primaryBackground,
-  textTheme: _createTextTheme(ProjectLightThemeColors.text),
-  textButtonTheme: _createTextButtonTheme(ProjectLightThemeColors.text),
-  outlinedButtonTheme: _createOutlineButtonTheme(ProjectLightThemeColors.text),
-  appBarTheme: _createAppBarTheme(ProjectLightThemeColors.secondaryBackground),
+  textTheme: _getTextTheme(ProjectLightThemeColors.text),
+  textButtonTheme: _getTextButtonTheme(ProjectLightThemeColors.text),
+  outlinedButtonTheme: _getOutlineButtonTheme(
+    ProjectLightThemeColors.text,
+    ProjectLightThemeColors.primary,
+  ),
+  elevatedButtonTheme: _getElevatedButtonTheme(ProjectLightThemeColors.primary),
+  appBarTheme: _getAppBarTheme(ProjectLightThemeColors.secondaryBackground),
 );
 
 final kDarkTheme = ThemeData(
   fontFamily: _mainFontFamily,
   brightness: Brightness.dark,
   primaryColor: ProjectDarkThemeColors.primary,
+  scaffoldBackgroundColor: ProjectDarkThemeColors.secondaryBackground,
   backgroundColor: ProjectDarkThemeColors.primaryBackground,
-  textTheme: _createTextTheme(ProjectDarkThemeColors.text),
-  textButtonTheme: _createTextButtonTheme(ProjectDarkThemeColors.text),
-  outlinedButtonTheme: _createOutlineButtonTheme(ProjectDarkThemeColors.text),
-  appBarTheme: _createAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
+  textTheme: _getTextTheme(ProjectDarkThemeColors.text),
+  textButtonTheme: _getTextButtonTheme(ProjectDarkThemeColors.text),
+  outlinedButtonTheme: _getOutlineButtonTheme(
+    ProjectDarkThemeColors.text,
+    ProjectDarkThemeColors.primary,
+  ),
+  elevatedButtonTheme: _getElevatedButtonTheme(ProjectDarkThemeColors.primary),
+  appBarTheme: _getAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
 );
 
 final _mainFontFamily = GoogleFonts.sourceSansPro().fontFamily;
 
-TextTheme _createTextTheme(Color textColor) {
+TextTheme _getTextTheme(Color textColor) {
   return const TextTheme(
     displayLarge: TextStyle(),
     displayMedium: TextStyle(
@@ -88,7 +98,7 @@ TextTheme _createTextTheme(Color textColor) {
   );
 }
 
-TextButtonThemeData _createTextButtonTheme(Color textColor) {
+TextButtonThemeData _getTextButtonTheme(Color textColor) {
   return TextButtonThemeData(
     style: TextButton.styleFrom(
       primary: textColor,
@@ -101,10 +111,15 @@ TextButtonThemeData _createTextButtonTheme(Color textColor) {
   );
 }
 
-OutlinedButtonThemeData _createOutlineButtonTheme(Color textColor) {
+OutlinedButtonThemeData _getOutlineButtonTheme(
+  Color textColor,
+  Color outlineColor,
+) {
   return OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       primary: textColor,
+      side: BorderSide(color: outlineColor, width: 3),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
           Radius.circular(ProjectBorderRadius.small),
@@ -114,7 +129,18 @@ OutlinedButtonThemeData _createOutlineButtonTheme(Color textColor) {
   );
 }
 
-AppBarTheme _createAppBarTheme(Color backgroundColor) {
+ElevatedButtonThemeData _getElevatedButtonTheme(Color color) {
+  return ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      onPrimary: ProjectColors.white,
+      primary: color,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+      elevation: 0,
+    ),
+  );
+}
+
+AppBarTheme _getAppBarTheme(Color backgroundColor) {
   return AppBarTheme(
     color: backgroundColor,
     elevation: 1,

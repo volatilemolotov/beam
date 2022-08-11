@@ -41,7 +41,7 @@ class ToggleThemeButton extends StatelessWidget {
             horizontal: ProjectSpacing.size8,
           ),
           child: TextButton.icon(
-            icon: SvgPicture.asset(ProjectAssets.beamLogo),
+            icon: SvgPicture.asset(ProjectAssets.themeMode),
             label: Text(text),
             onPressed: () {
               notifier.toggleTheme();

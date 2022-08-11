@@ -49,8 +49,11 @@ class _SdkSelection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        border: Border(
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? ProjectDarkThemeColors.primaryBackground
+            : ProjectLightThemeColors.primaryBackground,
+        border: const Border(
           right: BorderSide(
             color: ProjectColors.greyCBCBCB,
           ),
@@ -107,6 +110,8 @@ class _SdkButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const String sdk = 'Java';
+
     // TODO(nausharipov): make it responsive
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,11 +119,21 @@ class _SdkButtons extends StatelessWidget {
         Row(
           children: ['Java', 'Python', 'Go']
               .map(
-                (e) => OutlinedButton(
-                  onPressed: () {
-                    // TODO(nausharipov): select the language
-                  },
-                  child: Text(e),
+                (e) => Padding(
+                  padding: const EdgeInsets.only(right: 15),
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: sdk == e
+                          ? null
+                          : const BorderSide(
+                              color: ProjectColors.greyDFE1E3,
+                            ),
+                    ),
+                    onPressed: () {
+                      // TODO(nausharipov): select the language
+                    },
+                    child: Text(e),
+                  ),
                 ),
               )
               .toList(),
@@ -183,11 +198,14 @@ class _ModuleHeader extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(ProjectSpacing.size4),
-              child: SvgPicture.asset(ProjectAssets.welcomeProgress0),
+              child: SvgPicture.asset(
+                ProjectAssets.welcomeProgress0,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? ProjectColors.greyDFE1E3
+                    : null,
+              ),
             ),
-            const SizedBox(
-              width: ProjectSpacing.size16,
-            ),
+            const SizedBox(width: ProjectSpacing.size16),
             Text(
               title,
               style: Theme.of(context).textTheme.titleLarge,

@@ -23,6 +23,7 @@ class ProjectColors {
   static const black = Colors.black;
   static const greyCBCBCB = Color(0xFFCBCBCB);
   static const greyA0A4AB = Color(0xFFCBCBCB);
+  static const greyDFE1E3 = Color(0xFFDFE1E3);
 }
 
 class ProjectLightThemeColors {
