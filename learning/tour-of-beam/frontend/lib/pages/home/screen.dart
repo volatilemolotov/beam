@@ -21,7 +21,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../components/difficulty.dart';
+import '../../components/complexity.dart';
 import '../../components/page_container.dart';
 import '../../config/theme/colors_provider.dart';
 import '../../constants/assets.dart';
@@ -260,7 +260,7 @@ class _ModuleHeader extends StatelessWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(width: TobSizes.size6),
-            const Difficulty(level: DifficultyLevel.medium),
+            const ComplexityWidget(complexity: Complexity.medium),
           ],
         ),
       ],
