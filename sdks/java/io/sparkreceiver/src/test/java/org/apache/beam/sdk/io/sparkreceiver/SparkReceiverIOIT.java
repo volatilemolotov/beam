@@ -150,8 +150,6 @@ public class SparkReceiverIOIT {
             .withPluginsEnabled("rabbitmq_stream")
             .withExposedPorts(5552, 5672, 15672)
             .withEnv("RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS", "-rabbitmq_stream advertised_host localhost");
-//            .withUser(RABBITMQ_USERNAME, RABBITMQ_PASSWORD, ImmutableSet.of("administrator"))
-//            .withPermission("/", RABBITMQ_USERNAME, ".*", ".*", ".*");
     rabbitMqContainer.start();
     options.setRabbitMqBootstrapServerAddress(
         getBootstrapServers(
@@ -169,7 +167,7 @@ public class SparkReceiverIOIT {
 
     @Description("Options for synthetic source.")
     @Validation.Required
-    @Default.String("{\"numRecords\": \"50\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
+    @Default.String("{\"numRecords\": \"100\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
     String getSourceOptions();
 
     void setSourceOptions(String sourceOptions);
@@ -201,7 +199,7 @@ public class SparkReceiverIOIT {
 
     @Description("Time to wait for the events to be processed by the read pipeline (in seconds)")
 //    @Validation.Required
-    @Default.Integer(10)
+    @Default.Integer(25)
     Integer getReadTimeout();
 
     void setReadTimeout(Integer readTimeout);
@@ -251,7 +249,6 @@ public class SparkReceiverIOIT {
     final ReceiverBuilder<String, RabbitMqReceiverWithOffset> receiverBuilder =
         new ReceiverBuilder<>(RabbitMqReceiverWithOffset.class).withConstructorArgs(
             options.getRabbitMqBootstrapServerAddress(),
-            maxNumRecords,
             options.getStreamName());
 
     return SparkReceiverIO.<String>read()

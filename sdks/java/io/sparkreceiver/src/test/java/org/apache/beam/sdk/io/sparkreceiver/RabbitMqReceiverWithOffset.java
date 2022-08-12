@@ -17,25 +17,15 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import com.rabbitmq.stream.Consumer;
 import com.rabbitmq.stream.Environment;
-import com.rabbitmq.stream.OffsetSpecification;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.createStream;
 import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.getConsumer;
@@ -49,16 +39,12 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
   private static final Logger LOG = LoggerFactory.getLogger(RabbitMqReceiverWithOffset.class);
 
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private static final List<String> STORED_RECORDS = new ArrayList<>();
-  private static long MAX_NUM_RECORDS;
   private static String RABBITMQ_URL;
   private static String STREAM_NAME;
   private static Long startOffset;
 
-  RabbitMqReceiverWithOffset(final String uri, final Long maxNumRecords, final String streamName) {
+  RabbitMqReceiverWithOffset(final String uri, final String streamName) {
     super(StorageLevel.MEMORY_AND_DISK_2());
-    MAX_NUM_RECORDS = maxNumRecords;
     STREAM_NAME = streamName;
     RABBITMQ_URL = uri;
   }
@@ -82,67 +68,14 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
   private void receive() {
     long currentOffset = startOffset;
-    final Queue<String> received = new ConcurrentLinkedQueue<>();
     final AtomicInteger messageConsumed = new AtomicInteger((int) currentOffset);
 
     LOG.info("Starting receiver");
     try (final Environment environment = getEnvironment(RABBITMQ_URL)) {
       createStream(environment, STREAM_NAME);
-      getConsumer(environment, STREAM_NAME, messageConsumed.get(), received);
+      getConsumer(environment, STREAM_NAME, messageConsumed.get(), this::store);
     } catch (Exception e) {
       LOG.error("Exception during consumer creation", e);
-//      throw e;
     }
-
-    while (!isStopped() && messageConsumed.get() < MAX_NUM_RECORDS) {
-      if (!received.isEmpty()) {
-        try {
-          final String stringMessage = received.poll();
-          LOG.info("Moving message from test consumer to receiver = " + stringMessage);
-          STORED_RECORDS.add(stringMessage);
-          store(stringMessage);
-          messageConsumed.incrementAndGet();
-        } catch (Exception e) {
-          LOG.error("Exception " + e.getMessage());
-        }
-      }
-    }
-
-//    if (isStopped() || testConsumer.getReceived().size() == MAX_NUM_RECORDS) {
-//      try {
-//        LOG.info("Stopping receiver");
-//        channel.close();
-//        connection.close();
-//      } catch (TimeoutException | IOException e) {
-//        throw new RuntimeException(e);
-//      }
-//    }
   }
-
-//  /** A simple RabbitMQ {@code Consumer} that stores all received messages. */
-//  static class TestConsumer extends DefaultConsumer {
-//
-//    private final List<String> received;
-//
-//    public TestConsumer(Channel channel) {
-//      super(channel);
-//      this.received = Collections.synchronizedList(new ArrayList<>());
-//    }
-//
-//    @Override
-//    public void handleDelivery(
-//        String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) {
-//      try {
-//        LOG.info("adding message to test consumer " + new String(body, StandardCharsets.UTF_8));
-//        received.add(new String(body, StandardCharsets.UTF_8));
-//      } catch (Exception e) {
-//        LOG.error("Exception during reading from RabbitMQ " + e.getMessage());
-//      }
-//    }
-//
-//    /** Returns a thread safe unmodifiable view of received messages. */
-//    public List<String> getReceived() {
-//      return Collections.unmodifiableList(received);
-//    }
-//  }
 }

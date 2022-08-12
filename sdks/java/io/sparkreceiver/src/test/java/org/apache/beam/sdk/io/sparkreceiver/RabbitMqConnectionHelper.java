@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Queue;
 
 public class RabbitMqConnectionHelper {
 
@@ -20,7 +19,7 @@ public class RabbitMqConnectionHelper {
 
   @SuppressWarnings("StringSplitter")
   public static Environment getEnvironment(final String serverAddress) {
-    final String hostPort = serverAddress.split("rabbitmq-stream://guest:guest@")[1];
+    final String hostPort = serverAddress.split("@")[1];
     final String host = hostPort.split(":")[0];
     final int port = Integer.parseInt(hostPort.split(":")[1]);
     return Environment.builder()
@@ -52,31 +51,26 @@ public class RabbitMqConnectionHelper {
         .build();
   }
 
-  public static Consumer getConsumer(final Environment environment, final String streamName, final long currentOffset, final Queue<String> received) {
+  public static Consumer getConsumer(final Environment environment, final String streamName, final long currentOffset, final java.util.function.Consumer<String> messageConsumer) {
     return environment.consumerBuilder()
         .stream(streamName) // the stream to consume from
         .offset(OffsetSpecification.offset(currentOffset)) // start consuming at the beginning
-//        .name("myApp")
-//        .manualTrackingStrategy().builder()
-        .messageHandler(getMessageHandler(received))
+        .messageHandler(getMessageHandler(messageConsumer))
         .build();
   }
 
   @NotNull
-  public static MessageHandler getMessageHandler(Queue<String> received) {
+  public static MessageHandler getMessageHandler(final java.util.function.Consumer<String> messageConsumer) {
     return (context, message) -> {
-      // ... message processing ...
       try {
         final String sMessage = new String(message.getBodyAsBinary(), StandardCharsets.UTF_8);
-        LOG.info("adding message to test consumer " + sMessage);
-//        System.out.println("adding message to test consumer " + sMessage);
-        received.add(sMessage);
+        LOG.info("adding message to consumer " + sMessage);
+        messageConsumer.accept(sMessage);
       } catch (Exception e) {
         LOG.error("Exception during reading from RabbitMQ " + e.getMessage());
       }
 
-      context.storeOffset(); // store the message offset
-      // ...
+      context.storeOffset();
     };
   }
 }

@@ -24,10 +24,6 @@ import org.apache.spark.streaming.receiver.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,15 +39,11 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
 
   private static final Logger LOG = LoggerFactory.getLogger(RabbitMqReceiverWithoutOffset.class);
 
-  @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
-  private static final List<String> STORED_RECORDS = new ArrayList<>();
-  private static long MAX_NUM_RECORDS;
   private static String RABBITMQ_URL;
   private static String STREAM_NAME;
 
-  RabbitMqReceiverWithoutOffset(final String uri, final Long maxNumRecords, final String streamName) {
+  RabbitMqReceiverWithoutOffset(final String uri, final String streamName) {
     super(StorageLevel.MEMORY_AND_DISK_2());
-    MAX_NUM_RECORDS = maxNumRecords;
     STREAM_NAME = streamName;
     RABBITMQ_URL = uri;
   }
@@ -67,25 +59,12 @@ public class RabbitMqReceiverWithoutOffset extends Receiver<String> {
   }
 
   private void receive() {
-    final Queue<String> received = new ConcurrentLinkedQueue<>();
     final AtomicInteger messageConsumed = new AtomicInteger(0);
 
     LOG.info("Starting receiver");
     try (final Environment environment = getEnvironment(RABBITMQ_URL)) {
       createStream(environment, STREAM_NAME);
-      getConsumer(environment, STREAM_NAME, messageConsumed.get(), received);
-    }
-
-    while (!isStopped() && messageConsumed.get() < MAX_NUM_RECORDS) {
-      try {
-        final String stringMessage = received.poll();
-        LOG.info("Moving message from test consumer to receiver = " + stringMessage);
-        STORED_RECORDS.add(stringMessage);
-        store(stringMessage);
-        messageConsumed.incrementAndGet();
-      } catch (Exception e) {
-        LOG.error("Exception " + e.getMessage());
-      }
+      getConsumer(environment, STREAM_NAME, messageConsumed.get(), this::store);
     }
   }
 }
