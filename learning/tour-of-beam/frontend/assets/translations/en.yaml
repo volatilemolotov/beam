@@ -24,5 +24,4 @@ ui:
   copyright: '© The Apache Software Foundation'
 pages:
   home:
-    screen:
-      title: 'Tour of Beam Home Screen'
+    title: 'Welcome to the Tour of Beam!'
