@@ -2,8 +2,6 @@ apiVersion: rabbitmq.com/v1beta1
 kind: RabbitmqCluster
 metadata:
   name: rabbit
-data:
-  enabled_plugins: [rabbitmq_stream]
 spec:
   replicas: 1
   resources:
@@ -17,7 +15,7 @@ spec:
     additionalConfig: |
       log.console.level = info
       channel_max = 1700
-      default_user= guest 
+      default_user= guest
       default_pass = guest
       default_user_tags.administrator = true
   service:
