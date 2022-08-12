@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  rabbitmq-config
+  name: rabbitmq-config
 data:
   enabled_plugins: |
     [rabbitmq_stream].
