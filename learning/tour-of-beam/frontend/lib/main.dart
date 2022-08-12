@@ -31,7 +31,7 @@ void main() async {
   setPathUrlStrategy();
   await EasyLocalization.ensureInitialized();
   await initializeServiceLocator();
-  const Locale englishLocale = Locale('en');
+  const englishLocale = Locale('en');
 
   runApp(
     EasyLocalization(
