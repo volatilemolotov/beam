@@ -68,27 +68,27 @@ class ThemeColors {
   }
 
   Color get divider =>
-      isDark ? ProjectDarkThemeColors.grey : ProjectLightThemeColors.grey;
+      isDark ? TobDarkThemeColors.grey : TobLightThemeColors.grey;
 
   Color get primary =>
-      isDark ? ProjectDarkThemeColors.primary : ProjectLightThemeColors.primary;
+      isDark ? TobDarkThemeColors.primary : TobLightThemeColors.primary;
 
-  Color get primaryBackgroundTextColor => ProjectColors.white;
+  Color get primaryBackgroundTextColor => TobColors.white;
 
-  Color get lightGreyBackgroundTextColor => ProjectColors.black;
+  Color get lightGreyBackgroundTextColor => TobColors.black;
 
   Color get secondaryBackground => isDark
-      ? ProjectDarkThemeColors.secondaryBackground
-      : ProjectLightThemeColors.secondaryBackground;
+      ? TobDarkThemeColors.secondaryBackground
+      : TobLightThemeColors.secondaryBackground;
 
   Color get background =>
       _background ??
       (isDark
-          ? ProjectDarkThemeColors.primaryBackground
-          : ProjectLightThemeColors.primaryBackground);
+          ? TobDarkThemeColors.primaryBackground
+          : TobLightThemeColors.primaryBackground);
 
   Color get textColor =>
-      isDark ? ProjectDarkThemeColors.text : ProjectLightThemeColors.text;
+      isDark ? TobDarkThemeColors.text : TobLightThemeColors.text;
 
   Color get progressBackgroundColor =>
       // TODO(nausharipov): reuse these colors after discussion with Anna

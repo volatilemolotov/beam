@@ -45,24 +45,24 @@ class Footer extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: ProjectSizes.size4,
-          horizontal: ProjectSizes.size16,
+          vertical: TobSizes.size4,
+          horizontal: TobSizes.size16,
         ),
         child: Wrap(
-          spacing: ProjectSizes.size16,
+          spacing: TobSizes.size16,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             TextButton(
               style: linkButtonStyle,
               onPressed: () {
-                launchUrl(Uri.parse(ProjectLinks.reportIssue));
+                launchUrl(Uri.parse(TobLinks.reportIssue));
               },
               child: const Text('ui.reportIssue').tr(),
             ),
             TextButton(
               style: linkButtonStyle,
               onPressed: () {
-                launchUrl(Uri.parse(ProjectLinks.privacyPolicy));
+                launchUrl(Uri.parse(TobLinks.privacyPolicy));
               },
               child: const Text('ui.privacyPolicy').tr(),
             ),

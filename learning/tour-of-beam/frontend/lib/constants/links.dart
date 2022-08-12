@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-class ProjectLinks {
+class TobLinks {
   static const reportIssue = 'https://github.com/apache/beam/issues';
   static const privacyPolicy = 'https://beam.apache.org/privacy_policy/';
 }

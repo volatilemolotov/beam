@@ -37,11 +37,11 @@ class ToggleThemeButton extends StatelessWidget {
 
         return Padding(
           padding: const EdgeInsets.symmetric(
-            vertical: ProjectSizes.size4,
-            horizontal: ProjectSizes.size8,
+            vertical: TobSizes.size4,
+            horizontal: TobSizes.size8,
           ),
           child: TextButton.icon(
-            icon: SvgPicture.asset(ProjectAssets.themeMode),
+            icon: SvgPicture.asset(TobAssets.themeMode),
             label: Text(text),
             onPressed: () {
               notifier.toggleTheme();

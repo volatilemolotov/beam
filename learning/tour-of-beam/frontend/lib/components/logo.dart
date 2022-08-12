@@ -31,9 +31,9 @@ class Logo extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Image.asset(
-          ProjectAssets.beamLogo,
-          width: ProjectIconSizes.large,
-          height: ProjectIconSizes.large,
+          TobAssets.beamLogo,
+          width: TobIconSizes.large,
+          height: TobIconSizes.large,
         ),
         RichText(
           text: TextSpan(

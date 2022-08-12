@@ -25,7 +25,7 @@ String _getSvgPath(String fileName) {
 }
 
 // ignore_for_file: avoid_classes_with_only_static_members
-class ProjectAssets {
+class TobAssets {
   static final beamLogo = _getPngPath('beam-logo');
   static final themeMode = _getSvgPath('theme-mode');
   static final welcomeLaptop = _getPngPath('welcome-laptop');

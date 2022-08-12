@@ -18,7 +18,7 @@
 
 import 'package:flutter/material.dart';
 
-class ProjectColors {
+class TobColors {
   static const white = Colors.white;
   static const black = Colors.black;
   static const greyCBCBCB = Color(0xffCBCBCB);
@@ -29,7 +29,7 @@ class ProjectColors {
   static const red = Color(0xffE54545);
 }
 
-class ProjectLightThemeColors {
+class TobLightThemeColors {
   static const primaryBackground = Colors.white;
   static const secondaryBackground = Color(0xffFEFDFD);
   static const grey = Color(0xffE5E5E5);
@@ -37,7 +37,7 @@ class ProjectLightThemeColors {
   static const primary = Color(0xffE74D1A);
 }
 
-class ProjectDarkThemeColors {
+class TobDarkThemeColors {
   static const primaryBackground = Color(0xff18181B);
   static const secondaryBackground = Color(0xff2E2E34);
   static const grey = Color(0xff3F3F46);

@@ -24,32 +24,32 @@ import '../../constants/sizes.dart';
 
 final kLightTheme = ThemeData(
   brightness: Brightness.light,
-  primaryColor: ProjectLightThemeColors.primary,
-  scaffoldBackgroundColor: ProjectLightThemeColors.secondaryBackground,
-  backgroundColor: ProjectLightThemeColors.primaryBackground,
-  textTheme: _getTextTheme(ProjectLightThemeColors.text),
-  textButtonTheme: _getTextButtonTheme(ProjectLightThemeColors.text),
+  primaryColor: TobLightThemeColors.primary,
+  scaffoldBackgroundColor: TobLightThemeColors.secondaryBackground,
+  backgroundColor: TobLightThemeColors.primaryBackground,
+  textTheme: _getTextTheme(TobLightThemeColors.text),
+  textButtonTheme: _getTextButtonTheme(TobLightThemeColors.text),
   outlinedButtonTheme: _getOutlineButtonTheme(
-    ProjectLightThemeColors.text,
-    ProjectLightThemeColors.primary,
+    TobLightThemeColors.text,
+    TobLightThemeColors.primary,
   ),
-  elevatedButtonTheme: _getElevatedButtonTheme(ProjectLightThemeColors.primary),
-  appBarTheme: _getAppBarTheme(ProjectLightThemeColors.secondaryBackground),
+  elevatedButtonTheme: _getElevatedButtonTheme(TobLightThemeColors.primary),
+  appBarTheme: _getAppBarTheme(TobLightThemeColors.secondaryBackground),
 );
 
 final kDarkTheme = ThemeData(
   brightness: Brightness.dark,
-  primaryColor: ProjectDarkThemeColors.primary,
-  scaffoldBackgroundColor: ProjectDarkThemeColors.secondaryBackground,
-  backgroundColor: ProjectDarkThemeColors.primaryBackground,
-  textTheme: _getTextTheme(ProjectDarkThemeColors.text),
-  textButtonTheme: _getTextButtonTheme(ProjectDarkThemeColors.text),
+  primaryColor: TobDarkThemeColors.primary,
+  scaffoldBackgroundColor: TobDarkThemeColors.secondaryBackground,
+  backgroundColor: TobDarkThemeColors.primaryBackground,
+  textTheme: _getTextTheme(TobDarkThemeColors.text),
+  textButtonTheme: _getTextButtonTheme(TobDarkThemeColors.text),
   outlinedButtonTheme: _getOutlineButtonTheme(
-    ProjectDarkThemeColors.text,
-    ProjectDarkThemeColors.primary,
+    TobDarkThemeColors.text,
+    TobDarkThemeColors.primary,
   ),
-  elevatedButtonTheme: _getElevatedButtonTheme(ProjectDarkThemeColors.primary),
-  appBarTheme: _getAppBarTheme(ProjectDarkThemeColors.secondaryBackground),
+  elevatedButtonTheme: _getElevatedButtonTheme(TobDarkThemeColors.primary),
+  appBarTheme: _getAppBarTheme(TobDarkThemeColors.secondaryBackground),
 );
 
 TextTheme _getTextTheme(Color textColor) {
@@ -105,7 +105,7 @@ TextButtonThemeData _getTextButtonTheme(Color textColor) {
       primary: textColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(ProjectBorderRadius.large),
+          Radius.circular(TobBorderRadius.large),
         ),
       ),
     ),
@@ -123,7 +123,7 @@ OutlinedButtonThemeData _getOutlineButtonTheme(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(
-          Radius.circular(ProjectBorderRadius.small),
+          Radius.circular(TobBorderRadius.small),
         ),
       ),
     ),
@@ -133,7 +133,7 @@ OutlinedButtonThemeData _getOutlineButtonTheme(
 ElevatedButtonThemeData _getElevatedButtonTheme(Color color) {
   return ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      onPrimary: ProjectColors.white,
+      onPrimary: TobColors.white,
       primary: color,
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
       elevation: 0,

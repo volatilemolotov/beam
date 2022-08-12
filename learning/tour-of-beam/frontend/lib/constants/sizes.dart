@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-class ProjectSizes {
+class TobSizes {
   static const double zero = 0;
   static const double size4 = 4;
   static const double size6 = 6;
@@ -28,14 +28,14 @@ class ProjectSizes {
   static const double size36 = 36;
 }
 
-class ProjectBorderRadius {
+class TobBorderRadius {
   static const double small = 4;
   static const double medium = 6;
   static const double large = 8;
   static const double xl = 28;
 }
 
-class ProjectIconSizes {
+class TobIconSizes {
   static const double xs = 8;
   static const double small = 16;
   static const double medium = 24;

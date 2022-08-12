@@ -68,12 +68,12 @@ class _SdkSelection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 _IntroText(),
-                SizedBox(height: ProjectSizes.size32),
+                SizedBox(height: TobSizes.size32),
                 _SdkButtons(),
               ],
             ),
           ),
-          Image.asset(ProjectAssets.welcomeLaptop),
+          Image.asset(TobAssets.welcomeLaptop),
         ],
       ),
     );
@@ -95,7 +95,7 @@ class _IntroText extends StatelessWidget {
         Container(
           margin: const EdgeInsets.symmetric(vertical: 32),
           height: 2,
-          color: ProjectColors.greyA0A4AB,
+          color: TobColors.greyA0A4AB,
           constraints: const BoxConstraints(maxWidth: 150),
         ),
         RichText(
@@ -148,7 +148,7 @@ class _SdkButtons extends StatelessWidget {
                       side: sdk == e
                           ? null
                           : const BorderSide(
-                              color: ProjectColors.greyDFE1E3,
+                              color: TobColors.greyDFE1E3,
                             ),
                     ),
                     onPressed: () {
@@ -186,7 +186,7 @@ class _TourSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        vertical: ProjectSizes.size20,
+        vertical: TobSizes.size20,
         horizontal: 27,
       ),
       child: Column(
@@ -236,13 +236,13 @@ class _ModuleHeader extends StatelessWidget {
           child: Row(
             children: [
               Padding(
-                padding: const EdgeInsets.all(ProjectSizes.size4),
+                padding: const EdgeInsets.all(TobSizes.size4),
                 child: SvgPicture.asset(
-                  ProjectAssets.welcomeProgress0,
+                  TobAssets.welcomeProgress0,
                   color: ThemeColors.of(context).progressBackgroundColor,
                 ),
               ),
-              const SizedBox(width: ProjectSizes.size16),
+              const SizedBox(width: TobSizes.size16),
               Expanded(
                 child: Text(
                   title,
@@ -258,7 +258,7 @@ class _ModuleHeader extends StatelessWidget {
               'Medium level',
               style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(width: ProjectSizes.size6),
+            const SizedBox(width: TobSizes.size6),
             const Difficulty(level: DifficultyLevel.medium),
           ],
         ),
@@ -290,7 +290,7 @@ class _ModuleBody extends StatelessWidget {
           const Text(
             'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam velit purus, tincidunt id velit vitae, mattis dictum velit. Nunc sit amet nunc at turpis eleifend commodo ac ut libero. Aenean rutrum rutrum nulla ut efficitur. Vestibulum pulvinar eros dictum lectus volutpat dignissim vitae quis nisi. Maecenas sem erat, elementum in euismod ut, interdum ac massa.',
           ),
-          const SizedBox(height: ProjectSizes.size16),
+          const SizedBox(height: TobSizes.size16),
           Divider(
             color: ThemeColors.of(context).divider,
           ),
