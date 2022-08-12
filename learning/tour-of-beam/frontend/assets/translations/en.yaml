@@ -16,12 +16,12 @@
 #  under the License.
 
 ui:
-  signIn: 'Sign in'
+  copyright: '© The Apache Software Foundation'
   darkMode: 'Dark Mode'
   lightMode: 'Light Mode'
-  reportIssue: 'Report issue in Jira'
   privacyPolicy: 'Privacy Policy'
-  copyright: '© The Apache Software Foundation'
+  reportIssue: 'Report issue in Jira'
+  signIn: 'Sign in'
 pages:
   home:
     title: 'Welcome to the Tour of Beam!'
