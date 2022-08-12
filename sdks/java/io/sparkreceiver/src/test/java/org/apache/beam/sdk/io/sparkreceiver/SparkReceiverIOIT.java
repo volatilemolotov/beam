@@ -122,6 +122,7 @@ public class SparkReceiverIOIT {
   public static void setup() throws IOException {
     options = IOITHelper.readIOTestPipelineOptions(Options.class);
     sourceOptions = fromJsonString(options.getSourceOptions(), SyntheticSourceOptions.class);
+    options.setRabbitMqBootstrapServerAddress("rabbitmq-stream://guest:guest@" + options.getRabbitMqBootstrapServerAddress());
     if (options.isWithTestcontainers()) {
       setupRabbitMqContainer();
     } else {
@@ -173,7 +174,7 @@ public class SparkReceiverIOIT {
     void setSourceOptions(String sourceOptions);
 
     @Description("RabbitMQ bootstrap server address")
-    @Default.String("rabbitmq-stream://localhost:5672")
+    @Default.String("rabbitmq-stream://guest:guest@localhost:5672")
     String getRabbitMqBootstrapServerAddress();
 
     void setRabbitMqBootstrapServerAddress(String address);
