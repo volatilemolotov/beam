@@ -41,30 +41,23 @@ class ThemeSwitchNotifier extends ChangeNotifier {
     _setPreferences();
   }
 
-  void _setPreferences() {
-    SharedPreferences.getInstance().then(
-      (preferences) {
-        themeMode =
-            preferences.getString(kThemeMode) == ThemeMode.dark.toString()
-                ? ThemeMode.dark
-                : ThemeMode.light;
-        notifyListeners();
-      },
-    );
+  Future<void> _setPreferences() async {
+    final preferences = await SharedPreferences.getInstance();
+    themeMode = preferences.getString(kThemeMode) == ThemeMode.dark.toString()
+        ? ThemeMode.dark
+        : ThemeMode.light;
+    notifyListeners();
   }
 
   bool get isDarkMode {
     return themeMode == ThemeMode.dark;
   }
 
-  void toggleTheme() {
+  Future<void> toggleTheme() async {
     themeMode = themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-    SharedPreferences.getInstance().then(
-      (preferences) {
-        preferences.setString(kThemeMode, themeMode.toString());
-        notifyListeners();
-      },
-    );
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(kThemeMode, themeMode.toString());
+    notifyListeners();
   }
 }
 
