@@ -24,7 +24,6 @@ String _getSvgPath(String fileName) {
   return 'svg/$fileName.svg';
 }
 
-// ignore_for_file: avoid_classes_with_only_static_members
 class TobAssets {
   static final beamLogo = _getPngPath('beam-logo');
   static final themeMode = _getSvgPath('theme-mode');

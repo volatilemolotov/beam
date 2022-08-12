@@ -19,24 +19,16 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../constants/sizes.dart';
-
 class SignInButton extends StatelessWidget {
   const SignInButton();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: TobSizes.size4,
-        horizontal: TobSizes.size8,
-      ),
-      child: TextButton(
-        child: const Text('ui.signIn').tr(),
-        onPressed: () {
-          // TODO(nausharipov): sign in
-        },
-      ),
+    return TextButton(
+      child: const Text('ui.signIn').tr(),
+      onPressed: () {
+        // TODO(nausharipov): sign in
+      },
     );
   }
 }

@@ -27,7 +27,7 @@ class _Dot extends StatelessWidget {
 
   const _Dot({required this.color});
 
-  static const grey = _Dot(color: TobColors.greyA0A4AB);
+  static const grey = _Dot(color: TobColors.grey2);
   static const green = _Dot(color: TobColors.green);
   static const orange = _Dot(color: TobColors.orange);
   static const red = _Dot(color: TobColors.red);

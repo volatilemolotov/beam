@@ -32,7 +32,6 @@ class Logo extends StatelessWidget {
       children: [
         Image.asset(
           TobAssets.beamLogo,
-          width: TobIconSizes.large,
           height: TobIconSizes.large,
         ),
         RichText(

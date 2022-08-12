@@ -96,7 +96,7 @@ class _IntroText extends StatelessWidget {
         Container(
           margin: const EdgeInsets.symmetric(vertical: 32),
           height: 2,
-          color: TobColors.greyA0A4AB,
+          color: TobColors.grey2,
           constraints: const BoxConstraints(maxWidth: 150),
         ),
         RichText(
@@ -149,7 +149,7 @@ class _SdkButtons extends StatelessWidget {
                       side: sdk == e
                           ? null
                           : const BorderSide(
-                              color: TobColors.greyDFE1E3,
+                              color: TobColors.grey1,
                             ),
                     ),
                     onPressed: () {

@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<ThemeSwitchNotifier>(
         builder: (context, themeSwitchNotifier, _) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             themeMode: themeSwitchNotifier.themeMode,
             theme: kLightTheme,
             darkTheme: kDarkTheme,

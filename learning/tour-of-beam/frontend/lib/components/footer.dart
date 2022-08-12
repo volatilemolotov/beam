@@ -27,14 +27,14 @@ import '../constants/sizes.dart';
 class Footer extends StatelessWidget {
   const Footer();
 
+  static final _linkButtonStyle = TextButton.styleFrom(
+    textStyle: const TextStyle(
+      fontWeight: FontWeight.normal,
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
-    final linkButtonStyle = TextButton.styleFrom(
-      textStyle: const TextStyle(
-        fontWeight: FontWeight.normal,
-      ),
-    );
-
     return Container(
       decoration: BoxDecoration(
         color: ThemeColors.of(context).secondaryBackground,
@@ -53,14 +53,14 @@ class Footer extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             TextButton(
-              style: linkButtonStyle,
+              style: _linkButtonStyle,
               onPressed: () {
                 launchUrl(Uri.parse(TobLinks.reportIssue));
               },
               child: const Text('ui.reportIssue').tr(),
             ),
             TextButton(
-              style: linkButtonStyle,
+              style: _linkButtonStyle,
               onPressed: () {
                 launchUrl(Uri.parse(TobLinks.privacyPolicy));
               },

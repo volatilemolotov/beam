@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 
+import '../constants/sizes.dart';
 import 'footer.dart';
 import 'logo.dart';
 import 'sign_in_button.dart';
@@ -39,6 +40,7 @@ class PageContainer extends StatelessWidget {
         actions: const [
           ToggleThemeButton(),
           SignInButton(),
+          SizedBox(width: TobSizes.size16)
         ],
       ),
       body: Column(
