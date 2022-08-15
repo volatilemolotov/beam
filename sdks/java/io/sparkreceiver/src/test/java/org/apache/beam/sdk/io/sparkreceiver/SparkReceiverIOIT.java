@@ -1,6 +1,10 @@
 package org.apache.beam.sdk.io.sparkreceiver;
 
 import com.google.cloud.Timestamp;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.MessageProperties;
 import com.rabbitmq.stream.Environment;
 import com.rabbitmq.stream.Message;
 import com.rabbitmq.stream.Producer;
@@ -45,10 +49,11 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -122,7 +127,7 @@ public class SparkReceiverIOIT {
   public static void setup() throws IOException {
     options = IOITHelper.readIOTestPipelineOptions(Options.class);
     sourceOptions = fromJsonString(options.getSourceOptions(), SyntheticSourceOptions.class);
-    options.setRabbitMqBootstrapServerAddress("rabbitmq-stream://guest:guest@" + options.getRabbitMqBootstrapServerAddress() + ":5552");
+    options.setRabbitMqBootstrapServerAddress("amqp://guest:guest@" + options.getRabbitMqBootstrapServerAddress());
     if (options.isWithTestcontainers()) {
       setupRabbitMqContainer();
     } else {
@@ -168,7 +173,7 @@ public class SparkReceiverIOIT {
 
     @Description("Options for synthetic source.")
     @Validation.Required
-    @Default.String("{\"numRecords\": \"100\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
+    @Default.String("{\"numRecords\": \"500\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
     String getSourceOptions();
 
     void setSourceOptions(String sourceOptions);
@@ -206,7 +211,43 @@ public class SparkReceiverIOIT {
     void setReadTimeout(Integer readTimeout);
   }
 
-  private void writeToRabbitMq(final long maxNumRecords) {
+  private static class RabbitMqMessage {
+    private final byte[] body;
+
+    public RabbitMqMessage(String record) {
+      this.body = record.getBytes(StandardCharsets.UTF_8);
+    }
+
+    public byte[] getBody() {
+      return body;
+    }
+  }
+
+  private void writeToRabbitMq(final long maxNumRecords) throws Exception {
+    final List<RabbitMqMessage> data = LongStream.range(0, maxNumRecords)
+            .mapToObj(number -> new RabbitMqMessage(TEST_MESSAGE_PREFIX + number))
+            .collect(Collectors.toList());
+
+    final ConnectionFactory connectionFactory = new ConnectionFactory();
+    connectionFactory.setUri(options.getRabbitMqBootstrapServerAddress());
+    Map<String, Object> arguments = new HashMap<>();
+    arguments.put("x-queue-type", "stream");
+//    arguments.put("x-queue-leader-locator", "least-leaders");
+
+    try (Connection connection = connectionFactory.newConnection(); Channel channel = connection.createChannel()) {
+      channel.queueDeclare(options.getStreamName(), true, false, false, arguments);
+
+      data.forEach(message -> {
+        try {
+          channel.basicPublish("", options.getStreamName(), MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBody());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      });
+    }
+  }
+
+  private void writeToRabbitMqStream(final long maxNumRecords) {
     final CountDownLatch confirmLatch = new CountDownLatch((int) maxNumRecords);
     final List<String> data = LongStream.range(0, maxNumRecords)
         .mapToObj(number -> TEST_MESSAGE_PREFIX + number)
@@ -318,7 +359,11 @@ public class SparkReceiverIOIT {
   @Ignore
   public void testSparkReceiverIOReadsInStreaming() throws IOException {
 
-    writeToRabbitMq(sourceOptions.numRecords);
+    try {
+      writeToRabbitMq(sourceOptions.numRecords);
+    } catch (Exception e) {
+      System.err.println("Can not write to rabbit" + e.getMessage());
+    }
     LOG.info(sourceOptions.numRecords + " records were successfully written to RabbitMQ");
 
     // Use streaming pipeline to read RabbitMQ records.
@@ -349,8 +394,12 @@ public class SparkReceiverIOIT {
   @Test
   public void testSparkReceiverIOReadsInStreamingWithOffset() throws IOException {
 
-    writeToRabbitMq(sourceOptions.numRecords);
-    LOG.info(sourceOptions.numRecords + " records were successfully written to RabbitMQ");
+    try {
+      writeToRabbitMq(sourceOptions.numRecords);
+    } catch (Exception e) {
+      System.err.println("Can not write to rabbit" + e.getMessage());
+    }
+    System.out.println(sourceOptions.numRecords + " records were successfully written to RabbitMQ");
 
     // Use streaming pipeline to read RabbitMQ records.
     readPipeline.getOptions().as(Options.class).setStreaming(true);

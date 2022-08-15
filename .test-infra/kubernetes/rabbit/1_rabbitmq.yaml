@@ -18,7 +18,5 @@ spec:
       default_user= guest
       default_pass = guest
       default_user_tags.administrator = true
-    envConfig: |
-      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_stream advertised_host localhost
   service:
     type: LoadBalancer
