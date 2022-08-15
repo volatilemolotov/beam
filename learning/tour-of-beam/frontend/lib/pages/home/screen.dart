@@ -103,12 +103,11 @@ class _IntroText extends StatelessWidget {
           text: TextSpan(
             style: Theme.of(context).textTheme.bodyLarge,
             children: [
-              const TextSpan(
-                text:
-                    'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please',
+              TextSpan(
+                text: 'pages.home.ifSaveProgress'.tr(),
               ),
               TextSpan(
-                text: ' sign in',
+                text: 'pages.home.signIn'.tr(),
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge!
@@ -118,10 +117,7 @@ class _IntroText extends StatelessWidget {
                     // TODO(nausharipov): sign in
                   },
               ),
-              const TextSpan(
-                text:
-                    '. \n\nPlease select the default language (you may change the language at any time):',
-              ),
+              TextSpan(text: '\n\n${'pages.home.selectLanguage'.tr()}'),
             ],
           ),
         ),
@@ -165,7 +161,7 @@ class _SdkButtons extends StatelessWidget {
           onPressed: () {
             // TODO(nausharipov): redirect
           },
-          child: const Text('Start learning'),
+          child: const Text('pages.home.startLearning').tr(),
         ),
       ],
     );
@@ -256,9 +252,9 @@ class _ModuleHeader extends StatelessWidget {
         Row(
           children: [
             Text(
-              'Medium level',
+              'complexity.medium',
               style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            ).tr(),
             const SizedBox(width: TobSizes.size6),
             const ComplexityWidget(complexity: Complexity.medium),
           ],

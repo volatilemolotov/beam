@@ -25,3 +25,11 @@ ui:
 pages:
   home:
     title: 'Welcome to the Tour of Beam!'
+    ifSaveProgress: 'Your journey is broken down into learning modules. If you would like to save your progress and track completed modules, please'
+    signIn: ' sign in.'
+    selectLanguage: 'Please select the default language (you may change the language at any time):'
+    startLearning: 'Start learning'
+complexity:
+  basic: 'Basic level'
+  medium: 'Medium level'
+  advanced: 'Advanced level'
