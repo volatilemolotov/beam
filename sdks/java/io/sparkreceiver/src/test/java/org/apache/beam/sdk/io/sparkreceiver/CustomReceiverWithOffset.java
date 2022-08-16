@@ -63,8 +63,10 @@ public class CustomReceiverWithOffset extends Receiver<String> implements HasOff
     Long currentOffset = startOffset;
     while (!isStopped()) {
       if (currentOffset <= RECORDS_COUNT) {
-        STORED_RECORDS.add(currentOffset.toString());
-        store((currentOffset++).toString());
+        if (!isStopped()) {
+          STORED_RECORDS.add(currentOffset.toString());
+          store((currentOffset++).toString());
+        }
       }
       try {
         TimeUnit.MILLISECONDS.sleep(TIMEOUT_MS);
