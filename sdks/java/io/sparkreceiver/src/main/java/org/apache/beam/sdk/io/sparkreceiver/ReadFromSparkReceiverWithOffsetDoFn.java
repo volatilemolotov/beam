@@ -41,16 +41,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A SplittableDoFn which reads from {@link Receiver} that implements {@link HasOffset}.
- * By default, a {@link WatermarkEstimators.Manual}
- * watermark estimator is used to track watermark.
+ * A SplittableDoFn which reads from {@link Receiver} that implements {@link HasOffset}. By default,
+ * a {@link WatermarkEstimators.Manual} watermark estimator is used to track watermark.
  *
- * Initial range
- * The initial range is {@code [0, Long.MAX_VALUE)}
+ * <p>Initial range The initial range is {@code [0, Long.MAX_VALUE)}
  *
- * Resume Processing
- * Every time the sparkConsumer.hasRecords() returns false,
- * {@link ReadFromSparkReceiverWithOffsetDoFn} will move to process the next element.
+ * <p>Resume Processing Every time the sparkConsumer.hasRecords() returns false, {@link
+ * ReadFromSparkReceiverWithOffsetDoFn} will move to process the next element.
  */
 @UnboundedPerElement
 public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {

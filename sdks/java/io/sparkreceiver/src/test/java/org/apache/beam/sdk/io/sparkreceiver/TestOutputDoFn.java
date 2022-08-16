@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.beam.sdk.transforms.DoFn;
 
-/** Test output class for comparison with the input records of {@link CustomReceiverWithOffset} */
+/** Test output class for comparison with the input records of {@link CustomReceiverWithOffset}. */
 public class TestOutputDoFn extends DoFn<String, String> {
   private static final List<String> RECORDS = new ArrayList<>();
 
