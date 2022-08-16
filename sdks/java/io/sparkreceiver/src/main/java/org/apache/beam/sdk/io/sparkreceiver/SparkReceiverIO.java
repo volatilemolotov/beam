@@ -83,22 +83,26 @@ public class SparkReceiverIO {
       return toBuilder().setValueClass(valueClass).build();
     }
 
+    /** Sets {@link ReceiverBuilder} with value and custom Spark {@link Receiver} class */
     public Read<V> withSparkReceiverBuilder(
         ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder) {
       checkArgument(sparkReceiverBuilder != null, "Spark receiver builder can not be null");
       return toBuilder().setSparkReceiverBuilder(sparkReceiverBuilder).build();
     }
 
+    /** A function to get offset in order to start {@link Receiver} from it. */
     public Read<V> withGetOffsetFn(SerializableFunction<V, Long> getOffsetFn) {
       checkArgument(getOffsetFn != null, "Get offset function can not be null");
       return toBuilder().setGetOffsetFn(getOffsetFn).build();
     }
 
+    /** A function to calculate watermark after a record. */
     public Read<V> withWatermarkFn(SerializableFunction<V, Instant> watermarkFn) {
       checkArgument(watermarkFn != null, "Watermark function can not be null");
       return toBuilder().setWatermarkFn(watermarkFn).build();
     }
 
+    /** Sets {@link SparkConsumer} for start/stop reading from custom Spark {@link Receiver}*/
     public Read<V> withSparkConsumer(SparkConsumer<V> sparkConsumer) {
       checkArgument(sparkConsumer != null, "Spark consumer can not be null");
       return toBuilder().setSparkConsumer(sparkConsumer).build();
