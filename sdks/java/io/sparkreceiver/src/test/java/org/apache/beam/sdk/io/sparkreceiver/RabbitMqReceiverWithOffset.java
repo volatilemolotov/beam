@@ -101,7 +101,7 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
       channel = connection.createChannel();
       channel.queueDeclare(STREAM_NAME, true, false, false, arguments);
-      channel.basicQos(100, true);
+      channel.basicQos((int) TOTAL_MESSAGES_NUMBER);
       testConsumer = new TestConsumer(channel, this::store);
 
       channel.basicConsume(STREAM_NAME, false, arguments, testConsumer);
