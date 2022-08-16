@@ -40,21 +40,18 @@ public class SparkReceiverIOTest {
 
   @Test
   public void testReadBuildsCorrectly() {
-    ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
-        new ReceiverBuilder<>(CustomReceiverWithoutOffset.class).withConstructorArgs();
+    ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
+        new ReceiverBuilder<>(CustomReceiverWithOffset.class).withConstructorArgs();
     SerializableFunction<String, Long> offsetFn = Long::valueOf;
     SerializableFunction<String, Instant> watermarkFn = Instant::parse;
-    CustomSparkConsumer<String> sparkConsumer = new CustomSparkConsumer<>();
 
     SparkReceiverIO.Read<String> read =
         SparkReceiverIO.<String>read()
-            .withSparkConsumer(sparkConsumer)
             .withValueClass(String.class)
             .withGetOffsetFn(offsetFn)
             .withWatermarkFn(watermarkFn)
             .withSparkReceiverBuilder(receiverBuilder);
 
-    assertEquals(sparkConsumer, read.getSparkConsumer());
     assertEquals(offsetFn, read.getGetOffsetFn());
     assertEquals(receiverBuilder, read.getSparkReceiverBuilder());
     assertEquals(String.class, read.getValueClass());
@@ -77,13 +74,6 @@ public class SparkReceiverIOTest {
   public void testReadObjectCreationFailsIfWatermarkFnIsNull() {
     assertThrows(
         IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withWatermarkFn(null));
-  }
-
-  @Test
-  public void testReadObjectCreationFailsIfSparkConsumerIsNull() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> SparkReceiverIO.<String>read().withSparkConsumer(null));
   }
 
   @Test
@@ -131,32 +121,5 @@ public class SparkReceiverIOTest {
     p.run().waitUntilFinish(Duration.standardSeconds(15));
 
     assertEquals(outputRecords, storedRecords);
-  }
-
-  @Test
-  public void testReadFromCustomReceiverWithoutOffset() {
-    DirectOptions options = PipelineOptionsFactory.as(DirectOptions.class);
-    options.setBlockOnRun(false);
-    options.setRunner(DirectRunner.class);
-    Pipeline p = Pipeline.create(options);
-
-    ReceiverBuilder<String, CustomReceiverWithoutOffset> receiverBuilder =
-        new ReceiverBuilder<>(CustomReceiverWithoutOffset.class).withConstructorArgs();
-    SparkReceiverIO.Read<String> reader =
-        SparkReceiverIO.<String>read()
-            .withValueClass(String.class)
-            .withGetOffsetFn(Long::valueOf)
-            .withWatermarkFn(Instant::parse)
-            .withSparkConsumer(new CustomSparkConsumer<>())
-            .withSparkReceiverBuilder(receiverBuilder);
-
-    List<String> storedRecords = CustomReceiverWithoutOffset.getStoredRecords();
-    List<String> outputRecords = TestOutputDoFn.getRecords();
-    outputRecords.clear();
-
-    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(new TestOutputDoFn()));
-    p.run().waitUntilFinish(Duration.standardSeconds(15));
-
-    assertEquals(storedRecords, outputRecords);
   }
 }

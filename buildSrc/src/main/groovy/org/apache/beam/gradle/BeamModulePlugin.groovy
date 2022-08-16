@@ -389,7 +389,7 @@ class BeamModulePlugin implements Plugin<Project> {
 
     // Automatically use the official release version if we are performing a release
     // otherwise append '-SNAPSHOT'
-    project.version = '2.41.0'
+    project.version = '2.42.0'
     if (!isRelease(project)) {
       project.version += '-SNAPSHOT'
     }
@@ -559,6 +559,7 @@ class BeamModulePlugin implements Plugin<Project> {
         checker_qual                                : "org.checkerframework:checker-qual:$checkerframework_version",
         classgraph                                  : "io.github.classgraph:classgraph:$classgraph_version",
         commons_codec                               : "commons-codec:commons-codec:1.15",
+        commons_collections                         : "commons-collections:commons-collections:3.2.2",
         commons_compress                            : "org.apache.commons:commons-compress:1.21",
         commons_csv                                 : "org.apache.commons:commons-csv:1.8",
         commons_io                                  : "commons-io:commons-io:2.6",
@@ -592,7 +593,7 @@ class BeamModulePlugin implements Plugin<Project> {
         google_cloud_core_grpc                      : "com.google.cloud:google-cloud-core-grpc", // google_cloud_platform_libraries_bom sets version
         google_cloud_datacatalog_v1beta1            : "com.google.cloud:google-cloud-datacatalog", // google_cloud_platform_libraries_bom sets version
         google_cloud_dataflow_java_proto_library_all: "com.google.cloud.dataflow:google-cloud-dataflow-java-proto-library-all:0.5.160304",
-        google_cloud_datastore_v1_proto_client      : "com.google.cloud.datastore:datastore-v1-proto-client:2.2.10",
+        google_cloud_datastore_v1_proto_client      : "com.google.cloud.datastore:datastore-v1-proto-client:2.9.0",
         google_cloud_firestore                      : "com.google.cloud:google-cloud-firestore", // google_cloud_platform_libraries_bom sets version
         google_cloud_pubsub                         : "com.google.cloud:google-cloud-pubsub", // google_cloud_platform_libraries_bom sets version
         google_cloud_pubsublite                     : "com.google.cloud:google-cloud-pubsublite",  // google_cloud_platform_libraries_bom sets version
@@ -672,7 +673,7 @@ class BeamModulePlugin implements Plugin<Project> {
         kafka_clients                               : "org.apache.kafka:kafka-clients:$kafka_version",
         mockito_core                                : "org.mockito:mockito-core:3.7.7",
         mockito_inline                              : "org.mockito:mockito-inline:4.5.1",
-        mongo_java_driver                           : "org.mongodb:mongo-java-driver:3.12.10",
+        mongo_java_driver                           : "org.mongodb:mongo-java-driver:3.12.11",
         nemo_compiler_frontend_beam                 : "org.apache.nemo:nemo-compiler-frontend-beam:$nemo_version",
         netty_all                                   : "io.netty:netty-all:$netty_version",
         netty_handler                               : "io.netty:netty-handler:$netty_version",
@@ -687,7 +688,7 @@ class BeamModulePlugin implements Plugin<Project> {
         proto_google_cloud_bigtable_admin_v2        : "com.google.api.grpc:proto-google-cloud-bigtable-admin-v2", // google_cloud_platform_libraries_bom sets version
         proto_google_cloud_bigtable_v2              : "com.google.api.grpc:proto-google-cloud-bigtable-v2", // google_cloud_platform_libraries_bom sets version
         proto_google_cloud_datacatalog_v1beta1      : "com.google.api.grpc:proto-google-cloud-datacatalog-v1beta1", // google_cloud_platform_libraries_bom sets version
-        proto_google_cloud_datastore_v1             : "com.google.api.grpc:proto-google-cloud-datastore-v1:0.93.10", // google_cloud_platform_libraries_bom sets version
+        proto_google_cloud_datastore_v1             : "com.google.api.grpc:proto-google-cloud-datastore-v1:0.100.0", // google_cloud_platform_libraries_bom sets version
         proto_google_cloud_firestore_v1             : "com.google.api.grpc:proto-google-cloud-firestore-v1", // google_cloud_platform_libraries_bom sets version
         proto_google_cloud_pubsub_v1                : "com.google.api.grpc:proto-google-cloud-pubsub-v1", // google_cloud_platform_libraries_bom sets version
         proto_google_cloud_pubsublite_v1            : "com.google.api.grpc:proto-google-cloud-pubsublite-v1", // google_cloud_platform_libraries_bom sets version
@@ -718,7 +719,7 @@ class BeamModulePlugin implements Plugin<Project> {
         testcontainers_postgresql                   : "org.testcontainers:postgresql:$testcontainers_version",
         testcontainers_mysql                        : "org.testcontainers:mysql:$testcontainers_version",
         testcontainers_gcloud                       : "org.testcontainers:gcloud:$testcontainers_version",
-        vendored_grpc_1_43_2                        : "org.apache.beam:beam-vendor-grpc-1_43_2:0.1",
+        vendored_grpc_1_48_1                        : "org.apache.beam:beam-vendor-grpc-1_48_1:0.1",
         vendored_guava_26_0_jre                     : "org.apache.beam:beam-vendor-guava-26_0-jre:0.1",
         vendored_calcite_1_28_0                     : "org.apache.beam:beam-vendor-calcite-1_28_0:0.2",
         woodstox_core_asl                           : "org.codehaus.woodstox:woodstox-core-asl:4.4.1",
@@ -2128,10 +2129,10 @@ class BeamModulePlugin implements Plugin<Project> {
           archivesBaseName: configuration.archivesBaseName,
           automaticModuleName: configuration.automaticModuleName,
           shadowJarValidationExcludes: it.shadowJarValidationExcludes,
-          shadowClosure: GrpcVendoring_1_43_2.shadowClosure() << {
+          shadowClosure: GrpcVendoring_1_48_1.shadowClosure() << {
             // We perform all the code relocations but don't include
             // any of the actual dependencies since they will be supplied
-            // by org.apache.beam:beam-vendor-grpc-v1p43p2
+            // by org.apache.beam:beam-vendor-grpc-v1p48p1
             dependencies {
               include(dependency { return false })
             }
@@ -2148,14 +2149,14 @@ class BeamModulePlugin implements Plugin<Project> {
       project.protobuf {
         protoc {
           // The artifact spec for the Protobuf Compiler
-          artifact = "com.google.protobuf:protoc:${GrpcVendoring_1_43_2.protobuf_version}" }
+          artifact = "com.google.protobuf:protoc:${GrpcVendoring_1_48_1.protobuf_version}" }
 
         // Configure the codegen plugins
         plugins {
           // An artifact spec for a protoc plugin, with "grpc" as
           // the identifier, which can be referred to in the "plugins"
           // container of the "generateProtoTasks" closure.
-          grpc { artifact = "io.grpc:protoc-gen-grpc-java:${GrpcVendoring_1_43_2.grpc_version}" }
+          grpc { artifact = "io.grpc:protoc-gen-grpc-java:${GrpcVendoring_1_48_1.grpc_version}" }
         }
 
         generateProtoTasks {
@@ -2169,7 +2170,7 @@ class BeamModulePlugin implements Plugin<Project> {
         }
       }
 
-      project.dependencies GrpcVendoring_1_43_2.dependenciesClosure() << { shadow project.ext.library.java.vendored_grpc_1_43_2 }
+      project.dependencies GrpcVendoring_1_48_1.dependenciesClosure() << { shadow project.ext.library.java.vendored_grpc_1_48_1 }
     }
 
     /** ***********************************************************************************************/
@@ -2509,6 +2510,7 @@ class BeamModulePlugin implements Plugin<Project> {
         // specific binary here could make gradle delete it while pip will believe
         // the package is fully installed.
         outputs.dirs(project.ext.envdir)
+        outputs.upToDateWhen { false }
       }
 
       project.ext.pythonSdkDeps = project.files(
