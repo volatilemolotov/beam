@@ -64,8 +64,8 @@ job(jobName) {
           influxMeasurement             : 'sparkreceiverioit_results',
           influxDatabase                : InfluxDBCredentialsHelper.InfluxDBDatabaseName,
           influxHost                    : InfluxDBCredentialsHelper.InfluxDBHostUrl,
-          rabbitMqBootstrapServerAddress: 'rabbitmq-stream://guest:guest@' + rabbitMqHostName + ':5552',
-          streamName                    : 'stream',
+          rabbitMqBootstrapServerAddress: 'amqp://guest:guest@' + rabbitMqHostName + ':5672',
+          streamName                    : 'rabbitMqTestStream',
           readTimeout                   : '900',
           numWorkers                    : '5',
           autoscalingAlgorithm          : 'NONE'

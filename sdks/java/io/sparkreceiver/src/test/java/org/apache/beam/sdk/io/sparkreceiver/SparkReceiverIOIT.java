@@ -1,10 +1,44 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.beam.sdk.io.sparkreceiver;
+
+import static org.apache.beam.sdk.io.synthetic.SyntheticOptions.fromJsonString;
+import static org.junit.Assert.assertEquals;
 
 import com.google.cloud.Timestamp;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MessageProperties;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.common.IOITHelper;
@@ -27,7 +61,6 @@ import org.apache.beam.sdk.testutils.metrics.TimeMonitor;
 import org.apache.beam.sdk.testutils.publishing.InfluxDBSettings;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.SimpleFunction;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Duration;
@@ -40,28 +73,8 @@ import org.junit.runners.JUnit4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
-
-import static org.apache.beam.sdk.io.synthetic.SyntheticOptions.fromJsonString;
-import static org.junit.Assert.assertEquals;
 
 /**
  * IO Integration test for {@link org.apache.beam.sdk.io.sparkreceiver.SparkReceiverIO}.
@@ -72,10 +85,10 @@ import static org.junit.Assert.assertEquals;
  * <p>NOTE: This test sets retention policy of the messages so that all messages are retained in the
  * topic so that we could read them back after writing.
  *
- * <p>{@see https://stackoverflow.com/questions/59245356/how-to-create-apache-spark-standalone-cluster-for-integration-testing-using-test/68156137} for
- *  more details about spark testcontainers setup.</p>
+ * <p>{@see
+ * https://stackoverflow.com/questions/59245356/how-to-create-apache-spark-standalone-cluster-for-integration-testing-using-test/68156137}
+ * for more details about spark testcontainers setup.
  */
-@SuppressWarnings({"FieldCanBeLocal", "rawtypes", "unused"})
 @RunWith(JUnit4.class)
 public class SparkReceiverIOIT {
 
@@ -83,13 +96,9 @@ public class SparkReceiverIOIT {
 
   private static final String READ_TIME_METRIC_NAME = "read_time";
 
-  private static final String WRITE_TIME_METRIC_NAME = "write_time";
-
   private static final String RUN_TIME_METRIC_NAME = "run_time";
 
   private static final String READ_ELEMENT_METRIC_NAME = "spark_read_element_count";
-
-  private static final Network NETWORK = Network.newNetwork();
 
   private static final String NAMESPACE = SparkReceiverIOIT.class.getName();
 
@@ -103,7 +112,7 @@ public class SparkReceiverIOIT {
 
   private static SyntheticSourceOptions sourceOptions;
 
-  private static GenericContainer rabbitMqContainer;
+  private static GenericContainer<?> rabbitMqContainer;
 
   private static InfluxDBSettings settings;
 
@@ -122,7 +131,8 @@ public class SparkReceiverIOIT {
   public static void setup() throws IOException {
     options = IOITHelper.readIOTestPipelineOptions(Options.class);
     sourceOptions = fromJsonString(options.getSourceOptions(), SyntheticSourceOptions.class);
-    options.setRabbitMqBootstrapServerAddress("amqp://guest:guest@" + options.getRabbitMqBootstrapServerAddress());
+    options.setRabbitMqBootstrapServerAddress(
+        "amqp://guest:guest@" + options.getRabbitMqBootstrapServerAddress());
     if (options.isWithTestcontainers()) {
       setupRabbitMqContainer();
     } else {
@@ -140,22 +150,19 @@ public class SparkReceiverIOIT {
     if (rabbitMqContainer != null) {
       rabbitMqContainer.stop();
     }
+
+    clearRabbitMQ();
   }
 
   private static void setupRabbitMqContainer() {
     rabbitMqContainer =
         new RabbitMQContainer(
-            DockerImageName.parse("rabbitmq")
-                .withTag(options.getRabbitMqContainerVersion()))
-//            .withAdminPassword(null)
-//            .withPluginsEnabled("rabbitmq_stream")
+                DockerImageName.parse("rabbitmq").withTag(options.getRabbitMqContainerVersion()))
             .withExposedPorts(5672, 15672);
-//            .withEnv("RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS", "-rabbitmq_stream advertised_host localhost");
     rabbitMqContainer.start();
     options.setRabbitMqBootstrapServerAddress(
         getBootstrapServers(
-            rabbitMqContainer.getHost(),
-            rabbitMqContainer.getMappedPort(5672).toString()));
+            rabbitMqContainer.getHost(), rabbitMqContainer.getMappedPort(5672).toString()));
   }
 
   private static String getBootstrapServers(String host, String port) {
@@ -168,7 +175,6 @@ public class SparkReceiverIOIT {
 
     @Description("Options for synthetic source.")
     @Validation.Required
-    @Default.String("{\"numRecords\": \"500\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
     String getSourceOptions();
 
     void setSourceOptions(String sourceOptions);
@@ -180,7 +186,7 @@ public class SparkReceiverIOIT {
     void setRabbitMqBootstrapServerAddress(String address);
 
     @Description("RabbitMQ stream")
-    @Default.String("stream")
+    @Default.String("rabbitMqTestStream")
     String getStreamName();
 
     void setStreamName(String streamName);
@@ -199,8 +205,7 @@ public class SparkReceiverIOIT {
     void setRabbitMqContainerVersion(String rabbitMqContainerVersion);
 
     @Description("Time to wait for the events to be processed by the read pipeline (in seconds)")
-//    @Validation.Required
-    @Default.Integer(50)
+    @Validation.Required
     Integer getReadTimeout();
 
     void setReadTimeout(Integer readTimeout);
@@ -219,9 +224,11 @@ public class SparkReceiverIOIT {
   }
 
   private void writeToRabbitMq(final long maxNumRecords)
-      throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException, TimeoutException {
+      throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException,
+          TimeoutException {
 
-    final List<RabbitMqMessage> data = LongStream.range(0, maxNumRecords)
+    final List<RabbitMqMessage> data =
+        LongStream.range(0, maxNumRecords)
             .mapToObj(number -> new RabbitMqMessage(TEST_MESSAGE_PREFIX + number))
             .collect(Collectors.toList());
 
@@ -230,56 +237,56 @@ public class SparkReceiverIOIT {
     Map<String, Object> arguments = new HashMap<>();
     arguments.put("x-queue-type", "stream");
 
-    try (Connection connection = connectionFactory.newConnection(); Channel channel = connection.createChannel()) {
+    try (Connection connection = connectionFactory.newConnection();
+        Channel channel = connection.createChannel()) {
       channel.queueDeclare(options.getStreamName(), true, false, false, arguments);
 
-      data.forEach(message -> {
-        try {
-          channel.basicPublish("", options.getStreamName(), MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBody());
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
-      });
+      data.forEach(
+          message -> {
+            try {
+              channel.basicPublish(
+                  "",
+                  options.getStreamName(),
+                  MessageProperties.PERSISTENT_TEXT_PLAIN,
+                  message.getBody());
+            } catch (IOException e) {
+              throw new RuntimeException(e);
+            }
+          });
     }
   }
 
-  private SparkReceiverIO.Read<String> readFromRabbitMqWithOffset(final long maxNumRecords) {
+  private SparkReceiverIO.Read<String> readFromRabbitMqWithOffset() {
     final ReceiverBuilder<String, RabbitMqReceiverWithOffset> receiverBuilder =
-        new ReceiverBuilder<>(RabbitMqReceiverWithOffset.class).withConstructorArgs(
-            options.getRabbitMqBootstrapServerAddress(),
-            options.getStreamName(),
-            sourceOptions.numRecords);
+        new ReceiverBuilder<>(RabbitMqReceiverWithOffset.class)
+            .withConstructorArgs(
+                options.getRabbitMqBootstrapServerAddress(),
+                options.getStreamName(),
+                sourceOptions.numRecords);
 
     return SparkReceiverIO.<String>read()
-//        .withSparkConsumer(new CustomSparkConsumer<>(maxNumRecords))
         .withValueClass(String.class)
-        .withGetOffsetFn(rabbitMqMessage -> Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
+        .withGetOffsetFn(
+            rabbitMqMessage ->
+                Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
         .withSparkReceiverBuilder(receiverBuilder);
   }
 
-  private void clearRabbitMQ() {
+  private static void clearRabbitMQ() {
     final ConnectionFactory connectionFactory = new ConnectionFactory();
 
     try {
       connectionFactory.setUri(options.getRabbitMqBootstrapServerAddress());
-      try (Connection connection = connectionFactory.newConnection(); Channel channel = connection.createChannel()) {
+      try (Connection connection = connectionFactory.newConnection();
+          Channel channel = connection.createChannel()) {
         channel.queueDelete(options.getStreamName());
       }
-    } catch (URISyntaxException | NoSuchAlgorithmException | KeyManagementException | IOException | TimeoutException e) {
+    } catch (URISyntaxException
+        | NoSuchAlgorithmException
+        | KeyManagementException
+        | IOException
+        | TimeoutException e) {
       LOG.error("Error during RabbitMQ clean up", e);
-    }
-  }
-
-  private static class MapRabbitMqRecordsToStrings extends SimpleFunction<byte[], String> {
-
-    @Override
-    public String apply(byte[] input) {
-      try {
-        return Arrays.toString(input);
-      } catch (Exception e) {
-        LOG.error("Error during RabbitMQ message conversion");
-        throw e;
-      }
     }
   }
 
@@ -292,12 +299,14 @@ public class SparkReceiverIOIT {
     }
 
     @ProcessElement
+    @SuppressWarnings("unused")
     public void processElement() {
       elementCounter.inc(1L);
     }
   }
 
-  private void cancelIfTimeout(PipelineResult readResult, PipelineResult.State readState) throws IOException {
+  private void cancelIfTimeout(PipelineResult readResult, PipelineResult.State readState)
+      throws IOException {
     if (readState == null) {
       readResult.cancel();
     }
@@ -319,8 +328,7 @@ public class SparkReceiverIOIT {
     NamedTestResult readTime =
         supplier.apply(new MetricsReader(readResult, NAMESPACE), READ_TIME_METRIC_NAME);
     NamedTestResult runTime =
-        NamedTestResult.create(
-            TEST_ID, TIMESTAMP, RUN_TIME_METRIC_NAME, readTime.getValue());
+        NamedTestResult.create(TEST_ID, TIMESTAMP, RUN_TIME_METRIC_NAME, readTime.getValue());
 
     return ImmutableSet.of(readTime, runTime);
   }
@@ -338,7 +346,7 @@ public class SparkReceiverIOIT {
     // Use streaming pipeline to read RabbitMQ records.
     readPipeline.getOptions().as(Options.class).setStreaming(true);
     readPipeline
-        .apply("Read from unbounded RabbitMq", readFromRabbitMqWithOffset(sourceOptions.numRecords))
+        .apply("Read from unbounded RabbitMq", readFromRabbitMqWithOffset())
         .setCoder(StringUtf8Coder.of())
         .apply(ParDo.of(new TestOutputDoFn()))
         .apply("Measure read time", ParDo.of(new TimeMonitor<>(NAMESPACE, READ_TIME_METRIC_NAME)))
@@ -350,11 +358,7 @@ public class SparkReceiverIOIT {
 
     cancelIfTimeout(readResult, readState);
 
-    clearRabbitMQ();
-
-    assertEquals(
-        sourceOptions.numRecords,
-        readElementMetric(readResult));
+    assertEquals(sourceOptions.numRecords, readElementMetric(readResult));
 
     if (!options.isWithTestcontainers()) {
       Set<NamedTestResult> metrics = readMetrics(readResult);

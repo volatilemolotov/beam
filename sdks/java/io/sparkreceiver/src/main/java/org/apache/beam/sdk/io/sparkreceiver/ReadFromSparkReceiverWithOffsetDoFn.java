@@ -181,7 +181,9 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       LOG.error("Can not build Spark Receiver", e);
       throw new IllegalStateException("Spark Receiver was not built!");
     }
-    sparkConsumer = new SparkConsumerWithOffset<>(tracker.currentRestriction().getFrom(), tracker.currentRestriction().getTo());
+    sparkConsumer =
+        new SparkConsumerWithOffset<>(
+            tracker.currentRestriction().getFrom(), tracker.currentRestriction().getTo());
     sparkConsumer.start(sparkReceiver);
 
     while (sparkConsumer.hasRecords()) {

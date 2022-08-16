@@ -17,14 +17,13 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.spark.SparkConf;
 import org.apache.spark.streaming.receiver.Receiver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
-
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Imitation of {@link SparkConsumer} that stores records into static {@link Queue}. Used to test
