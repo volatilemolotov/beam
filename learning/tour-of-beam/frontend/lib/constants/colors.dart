@@ -23,6 +23,7 @@ class TobColors {
   static const black = Colors.black;
   static const grey1 = Color(0xffDFE1E3);
   static const grey2 = Color(0xffCBCBCB);
+  static const grey3 = Color(0xffA0A4AB);
 
   static const green = Color(0xff37AC66);
   static const orange = Color(0xffEEAB00);

@@ -21,7 +21,7 @@ import 'package:flutter/material.dart';
 import '../constants/sizes.dart';
 import 'footer.dart';
 import 'logo.dart';
-import 'sign_in_button.dart';
+import 'sign_in/sign_in_button.dart';
 import 'toggle_theme_button.dart';
 
 class PageContainer extends StatelessWidget {

@@ -25,6 +25,7 @@ import '../../constants/sizes.dart';
 final kLightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: TobLightThemeColors.primary,
+  canvasColor: TobLightThemeColors.primaryBackground,
   scaffoldBackgroundColor: TobLightThemeColors.secondaryBackground,
   backgroundColor: TobLightThemeColors.primaryBackground,
   textTheme: _getTextTheme(TobLightThemeColors.text),
@@ -40,6 +41,7 @@ final kLightTheme = ThemeData(
 final kDarkTheme = ThemeData(
   brightness: Brightness.dark,
   primaryColor: TobDarkThemeColors.primary,
+  canvasColor: TobDarkThemeColors.primaryBackground,
   scaffoldBackgroundColor: TobDarkThemeColors.secondaryBackground,
   backgroundColor: TobDarkThemeColors.primaryBackground,
   textTheme: _getTextTheme(TobDarkThemeColors.text),
@@ -146,5 +148,6 @@ AppBarTheme _getAppBarTheme(Color backgroundColor) {
     color: backgroundColor,
     elevation: 1,
     centerTitle: false,
+    toolbarHeight: TobSizes.appBarHeight,
   );
 }
