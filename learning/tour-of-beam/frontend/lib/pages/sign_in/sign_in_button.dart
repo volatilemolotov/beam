@@ -19,16 +19,42 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-class SignInButton extends StatelessWidget {
+import '../../components/dismissible_overlay.dart';
+import '../../components/sign_in/sign_in_overlay_content.dart';
+import '../../constants/sizes.dart';
+
+class SignInButton extends StatefulWidget {
   const SignInButton();
+
+  @override
+  State<SignInButton> createState() => _SignInButtonState();
+}
+
+class _SignInButtonState extends State<SignInButton> {
+  void _openOverlay() {
+    OverlayEntry? overlay;
+    overlay = OverlayEntry(
+      builder: (context) {
+        return DismissibleOverlay(
+          close: () {
+            overlay?.remove();
+          },
+          child: const Positioned(
+            right: TobSizes.size10,
+            top: TobSizes.appBarHeight,
+            child: SignInOverlayContent(),
+          ),
+        );
+      },
+    );
+    Overlay.of(context)?.insert(overlay);
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextButton(
+      onPressed: _openOverlay,
       child: const Text('ui.signIn').tr(),
-      onPressed: () {
-        // TODO(nausharipov): sign in
-      },
     );
   }
 }

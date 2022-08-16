@@ -22,6 +22,8 @@ ui:
   privacyPolicy: 'Privacy Policy'
   reportIssue: 'Report issue in Jira'
   signIn: 'Sign in'
+  continueGitHub: 'Continue with GitHub'
+  continueGoogle: 'Continue with Google'
 pages:
   home:
     title: 'Welcome to the Tour of Beam!'
@@ -29,6 +31,8 @@ pages:
     signIn: ' sign in.'
     selectLanguage: 'Please select the default language (you may change the language at any time):'
     startLearning: 'Start learning'
+dialogs:
+  signInIf: If you would like to save your progress and track completed modules
 complexity:
   basic: 'Basic level'
   medium: 'Medium level'

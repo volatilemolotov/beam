@@ -16,39 +16,43 @@
  * limitations under the License.
  */
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 
-import '../constants/sizes.dart';
-import 'footer.dart';
-import 'logo.dart';
-import 'sign_in/sign_in_button.dart';
-import 'toggle_theme_button.dart';
+import '../../components/dismissible_overlay.dart';
+import '../../constants/sizes.dart';
+import 'sign_in_overlay_content.dart';
 
-class PageContainer extends StatelessWidget {
-  final Widget content;
-
-  const PageContainer({
-    super.key,
-    required this.content,
-  });
+class SignInButton extends StatefulWidget {
+  const SignInButton();
 
   @override
+  State<SignInButton> createState() => _SignInButtonState();
+}
+
+class _SignInButtonState extends State<SignInButton> {
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Logo(),
-        actions: const [
-          ToggleThemeButton(),
-          SignInButton(),
-          SizedBox(width: TobSizes.size16)
-        ],
-      ),
-      body: Column(
-        children: [
-          Expanded(child: content),
-          const Footer(),
-        ],
+    return TextButton(
+      onPressed: _openOverlay,
+      child: const Text('ui.signIn').tr(),
+    );
+  }
+
+  void _openOverlay() {
+    OverlayEntry? overlay;
+    overlay = OverlayEntry(
+      builder: (context) => DismissibleOverlay(
+        close: () {
+          overlay?.remove();
+        },
+        child: const Positioned(
+          right: TobSizes.size10,
+          top: TobSizes.appBarHeight,
+          child: SignInOverlayContent(),
+        ),
       ),
     );
+    Overlay.of(context)?.insert(overlay);
   }
 }
