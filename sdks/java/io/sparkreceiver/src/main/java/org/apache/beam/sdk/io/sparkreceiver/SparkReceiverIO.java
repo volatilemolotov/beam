@@ -56,8 +56,6 @@ public class SparkReceiverIO {
 
     abstract @Nullable SerializableFunction<V, Instant> getWatermarkFn();
 
-    abstract @Nullable SparkConsumer<V> getSparkConsumer();
-
     abstract Builder<V> toBuilder();
 
     @Experimental(Experimental.Kind.PORTABILITY)
@@ -72,8 +70,6 @@ public class SparkReceiverIO {
       abstract Builder<V> setGetOffsetFn(SerializableFunction<V, Long> getOffsetFn);
 
       abstract Builder<V> setWatermarkFn(SerializableFunction<V, Instant> watermarkFn);
-
-      abstract Builder<V> setSparkConsumer(SparkConsumer<V> sparkConsumer);
 
       abstract Read<V> build();
     }
@@ -99,11 +95,6 @@ public class SparkReceiverIO {
       return toBuilder().setWatermarkFn(watermarkFn).build();
     }
 
-    public Read<V> withSparkConsumer(SparkConsumer<V> sparkConsumer) {
-      checkArgument(sparkConsumer != null, "Spark consumer can not be null");
-      return toBuilder().setSparkConsumer(sparkConsumer).build();
-    }
-
     @Override
     public PCollection<V> expand(PBegin input) {
       validateTransform();
@@ -113,9 +104,6 @@ public class SparkReceiverIO {
     public void validateTransform() {
       ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder = getSparkReceiverBuilder();
       checkStateNotNull(sparkReceiverBuilder, "withSparkReceiverBuilder() is required");
-      if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
-        checkStateNotNull(getSparkConsumer(), "withSparkConsumer() is required");
-      }
       checkStateNotNull(getValueClass(), "withValueClass() is required");
       checkStateNotNull(getGetOffsetFn(), "withGetOffsetFn() is required");
     }
@@ -135,11 +123,11 @@ public class SparkReceiverIO {
           sparkReceiverRead.getSparkReceiverBuilder();
       checkStateNotNull(sparkReceiverBuilder, "withSparkReceiverBuilder() is required");
       if (!HasOffset.class.isAssignableFrom(sparkReceiverBuilder.getSparkReceiverClass())) {
-        LOG.info(
-            "{} started reading", ReadFromSparkReceiverWithoutOffsetDoFn.class.getSimpleName());
-        return input
-            .apply(Impulse.create())
-            .apply(ParDo.of(new ReadFromSparkReceiverWithoutOffsetDoFn<>(sparkReceiverRead)));
+        throw new UnsupportedOperationException(
+            String.format(
+                "Given Spark Receiver class %s doesn't implement HasOffset interface,"
+                    + " therefore it is not supported!",
+                sparkReceiverBuilder.getSparkReceiverClass().getName()));
       } else {
         LOG.info("{} started reading", ReadFromSparkReceiverWithOffsetDoFn.class.getSimpleName());
         return input
