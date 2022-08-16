@@ -25,7 +25,6 @@ import 'package:tour_of_beam/main.dart' as app;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  // TODO(nausharipov): investigate the fail
   group('theme', () {
     testWidgets('mode toggle', (tester) async {
       app.main();
