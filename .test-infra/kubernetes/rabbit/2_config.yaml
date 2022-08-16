@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: rabbit
-data:
-  enabled_plugins: |
-    [rabbitmq_stream].

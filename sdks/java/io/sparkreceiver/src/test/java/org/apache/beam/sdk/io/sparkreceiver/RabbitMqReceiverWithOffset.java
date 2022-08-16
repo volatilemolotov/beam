@@ -17,8 +17,12 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import com.rabbitmq.client.*;
-import com.rabbitmq.stream.Environment;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.apache.spark.storage.StorageLevel;
 import org.apache.spark.streaming.receiver.Receiver;
@@ -27,15 +31,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.createStream;
-import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.getConsumer;
-import static org.apache.beam.sdk.io.sparkreceiver.RabbitMqConnectionHelper.getEnvironment;
 
 /**
  * Imitation of Spark {@link Receiver} for RabbitMQ that implements {@link HasOffset} interface. Used to
@@ -47,19 +50,19 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
   private static String RABBITMQ_URL;
   private static String STREAM_NAME;
-  private static Long startOffset;
+  private static long TOTAL_MESSAGES_NUMBER;
+  private static long startOffset;
 
-  RabbitMqReceiverWithOffset(final String uri, final String streamName) {
+  RabbitMqReceiverWithOffset(final String uri, final String streamName, final long totalMessagesNumber) {
     super(StorageLevel.MEMORY_AND_DISK_2());
-    STREAM_NAME = streamName;
     RABBITMQ_URL = uri;
+    STREAM_NAME = streamName;
+    TOTAL_MESSAGES_NUMBER = totalMessagesNumber;
   }
 
   @Override
   public void setStartOffset(Long startOffset) {
-    if (startOffset != null) {
-      RabbitMqReceiverWithOffset.startOffset = startOffset;
-    }
+    RabbitMqReceiverWithOffset.startOffset = startOffset != null ? startOffset : 0;
   }
 
   @Override
@@ -70,20 +73,6 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
   @Override
   public void onStop() {
-  }
-
-  @SuppressWarnings("UnusedMethod")
-  private void receiveStreaming() {
-    long currentOffset = startOffset;
-    final AtomicInteger messageConsumed = new AtomicInteger((int) currentOffset);
-
-    LOG.info("Starting receiver");
-    try (final Environment environment = getEnvironment(RABBITMQ_URL)) {
-      createStream(environment, STREAM_NAME);
-      getConsumer(environment, STREAM_NAME, messageConsumed.get(), this::store);
-    } catch (Exception e) {
-      LOG.error("Exception during consumer creation", e);
-    }
   }
 
   private void receive() {
@@ -105,24 +94,23 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
       connectionFactory.setRequestedChannelMax(0);
       connectionFactory.setRequestedFrameMax(0);
       connection = connectionFactory.newConnection();
-      channel = connection.createChannel();
 
-      Map<String, Object> arguments = new HashMap<>();
+      final Map<String, Object> arguments = new HashMap<>();
       arguments.put("x-queue-type", "stream");
-//      arguments.put("x-queue-leader-locator", "least-leaders");
-
-      channel.queueDeclare(STREAM_NAME, true, false, false, arguments);
-      channel.basicQos(500);
-      testConsumer = new TestConsumer(channel, this::store);
       arguments.put("x-stream-offset", currentOffset);
+
+      channel = connection.createChannel();
+      channel.queueDeclare(STREAM_NAME, true, false, false, arguments);
+      channel.basicQos(100, true);
+      testConsumer = new TestConsumer(channel, this::store);
+
       channel.basicConsume(STREAM_NAME, false, arguments, testConsumer);
-      System.out.println("BASIC CONSUME");
     } catch (Exception e) {
       LOG.error("Can not basic consume", e);
       throw new RuntimeException(e);
     }
 
-    while (!isStopped() && testConsumer.getReceived().size() < 500) {
+    while (!isStopped() && testConsumer.getReceived().size() < TOTAL_MESSAGES_NUMBER) {
       try {
         TimeUnit.SECONDS.sleep(1);
       } catch (InterruptedException e) {
