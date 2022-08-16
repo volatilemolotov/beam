@@ -40,12 +40,22 @@ import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** A SplittableDoFn which reads from {@link Receiver} that implements {@link HasOffset}. */
+/**
+ * A SplittableDoFn which reads from {@link Receiver} that implements {@link HasOffset}. By default,
+ * a {@link WatermarkEstimators.Manual} watermark estimator is used to track watermark.
+ *
+ * <p>Initial range The initial range is {@code [0, Long.MAX_VALUE)}
+ *
+ * <p>Resume Processing Every time the sparkConsumer.hasRecords() returns false, {@link
+ * ReadFromSparkReceiverWithOffsetDoFn} will move to process the next element.
+ */
 @UnboundedPerElement
 public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(ReadFromSparkReceiverWithOffsetDoFn.class);
+
+  /** Constant waiting time after the {@link Receiver} starts. Required to prepare for polling */
   private static final int START_POLL_TIMEOUT_MS = 1000;
 
   private final SerializableFunction<Instant, WatermarkEstimator<Instant>>
