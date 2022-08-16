@@ -18,8 +18,8 @@
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:playground_components/dismissible_overlay.dart';
 
-import '../../components/dismissible_overlay.dart';
 import '../../constants/sizes.dart';
 import 'sign_in_overlay_content.dart';
 
