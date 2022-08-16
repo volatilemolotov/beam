@@ -14,9 +14,11 @@ func main() {
 
 	p, s := beam.NewPipelineWithRoot()
 
+	// List of elements
 	input := beam.Create(s, "quick", "brown", "fox", "jumps", "over", "the", "lazy", "dog")
 
-	reversed, toUpper := applyTransform(s, input)
+    // The applyTransform() converts [input] to [reversed] and [toUpper]
+    reversed, toUpper := applyTransform(s, input)
 
 	debug.Printf(s, "Reversed: %s", reversed)
 
@@ -29,17 +31,19 @@ func main() {
 	}
 }
 
-
+// The applyTransform accept PCollection and return new 2 PCollection
 func applyTransform(s beam.Scope, input beam.PCollection) (beam.PCollection, beam.PCollection) {
 	reversed := reverseString(s, input)
 	toUpper := toUpperString(s, input)
 	return reversed, toUpper
 }
 
+// This function return PCollection with reversed elements
 func reverseString(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return beam.ParDo(s, reverseFn, input)
 }
 
+// This function return PCollection return elements with Upper case
 func toUpperString(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return beam.ParDo(s, strings.ToUpper, input)
 }
