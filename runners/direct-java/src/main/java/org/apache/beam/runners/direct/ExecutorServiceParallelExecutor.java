@@ -310,37 +310,31 @@ final class ExecutorServiceParallelExecutor
     try {
       serialExecutorServices.invalidateAll();
     } catch (final RuntimeException re) {
-      LOG.error("Serial executor invalidate all exception", re);
       errors.add(re);
     }
     try {
       serialExecutorServices.cleanUp();
     } catch (final RuntimeException re) {
-      LOG.error("Serial executor clean up exception", re);
       errors.add(re);
     }
     try {
       parallelExecutorService.shutdown();
     } catch (final RuntimeException re) {
-      LOG.error("Parallel executor shutdown exception", re);
       errors.add(re);
     }
     try {
       executorService.shutdown();
     } catch (final RuntimeException re) {
-      LOG.error("Executor shutdown exception", re);
       errors.add(re);
     }
     try {
       metricsExecutor.shutdown();
     } catch (final RuntimeException re) {
-      LOG.error("Metrics shutdown exception", re);
       errors.add(re);
     }
     try {
       registry.cleanup();
     } catch (final Exception e) {
-      LOG.error("Clean up exception", e);
       errors.add(e);
     }
     pipelineState.compareAndSet(State.RUNNING, newState); // ensure we hit a terminal node
