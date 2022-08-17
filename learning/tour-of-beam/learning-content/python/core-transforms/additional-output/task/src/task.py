@@ -23,5 +23,8 @@ with beam.Pipeline() as p:
          | beam.ParDo(ProcessNumbersDoFn())
          .with_outputs(num_above_100_tag, main=num_below_100_tag))
 
+    # First PCollection
     results[num_below_100_tag] | 'Log numbers <= 100' >> LogElements(prefix='Number <= 100: ')
+
+    # Additional PCollection
     results[num_above_100_tag] | 'Log numbers > 100' >> LogElements(prefix='Number > 100: ')

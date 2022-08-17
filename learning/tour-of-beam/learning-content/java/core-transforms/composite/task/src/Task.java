@@ -19,21 +19,27 @@ public class Task {
         Pipeline pipeline = Pipeline.create(options);
 
         pipeline
+                // List of elements
                 .apply(Create.of("1,2,3,4,5", "6,7,8,9,10"))
+
+                // Composite operation
                 .apply(new ExtractAndMultiplyNumbers())
+
                 .apply(Log.ofElements());
 
         pipeline.run();
     }
 
+    // The class with PTransform
     static class ExtractAndMultiplyNumbers
             extends PTransform<PCollection<String>, PCollection<Integer>> {
 
+        // First operation
         @Override
         public PCollection<Integer> expand(PCollection<String> input) {
             return input
                     .apply(ParDo.of(new DoFn<String, Integer>() {
-
+                        // Second operation
                         @ProcessElement
                         public void processElement(@Element String numbers, OutputReceiver<Integer> out) {
                             Arrays.stream(numbers.split(","))

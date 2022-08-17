@@ -41,8 +41,10 @@ public class Task {
             @ProcessElement
             public void processElement(@Element Integer number, MultiOutputReceiver out) {
                 if (number <= 100) {
+                    // First PCollection
                     out.get(numBelow100Tag).output(number);
                 } else {
+                    // Additional PCollection
                     out.get(numAbove100Tag).output(number);
                 }
             }

@@ -14,11 +14,13 @@ public class Task {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
         Pipeline pipeline = Pipeline.create(options);
 
+        // List of elements
         PCollection<Integer> numbers =
                 pipeline.apply(
                         Create.of(1, 2, 3, 4, 5, 100, 110, 150, 250)
                 );
 
+        // The applyTransform() converts [numbers] to [partition]
         PCollectionList<Integer> partition = applyTransform(numbers);
 
         partition.get(0).apply(Log.ofElements("Number > 100: "));
@@ -27,6 +29,7 @@ public class Task {
         pipeline.run();
     }
 
+    // The applyTransform accepts PCollection and returns the PCollection array
     static PCollectionList<Integer> applyTransform(PCollection<Integer> input) {
         return input
                 .apply(Partition.of(2,

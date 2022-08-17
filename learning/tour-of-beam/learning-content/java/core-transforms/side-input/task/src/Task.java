@@ -17,6 +17,7 @@ public class Task {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
         Pipeline pipeline = Pipeline.create(options);
 
+        // List of elements
         PCollection<KV<String, String>> citiesToCountries =
                 pipeline.apply("Cities and Countries",
                         Create.of(
@@ -40,6 +41,7 @@ public class Task {
                                 new Person("Alfred", "London")
                         ));
 
+        // The applyTransform() converts [persons] and [citiesToCountriesView] to [output]
         PCollection<Person> output = applyTransform(persons, citiesToCountriesView);
 
         output.apply(Log.ofElements());
@@ -47,17 +49,20 @@ public class Task {
         pipeline.run();
     }
 
+    // Create from citiesToCountries view "citiesToCountriesView"
     static PCollectionView<Map<String, String>> createView(
             PCollection<KV<String, String>> citiesToCountries) {
 
         return citiesToCountries.apply(View.asMap());
     }
 
+
     static PCollection<Person> applyTransform(
             PCollection<Person> persons, PCollectionView<Map<String, String>> citiesToCountriesView) {
 
         return persons.apply(ParDo.of(new DoFn<Person, Person>() {
 
+            // Get city from person and get from city view
             @ProcessElement
             public void processElement(@Element Person person, OutputReceiver<Person> out,
                                        ProcessContext context) {

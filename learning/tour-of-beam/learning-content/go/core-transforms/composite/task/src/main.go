@@ -38,7 +38,7 @@ func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return stats.Count(s, characters)
 }
 
-// Nested logic that collects words
+// Nested logic that collects characters
 func extractNonSpaceCharacters(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return beam.ParDo(s, func(line string, emit func(string)){
 		for _, k := range line {

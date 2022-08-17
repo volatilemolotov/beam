@@ -1,0 +1,3 @@
+# Tour of Beam Programming Guide
+
+The Beam Programming Guide is intended for Beam users who want to use the Beam SDK to create data processing pipelines. It contains recommendations for using the Beam SDK classes to create and test a pipeline. The Programming Guide is not intended as an exhaustive reference, but as a language-independent high-level guide to the software construction of the Beam pipeline. When the programming guide is completed, the text will include code examples in several languages that will help illustrate how to implement Beam concepts in your pipelines.

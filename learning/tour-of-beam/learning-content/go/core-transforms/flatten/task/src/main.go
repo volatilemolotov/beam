@@ -16,6 +16,7 @@ func main() {
 
     // List of elements start with a
     aWords := beam.Create(s, "apple", "ant", "arrow")
+
     // List of elements start with b
 	bWords := beam.Create(s, "ball", "book", "bow")
 

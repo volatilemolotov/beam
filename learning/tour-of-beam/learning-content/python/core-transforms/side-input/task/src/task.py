@@ -14,7 +14,7 @@ class Person:
 
 
 class EnrichCountryDoFn(beam.DoFn):
-
+    # Get city from cities_to_countries and set person
     def process(self, element, cities_to_countries):
         yield Person(element.name, element.city,
                      cities_to_countries[element.city])
@@ -22,6 +22,7 @@ class EnrichCountryDoFn(beam.DoFn):
 
 with beam.Pipeline() as p:
 
+    # List of elements
     cities_to_countries = {
         'Beijing': 'China',
         'London': 'United Kingdom',
