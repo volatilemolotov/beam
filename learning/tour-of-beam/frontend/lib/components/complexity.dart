@@ -28,15 +28,15 @@ class ComplexityWidget extends StatelessWidget {
 
   const ComplexityWidget({required this.complexity});
 
+  static const Map<Complexity, List<Widget>> _dots = {
+    Complexity.basic: [_Dot.green, _Dot.grey, _Dot.grey],
+    Complexity.medium: [_Dot.orange, _Dot.orange, _Dot.grey],
+    Complexity.advanced: [_Dot.red, _Dot.red, _Dot.red],
+  };
+
   @override
   Widget build(BuildContext context) {
-    const Map<Complexity, List<Widget>> dots = {
-      Complexity.basic: [_Dot.green, _Dot.grey, _Dot.grey],
-      Complexity.medium: [_Dot.orange, _Dot.orange, _Dot.grey],
-      Complexity.advanced: [_Dot.red, _Dot.red, _Dot.red],
-    };
-
-    return Row(children: dots[complexity]!);
+    return Row(children: _dots[complexity]!);
   }
 }
 
