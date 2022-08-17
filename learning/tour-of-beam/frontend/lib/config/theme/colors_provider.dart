@@ -57,15 +57,6 @@ class ThemeColors {
     required this.isDark,
   }) : _background = null;
 
-  ThemeColors copyWith({
-    Color? background,
-  }) {
-    return ThemeColors(
-      isDark: isDark,
-      background: background ?? this.background,
-    );
-  }
-
   Color get divider =>
       isDark ? TobDarkThemeColors.grey : TobLightThemeColors.grey;
 
