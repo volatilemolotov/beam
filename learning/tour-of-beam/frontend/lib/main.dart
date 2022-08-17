@@ -25,7 +25,7 @@ import 'package:url_strategy/url_strategy.dart';
 import 'config/theme/switch_notifier.dart';
 import 'config/theme/theme.dart';
 import 'locator.dart';
-import 'pages/home/screen.dart';
+import 'pages/welcome/screen.dart';
 
 void main() async {
   setPathUrlStrategy();
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            home: const HomeScreen(),
+            home: const WelcomeScreen(),
           );
         },
       ),

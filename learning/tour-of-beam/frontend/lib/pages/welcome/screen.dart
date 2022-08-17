@@ -28,8 +28,8 @@ import '../../constants/assets.dart';
 import '../../constants/colors.dart';
 import '../../constants/sizes.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen();
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen();
 
   @override
   Widget build(BuildContext context) {
