@@ -52,15 +52,7 @@ class _SdkSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: ThemeColors.of(context).background,
-        border: Border(
-          right: BorderSide(
-            color: ThemeColors.of(context).divider,
-          ),
-        ),
-      ),
+    return _SdkSelectionBody(
       child: Column(
         children: [
           Padding(
@@ -77,6 +69,58 @@ class _SdkSelection extends StatelessWidget {
           Image.asset(TobAssets.welcomeLaptop),
         ],
       ),
+    );
+  }
+}
+
+class _TourSummary extends StatelessWidget {
+  const _TourSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: TobSizes.size20,
+        horizontal: 27,
+      ),
+      child: Column(
+        children: _modules
+            .map(
+              (module) => _Module(
+                title: module,
+                isLast: module == _modules.last,
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  static const List<String> _modules = [
+    'Core Transforms',
+    'Common Transforms',
+    'IO',
+    'Windowing',
+    'Triggers',
+  ];
+}
+
+class _SdkSelectionBody extends StatelessWidget {
+  final Widget child;
+  const _SdkSelectionBody({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: ThemeColors.of(context).background,
+        border: Border(
+          right: BorderSide(
+            color: ThemeColors.of(context).divider,
+          ),
+        ),
+      ),
+      child: child,
     );
   }
 }
@@ -131,8 +175,6 @@ class _SdkButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const String sdk = 'Java';
-
     return Wrap(
       children: [
         Wrap(
@@ -142,7 +184,7 @@ class _SdkButtons extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 15, bottom: 10),
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      side: sdk == e
+                      side: _sdk == e
                           ? null
                           : const BorderSide(
                               color: TobColors.grey1,
@@ -166,38 +208,8 @@ class _SdkButtons extends StatelessWidget {
       ],
     );
   }
-}
 
-class _TourSummary extends StatelessWidget {
-  const _TourSummary();
-
-  static const List<String> _modules = [
-    'Core Transforms',
-    'Common Transforms',
-    'IO',
-    'Windowing',
-    'Triggers',
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: TobSizes.size20,
-        horizontal: 27,
-      ),
-      child: Column(
-        children: _modules
-            .map(
-              (module) => _Module(
-                title: module,
-                isLast: module == _modules.last,
-              ),
-            )
-            .toList(),
-      ),
-    );
-  }
+  static const String _sdk = 'Java';
 }
 
 class _Module extends StatelessWidget {

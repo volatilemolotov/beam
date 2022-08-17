@@ -27,36 +27,48 @@ class SignInOverlayContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return _Body(
+      child: Column(
+        children: [
+          Text(
+            'ui.signIn',
+            style: Theme.of(context).textTheme.titleLarge,
+          ).tr(),
+          const SizedBox(height: TobSizes.size10),
+          const Text(
+            'dialogs.signInIf',
+            textAlign: TextAlign.center,
+          ).tr(),
+          const _Divider(),
+          // TODO(nausharipov): check branded buttons in firebase_auth
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text('ui.continueGitHub').tr(),
+          ),
+          const SizedBox(height: TobSizes.size16),
+          ElevatedButton(
+            onPressed: () {},
+            child: const Text('ui.continueGoogle').tr(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  final Widget child;
+  const _Body({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
       elevation: TobSizes.size10,
       borderRadius: BorderRadius.circular(10),
       child: Container(
         width: TobSizes.authOverlayWidth,
         padding: const EdgeInsets.all(TobSizes.size24),
-        child: Column(
-          children: [
-            Text(
-              'ui.signIn',
-              style: Theme.of(context).textTheme.titleLarge,
-            ).tr(),
-            const SizedBox(height: TobSizes.size10),
-            const Text(
-              'dialogs.signInIf',
-              textAlign: TextAlign.center,
-            ).tr(),
-            const _Divider(),
-            // TODO(nausharipov): check branded buttons in firebase_auth
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('ui.continueGitHub').tr(),
-            ),
-            const SizedBox(height: TobSizes.size16),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Text('ui.continueGoogle').tr(),
-            ),
-          ],
-        ),
+        child: child,
       ),
     );
   }

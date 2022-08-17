@@ -57,7 +57,7 @@ final kDarkTheme = ThemeData(
 TextTheme _getTextTheme(Color textColor) {
   return GoogleFonts.sourceSansProTextTheme(
     const TextTheme(
-      displayLarge: TextStyle(),
+      displayLarge: _emptyTextStyle,
       displayMedium: TextStyle(
         fontSize: 48,
         fontWeight: FontWeight.w900,
@@ -67,8 +67,8 @@ TextTheme _getTextTheme(Color textColor) {
         fontSize: 18,
         fontWeight: FontWeight.w400,
       ),
-      headlineLarge: TextStyle(),
-      headlineMedium: TextStyle(),
+      headlineLarge: _emptyTextStyle,
+      headlineMedium: _emptyTextStyle,
       headlineSmall: TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w600,
@@ -77,14 +77,14 @@ TextTheme _getTextTheme(Color textColor) {
         fontSize: 24,
         fontWeight: FontWeight.w600,
       ),
-      titleMedium: TextStyle(),
-      titleSmall: TextStyle(),
+      titleMedium: _emptyTextStyle,
+      titleSmall: _emptyTextStyle,
       labelLarge: TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
-      labelMedium: TextStyle(),
-      labelSmall: TextStyle(),
+      labelMedium: _emptyTextStyle,
+      labelSmall: _emptyTextStyle,
       bodyLarge: TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w400,
@@ -93,7 +93,7 @@ TextTheme _getTextTheme(Color textColor) {
         fontSize: 13,
         fontWeight: FontWeight.w400,
       ),
-      bodySmall: TextStyle(),
+      bodySmall: _emptyTextStyle,
     ).apply(
       bodyColor: textColor,
       displayColor: textColor,
@@ -105,11 +105,7 @@ TextButtonThemeData _getTextButtonTheme(Color textColor) {
   return TextButtonThemeData(
     style: TextButton.styleFrom(
       primary: textColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(TobBorderRadius.large),
-        ),
-      ),
+      shape: _getButtonBorder(TobBorderRadius.large),
     ),
   );
 }
@@ -122,12 +118,8 @@ OutlinedButtonThemeData _getOutlineButtonTheme(
     style: OutlinedButton.styleFrom(
       primary: textColor,
       side: BorderSide(color: outlineColor, width: 3),
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(TobBorderRadius.small),
-        ),
-      ),
+      padding: _buttonPadding,
+      shape: _getButtonBorder(TobBorderRadius.small),
     ),
   );
 }
@@ -137,8 +129,8 @@ ElevatedButtonThemeData _getElevatedButtonTheme(Color color) {
     style: ElevatedButton.styleFrom(
       onPrimary: TobColors.white,
       primary: color,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
-      elevation: 0,
+      padding: _buttonPadding,
+      elevation: TobSizes.size0,
     ),
   );
 }
@@ -146,8 +138,23 @@ ElevatedButtonThemeData _getElevatedButtonTheme(Color color) {
 AppBarTheme _getAppBarTheme(Color backgroundColor) {
   return AppBarTheme(
     color: backgroundColor,
-    elevation: 1,
+    elevation: TobSizes.size1,
     centerTitle: false,
     toolbarHeight: TobSizes.appBarHeight,
   );
 }
+
+const EdgeInsets _buttonPadding = EdgeInsets.symmetric(
+  vertical: TobSizes.size20,
+  horizontal: TobSizes.size40,
+);
+
+RoundedRectangleBorder _getButtonBorder(double radius) {
+  return RoundedRectangleBorder(
+    borderRadius: BorderRadius.all(
+      Radius.circular(radius),
+    ),
+  );
+}
+
+const TextStyle _emptyTextStyle = TextStyle();

@@ -42,17 +42,16 @@ class ThemeColorsProvider extends StatelessWidget {
 
 class ThemeColors {
   final Color? _background;
-
   final bool isDark;
-
-  static ThemeColors of(BuildContext context, {bool listen = true}) {
-    return Provider.of<ThemeColors>(context, listen: listen);
-  }
 
   ThemeColors({
     required this.isDark,
     Color? background,
   }) : _background = background;
+
+  static ThemeColors of(BuildContext context, {bool listen = true}) {
+    return Provider.of<ThemeColors>(context, listen: listen);
+  }
 
   const ThemeColors.fromBrightness({
     required this.isDark,

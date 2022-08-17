@@ -27,15 +27,33 @@ import '../constants/sizes.dart';
 class Footer extends StatelessWidget {
   const Footer();
 
-  static final _linkButtonStyle = TextButton.styleFrom(
-    textStyle: const TextStyle(
-      fontWeight: FontWeight.normal,
-    ),
-  );
+  @override
+  Widget build(BuildContext context) {
+    return _Body(
+      child: Wrap(
+        spacing: TobSizes.size16,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const _ReportIssueButton(),
+          const _PrivacyPolicyButton(),
+          const Text('ui.copyright').tr(),
+        ],
+      ),
+    );
+  }
+}
+
+class _Body extends StatelessWidget {
+  final Widget child;
+  const _Body({required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.symmetric(
+        vertical: TobSizes.size4,
+        horizontal: TobSizes.size16,
+      ),
       decoration: BoxDecoration(
         color: ThemeColors.of(context).secondaryBackground,
         border: Border(
@@ -43,33 +61,43 @@ class Footer extends StatelessWidget {
         ),
       ),
       width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: TobSizes.size4,
-          horizontal: TobSizes.size16,
-        ),
-        child: Wrap(
-          spacing: TobSizes.size16,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            TextButton(
-              style: _linkButtonStyle,
-              onPressed: () {
-                launchUrl(Uri.parse(TobLinks.reportIssue));
-              },
-              child: const Text('ui.reportIssue').tr(),
-            ),
-            TextButton(
-              style: _linkButtonStyle,
-              onPressed: () {
-                launchUrl(Uri.parse(TobLinks.privacyPolicy));
-              },
-              child: const Text('ui.privacyPolicy').tr(),
-            ),
-            const Text('ui.copyright').tr(),
-          ],
-        ),
-      ),
+      child: child,
     );
   }
 }
+
+class _ReportIssueButton extends StatelessWidget {
+  const _ReportIssueButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: _linkButtonStyle,
+      onPressed: () {
+        launchUrl(Uri.parse(TobLinks.reportIssue));
+      },
+      child: const Text('ui.reportIssue').tr(),
+    );
+  }
+}
+
+class _PrivacyPolicyButton extends StatelessWidget {
+  const _PrivacyPolicyButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: _linkButtonStyle,
+      onPressed: () {
+        launchUrl(Uri.parse(TobLinks.privacyPolicy));
+      },
+      child: const Text('ui.privacyPolicy').tr(),
+    );
+  }
+}
+
+final _linkButtonStyle = TextButton.styleFrom(
+  textStyle: const TextStyle(
+    fontWeight: FontWeight.normal,
+  ),
+);

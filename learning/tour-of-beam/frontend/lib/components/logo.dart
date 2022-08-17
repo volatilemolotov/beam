@@ -26,7 +26,6 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -34,24 +33,33 @@ class Logo extends StatelessWidget {
           TobAssets.beamLogo,
           height: TobIconSizes.large,
         ),
-        RichText(
-          text: TextSpan(
-            style: Theme.of(context).textTheme.displaySmall,
-            children: [
-              TextSpan(
-                text: 'Tour of',
-                style: TextStyle(
-                  color: theme.textTheme.labelLarge?.color,
-                ),
-              ),
-              TextSpan(
-                text: ' Beam',
-                style: TextStyle(color: theme.primaryColor),
-              ),
-            ],
-          ),
-        ),
+        const _Text(),
       ],
+    );
+  }
+}
+
+class _Text extends StatelessWidget {
+  const _Text();
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        style: Theme.of(context).textTheme.displaySmall,
+        children: [
+          TextSpan(
+            text: 'Tour of',
+            style: TextStyle(
+              color: Theme.of(context).textTheme.labelLarge?.color,
+            ),
+          ),
+          TextSpan(
+            text: ' Beam',
+            style: TextStyle(color: Theme.of(context).primaryColor),
+          ),
+        ],
+      ),
     );
   }
 }

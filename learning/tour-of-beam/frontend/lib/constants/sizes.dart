@@ -17,6 +17,7 @@
  */
 
 class TobSizes {
+  static const double size0 = 0;
   static const double size1 = 1;
   static const double size4 = 4;
   static const double size6 = 6;
@@ -28,6 +29,7 @@ class TobSizes {
   static const double size24 = 24;
   static const double size32 = 32;
   static const double size36 = 36;
+  static const double size40 = 40;
   static const double appBarHeight = 55;
   static const double authOverlayWidth = 300;
 }
