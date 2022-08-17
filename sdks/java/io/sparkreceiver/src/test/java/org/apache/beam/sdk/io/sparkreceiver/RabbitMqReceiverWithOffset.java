@@ -66,6 +66,11 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
   }
 
   @Override
+  public Long getEndOffset() {
+    return Long.MAX_VALUE;
+  }
+
+  @Override
   @SuppressWarnings("FutureReturnValueIgnored")
   public void onStart() {
     Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().build()).submit(this::receive);

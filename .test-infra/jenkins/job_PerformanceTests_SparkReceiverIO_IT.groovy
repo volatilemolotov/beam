@@ -54,7 +54,7 @@ job(jobName) {
           runner                        : 'DataflowRunner',
           sourceOptions                 : """
                                      {
-                                       "numRecords": "100000000",
+                                       "numRecords": "600000",
                                        "keySizeBytes": "1",
                                        "valueSizeBytes": "90"
                                      }

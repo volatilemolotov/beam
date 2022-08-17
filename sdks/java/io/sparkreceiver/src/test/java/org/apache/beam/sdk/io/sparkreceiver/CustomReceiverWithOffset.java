@@ -51,6 +51,11 @@ public class CustomReceiverWithOffset extends Receiver<String> implements HasOff
   }
 
   @Override
+  public Long getEndOffset() {
+    return Long.MAX_VALUE;
+  }
+
+  @Override
   @SuppressWarnings("FutureReturnValueIgnored")
   public void onStart() {
     Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().build()).submit(this::receive);

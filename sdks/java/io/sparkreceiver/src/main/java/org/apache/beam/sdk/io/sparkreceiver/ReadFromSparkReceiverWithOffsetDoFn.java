@@ -56,7 +56,7 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       LoggerFactory.getLogger(ReadFromSparkReceiverWithOffsetDoFn.class);
 
   /** Constant waiting time after the {@link Receiver} starts. Required to prepare for polling */
-  private static final int START_POLL_TIMEOUT_MS = 5000;
+  private static final int START_POLL_TIMEOUT_MS = 1000;
 
   private final SerializableFunction<Instant, WatermarkEstimator<Instant>>
       createWatermarkEstimatorFn;
@@ -120,16 +120,13 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
   @Teardown
   public void teardown() throws Exception {}
 
-  @SuppressWarnings("unchecked")
   private static class SparkConsumerWithOffset<V> implements SparkConsumer<V> {
     private final Queue<V> recordsQueue;
     private @Nullable Receiver<V> sparkReceiver;
     private final Long startOffset;
-    private final Long endOffset;
 
-    public SparkConsumerWithOffset(Long startOffset, Long endOffset) {
+    public SparkConsumerWithOffset(Long startOffset) {
       this.startOffset = startOffset;
-      this.endOffset = endOffset;
       this.recordsQueue = new ConcurrentLinkedQueue<>();
     }
 
@@ -174,11 +171,6 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       }
       recordsQueue.clear();
     }
-
-    @Override
-    public Long getEndOffset() {
-      return this.endOffset;
-    }
   }
 
   @ProcessElement
@@ -196,9 +188,7 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       LOG.error("Can not build Spark Receiver", e);
       throw new IllegalStateException("Spark Receiver was not built!");
     }
-    sparkConsumer =
-        new SparkConsumerWithOffset<>(
-            tracker.currentRestriction().getFrom(), tracker.currentRestriction().getTo());
+    sparkConsumer = new SparkConsumerWithOffset<>(tracker.currentRestriction().getFrom());
     sparkConsumer.start(sparkReceiver);
 
     while (sparkConsumer.hasRecords()) {

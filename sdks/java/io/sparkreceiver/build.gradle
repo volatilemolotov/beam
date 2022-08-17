@@ -32,11 +32,11 @@ description = "Apache Beam :: SDKs :: Java :: IO :: Spark Receiver"
 ext.summary = """Apache Beam SDK provides a simple, Java-based
 interface for streaming integration with CDAP plugins."""
 
-configurations.all {
-    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
-    exclude group: 'org.slf4j', module: 'slf4j-jdk14'
-    exclude group: 'org.slf4j', module: 'slf4j-simple'
-}
+//configurations.all {
+//    exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+//    exclude group: 'org.slf4j', module: 'slf4j-jdk14'
+//    exclude group: 'org.slf4j', module: 'slf4j-simple'
+//}
 
 dependencies {
     implementation library.java.commons_lang3

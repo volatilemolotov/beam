@@ -64,6 +64,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Duration;
+import org.joda.time.Instant;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -175,6 +176,7 @@ public class SparkReceiverIOIT {
 
     @Description("Options for synthetic source.")
     @Validation.Required
+    @Default.String("{\"numRecords\": \"500\",\"keySizeBytes\": \"1\",\"valueSizeBytes\": \"90\"}")
     String getSourceOptions();
 
     void setSourceOptions(String sourceOptions);
@@ -205,6 +207,7 @@ public class SparkReceiverIOIT {
     void setRabbitMqContainerVersion(String rabbitMqContainerVersion);
 
     @Description("Time to wait for the events to be processed by the read pipeline (in seconds)")
+    @Default.Integer(50)
     @Validation.Required
     Integer getReadTimeout();
 
@@ -266,6 +269,7 @@ public class SparkReceiverIOIT {
 
     return SparkReceiverIO.<String>read()
         .withValueClass(String.class)
+//        .withWatermarkFn(Instant::parse)
         .withGetOffsetFn(
             rabbitMqMessage ->
                 Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
