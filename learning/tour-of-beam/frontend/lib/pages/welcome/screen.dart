@@ -62,7 +62,7 @@ class _SdkSelection extends StatelessWidget {
               children: const [
                 _IntroText(),
                 SizedBox(height: TobSizes.size32),
-                _SdkButtons(),
+                _Buttons(),
               ],
             ),
           ),
@@ -170,8 +170,8 @@ class _IntroText extends StatelessWidget {
   }
 }
 
-class _SdkButtons extends StatelessWidget {
-  const _SdkButtons();
+class _Buttons extends StatelessWidget {
+  const _Buttons();
 
   @override
   Widget build(BuildContext context) {
@@ -180,21 +180,9 @@ class _SdkButtons extends StatelessWidget {
         Wrap(
           children: ['Java', 'Python', 'Go']
               .map(
-                (e) => Padding(
-                  padding: const EdgeInsets.only(right: 15, bottom: 10),
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: _sdk == e
-                          ? null
-                          : const BorderSide(
-                              color: TobColors.grey1,
-                            ),
-                    ),
-                    onPressed: () {
-                      // TODO(nausharipov): select the language
-                    },
-                    child: Text(e),
-                  ),
+                (e) => _SdkButton(
+                  sdk: e,
+                  selectedSdk: _sdk,
                 ),
               )
               .toList(),
@@ -210,6 +198,34 @@ class _SdkButtons extends StatelessWidget {
   }
 
   static const String _sdk = 'Java';
+}
+
+class _SdkButton extends StatelessWidget {
+  final String sdk;
+  final String selectedSdk;
+
+  const _SdkButton({
+    required this.sdk,
+    required this.selectedSdk,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 15, bottom: 10),
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          side: selectedSdk == sdk
+              ? null
+              : const BorderSide(color: TobColors.grey1),
+        ),
+        onPressed: () {
+          // TODO(nausharipov): select the language
+        },
+        child: Text(sdk),
+      ),
+    );
+  }
 }
 
 class _Module extends StatelessWidget {
