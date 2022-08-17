@@ -40,7 +40,7 @@ class PageContainer extends StatelessWidget {
         actions: const [
           ToggleThemeButton(),
           SignInButton(),
-          SizedBox(width: TobSizes.size16)
+          SizedBox(width: TobSizes.size16),
         ],
       ),
       body: Column(

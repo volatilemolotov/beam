@@ -29,8 +29,7 @@ environment:
 dependencies:
   easy_localization: ^3.0.1
   easy_localization_loader: ^1.0.0
-  flutter:
-    sdk: flutter
+  flutter: { sdk: flutter }
   flutter_svg: ^1.0.3
   get_it: ^7.2.0
   google_fonts: ^3.0.1
@@ -42,10 +41,8 @@ dependencies:
   url_strategy: ^0.2.0
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  integration_test:
-    sdk: flutter
+  flutter_test: { sdk: flutter }
+  integration_test: { sdk: flutter }
   total_lints: ^2.17.0
 
 flutter:
