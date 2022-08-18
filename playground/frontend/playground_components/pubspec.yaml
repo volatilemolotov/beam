@@ -20,18 +20,15 @@ description: Reusable Playground components
 version: 0.0.1
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
-  flutter: ">=1.17.0"
+  sdk: '>=2.17.6 <3.0.0'
+  flutter: '>=1.17.0'
 
 dependencies:
-  flutter:
-    sdk: flutter
+  flutter: { sdk: flutter }
   total_lints: ^2.17.4
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_lints: ^2.0.0
+  flutter_test: { sdk: flutter }
 
 flutter:
-
