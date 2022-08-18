@@ -17,28 +17,11 @@
  */
 package org.apache.beam.sdk.io.sparkreceiver;
 
-import static org.apache.beam.sdk.io.synthetic.SyntheticOptions.fromJsonString;
-import static org.junit.Assert.assertEquals;
-
 import com.google.cloud.Timestamp;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.MessageProperties;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.LongStream;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.common.IOITHelper;
@@ -64,7 +47,6 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.joda.time.Duration;
-import org.joda.time.Instant;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -76,6 +58,24 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.utility.DockerImageName;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+
+import static org.apache.beam.sdk.io.synthetic.SyntheticOptions.fromJsonString;
+import static org.junit.Assert.assertEquals;
 
 /**
  * IO Integration test for {@link org.apache.beam.sdk.io.sparkreceiver.SparkReceiverIO}.
@@ -144,6 +144,11 @@ public class SparkReceiverIOIT {
               .withMeasurement(options.getInfluxMeasurement())
               .get();
     }
+  }
+
+  @BeforeClass
+  public static void beforeClass() {
+    clearRabbitMQ();
   }
 
   @AfterClass
@@ -269,7 +274,6 @@ public class SparkReceiverIOIT {
 
     return SparkReceiverIO.<String>read()
         .withValueClass(String.class)
-//        .withWatermarkFn(Instant::parse)
         .withGetOffsetFn(
             rabbitMqMessage ->
                 Long.valueOf(rabbitMqMessage.substring(TEST_MESSAGE_PREFIX.length())))
