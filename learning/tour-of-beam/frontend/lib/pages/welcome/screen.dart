@@ -181,8 +181,11 @@ class _Buttons extends StatelessWidget {
           children: ['Java', 'Python', 'Go']
               .map(
                 (e) => _SdkButton(
-                  sdk: e,
-                  selectedSdk: _sdk,
+                  value: e,
+                  groupValue: _sdk,
+                  onChanged: () {
+                    // TODO(nausharipov): select the language
+                  },
                 ),
               )
               .toList(),
@@ -201,12 +204,14 @@ class _Buttons extends StatelessWidget {
 }
 
 class _SdkButton extends StatelessWidget {
-  final String sdk;
-  final String selectedSdk;
+  final String value;
+  final String groupValue;
+  final void Function()? onChanged;
 
   const _SdkButton({
-    required this.sdk,
-    required this.selectedSdk,
+    required this.value,
+    required this.groupValue,
+    required this.onChanged,
   });
 
   @override
@@ -215,14 +220,12 @@ class _SdkButton extends StatelessWidget {
       padding: const EdgeInsets.only(right: 15, bottom: 10),
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          side: selectedSdk == sdk
+          side: groupValue == value
               ? null
               : const BorderSide(color: TobColors.grey1),
         ),
-        onPressed: () {
-          // TODO(nausharipov): select the language
-        },
-        child: Text(sdk),
+        onPressed: onChanged,
+        child: Text(value),
       ),
     );
   }
