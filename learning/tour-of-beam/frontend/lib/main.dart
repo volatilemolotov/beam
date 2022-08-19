@@ -40,13 +40,13 @@ void main() async {
       fallbackLocale: englishLocale,
       path: 'assets/translations',
       assetLoader: YamlAssetLoader(),
-      child: const MyApp(),
+      child: const TourOfBeamApp(),
     ),
   );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp();
+class TourOfBeamApp extends StatelessWidget {
+  const TourOfBeamApp();
 
   @override
   Widget build(BuildContext context) {
