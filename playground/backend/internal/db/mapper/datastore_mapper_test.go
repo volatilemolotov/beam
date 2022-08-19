@@ -115,7 +115,7 @@ func TestEntityMapper_ToFileEntity(t *testing.T) {
 				},
 			},
 			expected: &entity.FileEntity{
-				Name:     "main.java",
+				Name:     "MOCK_NAME.java",
 				Content:  "MOCK_CONTENT",
 				CntxLine: 1,
 				IsMain:   true,
@@ -125,7 +125,7 @@ func TestEntityMapper_ToFileEntity(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := testable.ToFileEntity(tt.args.info, tt.args.file)
+			result, _ := testable.ToFileEntity(tt.args.info, tt.args.file)
 			if result.IsMain != tt.expected.IsMain ||
 				result.Name != tt.expected.Name ||
 				result.Content != tt.expected.Content ||

@@ -827,7 +827,7 @@ func TestPlaygroundController_SaveSnippet(t *testing.T) {
 				},
 			},
 			wantErr: false,
-			wantId:  "xHce_LOg7Zm",
+			wantId:  "l7OFah5mLHU",
 		},
 		// Test case with calling SaveSnippet method with too large entity.
 		// As a result, want to receive an error.
