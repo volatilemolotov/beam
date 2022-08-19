@@ -173,6 +173,10 @@ class _IntroText extends StatelessWidget {
 class _Buttons extends StatelessWidget {
   const _Buttons();
 
+  void _onSdkChanged(String value) {
+    // TODO(nausharipov): select the language
+  }
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
@@ -183,9 +187,7 @@ class _Buttons extends StatelessWidget {
                 (e) => _SdkButton(
                   value: e,
                   groupValue: _sdk,
-                  onChanged: () {
-                    // TODO(nausharipov): select the language
-                  },
+                  onChanged: _onSdkChanged,
                 ),
               )
               .toList(),
@@ -206,7 +208,7 @@ class _Buttons extends StatelessWidget {
 class _SdkButton extends StatelessWidget {
   final String value;
   final String groupValue;
-  final void Function()? onChanged;
+  final ValueChanged<String> onChanged;
 
   const _SdkButton({
     required this.value,
@@ -224,7 +226,9 @@ class _SdkButton extends StatelessWidget {
               ? null
               : const BorderSide(color: TobColors.grey1),
         ),
-        onPressed: onChanged,
+        onPressed: () {
+          onChanged(value);
+        },
         child: Text(value),
       ),
     );
