@@ -19,16 +19,16 @@ import (
 	"context"
 	"testing"
 
-	"beam.apache.org/playground/backend/internal/app_constants"
+	"beam.apache.org/playground/backend/internal/constants"
 )
 
 var ctx = context.Background()
 
 func TestGetExampleKey(t *testing.T) {
 	exampleKey := GetExampleKey(ctx, "MOCK_ID")
-	if exampleKey.Namespace != app_constants.Namespace ||
+	if exampleKey.Namespace != constants.Namespace ||
 		exampleKey.Parent != nil ||
-		exampleKey.Kind != app_constants.ExampleKind ||
+		exampleKey.Kind != constants.ExampleKind ||
 		exampleKey.Name != "MOCK_ID" {
 		t.Error("GetExampleKey() unexpected result")
 	}
@@ -36,9 +36,9 @@ func TestGetExampleKey(t *testing.T) {
 
 func TestGetSdkKey(t *testing.T) {
 	sdkKey := GetSdkKey(ctx, "MOCK_ID")
-	if sdkKey.Namespace != app_constants.Namespace ||
+	if sdkKey.Namespace != constants.Namespace ||
 		sdkKey.Parent != nil ||
-		sdkKey.Kind != app_constants.SdkKind ||
+		sdkKey.Kind != constants.SdkKind ||
 		sdkKey.Name != "MOCK_ID" {
 		t.Error("GetSdkKey() unexpected result")
 	}
@@ -46,9 +46,9 @@ func TestGetSdkKey(t *testing.T) {
 
 func TestGetFileKey(t *testing.T) {
 	sdkKey := GetFileKey(ctx, "MOCK_ID")
-	if sdkKey.Namespace != app_constants.Namespace ||
+	if sdkKey.Namespace != constants.Namespace ||
 		sdkKey.Parent != nil ||
-		sdkKey.Kind != app_constants.FileKind ||
+		sdkKey.Kind != constants.FileKind ||
 		sdkKey.Name != "MOCK_ID" {
 		t.Error("GetFileKey() unexpected result")
 	}
@@ -56,9 +56,9 @@ func TestGetFileKey(t *testing.T) {
 
 func TestGetSchemaVerKey(t *testing.T) {
 	sdkKey := GetSchemaVerKey(ctx, "MOCK_ID")
-	if sdkKey.Namespace != app_constants.Namespace ||
+	if sdkKey.Namespace != constants.Namespace ||
 		sdkKey.Parent != nil ||
-		sdkKey.Kind != app_constants.SchemaKind ||
+		sdkKey.Kind != constants.SchemaKind ||
 		sdkKey.Name != "MOCK_ID" {
 		t.Error("GetSchemaVerKey() unexpected result")
 	}
@@ -66,9 +66,9 @@ func TestGetSchemaVerKey(t *testing.T) {
 
 func TestGetSnippetKey(t *testing.T) {
 	sdkKey := GetSnippetKey(ctx, "MOCK_ID")
-	if sdkKey.Namespace != app_constants.Namespace ||
+	if sdkKey.Namespace != constants.Namespace ||
 		sdkKey.Parent != nil ||
-		sdkKey.Kind != app_constants.SnippetKind ||
+		sdkKey.Kind != constants.SnippetKind ||
 		sdkKey.Name != "MOCK_ID" {
 		t.Error("GetSnippetKey() unexpected result")
 	}
@@ -76,9 +76,9 @@ func TestGetSnippetKey(t *testing.T) {
 
 func TestGetPCObjectKey(t *testing.T) {
 	sdkKey := GetPCObjectKey(ctx, "MOCK_ID")
-	if sdkKey.Namespace != app_constants.Namespace ||
+	if sdkKey.Namespace != constants.Namespace ||
 		sdkKey.Parent != nil ||
-		sdkKey.Kind != app_constants.PCObjectKind ||
+		sdkKey.Kind != constants.PCObjectKind ||
 		sdkKey.Name != "MOCK_ID" {
 		t.Error("GetPCObjectKey() unexpected result")
 	}

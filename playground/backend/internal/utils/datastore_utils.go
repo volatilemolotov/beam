@@ -24,42 +24,42 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"beam.apache.org/playground/backend/internal/app_constants"
+	"beam.apache.org/playground/backend/internal/constants"
 	"beam.apache.org/playground/backend/internal/logger"
 )
 
 func GetExampleKey(ctx context.Context, values ...interface{}) *datastore.Key {
 	id := GetIDWithDelimiter(values...)
-	return getNameKey(ctx, app_constants.ExampleKind, id, nil)
+	return getNameKey(ctx, constants.ExampleKind, id, nil)
 }
 
 func GetSdkKey(ctx context.Context, values ...interface{}) *datastore.Key {
 	id := GetIDWithDelimiter(values...)
-	return getNameKey(ctx, app_constants.SdkKind, id, nil)
+	return getNameKey(ctx, constants.SdkKind, id, nil)
 }
 
 func GetFileKey(ctx context.Context, values ...interface{}) *datastore.Key {
 	id := GetIDWithDelimiter(values...)
-	return getNameKey(ctx, app_constants.FileKind, id, nil)
+	return getNameKey(ctx, constants.FileKind, id, nil)
 }
 
 func GetSchemaVerKey(ctx context.Context, values ...interface{}) *datastore.Key {
 	id := GetIDWithDelimiter(values...)
-	return getNameKey(ctx, app_constants.SchemaKind, id, nil)
+	return getNameKey(ctx, constants.SchemaKind, id, nil)
 }
 
 func GetSnippetKey(ctx context.Context, values ...interface{}) *datastore.Key {
 	id := GetIDWithDelimiter(values...)
-	return getNameKey(ctx, app_constants.SnippetKind, id, nil)
+	return getNameKey(ctx, constants.SnippetKind, id, nil)
 }
 
 func GetPCObjectKey(ctx context.Context, values ...interface{}) *datastore.Key {
 	id := GetIDWithDelimiter(values...)
-	return getNameKey(ctx, app_constants.PCObjectKind, id, nil)
+	return getNameKey(ctx, constants.PCObjectKind, id, nil)
 }
 
 func GetExampleID(cloudPath string) (string, error) {
-	cloudPathParams := strings.Split(cloudPath, app_constants.CloudPathDelimiter)
+	cloudPathParams := strings.Split(cloudPath, constants.CloudPathDelimiter)
 	if len(cloudPathParams) < 3 {
 		logger.Error("the wrong cloud path from a client")
 		return "", fmt.Errorf("cloud path doesn't have all options. The minimum size must be 3")
@@ -85,7 +85,7 @@ func GetIDWithDelimiter(values ...interface{}) string {
 			valuesAsStr = append(valuesAsStr, value.(string))
 		}
 	}
-	return strings.Join(valuesAsStr, app_constants.IDDelimiter)
+	return strings.Join(valuesAsStr, constants.IDDelimiter)
 }
 
 // getNameKey returns the datastore key
@@ -99,11 +99,11 @@ func getNameKey(ctx context.Context, kind, id string, parentId *datastore.Key) *
 }
 
 func GetNamespace(ctx context.Context) string {
-	namespace, ok := ctx.Value(app_constants.DatastoreNamespaceKey).(string)
+	namespace, ok := ctx.Value(constants.DatastoreNamespaceKey).(string)
 	if !ok {
-		namespace, ok = os.LookupEnv(app_constants.DatastoreNamespaceKey)
+		namespace, ok = os.LookupEnv(constants.DatastoreNamespaceKey)
 		if !ok {
-			return app_constants.Namespace
+			return constants.Namespace
 		}
 		return namespace
 	}
