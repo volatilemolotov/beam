@@ -20,7 +20,7 @@ import (
 	"time"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -47,7 +47,7 @@ func (m *DatastoreMapper) ToSnippet(info *pb.SaveSnippetRequest) *entity.Snippet
 			PipeOpts:      info.PipelineOptions,
 			Created:       nowDate,
 			LVisited:      nowDate,
-			Origin:        constants.UserSnippetOrigin,
+			Origin:        app_constants.UserSnippetOrigin,
 			NumberOfFiles: len(info.Files),
 		},
 	}

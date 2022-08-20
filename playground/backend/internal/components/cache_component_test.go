@@ -22,9 +22,9 @@ import (
 	"testing"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
-	"beam.apache.org/playground/backend/internal/constants"
 	db "beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/mapper"
@@ -45,16 +45,16 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	datastoreEmulatorHost := os.Getenv(constants.EmulatorHostKey)
+	datastoreEmulatorHost := os.Getenv(app_constants.EmulatorHostKey)
 	if datastoreEmulatorHost == "" {
-		if err := os.Setenv(constants.EmulatorHostKey, constants.EmulatorHostValue); err != nil {
+		if err := os.Setenv(app_constants.EmulatorHostKey, app_constants.EmulatorHostValue); err != nil {
 			panic(err)
 		}
 	}
 	ctx = context.Background()
-	ctx = context.WithValue(ctx, constants.DatastoreNamespaceKey, "components")
+	ctx = context.WithValue(ctx, app_constants.DatastoreNamespaceKey, "components")
 	cacheService = local.New(ctx)
-	datastoreDb, _ = db.New(ctx, mapper.NewPrecompiledObjectMapper(), constants.EmulatorProjectId)
+	datastoreDb, _ = db.New(ctx, mapper.NewPrecompiledObjectMapper(), app_constants.EmulatorProjectId)
 	cacheComponent = NewService(cacheService, datastoreDb)
 }
 
@@ -295,7 +295,7 @@ func saveExample(name, sdk string) {
 		Complexity: "MEDIUM",
 		Path:       "MOCK_PATH",
 		Type:       pb.PrecompiledObjectType_PRECOMPILED_OBJECT_TYPE_EXAMPLE.String(),
-		Origin:     constants.ExampleOrigin,
+		Origin:     app_constants.ExampleOrigin,
 		SchVer:     utils.GetSchemaVerKey(ctx, "MOCK_VERSION"),
 	})
 }
@@ -309,7 +309,7 @@ func saveSnippet(snipId, sdk string) {
 		Snippet: &entity.SnippetEntity{
 			Sdk:           utils.GetSdkKey(ctx, sdk),
 			PipeOpts:      "MOCK_OPTIONS",
-			Origin:        constants.ExampleOrigin,
+			Origin:        app_constants.ExampleOrigin,
 			NumberOfFiles: 1,
 		},
 		Files: []*entity.FileEntity{{
@@ -322,7 +322,7 @@ func saveSnippet(snipId, sdk string) {
 }
 
 func savePCObjs(exampleId string) {
-	pcTypes := []string{constants.PCOutputType, constants.PCLogType, constants.PCGraphType}
+	pcTypes := []string{app_constants.PCOutputType, app_constants.PCLogType, app_constants.PCGraphType}
 	for _, pcType := range pcTypes {
 		_, _ = datastoreDb.Client.Put(
 			ctx,

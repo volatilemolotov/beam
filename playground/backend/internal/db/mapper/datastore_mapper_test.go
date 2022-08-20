@@ -21,7 +21,7 @@ import (
 	"testing"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -61,7 +61,7 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 					SchVer:        utils.GetSchemaVerKey(datastoreMapperCtx, "MOCK_SCHEMA"),
 					Sdk:           utils.GetSdkKey(datastoreMapperCtx, pb.Sdk_SDK_JAVA.String()),
 					PipeOpts:      "MOCK_OPTIONS",
-					Origin:        constants.UserSnippetOrigin,
+					Origin:        app_constants.UserSnippetOrigin,
 					NumberOfFiles: 1,
 				},
 				Files: []*entity.FileEntity{
@@ -83,7 +83,7 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 				result.Salt != tt.expected.Salt ||
 				result.Snippet.PipeOpts != tt.expected.Snippet.PipeOpts ||
 				result.Snippet.NumberOfFiles != 1 ||
-				result.Snippet.Origin != constants.UserSnippetOrigin {
+				result.Snippet.Origin != app_constants.UserSnippetOrigin {
 				t.Error("Unexpected result")
 			}
 		})

@@ -22,7 +22,7 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/dto"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
@@ -203,7 +203,7 @@ func (d *Datastore) GetSDKs(ctx context.Context) ([]*entity.SDKEntity, error) {
 //GetCatalog returns all examples
 func (d *Datastore) GetCatalog(ctx context.Context, sdkCatalog []*entity.SDKEntity) ([]*pb.Categories, error) {
 	//Retrieving examples
-	exampleQuery := datastore.NewQuery(constants.ExampleKind).Namespace(utils.GetNamespace(ctx))
+	exampleQuery := datastore.NewQuery(app_constants.ExampleKind).Namespace(utils.GetNamespace(ctx))
 	var examples []*entity.ExampleEntity
 	exampleKeys, err := d.Client.GetAll(ctx, exampleQuery, &examples)
 	if err != nil {
@@ -374,7 +374,7 @@ func (d *Datastore) GetExampleOutput(ctx context.Context, id string) (string, er
 	}
 	defer rollback(tx)
 
-	pcObjKey := utils.GetPCObjectKey(ctx, id, constants.PCOutputType)
+	pcObjKey := utils.GetPCObjectKey(ctx, id, app_constants.PCOutputType)
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -395,7 +395,7 @@ func (d *Datastore) GetExampleLogs(ctx context.Context, id string) (string, erro
 	}
 	defer rollback(tx)
 
-	pcObjKey := utils.GetPCObjectKey(ctx, id, constants.PCLogType)
+	pcObjKey := utils.GetPCObjectKey(ctx, id, app_constants.PCLogType)
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -416,7 +416,7 @@ func (d *Datastore) GetExampleGraph(ctx context.Context, id string) (string, err
 	}
 	defer rollback(tx)
 
-	pcObjKey := utils.GetPCObjectKey(ctx, id, constants.PCGraphType)
+	pcObjKey := utils.GetPCObjectKey(ctx, id, app_constants.PCGraphType)
 	var pcObj = new(entity.PrecompiledObjectEntity)
 	if err = tx.Get(pcObjKey, pcObj); err != nil {
 		if err == datastore.ErrNoSuchEntity {
@@ -433,10 +433,10 @@ func (d *Datastore) GetExampleGraph(ctx context.Context, id string) (string, err
 func (d *Datastore) DeleteUnusedSnippets(ctx context.Context, dayDiff int32) error {
 	var hoursDiff = dayDiff * 24
 	boundaryDate := time.Now().Add(-time.Hour * time.Duration(hoursDiff))
-	snippetQuery := datastore.NewQuery(constants.SnippetKind).
+	snippetQuery := datastore.NewQuery(app_constants.SnippetKind).
 		Namespace(utils.GetNamespace(ctx)).
 		Filter("lVisited <= ", boundaryDate).
-		Filter("origin =", constants.UserSnippetOrigin).
+		Filter("origin =", app_constants.UserSnippetOrigin).
 		Project("numberOfFiles")
 	var snpDtos []*dto.SnippetDeleteDTO
 	snpKeys, err := d.Client.GetAll(ctx, snippetQuery, &snpDtos)

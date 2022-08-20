@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/dto"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/utils"
@@ -209,13 +209,13 @@ func getExampleDTO(name, defaultName, sdk string) *dto.ExampleDTO {
 			Complexity: "MEDIUM",
 			Path:       "MOCK_PATH",
 			Type:       pb.PrecompiledObjectType_PRECOMPILED_OBJECT_TYPE_EXAMPLE.String(),
-			Origin:     constants.ExampleOrigin,
+			Origin:     app_constants.ExampleOrigin,
 			SchVer:     utils.GetSchemaVerKey(pcObjMapperCtx, "MOCK_VERSION"),
 		},
 		Snippet: &entity.SnippetEntity{
 			Sdk:           utils.GetSdkKey(pcObjMapperCtx, sdk),
 			PipeOpts:      "MOCK_OPTIONS",
-			Origin:        constants.ExampleOrigin,
+			Origin:        app_constants.ExampleOrigin,
 			SchVer:        utils.GetSchemaVerKey(pcObjMapperCtx, "MOCK_VERSION"),
 			NumberOfFiles: 1,
 		},

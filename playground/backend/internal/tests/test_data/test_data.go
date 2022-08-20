@@ -29,7 +29,7 @@ import (
 	"cloud.google.com/go/datastore"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/utils"
 )
@@ -115,7 +115,7 @@ func createExampleEntity(ctx context.Context, name, sdk string) *entity.ExampleE
 		Complexity: "MEDIUM",
 		Path:       "MOCK_PATH",
 		Type:       pb.PrecompiledObjectType_PRECOMPILED_OBJECT_TYPE_EXAMPLE.String(),
-		Origin:     constants.ExampleOrigin,
+		Origin:     app_constants.ExampleOrigin,
 		SchVer:     utils.GetSchemaVerKey(ctx, "MOCK_VERSION"),
 	}
 }
@@ -130,7 +130,7 @@ func createSnippetEntities(ctx context.Context, examples []*entity.ExampleEntity
 			Sdk:           example.Sdk,
 			PipeOpts:      "MOCK_P_OPTS",
 			Created:       now,
-			Origin:        constants.ExampleOrigin,
+			Origin:        app_constants.ExampleOrigin,
 			SchVer:        utils.GetSchemaVerKey(ctx, "MOCK_VERSION"),
 			NumberOfFiles: 1,
 		}
@@ -162,7 +162,7 @@ func createPCObjEntities(ctx context.Context, examples []*entity.ExampleEntity) 
 	keys := make([]*datastore.Key, 0)
 	objs := make([]*entity.PrecompiledObjectEntity, 0)
 	for _, example := range examples {
-		types := []string{constants.PCLogType, constants.PCGraphType, constants.PCOutputType}
+		types := []string{app_constants.PCLogType, app_constants.PCGraphType, app_constants.PCOutputType}
 		for _, typeVal := range types {
 			key := utils.GetPCObjectKey(ctx, example.Sdk.Name, example.Name, typeVal)
 			obj := &entity.PrecompiledObjectEntity{Content: "MOCK_CONTENT_" + typeVal}
@@ -188,7 +188,7 @@ func saveEntities(ctx context.Context, client *datastore.Client, keys []*datasto
 }
 
 func createDatastoreClient(ctx context.Context) (*datastore.Client, func()) {
-	projectId := getEnv("GOOGLE_CLOUD_PROJECT", constants.EmulatorProjectId)
+	projectId := getEnv("GOOGLE_CLOUD_PROJECT", app_constants.EmulatorProjectId)
 	client, err := datastore.NewClient(ctx, projectId)
 	if err != nil {
 		fmt.Println(err.Error())

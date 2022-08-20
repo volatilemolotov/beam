@@ -21,37 +21,37 @@ import (
 
 	"cloud.google.com/go/datastore"
 
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/utils"
 )
 
 func CleanExample(ctx context.Context, t *testing.T, exampleId string) {
-	cleanData(ctx, t, constants.ExampleKind, exampleId, nil)
+	cleanData(ctx, t, app_constants.ExampleKind, exampleId, nil)
 }
 
 func CleanSnippet(ctx context.Context, t *testing.T, snippetId string) {
-	cleanData(ctx, t, constants.SnippetKind, snippetId, nil)
+	cleanData(ctx, t, app_constants.SnippetKind, snippetId, nil)
 }
 
 func CleanPCObjs(ctx context.Context, t *testing.T, exampleId string) {
-	pcTypes := []string{constants.PCOutputType, constants.PCLogType, constants.PCGraphType}
+	pcTypes := []string{app_constants.PCOutputType, app_constants.PCLogType, app_constants.PCGraphType}
 	for _, pcType := range pcTypes {
-		cleanData(ctx, t, constants.PCObjectKind, utils.GetIDWithDelimiter(exampleId, pcType), nil)
+		cleanData(ctx, t, app_constants.PCObjectKind, utils.GetIDWithDelimiter(exampleId, pcType), nil)
 	}
 }
 
 func CleanFiles(ctx context.Context, t *testing.T, snippetId string, numberOfFiles int) {
 	for fileIndx := 0; fileIndx < numberOfFiles; fileIndx++ {
-		cleanData(ctx, t, constants.FileKind, utils.GetIDWithDelimiter(snippetId, fileIndx), nil)
+		cleanData(ctx, t, app_constants.FileKind, utils.GetIDWithDelimiter(snippetId, fileIndx), nil)
 	}
 }
 
 func CleanSchemaVersion(ctx context.Context, t *testing.T, schemaId string) {
-	cleanData(ctx, t, constants.SchemaKind, schemaId, nil)
+	cleanData(ctx, t, app_constants.SchemaKind, schemaId, nil)
 }
 
 func cleanData(ctx context.Context, t *testing.T, kind, id string, parentId *datastore.Key) {
-	client, err := datastore.NewClient(ctx, constants.EmulatorProjectId)
+	client, err := datastore.NewClient(ctx, app_constants.EmulatorProjectId)
 	if err != nil {
 		t.Errorf("Error during datastore client creating, err: %s\n", err.Error())
 		return

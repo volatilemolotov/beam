@@ -21,12 +21,12 @@ import (
 	"cloud.google.com/go/datastore"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 )
 
 func TestSnippet_ID(t *testing.T) {
-	sdkKey := datastore.NameKey(constants.SdkKind, pb.Sdk_SDK_GO.String(), nil)
-	sdkKey.Namespace = constants.Namespace
+	sdkKey := datastore.NameKey(app_constants.SdkKind, pb.Sdk_SDK_GO.String(), nil)
+	sdkKey.Namespace = app_constants.Namespace
 	tests := []struct {
 		name    string
 		snip    *Snippet

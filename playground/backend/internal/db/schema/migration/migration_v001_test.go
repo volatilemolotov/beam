@@ -20,7 +20,7 @@ import (
 	"os"
 	"testing"
 
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/db/schema"
@@ -38,16 +38,16 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	datastoreEmulatorHost := os.Getenv(constants.EmulatorHostKey)
+	datastoreEmulatorHost := os.Getenv(app_constants.EmulatorHostKey)
 	if datastoreEmulatorHost == "" {
-		if err := os.Setenv(constants.EmulatorHostKey, constants.EmulatorHostValue); err != nil {
+		if err := os.Setenv(app_constants.EmulatorHostKey, app_constants.EmulatorHostValue); err != nil {
 			panic(err)
 		}
 	}
 	ctx = context.Background()
-	ctx = context.WithValue(ctx, constants.DatastoreNamespaceKey, "migration")
+	ctx = context.WithValue(ctx, app_constants.DatastoreNamespaceKey, "migration")
 	var err error
-	datastoreDb, err = datastore.New(ctx, mapper.NewPrecompiledObjectMapper(), constants.EmulatorProjectId)
+	datastoreDb, err = datastore.New(ctx, mapper.NewPrecompiledObjectMapper(), app_constants.EmulatorProjectId)
 	if err != nil {
 		panic(err)
 	}

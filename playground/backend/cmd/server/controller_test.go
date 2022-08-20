@@ -34,10 +34,10 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/components"
-	"beam.apache.org/playground/backend/internal/constants"
 	"beam.apache.org/playground/backend/internal/db"
 	datastoreDb "beam.apache.org/playground/backend/internal/db/datastore"
 	"beam.apache.org/playground/backend/internal/db/entity"
@@ -99,13 +99,13 @@ func setup() *grpc.Server {
 	cacheService = local.New(ctx)
 
 	// setup database
-	datastoreEmulatorHost := os.Getenv(constants.EmulatorHostKey)
+	datastoreEmulatorHost := os.Getenv(app_constants.EmulatorHostKey)
 	if datastoreEmulatorHost == "" {
-		if err = os.Setenv(constants.EmulatorHostKey, constants.EmulatorHostValue); err != nil {
+		if err = os.Setenv(app_constants.EmulatorHostKey, app_constants.EmulatorHostValue); err != nil {
 			panic(err)
 		}
 	}
-	dbClient, err = datastoreDb.New(ctx, mapper.NewPrecompiledObjectMapper(), constants.EmulatorProjectId)
+	dbClient, err = datastoreDb.New(ctx, mapper.NewPrecompiledObjectMapper(), app_constants.EmulatorProjectId)
 	if err != nil {
 		panic(err)
 	}
@@ -127,7 +127,7 @@ func setup() *grpc.Server {
 	if err = os.Setenv("PROPERTY_PATH", "../../."); err != nil {
 		panic(err)
 	}
-	if err = os.Setenv(constants.DatastoreNamespaceKey, "main"); err != nil {
+	if err = os.Setenv(app_constants.DatastoreNamespaceKey, "main"); err != nil {
 		panic(err)
 	}
 
@@ -929,7 +929,7 @@ func TestPlaygroundController_GetSnippet(t *testing.T) {
 							Sdk:           utils.GetSdkKey(ctx, pb.Sdk_SDK_JAVA.String()),
 							PipeOpts:      "MOCK_OPTIONS",
 							Created:       nowDate,
-							Origin:        constants.UserSnippetOrigin,
+							Origin:        app_constants.UserSnippetOrigin,
 							NumberOfFiles: 1,
 						},
 						Files: []*entity.FileEntity{{
@@ -1113,7 +1113,7 @@ func TestPlaygroundController_GetPrecompiledObjectOutput(t *testing.T) {
 				info: &pb.GetPrecompiledObjectOutputRequest{CloudPath: "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MOCK_DEFAULT_EXAMPLE"},
 			},
 			wantErr:      false,
-			wantResponse: "MOCK_CONTENT_" + constants.PCOutputType,
+			wantResponse: "MOCK_CONTENT_" + app_constants.PCOutputType,
 		},
 	}
 
@@ -1153,7 +1153,7 @@ func TestPlaygroundController_GetPrecompiledObjectLogs(t *testing.T) {
 				info: &pb.GetPrecompiledObjectLogsRequest{CloudPath: "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MOCK_DEFAULT_EXAMPLE"},
 			},
 			wantErr:      false,
-			wantResponse: "MOCK_CONTENT_" + constants.PCLogType,
+			wantResponse: "MOCK_CONTENT_" + app_constants.PCLogType,
 		},
 	}
 
@@ -1193,7 +1193,7 @@ func TestPlaygroundController_GetPrecompiledObjectGraph(t *testing.T) {
 				info: &pb.GetPrecompiledObjectGraphRequest{CloudPath: "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MOCK_DEFAULT_EXAMPLE"},
 			},
 			wantErr:      false,
-			wantResponse: "MOCK_CONTENT_" + constants.PCGraphType,
+			wantResponse: "MOCK_CONTENT_" + app_constants.PCGraphType,
 		},
 	}
 

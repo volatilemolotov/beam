@@ -23,7 +23,7 @@ import (
 	"time"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/app_constants"
 	"beam.apache.org/playground/backend/internal/db/entity"
 	"beam.apache.org/playground/backend/internal/db/mapper"
 	"beam.apache.org/playground/backend/internal/tests/test_cleaner"
@@ -41,16 +41,16 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	datastoreEmulatorHost := os.Getenv(constants.EmulatorHostKey)
+	datastoreEmulatorHost := os.Getenv(app_constants.EmulatorHostKey)
 	if datastoreEmulatorHost == "" {
-		if err := os.Setenv(constants.EmulatorHostKey, constants.EmulatorHostValue); err != nil {
+		if err := os.Setenv(app_constants.EmulatorHostKey, app_constants.EmulatorHostValue); err != nil {
 			panic(err)
 		}
 	}
 	ctx = context.Background()
-	context.WithValue(ctx, constants.DatastoreNamespaceKey, "datastore")
+	context.WithValue(ctx, app_constants.DatastoreNamespaceKey, "datastore")
 	var err error
-	datastoreDb, err = New(ctx, mapper.NewPrecompiledObjectMapper(), constants.EmulatorProjectId)
+	datastoreDb, err = New(ctx, mapper.NewPrecompiledObjectMapper(), app_constants.EmulatorProjectId)
 	if err != nil {
 		panic(err)
 	}
@@ -84,7 +84,7 @@ func TestDatastore_PutSnippet(t *testing.T) {
 				Snippet: &entity.SnippetEntity{
 					Sdk:           utils.GetSdkKey(ctx, pb.Sdk_SDK_GO.String()),
 					PipeOpts:      "MOCK_OPTIONS",
-					Origin:        constants.UserSnippetOrigin,
+					Origin:        app_constants.UserSnippetOrigin,
 					NumberOfFiles: 1,
 				},
 				Files: []*entity.FileEntity{{
@@ -144,7 +144,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 						Sdk:           utils.GetSdkKey(ctx, pb.Sdk_SDK_GO.String()),
 						PipeOpts:      "MOCK_OPTIONS",
 						Created:       nowDate,
-						Origin:        constants.UserSnippetOrigin,
+						Origin:        app_constants.UserSnippetOrigin,
 						NumberOfFiles: 1,
 					},
 					Files: []*entity.FileEntity{{
@@ -174,7 +174,7 @@ func TestDatastore_GetSnippet(t *testing.T) {
 			if err == nil {
 				if snip.Sdk.Name != pb.Sdk_SDK_GO.String() ||
 					snip.PipeOpts != "MOCK_OPTIONS" ||
-					snip.Origin != constants.UserSnippetOrigin ||
+					snip.Origin != app_constants.UserSnippetOrigin ||
 					snip.OwnerId != "" {
 					t.Error("GetSnippet() unexpected result")
 				}
@@ -889,14 +889,14 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			name:    "Initialize datastore database",
-			args:    args{ctx: ctx, projectId: constants.EmulatorProjectId},
+			args:    args{ctx: ctx, projectId: app_constants.EmulatorProjectId},
 			wantErr: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := New(ctx, mapper.NewPrecompiledObjectMapper(), constants.EmulatorProjectId)
+			_, err := New(ctx, mapper.NewPrecompiledObjectMapper(), app_constants.EmulatorProjectId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -913,7 +913,7 @@ func saveExample(name, sdk string) {
 		Complexity: "MEDIUM",
 		Path:       "MOCK_PATH",
 		Type:       "PRECOMPILED_OBJECT_TYPE_EXAMPLE",
-		Origin:     constants.ExampleOrigin,
+		Origin:     app_constants.ExampleOrigin,
 		SchVer:     utils.GetSchemaVerKey(ctx, "MOCK_VERSION"),
 	})
 }
@@ -927,7 +927,7 @@ func saveSnippet(snipId, sdk string) {
 		Snippet: &entity.SnippetEntity{
 			Sdk:           utils.GetSdkKey(ctx, sdk),
 			PipeOpts:      "MOCK_OPTIONS",
-			Origin:        constants.ExampleOrigin,
+			Origin:        app_constants.ExampleOrigin,
 			NumberOfFiles: 1,
 		},
 		Files: []*entity.FileEntity{{
@@ -940,7 +940,7 @@ func saveSnippet(snipId, sdk string) {
 }
 
 func savePCObjs(exampleId string) {
-	pcTypes := []string{constants.PCOutputType, constants.PCLogType, constants.PCGraphType}
+	pcTypes := []string{app_constants.PCOutputType, app_constants.PCLogType, app_constants.PCGraphType}
 	for _, pcType := range pcTypes {
 		_, _ = datastoreDb.Client.Put(
 			ctx,
