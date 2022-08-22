@@ -51,6 +51,7 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
   private final String streamName;
   private final long totalMessagesNumber;
   private long startOffset;
+  private static final int READ_TIMEOUT_IN_SECONDS = 1;
 
   RabbitMqReceiverWithOffset(
       final String uri, final String streamName, final long totalMessagesNumber) {
@@ -116,7 +117,7 @@ public class RabbitMqReceiverWithOffset extends Receiver<String> implements HasO
 
     while (!isStopped() && testConsumer.getReceived().size() < totalMessagesNumber) {
       try {
-        TimeUnit.SECONDS.sleep(1);
+        TimeUnit.SECONDS.sleep(READ_TIMEOUT_IN_SECONDS);
       } catch (InterruptedException e) {
         LOG.error("Interrupted", e);
       }

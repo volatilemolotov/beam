@@ -85,10 +85,6 @@ import static org.junit.Assert.assertEquals;
  *
  * <p>NOTE: This test sets retention policy of the messages so that all messages are retained in the
  * topic so that we could read them back after writing.
- *
- * <p>{@see
- * https://stackoverflow.com/questions/59245356/how-to-create-apache-spark-standalone-cluster-for-integration-testing-using-test/68156137}
- * for more details about spark testcontainers setup.
  */
 @RunWith(JUnit4.class)
 public class SparkReceiverIOIT {
@@ -121,8 +117,6 @@ public class SparkReceiverIOIT {
 
   static {
     sdfPipelineOptions = PipelineOptionsFactory.create().as(ExperimentalOptions.class);
-    ExperimentalOptions.addExperiment(sdfPipelineOptions, "use_sdf_read");
-    ExperimentalOptions.addExperiment(sdfPipelineOptions, "beam_fn_api");
     sdfPipelineOptions.as(TestPipelineOptions.class).setBlockOnRun(false);
   }
 
@@ -144,10 +138,6 @@ public class SparkReceiverIOIT {
               .withMeasurement(options.getInfluxMeasurement())
               .get();
     }
-  }
-
-  @BeforeClass
-  public static void beforeClass() {
     clearRabbitMQ();
   }
 
@@ -176,7 +166,6 @@ public class SparkReceiverIOIT {
   }
 
   /** Pipeline options specific for this test. */
-  @SuppressWarnings("unused")
   public interface Options extends IOTestPipelineOptions, StreamingOptions {
 
     @Description("Options for synthetic source.")
@@ -219,25 +208,13 @@ public class SparkReceiverIOIT {
     void setReadTimeout(Integer readTimeout);
   }
 
-  private static class RabbitMqMessage {
-    private final byte[] body;
-
-    public RabbitMqMessage(String record) {
-      this.body = record.getBytes(StandardCharsets.UTF_8);
-    }
-
-    public byte[] getBody() {
-      return body;
-    }
-  }
-
   private void writeToRabbitMq(final long maxNumRecords)
       throws URISyntaxException, NoSuchAlgorithmException, KeyManagementException, IOException,
           TimeoutException {
 
-    final List<RabbitMqMessage> data =
+    final List<String> data =
         LongStream.range(0, maxNumRecords)
-            .mapToObj(number -> new RabbitMqMessage(TEST_MESSAGE_PREFIX + number))
+            .mapToObj(number -> TEST_MESSAGE_PREFIX + number)
             .collect(Collectors.toList());
 
     final ConnectionFactory connectionFactory = new ConnectionFactory();
@@ -256,7 +233,7 @@ public class SparkReceiverIOIT {
                   "",
                   options.getStreamName(),
                   MessageProperties.PERSISTENT_TEXT_PLAIN,
-                  message.getBody());
+                  message.getBytes(StandardCharsets.UTF_8));
             } catch (IOException e) {
               throw new RuntimeException(e);
             }
@@ -280,6 +257,10 @@ public class SparkReceiverIOIT {
         .withSparkReceiverBuilder(receiverBuilder);
   }
 
+  /**
+   * Since streams in RabbitMQ are durable by definition, we have to clean them up after test execution.
+   * The simplest way is to delete the whole stream after test execution.
+   */
   private static void clearRabbitMQ() {
     final ConnectionFactory connectionFactory = new ConnectionFactory();
 
@@ -298,6 +279,9 @@ public class SparkReceiverIOIT {
     }
   }
 
+  /**
+   * Function for counting processed pipeline elements
+   */
   private static class CountingFn extends DoFn<String, Void> {
 
     private final Counter elementCounter;
@@ -307,7 +291,6 @@ public class SparkReceiverIOIT {
     }
 
     @ProcessElement
-    @SuppressWarnings("unused")
     public void processElement() {
       elementCounter.inc(1L);
     }
