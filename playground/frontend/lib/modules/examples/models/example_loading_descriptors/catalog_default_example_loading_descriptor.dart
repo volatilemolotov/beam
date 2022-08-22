@@ -16,29 +16,25 @@
  * limitations under the License.
  */
 
-import 'package:aligned_dialog/aligned_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:playground/components/summit_banner/banner_description.dart';
-import 'package:playground/constants/assets.dart';
+import 'package:playground/modules/sdk/models/sdk.dart';
+import 'package:playground/modules/examples/models/example_loading_descriptors/example_loading_descriptor.dart';
+import 'package:playground/modules/examples/models/example_origin.dart';
 
-class SummitBanner extends StatelessWidget {
-  const SummitBanner({Key? key}) : super(key: key);
+class CatalogDefaultExampleLoadingDescriptor extends ExampleLoadingDescriptor {
+  final SDK sdk;
+
+  const CatalogDefaultExampleLoadingDescriptor({
+    required this.sdk,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onHover: (_) {
-        showAlignedDialog(
-          context: context,
-          builder: (dialogContext) => const BannerDescription(),
-          followerAnchor: Alignment.topRight,
-          targetAnchor: Alignment.topRight,
-          barrierColor: Colors.transparent,
-        );
-      },
-      child: SvgPicture.asset(kSummitBannerAsset),
-    );
+  ExampleOrigin get origin => ExampleOrigin.catalogDefault;
+
+  @override
+  int get hashCode => sdk.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is CatalogDefaultExampleLoadingDescriptor && sdk == other.sdk;
   }
 }

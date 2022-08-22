@@ -16,14 +16,28 @@
  * limitations under the License.
  */
 
-import 'package:flutter/cupertino.dart';
+import 'package:playground/modules/examples/models/example_loading_descriptors/example_loading_descriptor.dart';
+import 'package:playground/modules/examples/models/example_origin.dart';
 
-class PipelineOptionController {
-  final TextEditingController name = TextEditingController();
-  final TextEditingController value = TextEditingController();
+class UserSharedExampleLoadingDescriptor extends ExampleLoadingDescriptor {
+  final String snippetId;
 
-  PipelineOptionController({String name = '', String value = ''}) {
-    this.name.text = name;
-    this.value.text = value;
+  const UserSharedExampleLoadingDescriptor({
+    required this.snippetId,
+  });
+
+  @override
+  ExampleOrigin get origin => ExampleOrigin.userShared;
+
+  @override
+  String toString() => '$origin-$snippetId';
+
+  @override
+  int get hashCode => snippetId.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is UserSharedExampleLoadingDescriptor &&
+        snippetId == other.snippetId;
   }
 }
