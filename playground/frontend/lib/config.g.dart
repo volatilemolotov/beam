@@ -22,8 +22,8 @@ const String kApiClientURL =
 const String kApiJavaClientURL =
     'http://34.173.7.61:8080';
 const String kApiGoClientURL =
-    'http://34.72.167.137:8080';
+    'http://34.69.121.59:8080';
 const String kApiPythonClientURL =
     'http://34.135.119.179:8080';
 const String kApiScioClientURL =
-    'http://35.202.183.205:8080';
+    'http://34.172.61.253:8080';
