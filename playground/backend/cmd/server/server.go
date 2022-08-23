@@ -209,6 +209,7 @@ func setupExamplesCatalogFromDatastore(ctx context.Context, cacheService cache.C
 	if err != nil {
 		return err
 	}
+	logger.Infof("Catalog length: %d", len(catalog))
 	if err = cacheService.SetCatalog(ctx, catalog); err != nil {
 		logger.Errorf("GetPrecompiledObjects(): cache error: %s", err.Error())
 	}
