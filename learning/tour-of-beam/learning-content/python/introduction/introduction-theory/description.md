@@ -1,8 +1,18 @@
 # Tour of Beam Programming Guide
 
-The Beam Programming Guide is intended for Beam users who want to use the Beam SDKs to create data processing pipelines. It provides guidance for using the Beam SDK classes to build and test your pipeline. The programming guide is not intended as an exhaustive reference, but as a language-agnostic, high-level guide to programmatically building your Beam pipeline. As the programming guide is filled out, the text will include code samples in multiple languages to help illustrate how to implement Beam concepts in your pipelines.
+The Beam Programming Guide is intended for Beam users who want to use the Beam SDKs to create data processing pipelines. This guide provides guidance for using the Beam SDK classes to build and test pipelines. The programming guide is not intended to be an exhaustive reference, but rather a language-agnostic, high-level guide to programmatically building your Beam pipeline. As the programming guide is filled out, the text will include code samples in multiple languages to help illustrate how to implement Beam concepts in your pipelines.
 
-If you want a brief introduction to Beam’s basic concepts before reading the programming guide, take a look at the Basics of the Beam model page.
+For a brief introduction to Beam’s basic concepts,take a look at the Basics of the Beam model page before reading the programming guide.
+
+### Introduction
+
+Welcome to a Tour Of Beam, a learning guide you can use to get familiar with the Apache Beam.
+The tour is divided into a list of modules that contain learning units covering various Apache Beam features and principles.
+You can access list of modules by ‘’<<<’ button on the left . For each module, learning progress is displayed next to it.
+Throughout the tour, you will find list of learning materials, examples, exercises and challenges for you to complete.
+The tour is Introduction learning module contains an example that you can review in the right pane, run and see the output by clicking ‘Run’. Try to modify the example to output ‘Beam is great’.
+Each module also contains a challenge based on the material learned. Try to solve as many as you can, and if you need help, just click on the ‘Hint’ button or examine the correct solution by clicking the ‘Solution’ button.
+Now let’s start the tour with learning core Beam principles.
 
 ### Overview
 
@@ -15,8 +25,6 @@ The Beam SDKs provide a number of abstractions that simplify the mechanics of la
 &#8594; PCollection: A PCollection represents a distributed data set that your Beam pipeline operates on. The data set can be bounded, meaning it comes from a fixed source like a file, or unbounded, meaning it comes from a continuously updating source via a subscription or other mechanism. Your pipeline typically creates an initial PCollection by reading data from an external data source, but you can also create a PCollection from in-memory data within your driver program. From there, PCollections are the inputs and outputs for each step in your pipeline.
 
 &#8594; PTransform: A PTransform represents a data processing operation, or a step, in your pipeline. Every PTransform takes one or more PCollection objects as input, performs a processing function that you provide on the elements of that PCollection, and produces zero or more output PCollection objects.
-
-&#8594; `Scope`: The Go SDK has an explicit scope variable used to build a `Pipeline`. A Pipeline can return it’s root scope with the `Root()` method. The scope variable is passed to `PTransform` functions to place them in the `Pipeline` that owns the `Scope`.
 
 &#8594; I/O transforms: Beam comes with a number of “IOs” - library PTransforms that read or write data to various external storage systems.
 
@@ -41,12 +49,10 @@ The `Pipeline` abstraction encapsulates all the data and steps in your data proc
 To use Beam, your driver program must first create an instance of the Beam SDK class Pipeline (typically in the main() function). When you create your `Pipeline`, you’ll also need to set some configuration options. You can set your pipeline’s configuration options programmatically, but it’s often easier to set the options ahead of time (or read them from the command line) and pass them to the Pipeline object when you create the object.
 
 ```
-// beam.Init() is an initialization hook that must be called
-// near the beginning of main(), before creating a pipeline.
-beam.Init()
+import apache_beam as beam
 
-// Create the Pipeline object and root scope.
-pipeline, scope := beam.NewPipelineWithRoot()
+with beam.Pipeline() as pipeline:
+  pass  # build your pipeline here
 ```
 
 ### Configuring pipeline options
@@ -55,12 +61,14 @@ Use the pipeline options to configure different aspects of your pipeline, such a
 
 ### Setting PipelineOptions from command-line arguments
 
-Use Go flags to parse command line arguments to configure your pipeline. Flags must be parsed before `beam.Init()` is called.
+While you can configure your pipeline by creating a `PipelineOptions` object and setting the fields directly, the Beam SDKs include a command-line parser that you can use to set fields in `PipelineOptions` using command-line arguments.
+
+To read options from the command-line, construct your `PipelineOptions` object as demonstrated in the following example code:
 
 ```
-// If beamx or Go flags are used, flags must be parsed first,
-// before beam.Init() is called.
-flag.Parse()
+from apache_beam.options.pipeline_options import PipelineOptions
+
+beam_options = PipelineOptions()
 ```
 
 This interprets command-line arguments that follow the format:
@@ -80,21 +88,31 @@ You can add your own custom options in addition to the standard `PipelineOptions
 The following example shows how to add `input` and `output` custom options:
 
 ```
-// Use standard Go flags to define pipeline options.
-var (
-	input  = flag.String("input", "", "")
-	output = flag.String("output", "", "")
-)
+from apache_beam.options.pipeline_options import PipelineOptions
+
+class MyOptions(PipelineOptions):
+  @classmethod
+  def _add_argparse_args(cls, parser):
+    parser.add_argument('--input')
+    parser.add_argument('--output')
 ```
 
 You can also specify a description, which appears when a user passes `--help` as a command-line argument, and a default value.
 
+You set the description and default value using annotations, as follows:
+
 ```
-var (
-	input  = flag.String("input", "gs://my-bucket/input", "Input for the pipeline")
-	output = flag.String("output", "gs://my-bucket/output", "Output for the pipeline")
-)
+from apache_beam.options.pipeline_options import PipelineOptions
+
+class MyOptions(PipelineOptions):
+  @classmethod
+  def _add_argparse_args(cls, parser):
+    parser.add_argument(
+        '--input',
+        default='gs://dataflow-samples/shakespeare/kinglear.txt',
+        help='The file path for the input text to process.')
+    parser.add_argument(
+        '--output', required=True, help='The path prefix for output files.')
 ```
 
-Now your pipeline can accept `--input=value` and `--output=value` as command-line arguments.
-
+For Python, you can also simply parse your custom options with argparse; there is no need to create a separate PipelineOptions subclass.

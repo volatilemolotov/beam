@@ -1,6 +1,18 @@
 # Tour of Beam Programming Guide
 
-The Beam Programming Guide is intended for Beam users who want to use the Beam SDK to create data processing pipelines. It contains recommendations for using the Beam SDK classes to create and test a pipeline. The Programming Guide is not intended as an exhaustive reference, but as a language-independent high-level guide to the software construction of the Beam pipeline. When the programming guide is completed, the text will include code examples in several languages that will help illustrate how to implement Beam concepts in your pipelines.
+The Beam Programming Guide is intended for Beam users who want to use the Beam SDKs to create data processing pipelines. This guide provides guidance for using the Beam SDK classes to build and test pipelines. The programming guide is not intended to be an exhaustive reference, but rather a language-agnostic, high-level guide to programmatically building your Beam pipeline. As the programming guide is filled out, the text will include code samples in multiple languages to help illustrate how to implement Beam concepts in your pipelines.
+
+For a brief introduction to Beam’s basic concepts,take a look at the Basics of the Beam model page before reading the programming guide.
+
+### Introduction
+
+Welcome to a Tour Of Beam, a learning guide you can use to get familiar with the Apache Beam.
+The tour is divided into a list of modules that contain learning units covering various Apache Beam features and principles.
+You can access list of modules by ‘’<<<’ button on the left . For each module, learning progress is displayed next to it.
+Throughout the tour, you will find list of learning materials, examples, exercises and challenges for you to complete.
+The tour is interqEach learning module contains an example that you can review in the right pane, run and see the output by clicking ‘Run’. Try to modify the example to output ‘Beam is great’.
+Each module also contains a challenge based on the material learned. Try to solve as many as you can, and if you need help, just click on the ‘Hint’ button or examine the correct solution by clicking the ‘Solution’ button.
+Now let’s start the tour with learning core Beam principles.
 
 ### Overview
 
@@ -121,6 +133,3 @@ MyOptions options = PipelineOptionsFactory.fromArgs(args)
                                                 .withValidation()
                                                 .as(MyOptions.class);
 ```
-
-Now your pipeline can accept `--input=value` and `--output=value` as command-line arguments.
-
