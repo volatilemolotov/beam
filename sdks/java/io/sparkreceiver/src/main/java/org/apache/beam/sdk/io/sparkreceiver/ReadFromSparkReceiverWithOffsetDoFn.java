@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  * ReadFromSparkReceiverWithOffsetDoFn} will move to process the next element.
  */
 @UnboundedPerElement
-public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
+class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(ReadFromSparkReceiverWithOffsetDoFn.class);
@@ -64,7 +64,7 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
   private final SerializableFunction<V, Instant> getWatermarkFn;
   private final ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder;
 
-  public ReadFromSparkReceiverWithOffsetDoFn(SparkReceiverIO.Read<V> transform) {
+  ReadFromSparkReceiverWithOffsetDoFn(SparkReceiverIO.Read<V> transform) {
     createWatermarkEstimatorFn = WatermarkEstimators.Manual::new;
 
     ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder =
@@ -77,7 +77,9 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
     this.getOffsetFn = getOffsetFn;
 
     SerializableFunction<V, Instant> getWatermarkFn = transform.getWatermarkFn();
-    checkStateNotNull(getWatermarkFn, "Watermark fn can't be null!");
+    if (getWatermarkFn == null) {
+      getWatermarkFn = input -> Instant.now();
+    }
     this.getWatermarkFn = getWatermarkFn;
   }
 
@@ -100,7 +102,6 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
   @GetSize
   public double getSize(@Element byte[] element, @Restriction OffsetRange offsetRange) {
     return restrictionTracker(element, offsetRange).getProgress().getWorkRemaining();
-    // Before processing elements, we don't have a good estimated size of records and offset gap.
   }
 
   @NewTracker
@@ -114,19 +115,15 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
     return new OffsetRange.Coder();
   }
 
-  @Setup
-  public void setup() throws Exception {}
-
-  @Teardown
-  public void teardown() throws Exception {}
-
+  // Need to do an unchecked cast from Object
+  // because org.apache.spark.streaming.receiver.ReceiverSupervisor accepts Object in push methods
   @SuppressWarnings("unchecked")
   private static class SparkConsumerWithOffset<V> implements SparkConsumer<V> {
     private final Queue<V> recordsQueue;
     private @Nullable Receiver<V> sparkReceiver;
     private final Long startOffset;
 
-    public SparkConsumerWithOffset(Long startOffset) {
+    SparkConsumerWithOffset(Long startOffset) {
       this.startOffset = startOffset;
       this.recordsQueue = new ConcurrentLinkedQueue<>();
     }
@@ -161,14 +158,14 @@ public class ReadFromSparkReceiverWithOffsetDoFn<V> extends DoFn<byte[], V> {
       try {
         TimeUnit.MILLISECONDS.sleep(START_POLL_TIMEOUT_MS);
       } catch (InterruptedException e) {
-        LOG.error("Interrupted", e);
+        LOG.error("SparkReceiver was interrupted before polling started", e);
       }
     }
 
     @Override
     public void stop() {
       if (sparkReceiver != null) {
-        sparkReceiver.stop("Stopped");
+        sparkReceiver.stop("SparkReceiver is stopped.");
       }
       recordsQueue.clear();
     }

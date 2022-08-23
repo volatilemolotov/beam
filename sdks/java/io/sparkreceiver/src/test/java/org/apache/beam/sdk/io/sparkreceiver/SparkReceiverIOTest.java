@@ -21,15 +21,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.util.List;
-import org.apache.beam.runners.direct.DirectOptions;
-import org.apache.beam.runners.direct.DirectRunner;
-import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.testing.PAssert;
+import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.testing.TestPipelineOptions;
 import org.apache.beam.sdk.transforms.SerializableFunction;
+import org.apache.beam.sdk.values.PCollection;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -37,6 +37,15 @@ import org.junit.runners.JUnit4;
 /** Test class for {@link SparkReceiverIO}. */
 @RunWith(JUnit4.class)
 public class SparkReceiverIOTest {
+
+  public static final TestPipelineOptions OPTIONS =
+      TestPipeline.testingPipelineOptions().as(TestPipelineOptions.class);
+
+  static {
+    OPTIONS.setBlockOnRun(false);
+  }
+
+  @Rule public final transient TestPipeline pipeline = TestPipeline.fromOptions(OPTIONS);
 
   @Test
   public void testReadBuildsCorrectly() {
@@ -47,14 +56,12 @@ public class SparkReceiverIOTest {
 
     SparkReceiverIO.Read<String> read =
         SparkReceiverIO.<String>read()
-            .withValueClass(String.class)
             .withGetOffsetFn(offsetFn)
             .withWatermarkFn(watermarkFn)
             .withSparkReceiverBuilder(receiverBuilder);
 
     assertEquals(offsetFn, read.getGetOffsetFn());
     assertEquals(receiverBuilder, read.getSparkReceiverBuilder());
-    assertEquals(String.class, read.getValueClass());
   }
 
   @Test
@@ -77,12 +84,6 @@ public class SparkReceiverIOTest {
   }
 
   @Test
-  public void testReadObjectCreationFailsIfValueClassIsNull() {
-    assertThrows(
-        IllegalArgumentException.class, () -> SparkReceiverIO.<String>read().withValueClass(null));
-  }
-
-  @Test
   public void testReadValidationFailsMissingReceiverBuilder() {
     SparkReceiverIO.Read<String> read = SparkReceiverIO.read();
     assertThrows(IllegalStateException.class, read::validateTransform);
@@ -99,27 +100,19 @@ public class SparkReceiverIOTest {
 
   @Test
   public void testReadFromCustomReceiverWithOffset() {
-    DirectOptions options = PipelineOptionsFactory.as(DirectOptions.class);
-    options.setBlockOnRun(false);
-    options.setRunner(DirectRunner.class);
-    Pipeline p = Pipeline.create(options);
-
     ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
         new ReceiverBuilder<>(CustomReceiverWithOffset.class).withConstructorArgs();
     SparkReceiverIO.Read<String> reader =
         SparkReceiverIO.<String>read()
-            .withValueClass(String.class)
             .withGetOffsetFn(Long::valueOf)
             .withWatermarkFn(Instant::parse)
             .withSparkReceiverBuilder(receiverBuilder);
 
     List<String> storedRecords = CustomReceiverWithOffset.getStoredRecords();
-    List<String> outputRecords = TestOutputDoFn.getRecords();
-    outputRecords.clear();
 
-    p.apply(reader).setCoder(StringUtf8Coder.of()).apply(ParDo.of(new TestOutputDoFn()));
-    p.run().waitUntilFinish(Duration.standardSeconds(15));
+    PCollection<String> output = pipeline.apply(reader).setCoder(StringUtf8Coder.of());
 
-    assertEquals(outputRecords, storedRecords);
+    PAssert.that(output).containsInAnyOrder(storedRecords);
+    pipeline.run().waitUntilFinish(Duration.standardSeconds(15));
   }
 }

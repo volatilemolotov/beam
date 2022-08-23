@@ -21,7 +21,6 @@ import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import com.google.auto.value.AutoValue;
-import org.apache.beam.sdk.annotations.Experimental;
 import org.apache.beam.sdk.transforms.Impulse;
 import org.apache.beam.sdk.transforms.PTransform;
 import org.apache.beam.sdk.transforms.ParDo;
@@ -34,7 +33,39 @@ import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Streaming sources for Spark {@link Receiver}. */
+/**
+ * Streaming sources for Spark {@link Receiver}.
+ *
+ * <h3>Reading using {@link SparkReceiverIO}</h3>
+ *
+ * <p>You will need to pass a {@link ReceiverBuilder} which is responsible for instantiating new
+ * {@link Receiver} objects.
+ *
+ * <p>{@link Receiver} that will be used should implement {@link HasOffset} interface. You will need
+ * to pass {@code getOffsetFn} which is a {@link SerializableFunction} that defines how to get
+ * {@code Long offset} from {@code V record}.
+ *
+ * <p>Optionally you can pass {@code watermarkFn} which is a {@link SerializableFunction} that
+ * defines how to get {@code Instant watermark} from {@code V record}.
+ *
+ * <p>Example of {@link SparkReceiverIO#read()} usage:
+ *
+ * <pre>{@code
+ * Pipeline p = ...; // Create pipeline.
+ *
+ * // Create ReceiverBuilder for CustomReceiver
+ * ReceiverBuilder<String, CustomReceiverWithOffset> receiverBuilder =
+ *         new ReceiverBuilder<>(CustomReceiver.class).withConstructorArgs();
+ *
+ * //Read from CustomReceiver
+ * p.apply("Spark Receiver Read",
+ *  SparkReceiverIO.Read<String> reader =
+ *    SparkReceiverIO.<String>read()
+ *      .withGetOffsetFn(Long::valueOf)
+ *      .withWatermarkFn(Instant::parse)
+ *      .withSparkReceiverBuilder(receiverBuilder);
+ * }</pre>
+ */
 public class SparkReceiverIO {
 
   private static final Logger LOG = LoggerFactory.getLogger(SparkReceiverIO.class);
@@ -50,19 +81,14 @@ public class SparkReceiverIO {
 
     abstract @Nullable ReceiverBuilder<V, ? extends Receiver<V>> getSparkReceiverBuilder();
 
-    abstract @Nullable Class<V> getValueClass();
-
     abstract @Nullable SerializableFunction<V, Long> getGetOffsetFn();
 
     abstract @Nullable SerializableFunction<V, Instant> getWatermarkFn();
 
     abstract Builder<V> toBuilder();
 
-    @Experimental(Experimental.Kind.PORTABILITY)
     @AutoValue.Builder
     abstract static class Builder<V> {
-
-      abstract Builder<V> setValueClass(Class<V> valueClass);
 
       abstract Builder<V> setSparkReceiverBuilder(
           ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder);
@@ -72,11 +98,6 @@ public class SparkReceiverIO {
       abstract Builder<V> setWatermarkFn(SerializableFunction<V, Instant> watermarkFn);
 
       abstract Read<V> build();
-    }
-
-    public Read<V> withValueClass(Class<V> valueClass) {
-      checkArgument(valueClass != null, "Value class can not be null");
-      return toBuilder().setValueClass(valueClass).build();
     }
 
     /** Sets {@link ReceiverBuilder} with value and custom Spark {@link Receiver} class. */
@@ -107,7 +128,6 @@ public class SparkReceiverIO {
     public void validateTransform() {
       ReceiverBuilder<V, ? extends Receiver<V>> sparkReceiverBuilder = getSparkReceiverBuilder();
       checkStateNotNull(sparkReceiverBuilder, "withSparkReceiverBuilder() is required");
-      checkStateNotNull(getValueClass(), "withValueClass() is required");
       checkStateNotNull(getGetOffsetFn(), "withGetOffsetFn() is required");
     }
   }

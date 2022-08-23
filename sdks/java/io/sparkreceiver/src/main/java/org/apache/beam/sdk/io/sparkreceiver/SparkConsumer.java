@@ -25,7 +25,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * Interface for start/stop reading from some Spark {@link Receiver} into some place and poll from
  * it.
  */
-public interface SparkConsumer<V> extends Serializable {
+interface SparkConsumer<V> extends Serializable {
 
   boolean hasRecords();
 
