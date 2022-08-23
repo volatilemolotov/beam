@@ -203,7 +203,7 @@ func setupCache(ctx context.Context, appEnv environment.ApplicationEnvs) (cache.
 func setupExamplesCatalogFromDatastore(ctx context.Context, cacheService cache.Cache, db db.Database, sdks []*entity.SDKEntity) error {
 	catalog, err := db.GetCatalog(ctx, sdks)
 	if len(catalog) == 0 {
-		logger.Warn("Example catalog is empty")
+		logger.Warn("example catalog is empty")
 		return nil
 	}
 	if err != nil {
