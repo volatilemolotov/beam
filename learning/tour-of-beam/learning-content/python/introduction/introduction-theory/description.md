@@ -4,19 +4,9 @@ The Beam Programming Guide is intended for Beam users who want to use the Beam S
 
 For a brief introduction to Beam’s basic concepts,take a look at the Basics of the Beam model page before reading the programming guide.
 
-### Introduction
-
-Welcome to a Tour Of Beam, a learning guide you can use to get familiar with the Apache Beam.
-The tour is divided into a list of modules that contain learning units covering various Apache Beam features and principles.
-You can access list of modules by ‘’<<<’ button on the left . For each module, learning progress is displayed next to it.
-Throughout the tour, you will find list of learning materials, examples, exercises and challenges for you to complete.
-The tour is Introduction learning module contains an example that you can review in the right pane, run and see the output by clicking ‘Run’. Try to modify the example to output ‘Beam is great’.
-Each module also contains a challenge based on the material learned. Try to solve as many as you can, and if you need help, just click on the ‘Hint’ button or examine the correct solution by clicking the ‘Solution’ button.
-Now let’s start the tour with learning core Beam principles.
-
 ### Overview
 
-To use Beam, you need to first create a driver program using the classes in one of the Beam SDKs. Your driver program defines your pipeline, including all of the inputs, transforms, and outputs; it also sets execution options for your pipeline (typically passed in using command-line options). These include the Pipeline Runner, which, in turn, determines what back-end your pipeline will run on.
+To use Beam, you need to first create a driver program using the classes in one of the Beam SDKs. Your driver program then defines your pipeline, including all of the inputs, transforms, and outputs; it also sets execution options for your pipeline (typically passed by using command-line options). These include the Pipeline Runner, which, in turn, determines what back-end your pipeline will run on.
 
 The Beam SDKs provide a number of abstractions that simplify the mechanics of large-scale distributed data processing. The same Beam abstractions work with both batch and streaming data sources. When you create your Beam pipeline, you can think about your data processing task in terms of these abstractions. They include:
 
@@ -24,7 +14,7 @@ The Beam SDKs provide a number of abstractions that simplify the mechanics of la
 
 &#8594; PCollection: A PCollection represents a distributed data set that your Beam pipeline operates on. The data set can be bounded, meaning it comes from a fixed source like a file, or unbounded, meaning it comes from a continuously updating source via a subscription or other mechanism. Your pipeline typically creates an initial PCollection by reading data from an external data source, but you can also create a PCollection from in-memory data within your driver program. From there, PCollections are the inputs and outputs for each step in your pipeline.
 
-&#8594; PTransform: A PTransform represents a data processing operation, or a step, in your pipeline. Every PTransform takes one or more PCollection objects as input, performs a processing function that you provide on the elements of that PCollection, and produces zero or more output PCollection objects.
+&#8594; PTransform: A PTransform represents a data processing operation, or a step, in your pipeline. Every PTransform takes one or more PCollection objects as the input, performs a processing function that you provide on the elements of that PCollection, and produces zero or more output PCollection objects.
 
 &#8594; I/O transforms: Beam comes with a number of “IOs” - library PTransforms that read or write data to various external storage systems.
 
@@ -40,11 +30,11 @@ A typical Beam driver program works as follows:
 
 &#8594; Run the pipeline using the designated Pipeline Runner.
 
-When you run your Beam driver program, the Pipeline Runner that you designate constructs a workflow graph of your pipeline based on the PCollection objects you’ve created and transforms that you’ve applied. That graph is then executed using the appropriate distributed processing back-end, becoming an asynchronous “job” (or equivalent) on that back-end.
+When you run your Beam driver program, the Pipeline Runner that you designate constructs a workflow graph of your pipeline based on the PCollection objects that you’ve created and transforms that you’ve applied. That graph is then executed using the appropriate distributed processing back-end, becoming an asynchronous “job” (or equivalent) on that back-end.
 
 ### Creating a pipeline
 
-The `Pipeline` abstraction encapsulates all the data and steps in your data processing task. Your Beam driver program typically starts by constructing a Pipeline object, and then using that object as the basis for creating the pipeline’s data sets as PCollections and its operations as `Transforms`.
+The `Pipeline` abstraction encapsulates all the data and steps in your data processing task. Your Beam driver program typically starts by constructing a Pipeline object, and then use that object as the basis for creating the pipeline’s data sets as PCollections and its operations as `Transforms`.
 
 To use Beam, your driver program must first create an instance of the Beam SDK class Pipeline (typically in the main() function). When you create your `Pipeline`, you’ll also need to set some configuration options. You can set your pipeline’s configuration options programmatically, but it’s often easier to set the options ahead of time (or read them from the command line) and pass them to the Pipeline object when you create the object.
 
@@ -61,7 +51,7 @@ Use the pipeline options to configure different aspects of your pipeline, such a
 
 ### Setting PipelineOptions from command-line arguments
 
-While you can configure your pipeline by creating a `PipelineOptions` object and setting the fields directly, the Beam SDKs include a command-line parser that you can use to set fields in `PipelineOptions` using command-line arguments.
+While you can configure your pipeline by creating a `PipelineOptions` object and setting the fields directly, the Beam SDKs include a command-line parser that you can also use to set fields in `PipelineOptions` using command-line arguments.
 
 To read options from the command-line, construct your `PipelineOptions` object as demonstrated in the following example code:
 
@@ -71,7 +61,7 @@ from apache_beam.options.pipeline_options import PipelineOptions
 beam_options = PipelineOptions()
 ```
 
-This interprets command-line arguments that follow the format:
+This interprets command-line arguments that follow this format:
 
 ```
 --<option>=<value>
