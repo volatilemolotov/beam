@@ -1,10 +1,12 @@
 # Tour of Beam Programming Guide
 
-The Beam Programming Guide is intended for Beam users who want to use the Beam SDK to create data processing pipelines. It contains recommendations for using the Beam SDK classes to create and test a pipeline. The Programming Guide is not intended as an exhaustive reference, but as a language-independent high-level guide to the software construction of the Beam pipeline. When the programming guide is completed, the text will include code examples in several languages that will help illustrate how to implement Beam concepts in your pipelines.
+The Beam Programming Guide is intended for Beam users who want to use the Beam SDKs to create data processing pipelines. This guide provides guidance for using the Beam SDK classes to build and test pipelines. The programming guide is not intended to be an exhaustive reference, but rather a language-agnostic, high-level guide to programmatically building your Beam pipeline. As the programming guide is filled out, the text will include code samples in multiple languages to help illustrate how to implement Beam concepts in your pipelines.
+
+For a brief introduction to Beam’s basic concepts,take a look at the Basics of the Beam model page before reading the programming guide.
 
 ### Overview
 
-To use Beam, you need to first create a driver program using the classes in one of the Beam SDKs. Your driver program defines your pipeline, including all of the inputs, transforms, and outputs; it also sets execution options for your pipeline (typically passed in using command-line options). These include the Pipeline Runner, which, in turn, determines what back-end your pipeline will run on.
+To use Beam, you need to first create a driver program using the classes in one of the Beam SDKs. Your driver program defines your pipeline, including all of the inputs, transforms, and outputs; it also sets execution options for your pipeline (typically passed by using command-line options). These include the Pipeline Runner, which, in turn, determines what back-end your pipeline will run on.
 
 The Beam SDKs provide a number of abstractions that simplify the mechanics of large-scale distributed data processing. The same Beam abstractions work with both batch and streaming data sources. When you create your Beam pipeline, you can think about your data processing task in terms of these abstractions. They include:
 
@@ -121,6 +123,3 @@ MyOptions options = PipelineOptionsFactory.fromArgs(args)
                                                 .withValidation()
                                                 .as(MyOptions.class);
 ```
-
-Now your pipeline can accept `--input=value` and `--output=value` as command-line arguments.
-
