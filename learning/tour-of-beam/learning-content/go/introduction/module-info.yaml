@@ -17,6 +17,11 @@
 # under the License.
 #
 
-sdk: Java
+id: introduction
+name: Introduction
+complexity: BASIC
 content:
-  - introduction
+- introduction-guide
+- introduction-concepts
+- introduction-terms
+
