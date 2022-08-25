@@ -1,6 +1,6 @@
 ### Using Filter
 
-You can filter the dataset by criteria. It can also be used for equality based.Filter accepts a function that keeps elements that return True, and filters out the remaining elements.
+PCollection datasets can be filtered using the Filter transform. You can create a filter by supplying a predicate and, when applied, filtering out all the elements of PCollection that don’t satisfy the predicate.
 
 ```
 import apache_beam as beam
@@ -16,7 +16,7 @@ with beam.Pipeline() as p:
 
 ### Example 1: Filtering with a function
 
-We define a function is_perennial which returns True if the element’s duration equals 'perennial', and False otherwise.
+You can define a function `is_perennial()` which returns True if the element’s duration equals 'perennial', and False otherwise.
 
 ```
 import apache_beam as beam
@@ -58,7 +58,7 @@ Output
 
 ### Example 2: Filtering with a lambda function
 
-We can also use lambda functions to simplify Example 1.
+You can also use lambda functions to simplify Example 1.
 
 ```
 import apache_beam as beam

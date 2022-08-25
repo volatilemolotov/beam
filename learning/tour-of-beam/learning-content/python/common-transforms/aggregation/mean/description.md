@@ -1,6 +1,6 @@
 # Mean
 
-Transforms for computing the arithmetic mean of the elements in a collection, or the mean of the values associated with each key in a collection of key-value pairs.
+You can use Mean transforms to compute the arithmetic mean of the elements in a collection or the mean of the values associated with each key in a collection of key-value pairs.
 
 ### Mean of element in a PCollection
 

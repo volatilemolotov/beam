@@ -1,6 +1,6 @@
 # Max
 
-Provides a variety of different transforms for computing the maximum values in a collection, either globally or for each key.
+Max provides a variety of different transforms for computing the maximum values in a collection, either globally or for each key.
 
 You can find the global maximum value from the ```PCollection``` by using ```Max.doublesGlobally()```
 
@@ -15,7 +15,7 @@ Output
 10
 ```
 
-To calculate the maximum Integer associated with each unique key (which is of type String), you can use ```Max.integersPerKey()```
+You can use ```Max.integersPerKey()``` to calculate the maximum Integer associated with each unique key (which is of type String).
 
 ```
 PCollection<KV<String, Integer>> input = pipeline.apply(

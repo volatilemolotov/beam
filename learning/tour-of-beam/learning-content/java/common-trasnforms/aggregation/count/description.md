@@ -1,5 +1,7 @@
 # Count
 
+Count to get the total number of elements in different ways.
+
 Counts the number of elements within each aggregation. The Count transform has three varieties:
 
 ### Counting all elements in a PCollection

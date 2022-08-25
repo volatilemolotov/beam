@@ -1,6 +1,6 @@
 # Min
 
-Provides a variety of different transforms for computing the minimum values in a collection, either globally or for each key.
+Min transforms find the minimum values globally or for each key in the input collection.
 
 You can find the global minimum value from the ```PCollection``` by using ```Min()```
 
@@ -15,7 +15,7 @@ func ApplyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
 }
 ```
 
-To calculate the minimum of the elements associated with each unique key, you can use ```MinPerKey()```
+You can use ```MinPerKey()``` to calculate the minimum Integer associated with each unique key (which is of type String).
 
 ```
 import (

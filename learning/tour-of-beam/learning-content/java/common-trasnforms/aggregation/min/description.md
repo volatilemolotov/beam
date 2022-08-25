@@ -1,6 +1,6 @@
 # Min
 
-Provides a variety of different transforms for computing the minimum values in a collection, either globally or for each key.
+Min transforms find the minimum values globally or for each key in the input collection.
 
 You can find the global minimum value from the ```PCollection``` by using ```Min.doublesGlobally()```
 
@@ -15,7 +15,7 @@ Output
 1
 ```
 
-To calculate the minimum Integer associated with each unique key (which is of type String), you can use ```Min.integersPerKey()```
+You can use ```Min.integersPerKey()``` to calculate the minimum Integer associated with each unique key (which is of type String).
 
 ```
 PCollection<KV<String, Integer>> input = pipeline.apply(

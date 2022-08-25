@@ -1,6 +1,6 @@
 ### Using Filter
 
-You can filter the dataset by criteria. It can also be used for equality based. Filter accepts a function that keeps elements that return True, and filters out the remaining elements.
+PCollection datasets can be filtered using the Filter transform. You can create a filter by supplying a predicate and, when applied, filtering out all the elements of PCollection that don’t satisfy the predicate.
 
 ```
 PCollection<String> allStrings = pipeline
@@ -23,7 +23,7 @@ world
 
 ### Built-in filters
 
-The Java SDK has several filter methods built-in like ```Filter.greaterThan``` and ```Filter.lessThenEq```. Using this filter, input ```PCollection``` can be filtered such that only elements whose value is greater than specified remain.
+The Java SDK has several filter methods built-in, like Filter.greaterThan and Filter.lessThen.  With Filter.greaterThan, the input PCollection can be filtered so that only the elements whose values are greater than the specified amount remain. Similarly, you can use Filter.lessThen to filter out elements of the input PCollection whose values are greater than the specified amount.
 
 Other built-in filters are:
 

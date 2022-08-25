@@ -1,10 +1,10 @@
 # Min
 
-Provides a variety of different transforms for computing the minimum values in a collection, either globally or for each key.
+Min transforms find the minimum values globally or for each key in the input collection.
 
 ### Minimum element in a PCollection
 
-You use ```CombineGlobally(lambda elements: min(elements or [-1]))``` to get the minimum element from the entire ```PCollection```.
+You can use ```CombineGlobally(lambda elements: min(elements or [-1]))``` to get the minimum element from the entire ```PCollection```.
 
 ```
 import apache_beam as beam

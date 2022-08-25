@@ -1,6 +1,6 @@
 # Max
 
-Provides a variety of different transforms for computing the maximum values in a collection, either globally or for each key.
+Max provides a variety of different transforms for computing the maximum values in a collection, either globally or for each key.
 
 You can find the global maximum value from the ```PCollection``` by using ```Max()```
 
@@ -15,7 +15,7 @@ func ApplyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
 }
 ```
 
-To calculate the maximum of the elements associated with each unique key, you can use ```MaxPerKey()```
+You can use ```MaxPerKey()``` to calculate the maximum Integer associated with each unique key (which is of type String).
 
 ```
 import (

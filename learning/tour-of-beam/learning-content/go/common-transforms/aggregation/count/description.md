@@ -1,4 +1,6 @@
-### Count
+# Count
+
+Count to get the total number of elements in different ways.
 
 Counts the number of elements within each aggregation. The Count transform has two varieties:
 
@@ -15,7 +17,7 @@ func ApplyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
 }
 ```
 
-To count how many elements are associated with a particular key, you can use ```Count()``` , the result will be one output for each key
+You can use ```Count()``` to count how many elements are associated with a particular key, the result will be one output for each key.
 
 ```
 import (

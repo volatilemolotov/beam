@@ -1,10 +1,10 @@
 # Max
 
-In the following example, we create a pipeline with a PCollection. Then, we get the element with the maximum value in different ways.
-
+Max provides a variety of different transforms for computing the maximum values in a collection, either globally or for each key.
+    
 ### Maximum element in a PCollection
 
-You use ```CombineGlobally(lambda elements: max(elements or [None]))``` to get the maximum element from the entire ```PCollection```.
+You can use ```CombineGlobally(lambda elements: max(elements or [None]))``` to get the maximum element from the entire ```PCollection```.
 
 ```
 import apache_beam as beam

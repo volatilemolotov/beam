@@ -1,6 +1,6 @@
 # Sum
 
-Transforms for computing the sum of the elements in a collection, or the sum of the values associated with each key in a collection of key-value pairs.
+You can use Sum transforms to compute the sum of the elements in a collection or the sum of the values associated with each key in a collection of key-value pairs.
 
 ### Sum of the elements in a PCollection
 

@@ -1,6 +1,6 @@
 # WithKeys
 
-Takes a ```PCollection<V>``` and produces a ```PCollection<KV<K, V>>``` by associating each input element with a key.
+WithKeys takes a ```PCollection<V>``` and produces a ```PCollection<KV<K, V>>``` by associating each input element with a key.
 
 There are two versions of WithKeys, depending on how the key should be determined:
 

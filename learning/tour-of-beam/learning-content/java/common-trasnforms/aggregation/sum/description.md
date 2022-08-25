@@ -1,6 +1,6 @@
 # Sum
 
-Transforms for computing the sum of the elements in a collection, or the sum of the values associated with each key in a collection of key-value pairs.
+You can use Sum transforms to compute the sum of the elements in a collection or the sum of the values associated with each key in a collection of key-value pairs.
 
 You can find the global sum value from the ```PCollection``` by using ```Sum.doublesGlobally()```
 
@@ -15,7 +15,7 @@ Output
 55
 ```
 
-To calculate the sum Integer associated with each unique key (which is of type String), you can use ```Sum.integersPerKey()```
+You can use ```Sum.integersPerKey()```to calculate the sum Integer associated with each unique key (which is of type String).
 
 ```
 PCollection<KV<String, Integer>> input = pipeline.apply(

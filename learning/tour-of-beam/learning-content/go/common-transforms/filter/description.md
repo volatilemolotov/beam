@@ -1,7 +1,6 @@
 ### Using Filter
 
-
-You can filter the dataset by criteria. It can also be used for equality based.Filter accepts a function that keeps elements that return True, and filters out the remaining elements.
+PCollection datasets can be filtered using the Filter transform. You can create a filter by supplying a predicate and, when applied, filtering out all the elements of PCollection that don’t satisfy the predicate.
 
 ```
 import (

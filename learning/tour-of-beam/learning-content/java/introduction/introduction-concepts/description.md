@@ -23,15 +23,15 @@ To use Beam, you need to first create a driver program using the classes in one 
 
 The Beam SDKs provide a number of abstractions that simplify the mechanics of large-scale distributed data processing. The same Beam abstractions work with both batch and streaming data sources. When you create your Beam pipeline, you can think about your data processing task in terms of these abstractions. They include:
 
-&#8594; Pipeline: A Pipeline encapsulates your entire data processing task, from start to finish. This includes reading input data, transforming that data, and writing output data. All Beam driver programs must create a Pipeline. When you create the Pipeline, you must also specify the execution options that tell the Pipeline where and how to run.
+&#8594; `Pipeline`: A Pipeline encapsulates your entire data processing task, from start to finish. This includes reading input data, transforming that data, and writing output data. All Beam driver programs must create a Pipeline. When you create the Pipeline, you must also specify the execution options that tell the Pipeline where and how to run.
 
-&#8594; PCollection: A PCollection represents a distributed data set that your Beam pipeline operates on. The data set can be bounded, meaning it comes from a fixed source like a file, or unbounded, meaning it comes from a continuously updating source via a subscription or other mechanism. Your pipeline typically creates an initial PCollection by reading data from an external data source, but you can also create a PCollection from in-memory data within your driver program. From there, PCollections are the inputs and outputs for each step in your pipeline.
+&#8594; `PCollection`: A PCollection represents a distributed data set that your Beam pipeline operates on. The data set can be bounded, meaning it comes from a fixed source like a file, or unbounded, meaning it comes from a continuously updating source via a subscription or other mechanism. Your pipeline typically creates an initial PCollection by reading data from an external data source, but you can also create a PCollection from in-memory data within your driver program. From there, PCollections are the inputs and outputs for each step in your pipeline.
 
-&#8594; PTransform: A PTransform represents a data processing operation, or a step, in your pipeline. Every PTransform takes one or more PCollection objects as input, performs a processing function that you provide on the elements of that PCollection, and produces zero or more output PCollection objects.
+&#8594; `PTransform`: A PTransform represents a data processing operation, or a step, in your pipeline. Every PTransform takes one or more PCollection objects as input, performs a processing function that you provide on the elements of that PCollection, and produces zero or more output PCollection objects.
 
-&#8594; Scope: The Go SDK has an explicit scope variable used to build a Pipeline. A Pipeline can return it’s root scope with the Root() method. The scope variable is passed to PTransform functions to place them in the Pipeline that owns the Scope.
+&#8594; `Scope`: The Go SDK has an explicit scope variable used to build a Pipeline. A Pipeline can return it’s root scope with the `Root()` method. The scope variable is passed to PTransform functions to place them in the Pipeline that owns the Scope.
 
-&#8594; I/O transforms: Beam comes with a number of “IOs” - library PTransforms that read or write data to various external storage systems.
+&#8594; `I/O transforms`: Beam comes with a number of “IOs” - library PTransforms that read or write data to various external storage systems.
 
 A typical Beam driver program works as follows:
 
