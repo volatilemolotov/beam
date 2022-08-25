@@ -48,7 +48,7 @@ func setup() {
 		}
 	}
 	ctx = context.Background()
-	context.WithValue(ctx, constants.DatastoreNamespaceKey, "datastore")
+	ctx = context.WithValue(ctx, constants.DatastoreNamespaceKey, "datastore")
 	var err error
 	datastoreDb, err = New(ctx, mapper.NewPrecompiledObjectMapper(), constants.EmulatorProjectId)
 	if err != nil {
@@ -424,7 +424,8 @@ func TestDatastore_GetCatalog(t *testing.T) {
 					actualPCObj.PipelineOptions != "MOCK_OPTIONS" ||
 					actualPCObj.Description != "MOCK_DESCR" ||
 					actualPCObj.Link != "MOCK_PATH" ||
-					actualPCObj.ContextLine != 32 {
+					actualPCObj.ContextLine != 32 ||
+					actualPCObj.Complexity != pb.Complexity_MEDIUM {
 					t.Error("GetCatalog() unexpected result: wrong precompiled obj")
 				}
 				tt.cleanData()
@@ -491,7 +492,8 @@ func TestDatastore_GetDefaultExamples(t *testing.T) {
 						example.Type.String() != "PRECOMPILED_OBJECT_TYPE_EXAMPLE" ||
 						example.PipelineOptions != "MOCK_OPTIONS" ||
 						example.Description != "MOCK_DESCR" ||
-						example.Link != "MOCK_PATH" {
+						example.Link != "MOCK_PATH" ||
+						example.Complexity != pb.Complexity_MEDIUM {
 						t.Errorf("GetDefaultExamples() unexpected result: wrong precompiled obj")
 					}
 				}
@@ -554,7 +556,8 @@ func TestDatastore_GetExample(t *testing.T) {
 					example.Type.String() != "PRECOMPILED_OBJECT_TYPE_EXAMPLE" ||
 					example.Link != "MOCK_PATH" ||
 					example.PipelineOptions != "MOCK_OPTIONS" ||
-					example.CloudPath != "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MOCK_EXAMPLE" {
+					example.CloudPath != "SDK_JAVA/PRECOMPILED_OBJECT_TYPE_EXAMPLE/MOCK_EXAMPLE" ||
+					example.Complexity != pb.Complexity_MEDIUM {
 					t.Errorf("GetExample() unexpected result: wrong precompiled obj")
 				}
 				tt.clean()
@@ -788,25 +791,25 @@ func TestDatastore_DeleteUnusedSnippets(t *testing.T) {
 			args: args{ctx: ctx, dayDiff: 10},
 			prepare: func() {
 				//last visit date is now - 7 days
-				putSnippet("MOCK_ID0", "PG_USER", now.Add(-time.Hour*24*7), 2)
+				putSnippet("MOCK_ID0", constants.UserSnippetOrigin, now.Add(-time.Hour*24*7), 2)
 				//last visit date is now - 10 days
-				putSnippet("MOCK_ID1", "PG_USER", now.Add(-time.Hour*24*10), 4)
+				putSnippet("MOCK_ID1", constants.UserSnippetOrigin, now.Add(-time.Hour*24*10), 4)
 				//last visit date is now - 15 days
-				putSnippet("MOCK_ID2", "PG_USER", now.Add(-time.Hour*24*15), 8)
+				putSnippet("MOCK_ID2", constants.UserSnippetOrigin, now.Add(-time.Hour*24*15), 8)
 				//last visit date is now
-				putSnippet("MOCK_ID3", "PG_USER", now, 1)
+				putSnippet("MOCK_ID3", constants.UserSnippetOrigin, now, 1)
 				//last visit date is now + 2 days
-				putSnippet("MOCK_ID4", "PG_USER", now.Add(time.Hour*24*2), 2)
+				putSnippet("MOCK_ID4", constants.UserSnippetOrigin, now.Add(time.Hour*24*2), 2)
 				//last visit date is now + 10 days
-				putSnippet("MOCK_ID5", "PG_USER", now.Add(time.Hour*24*10), 2)
+				putSnippet("MOCK_ID5", constants.UserSnippetOrigin, now.Add(time.Hour*24*10), 2)
 				//last visit date is now - 18 days
-				putSnippet("MOCK_ID6", "PG_USER", now.Add(-time.Hour*24*18), 3)
+				putSnippet("MOCK_ID6", constants.UserSnippetOrigin, now.Add(-time.Hour*24*18), 3)
 				//last visit date is now - 18 days and origin != PG_USER
-				putSnippet("MOCK_ID7", "PG_EXAMPLES", now.Add(-time.Hour*24*18), 2)
+				putSnippet("MOCK_ID7", constants.ExampleOrigin, now.Add(-time.Hour*24*18), 2)
 				//last visit date is now - 9 days
-				putSnippet("MOCK_ID8", "PG_USER", now.Add(-time.Hour*24*9), 2)
+				putSnippet("MOCK_ID8", constants.UserSnippetOrigin, now.Add(-time.Hour*24*9), 2)
 				//last visit date is now - 11 days
-				putSnippet("MOCK_ID9", "PG_USER", now.Add(-time.Hour*24*11), 2)
+				putSnippet("MOCK_ID9", constants.UserSnippetOrigin, now.Add(-time.Hour*24*11), 2)
 			},
 			wantErr: false,
 		},
@@ -910,9 +913,9 @@ func saveExample(name, sdk string) {
 		Sdk:        utils.GetSdkKey(ctx, sdk),
 		Descr:      "MOCK_DESCR",
 		Cats:       []string{"MOCK_CATEGORY"},
-		Complexity: "MEDIUM",
+		Complexity: pb.Complexity_MEDIUM.String(),
 		Path:       "MOCK_PATH",
-		Type:       "PRECOMPILED_OBJECT_TYPE_EXAMPLE",
+		Type:       pb.PrecompiledObjectType_PRECOMPILED_OBJECT_TYPE_EXAMPLE.String(),
 		Origin:     constants.ExampleOrigin,
 		SchVer:     utils.GetSchemaVerKey(ctx, "MOCK_VERSION"),
 	})

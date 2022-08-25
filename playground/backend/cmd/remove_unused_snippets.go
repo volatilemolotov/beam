@@ -43,7 +43,8 @@ func main() {
 	}
 
 	ctx := context.Background()
-	db, err := datastore.New(ctx, mapper.NewPrecompiledObjectMapper(), projectId)
+	pcMapper := mapper.NewPrecompiledObjectMapper()
+	db, err := datastore.New(ctx, pcMapper, projectId)
 	if err != nil {
 		fmt.Printf("Couldn't create the database client, err: %s \n", err.Error())
 		return

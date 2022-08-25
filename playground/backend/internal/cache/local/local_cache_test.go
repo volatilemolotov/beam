@@ -571,7 +571,7 @@ func TestLocalCache_startGC(t *testing.T) {
 				pipelinesExpiration: tt.fields.pipelinesExpiration,
 			}
 			go lc.startGC(ctx)
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(time.Millisecond)
 			if len(tt.fields.items) != 0 {
 				t.Errorf("Pipeline: %s not deleted in time.", preparedId)
 			}

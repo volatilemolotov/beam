@@ -23,8 +23,6 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
 
-	"beam.apache.org/playground/backend/internal/tasks"
-
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
@@ -38,6 +36,7 @@ import (
 	"beam.apache.org/playground/backend/internal/db/schema/migration"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/tasks"
 	"beam.apache.org/playground/backend/internal/tests/test_data"
 )
 
@@ -94,13 +93,13 @@ func runServer() error {
 		}
 
 		entityMapper = mapper.NewDatastoreMapper(ctx, &envService.ApplicationEnvs, props)
+		cacheComponent = components.NewService(cacheService, dbClient)
 
 		// Since only router server has the scheduled task, the task creation is here
 		scheduledTasks := tasks.New(ctx)
 		if err = scheduledTasks.StartRemovingExtraSnippets(props.RemovingUnusedSnptsCron, props.RemovingUnusedSnptsDays, dbClient); err != nil {
 			return err
 		}
-		cacheComponent = components.NewService(cacheService, dbClient)
 	}
 
 	pb.RegisterPlaygroundServiceServer(grpcServer, &playgroundController{
@@ -209,7 +208,6 @@ func setupExamplesCatalogFromDatastore(ctx context.Context, cacheService cache.C
 	if err != nil {
 		return err
 	}
-	logger.Infof("Catalog length: %d", len(catalog))
 	if err = cacheService.SetCatalog(ctx, catalog); err != nil {
 		logger.Errorf("GetPrecompiledObjects(): cache error: %s", err.Error())
 	}
@@ -228,7 +226,10 @@ func setupExamplesCatalogFromDatastore(ctx context.Context, cacheService cache.C
 
 // setupDBStructure initializes the data structure
 func setupDBStructure(ctx context.Context, db db.Database, appEnv *environment.ApplicationEnvs, props *environment.Properties) error {
-	versions := []schema.Version{new(migration.InitialStructure)}
+	versions := []schema.Version{
+		new(migration.InitialStructure),
+		new(migration.AddingComplexityProperty),
+	}
 	dbSchema := schema.New(ctx, db, appEnv, props, versions)
 	actualSchemaVersion, err := dbSchema.InitiateData()
 	if err != nil {

@@ -52,8 +52,8 @@ task copyDockerfileDependencies(type: Copy) {
       into 'build/'
    }
    copy {
-       from '../../../sdks-emulator.yaml'
-       into 'build/'
+      from '../../../sdks-emulator.yaml'
+      into 'build/'
    }
 }
 
