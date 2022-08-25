@@ -17,11 +17,6 @@
 # under the License.
 #
 
-id: common-transforms
-name: Common Transforms
-complexity: BASIC
-content:
-- aggregation
-# - filter
-# - challenge
-
+id: sum
+name: Sum
+taskName: Sum

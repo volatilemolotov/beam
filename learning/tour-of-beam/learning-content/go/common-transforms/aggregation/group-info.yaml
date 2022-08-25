@@ -17,11 +17,13 @@
 # under the License.
 #
 
-id: common-transforms
-name: Common Transforms
-complexity: BASIC
+id: aggregation
+name: Aggregation
 content:
-- aggregation
-# - filter
-# - challenge
+- count
+- sum
+- mean
+- min
+- max
+
 
