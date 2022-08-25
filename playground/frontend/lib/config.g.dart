@@ -18,12 +18,12 @@
 
 const String kAnalyticsUA = 'UA-73650088-2';
 const String kApiClientURL =
-    'https://backend-router-beta-dot-apache-beam-testing.appspot.com';
+    'http://35.232.90.249:8080';
 const String kApiJavaClientURL =
-    'https://backend-java-beta-dot-apache-beam-testing.appspot.com';
+    'http://34.173.7.61:8080';
 const String kApiGoClientURL =
-    'https://backend-go-beta-dot-apache-beam-testing.appspot.com';
+    'http://34.69.121.59:8080';
 const String kApiPythonClientURL =
-    'https://backend-python-beta-dot-apache-beam-testing.appspot.com';
+    'http://34.135.119.179:8080';
 const String kApiScioClientURL =
-    'https://backend-scio-beta-dot-apache-beam-testing.appspot.com';
+    'http://34.172.61.253:8080';
