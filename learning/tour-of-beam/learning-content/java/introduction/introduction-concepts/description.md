@@ -86,10 +86,6 @@ This interprets command-line arguments that follow the format:
 
 > Appending the method .withValidation will check for required command-line arguments and validate argument values.
 
-Building your PipelineOptions this way lets you specify any of the options as a command-line argument. 
-
-> **Note**: The WordCount example pipeline demonstrates how to set pipeline options at runtime by using command-line options.
-
 ### Creating custom options
 
 You can add your own custom options in addition to the standard `PipelineOptions`.

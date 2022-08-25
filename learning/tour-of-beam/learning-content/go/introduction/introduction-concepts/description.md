@@ -82,10 +82,6 @@ This interprets command-line arguments this follow the format:
 --<option>=<value>
 ```
 
-Building your `PipelineOptions` this way allow you to specify any of the options as a command-line argument.
-
-> **Note**: The WordCount example pipeline demonstrates how to set pipeline options at runtime by using command-line options.
-
 ### Creating custom options
 
 You can add your own custom options in addition to the standard `PipelineOptions`.
