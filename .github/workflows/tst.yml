@@ -14,7 +14,7 @@ jobs:
              echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
       - name: DB Index creation
         run: |
-
-         gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
+       
+         gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} --impersonate-service-account ms1-demo-svc@playground-ms1-demo.iam.gserviceaccount.com
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
