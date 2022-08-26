@@ -2,6 +2,7 @@ name: tst
 
 on:
   workflow_dispatch:
+  push:
 jobs:
   build_playground_backend_docker_image:
     name: tst
