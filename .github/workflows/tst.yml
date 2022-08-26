@@ -1,0 +1,19 @@
+name: tst
+
+on:
+  workflow_dispatch:
+jobs:
+  build_playground_backend_docker_image:
+    name: tst
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup GCP account
+        run: |
+             echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
+      - name: DB Index creation
+        run: |
+
+         gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
