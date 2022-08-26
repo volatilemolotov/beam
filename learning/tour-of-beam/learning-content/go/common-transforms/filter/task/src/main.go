@@ -1,7 +1,6 @@
 package main
 
 import (
-	"beam.apache.org/learning/katas/common_transforms/filter/filter/pkg/task"
 	"context"
 	"github.com/apache/beam/sdks/go/pkg/beam"
 	"github.com/apache/beam/sdks/go/pkg/beam/log"

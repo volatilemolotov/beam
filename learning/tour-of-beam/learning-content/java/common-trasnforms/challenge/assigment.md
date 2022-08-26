@@ -1,0 +1,1 @@
+You are given a `PCollection` of integers. Filter out the positive numbers and set the keys to "positive" for them. Output their count by key.
