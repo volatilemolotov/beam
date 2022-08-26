@@ -21,8 +21,6 @@ ARG BASE_IMAGE=golang:1.18-bullseye
 FROM $BASE_IMAGE AS build
 
 # Setup Go Environment
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 &&\
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
@@ -31,8 +29,6 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 &&\
 COPY src /go/src/playground/backend
 
 ARG BEAM_VERSION=2.40.0
-ENV PREPARED_MOD_DIR=/opt/playground/prepared_folder/
-ENV PIPELINES_FOLDER_NAME="executable_files"
 RUN mkdir -p /opt/playground/ $PREPARED_MOD_DIR
 WORKDIR $PREPARED_MOD_DIR
 
@@ -64,12 +60,6 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Set Environment
-ENV SERVER_IP=0.0.0.0
-ENV SERVER_PORT=8080
-ENV APP_WORK_DIR=/opt/playground/backend/
-ENV BEAM_SDK="SDK_UNSPECIFIED"
-ENV SDK_CONFIG=/opt/playground/backend/sdks.yaml
-ENV PROPERTY_PATH=/opt/playground/backend/
 
 # Copy build result
 COPY --from=build /go/bin/server_go_backend /opt/playground/backend/

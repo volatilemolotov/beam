@@ -20,8 +20,6 @@ ARG GO_BASE_IMAGE=golang:1.18-bullseye
 FROM $GO_BASE_IMAGE AS build
 
 # Setup Go Environment
-ENV GOPATH /go
-ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 &&\
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
@@ -38,11 +36,6 @@ RUN go mod download &&\
     go build -o /go/bin/server_python_backend
 
 FROM $BASE_IMAGE
-ENV SERVER_IP=0.0.0.0
-ENV SERVER_PORT=8080
-ENV APP_WORK_DIR=/opt/playground/backend/
-ENV BEAM_SDK="SDK_PYTHON"
-ENV PROPERTY_PATH=/opt/playground/backend/properties.yaml
 
 # Copy build result
 COPY --from=build /go/bin/server_python_backend /opt/playground/backend/
@@ -50,7 +43,6 @@ COPY --from=build /go/src/playground/backend/configs /opt/playground/backend/con
 
 # Install Python Katas Utils
 COPY katas/log_elements.py /go/src/katas/
-ENV PYTHONPATH="$PYTHONPATH:/go/src/katas"
 
 # Install mitmpoxy
 RUN mkdir /opt/mitmproxy &&\
@@ -60,8 +52,6 @@ RUN mkdir /opt/mitmproxy &&\
     mkdir /usr/local/share/ca-certificates/extra
 COPY allow_list_proxy.py /opt/mitmproxy/
 COPY allow_list.py /opt/mitmproxy/
-ENV HTTP_PROXY="http://127.0.0.1:8081"
-ENV HTTPS_PROXY="http://127.0.0.1:8081"
 
 COPY src/properties.yaml /opt/playground/backend/properties.yaml
 COPY entrypoint.sh /
