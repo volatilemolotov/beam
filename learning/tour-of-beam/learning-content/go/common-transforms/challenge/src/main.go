@@ -1,13 +1,13 @@
 package main
 
 import (
-    "context"
+	"context"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/filter"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/stats"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/beamx"
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
-    "github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/filter"
-    "github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/stats"
 )
 
 func main() {
@@ -16,13 +16,16 @@ func main() {
 	p, s := beam.NewPipelineWithRoot()
 
 	// List of elements
-    input := beam.Create(s, -12, 4, 532, -88, -79, 0)
+	input := beam.Create(s, -12, 4, 532, -88, -79, 0, 7, 31)
 
-    // The [input] filtered with the positiveNumbersFilter()
-    filtered := positiveNumbersFilter(s, input)
+	// The [input] filtered with the positiveNumbersFilter()
+	filtered := getPositiveNumbers(s, input)
 
-    // Return numbers count with the countingNumbers()
-    count := countingNumbers(s, filtered)
+    // Returns map
+	numberMap := getMap(s, filtered)
+
+	// Returns numbers count with the countingNumbers()
+	count := getCountingNumbersByKey(s, numberMap)
 
 	debug.Print(s, count)
 
@@ -33,7 +36,8 @@ func main() {
 	}
 }
 
-// Write here positiveNumbersFilter function
+// Write here getPositiveNumbers function
 
+// Write here getMap function
 
-// Write here countingNumbers function
+// Write here getCountingNumbersByKey function

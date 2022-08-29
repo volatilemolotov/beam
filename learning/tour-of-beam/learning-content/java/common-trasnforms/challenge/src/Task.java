@@ -1,11 +1,9 @@
-import org.apache.beam.learning.katas.util.Log;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.Filter;
+import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.transforms.Count;
 
 
 public class Task {
@@ -15,21 +13,43 @@ public class Task {
 
         // List of elements
         PCollection<Integer> numbers =
-                pipeline.apply(Create.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+                pipeline.apply(Create.of(-34, -1, 26, 0, 93, -66, 53));
 
         // The [numbers] filtered with the positiveNumberFilter()
-        PCollection<Integer> filtered = positiveNumberFilter(numbers);
+        PCollection<Integer> filtered = getPositiveNumbers(numbers);
+
+        // Set key for each number
+        PCollection<KV<String,Integer>> getCollectionWithKey = setKeyForNumbers(filtered);
 
         // Return count numbers
-        PCollection<Long> count = countNumbers(filtered);
+        PCollection<KV<String,Long>> countPerKey = getCountPerKey(getCollectionWithKey);
 
-        count.apply(Log.ofElements());
+        output(countPerKey);
 
         pipeline.run();
     }
 
+    // Write a method that returns positive numbers
+    // static PCollection<Integer> getPositiveNumbers(PCollection<Integer> input) {
+    //
+    // }
 
-    // Write here positiveNumbersFilter function
+    // Returns a map with a key that will not be odd or even , and the value will be the number itself at the input
+    // static PCollection<KV<String, Integer>> setKeyForNumbers(PCollection<Integer> input) {
+    //
+    // }
 
-    // Write here countingNumbers function
+    // Returns the count of numbers
+    // static PCollection<KV<String,Long>> getCountPerKey(PCollection<KV<String, Integer>> input) {
+    //
+    // }
+
+    static <T> void output(PCollection<T> pCollection) {
+        pCollection.apply(ParDo.of(new DoFn<T, T>() {
+            @ProcessElement
+            public void processElement(ProcessContext c) {
+                System.out.println(c.element());
+            }
+        }));
+    }
 }

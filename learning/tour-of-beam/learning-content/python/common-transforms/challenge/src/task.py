@@ -1,6 +1,14 @@
 import apache_beam as beam
 
-from log_elements import LogElements
+# Output PCollection
+class Output(beam.PTransform):
+    class _OutputFn(beam.DoFn):
+
+        def process(self, element):
+            print(element)
+
+    def expand(self, input):
+        input | beam.ParDo(self._OutputFn())
 
 with beam.Pipeline() as p:
     # List of elements
@@ -11,5 +19,5 @@ with beam.Pipeline() as p:
 
     # Return count for each key
 
-     | LogElements())
+     | Output())
 
