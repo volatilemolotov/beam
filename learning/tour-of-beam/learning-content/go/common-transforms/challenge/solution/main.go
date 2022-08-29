@@ -19,10 +19,10 @@ func main() {
     input := beam.Create(s, -12, 4, 532, -88, -79, 0)
 
     // The [input] filtered with the positiveNumbersFilter()
-    filtered := positiveNumbersFilter(s, input)
+    filtered := getPositiveNumbers(s, input)
 
     // Return numbers count with the countingNumbers()
-    count := countingNumbers(s, filtered)
+    count := getCountingNumbersByKey(s, filtered)
 
 	debug.Print(s, count)
 
@@ -34,13 +34,20 @@ func main() {
 }
 
 // Return positive numbers
-func positiveNumbersFilter(s beam.Scope, input beam.PCollection) beam.PCollection {
+func getPositiveNumbers(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return filter.Exclude(s, input, func(element int) bool {
 		return element >= 0
 	})
 }
 
+// Set key for each number
+type ComputeWordLengthFn struct{}
+
+func (fn *ComputeWordLengthFn) ProcessElement(word string, emit func(int)) {
+	emit(len(word))
+}
+
 // Return the count of numbers
-func countingNumbers(s beam.Scope, input beam.PCollection) beam.PCollection {
+func getCountingNumbersByKey(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return stats.CountElms(s, input)
 }

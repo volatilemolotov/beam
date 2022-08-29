@@ -1,1 +1,1 @@
-You are given a `PCollection` of integers. Filter out the positive numbers and set the keys to "positive" for them. Output their count by key.
+You are given a `PCollection` of integers. Filter out the positive numbers. Set the "odd" key for odd numbers and the "even" key for even numbers. Output their count by key.
