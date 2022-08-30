@@ -17,7 +17,7 @@
  */
 
  // beam-playground:
-//   name: WordCount
+//   name: HelloBeam
 //   description: Hello Beam example.
 //   multifile: false
 //   context_line: 32

@@ -17,6 +17,13 @@
 # under the License.
 #
 
-id: concepts
-name: Beam Concepts
-taskName: HelloBeam
+id: common-transforms
+name: Common Transforms
+complexity: BASIC
+content:
+- filter
+- aggregation
+- with-keys
+- challenge
+
+
