@@ -15,8 +15,8 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: HelloBeam
-#   description: Hello Beam example.
+#   name: Mean
+#   description: Mean example.
 #   multifile: false
 #   context_line: 23
 
@@ -25,6 +25,8 @@ import apache_beam as beam
 from log_elements import LogElements
 
 with beam.Pipeline() as p:
-    (p | beam.Create(['Hello Beam'])
-    | LogElements())
 
+    (p | beam.Create(range(1, 11))
+    # beam.combiners.Mean.Globally() to return the mean of numbers from `PCollection`.
+     | beam.combiners.Mean.Globally()
+     | LogElements())

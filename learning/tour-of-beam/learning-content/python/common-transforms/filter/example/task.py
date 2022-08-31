@@ -15,8 +15,8 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: HelloBeam
-#   description: Hello Beam example.
+#   name: Filter
+#   description: Filter Transform example.
 #   multifile: false
 #   context_line: 23
 
@@ -25,6 +25,10 @@ import apache_beam as beam
 from log_elements import LogElements
 
 with beam.Pipeline() as p:
-    (p | beam.Create(['Hello Beam'])
-    | LogElements())
+
+    # List of elements
+    (p | beam.Create(range(1, 11))
+    # The elements filtered with the beam.Filter()
+     | beam.Filter(lambda num: num % 2 == 0)
+     | LogElements())
 

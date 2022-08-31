@@ -16,17 +16,18 @@
  * limitations under the License.
  */
 
- // beam-playground:
-//   name: HelloBeam
-//   description: Hello Beam example.
+// beam-playground:
+//   name: Max
+//   description: Max example.
 //   multifile: false
-//   context_line: 32
+//   context_line: 33
 
 import org.apache.beam.learning.katas.util.Log;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.Max;
 import org.apache.beam.sdk.values.PCollection;
 
 public class Task {
@@ -35,14 +36,19 @@ public class Task {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
         Pipeline pipeline = Pipeline.create(options);
 
-        PCollection<String> output = setupPipeline(pipeline);
+        // List of elements
+        PCollection<Integer> numbers = pipeline.apply(Create.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+
+        // The applyTransform() converts [numbers] to [output]
+        PCollection<Integer> output = applyTransform(numbers);
 
         output.apply(Log.ofElements());
 
         pipeline.run();
     }
 
-    static PCollection<String> setupPipeline(Pipeline pipeline) {
-        return pipeline.apply(Create.of("Hello Beam"));
+    // Max.integersGlobally() to return the globally maximum from `PCollection`
+    static PCollection<Integer> applyTransform(PCollection<Integer> input) {
+        return input.apply(Max.integersGlobally());
     }
 }

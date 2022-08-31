@@ -17,6 +17,13 @@
 # under the License.
 #
 
-id: concepts
-name: Beam Concepts
-taskName: HelloBeam
+id: aggregation
+name: Aggregation
+content:
+- count
+- sum
+- mean
+- min
+- max
+
+

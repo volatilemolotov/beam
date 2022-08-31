@@ -17,6 +17,6 @@
 # under the License.
 #
 
-id: concepts
-name: Beam Concepts
-taskName: HelloBeam
+id: mean
+name: Mean
+taskName: Mean

@@ -21,7 +21,8 @@ id: common-transforms
 name: Common Transforms
 complexity: BASIC
 content:
+- filter
 - aggregation
-# - filter
-# - challenge
+- challenge
+
 
