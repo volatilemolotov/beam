@@ -63,3 +63,7 @@ In your processing method, you’ll also need to meet some immutability requirem
 
 &#8594; You should not in any way modify the element argument provided to the process method, or any side inputs.
 &#8594; Once you output a value using yield or return, you should not modify that value in any way.
+
+### Description for example
+
+There are `PCollection` elements at the input. the `applyTransform()` function will return the elements multiplied by 10.

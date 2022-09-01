@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
- // beam-playground:
+// beam-playground:
 //   name: HelloBeam
 //   description: Hello Beam example.
 //   multifile: false

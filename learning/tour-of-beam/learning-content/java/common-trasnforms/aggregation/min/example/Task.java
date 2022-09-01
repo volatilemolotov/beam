@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
- // beam-playground:
-//   name: Min
+// beam-playground:
+//   name: min
 //   description: Min example.
 //   multifile: false
 //   context_line: 33

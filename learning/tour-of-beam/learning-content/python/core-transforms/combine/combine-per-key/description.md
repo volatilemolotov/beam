@@ -22,3 +22,7 @@ avg_accuracy_per_player = (
     player_accuracies
     | beam.CombinePerKey(beam.combiners.MeanCombineFn()))
 ```
+
+### Description for example
+
+At the input we have 3 keys with different values, `CombinePerKey` creates a combination of sums, sums up all the values.

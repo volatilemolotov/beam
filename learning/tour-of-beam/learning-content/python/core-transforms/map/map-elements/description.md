@@ -26,3 +26,7 @@ words = ...
 
 word_lengths = words | beam.Map(len)
 ```
+
+### Description for example 
+
+At the input, the `PCollection` elements are in the form of numbers. The `beam.Map()` returns elements multiplied by 5.

@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // beam-playground:
-//   name: Filter
+//   name: filter
 //   description: Filter example.
 //   multifile: false
 //   context_line: 33

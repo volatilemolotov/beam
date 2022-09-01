@@ -17,7 +17,7 @@
  */
 
  // beam-playground:
-//   name: Count
+//   name: count
 //   description: Count example.
 //   multifile: false
 //   context_line: 33

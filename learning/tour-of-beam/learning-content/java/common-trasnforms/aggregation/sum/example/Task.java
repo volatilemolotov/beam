@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
- // beam-playground:
-//   name: Sum
+// beam-playground:
+//   name: sum
 //   description: Sum example.
 //   multifile: false
 //   context_line: 33

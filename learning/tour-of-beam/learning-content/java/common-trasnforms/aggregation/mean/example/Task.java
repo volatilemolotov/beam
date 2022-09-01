@@ -17,7 +17,7 @@
  */
 
  // beam-playground:
-//   name: Mean
+//   name: mean
 //   description: Mean example.
 //   multifile: false
 //   context_line: 33

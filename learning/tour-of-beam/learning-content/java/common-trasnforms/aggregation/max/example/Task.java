@@ -17,7 +17,7 @@
  */
 
 // beam-playground:
-//   name: Max
+//   name: max
 //   description: Max example.
 //   multifile: false
 //   context_line: 33

@@ -52,3 +52,7 @@ Output
 ('🍆', 1)
 ('🍅', 3)
 ```
+
+### Description for example
+
+Created a list of integers ```PCollection```. The ```beam.combiners.Top.Smallest(5)``` to return the small number than [5] from `PCollection`.

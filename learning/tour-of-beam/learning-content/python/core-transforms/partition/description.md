@@ -21,3 +21,7 @@ by_decile = students | beam.Partition(partition_fn, 10)
 
 fortieth_percentile = by_decile[4]
 ```
+
+### Description for example
+
+The input is integers. Save numbers that are larger than one `PCollection` array, if smaller in another `PCollection` array.

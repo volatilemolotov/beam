@@ -84,3 +84,7 @@ Output
 ('🍅', 3)
 ('🌽', 1)
 ```
+
+### Description for example
+
+Created a list of integers ```PCollection```. The ```beam.combiners.Count.Globally()``` function return count of numbers from ```PCollection```.

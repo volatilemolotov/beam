@@ -48,3 +48,7 @@ If you do apply ```GroupByKey``` or ```CoGroupByKey``` to a group of unbounded `
 When using ```GroupByKey``` or ```CoGroupByKey``` to group PCollections that have a windowing strategy applied, all of the ```PCollections``` you want to group must use the same windowing strategy and window sizing. For example, all of the collections you are merging must use (hypothetically) identical 5-minute fixed windows, or 4-minute sliding windows starting every 30 seconds.
 
 If your pipeline attempts to use ```GroupByKey``` or ```CoGroupByKey``` to merge ```PCollections``` with incompatible windows, Beam generates an IllegalStateException error at pipeline construction time.
+
+### Description for example 
+
+A list of strings is provided. The `applyTransform()` method implements grouping by the first letter of words, which will be a list of words.

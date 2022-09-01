@@ -20,9 +20,7 @@
 id: map
 name: Map
 content:
-  - flat-map-elements
   - group-by-key
-  - map-elements
   - pardo-one-to-many
   - pardo-one-to-one
 

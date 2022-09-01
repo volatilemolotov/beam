@@ -15,10 +15,10 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: Filter
+#   name: filter
 #   description: Filter Transform example.
 #   multifile: false
-#   context_line: 23
+#   context_line: 27
 
 import apache_beam as beam
 

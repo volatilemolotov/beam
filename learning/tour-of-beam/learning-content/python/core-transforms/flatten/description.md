@@ -23,3 +23,6 @@ When using `Flatten` to merge `PCollection` objects that have a windowing strate
 
 If your pipeline attempts to use `Flatten` to merge `PCollection` objects with incompatible windows, Beam generates an `IllegalStateException` error when your pipeline is constructed.
 
+### Description for example 
+
+There are 2 string `PCollection`s at the input, one with words starting with "a" and the other with "b". Since the data type is the same using flatten you can get a combined `PCollection`.

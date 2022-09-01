@@ -80,3 +80,7 @@ Output
 ('🍆', 1.0)
 ('🍅', 4.0)
 ```
+
+### Description for example
+
+Created a list of integers ```PCollection```. The ```beam.combiners.Mean.Globally()``` to return the mean of numbers from `PCollection`.

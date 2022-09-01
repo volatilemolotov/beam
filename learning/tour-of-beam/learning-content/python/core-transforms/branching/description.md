@@ -102,3 +102,6 @@ mixedCollection.get(startsWithBTag).apply(...);
 
 You can use either mechanism to produce multiple output `PCollection`s. However, using additional outputs makes more sense if the transform’s computation per element is time-consuming.
 
+### Description for example 
+
+You can use the data in various transformations, since they do not change the original data. At the input of integers, you can create two "PCollection" based on them, one of which is a multiple of 5, the second is a multiple of 10.

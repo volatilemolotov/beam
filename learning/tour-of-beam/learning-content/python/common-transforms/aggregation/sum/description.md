@@ -51,3 +51,7 @@ Output
 ('🍆', 1)
 ('🍅', 12)
 ```
+
+### Description for example
+
+Created a list of integers ```PCollection```. The ```beam.CombineGlobally(sum)``` to return the sum of numbers from `PCollection`.

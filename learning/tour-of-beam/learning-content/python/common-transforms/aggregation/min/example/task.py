@@ -15,10 +15,10 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: Min
+#   name: min
 #   description: Min example.
 #   multifile: false
-#   context_line: 23
+#   context_line: 27
 
 import apache_beam as beam
 

@@ -15,10 +15,10 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: Sum
+#   name: sum
 #   description: Sum example.
 #   multifile: false
-#   context_line: 23
+#   context_line: 27
 
 import apache_beam as beam
 

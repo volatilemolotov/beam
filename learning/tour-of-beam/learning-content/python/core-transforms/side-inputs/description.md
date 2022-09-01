@@ -51,7 +51,7 @@ class FilterUsingLength(beam.DoFn):
 
 small_words = words | beam.ParDo(FilterUsingLength(), 0, 3)
 
-...
+
 ```
 
 ### Side inputs and windowing
@@ -66,3 +66,6 @@ If the main input element exists in more than one window, then `processElement` 
 
 If the side input has multiple trigger firings, Beam uses the value from the latest trigger firing. This is particularly useful if you use a side input with a single global window and specify a trigger.
 
+### Description for example 
+
+At the entrance we have a map whose key is the city of the country value. And we also have a `Person` structure with his name and city. We can compare cities and embed countries in Person.
