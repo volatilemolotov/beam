@@ -2,7 +2,7 @@
 
 While `beam.ParDo` always produces an output `PCollection`, your DoFn can produce any number of additional output `PCollection`s, or even none at all. If you choose to have multiple outputs, your `DoFn` needs to be called with the `ParDo` function that matches the number of outputs. `beam.ParDo2` for two output `PCollection`s, `beam.ParDo3` for three and so on until `beam.ParDo7`. If you need more, you can use `beam.ParDoN` which will return a `[]beam.PCollection`.
 
-    ### Tags for multiple outputs
+### Tags for multiple outputs
 
 The Go SDK doesn’t use output tags, and instead uses positional ordering for multiple output `PCollection`s.
 
