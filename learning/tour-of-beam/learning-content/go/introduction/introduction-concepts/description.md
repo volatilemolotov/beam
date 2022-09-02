@@ -104,4 +104,78 @@ var (
 	output = flag.String("output", "gs://my-bucket/output", "Output for the pipeline")
 )
 ```
- 
+
+### Creating PCollection
+
+Now that you know how to create a Beam pipeline and pass parameters into it, it is time to learn how to create an initial `PCollection` and fill it with data.
+
+There are several options on how to do that:
+
+&#8594; You can create a PCollection of data stored in an in-memory collection class in your driver program.
+
+&#8594; You can also read the data from a variety of external sources such as local and cloud-based files, databases, or other sources using Beam-provided I/O adapters
+
+Through the tour, most of the examples use either `PCollection` created from in-memory data or data read from one of the cloud buckets: beam-examples, dataflow-samples. These buckets contain sample data sets specifically created for educational purposes.
+
+We encourage you to take a look, explore these data sets and use them while learning Apache Beam.
+
+### Creating a PCollection from in-memory data
+
+You can use the Beam-provided Create transform to create a `PCollection` from an in-memory Go Collection. You can apply Create transform directly to your Pipeline object itself.
+
+The following example code shows how to do this:
+
+```
+func main() {
+	ctx := context.Background()
+    
+    // First create pipline
+	p, s := beam.NewPipelineWithRoot()
+
+    //Now create the PCollection using list of strings
+	numbers := beam.Create(s, "To", "be", "or", "not", "to", "be","that", "is", "the", "question")
+    
+    //Create a numerical PCollection
+	numbers := beam.Create(s, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+   
+}
+```
+
+You can find the complete code of this example in the playground window you can run and experiment with.
+
+One of the differences you will notice is that it also contains the part to output `PCollection` elements to the console. Don’t worry if you don’t quite understand it, as the concept of `ParDo` transform will be explained later in the course. Feel free, however, to use it in exercises and challenges to explore results.
+
+Do you also notice in what order elements of PCollection appear in the console? Why is that? You can also run the example several times to see if the output stays the same or changes.
+
+### Reading from text file
+
+You use one of the Beam-provided I/O adapters to read from an external source. The adapters vary in their exact usage, but all of them read from some external data source and return a `PCollection` whose elements represent the data records in that source.
+
+Each data source adapter has a Read transform; to read, you must apply that transform to the Pipeline object itself.
+
+`TextIO.Read` , for example, reads from an external text file and returns a `PCollection` whose elements are of type String. Each String represents one line from the text file. Here’s how you would apply `TextIO.Read` to your Pipeline to create a `PCollection`:
+
+```
+func main() {
+	ctx := context.Background()
+    
+    // First create pipline
+	p, s := beam.NewPipelineWithRoot()
+
+    // Now create the PCollection by reading text files. Separate elements will be added for each line in the input file 
+    lines :=  textio.Read(scope, 'gs://some/inputData.txt')
+    
+}
+```
+
+In the playground window, you can find an example that reads a king lear poem from the text file stored in the Google Storage bucket and fills PCollection with individual lines and then with individual words. Try it out and see what the output is.
+
+One of the differences you will see is that the output is much shorter than the input file itself. This is because the number of elements in the output `PCollection` is limited with the `Sample.fixedSizeGlobally` transform. Use Sample.fixedSizeGlobally transform of is another technique you can use to troubleshoot and limit the output sent to the console for debugging purposes in case of large input datasets.
+
+### Read from csv file
+
+Data processing pipelines often work with tabular data. In many examples and challenges throughout the course, you’ll be working with one of the datasets stored as csv files in either beam-examples, dataflow-samples buckets.
+
+Loading data from csv file requires some processing and consists of two main part:
+* Loading text lines using `TextIO.Read` transform
+* Parsing lines of text into tabular format 
