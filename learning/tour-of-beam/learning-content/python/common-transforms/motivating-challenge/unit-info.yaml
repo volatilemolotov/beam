@@ -17,13 +17,7 @@
 # under the License.
 #
 
-id: common-transforms
-name: Common Transforms
-complexity: BASIC
-content:
-- aggregation
-- filter
-- with-keys
-- motivating-challenge
-
-
+id: motivating-challenge
+name: Motivating Challenge for Common Transforms unit
+taskName: CommonTransformsChallenge
+solutionName: CommonTransformsSolution
