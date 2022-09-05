@@ -18,11 +18,27 @@
 #   name: group-by-key
 #   description: GroupByKey example.
 #   multifile: false
-#   context_line: 27
+#   context_line: 43
 
 import apache_beam as beam
 
-from log_elements import LogElements
+# Output PCollection
+class Output(beam.PTransform):
+    class _OutputFn(beam.DoFn):
+        def __init__(self, prefix=''):
+            super().__init__()
+            self.prefix = prefix
+
+        def process(self, element):
+            print(self.prefix+str(element))
+
+    def __init__(self, label=None,prefix=''):
+        super().__init__(label)
+        self.prefix = prefix
+
+    def expand(self, input):
+        input | beam.ParDo(self._OutputFn(self.prefix))
+
 
 with beam.Pipeline() as p:
 
@@ -30,4 +46,4 @@ with beam.Pipeline() as p:
     # Returns a map which key will be the first letter, and the values are a list of words
      | beam.Map(lambda word: (word[0], word))
      | beam.GroupByKey()
-     | LogElements())
+     | Output())

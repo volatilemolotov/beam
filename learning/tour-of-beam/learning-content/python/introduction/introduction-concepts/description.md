@@ -141,12 +141,10 @@ The following example code shows how to do this:
 with beam.Pipeline() as p:
 
     # Create a numerical PCollection
-    (p | beam.Create(range(1, 11))
-     | LogElements())
+    (p | beam.Create(range(1, 11)))
      
      # Now create the PCollection using list of strings
-    (p | beam.Create(['To', 'be', 'or', 'not', 'to', 'be', 'that', 'is', 'the', 'question'])
-     | LogElements())
+    (p | beam.Create(['To', 'be', 'or', 'not', 'to', 'be', 'that', 'is', 'the', 'question']))
 
 ```
 

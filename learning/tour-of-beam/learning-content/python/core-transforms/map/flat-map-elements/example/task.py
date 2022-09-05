@@ -18,15 +18,31 @@
 #   name: flat-map-elements
 #   description: FlatMap elements example.
 #   multifile: false
-#   context_line: 27
+#   context_line: 43
 
 import apache_beam as beam
 
-from log_elements import LogElements
+# Output PCollection
+class Output(beam.PTransform):
+    class _OutputFn(beam.DoFn):
+        def __init__(self, prefix=''):
+            super().__init__()
+            self.prefix = prefix
+
+        def process(self, element):
+            print(self.prefix+str(element))
+
+    def __init__(self, label=None,prefix=''):
+        super().__init__(label)
+        self.prefix = prefix
+
+    def expand(self, input):
+        input | beam.ParDo(self._OutputFn(self.prefix))
+
 
 with beam.Pipeline() as p:
 
     (p | beam.Create(['Apache Beam', 'Unified Batch and Streaming'])
     # Lambda function that returns a list of words from a sentence
      | beam.FlatMap(lambda sentence: sentence.split())
-     | LogElements())
+     | Output())

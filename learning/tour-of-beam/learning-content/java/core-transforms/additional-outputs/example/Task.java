@@ -17,21 +17,22 @@
 //   name: additional-outputs
 //   description: Additional outputs example.
 //   multifile: false
-//   context_line: 34
+//   context_line: 33
 
-import org.apache.beam.learning.katas.util.Log;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.TupleTag;
 import org.apache.beam.sdk.values.TupleTagList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Task {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
@@ -46,8 +47,13 @@ public class Task {
         // The applyTransform() converts [numbers] to [outputTuple]
         PCollectionTuple outputTuple = applyTransform(numbers, numBelow100Tag, numAbove100Tag);
 
-        outputTuple.get(numBelow100Tag).apply(Log.ofElements("Number <= 100: "));
-        outputTuple.get(numAbove100Tag).apply(Log.ofElements("Number > 100: "));
+        print("Number <= 100: ", outputTuple.get(numBelow100Tag));
+        print("Number > 100: ", outputTuple.get(numAbove100Tag));
+
+        numBelow100Tag.apply("Log Number <= 100: ", ParDo.of(new LogOutput<Integer>("Number <= 100: ")));
+
+        numAbove100Tag.apply("Log Number > 100: ", ParDo.of(new LogOutput<Integer>("Number > 100: ")));
+
 
         pipeline.run();
     }
@@ -73,4 +79,20 @@ public class Task {
         }).withOutputTags(numBelow100Tag, TupleTagList.of(numAbove100Tag)));
     }
 
+    static class LogOutput<T> extends DoFn<T, T> {
+        private String prefix;
+
+        LogOutput() {
+            this.prefix = "Processing element";
+        }
+
+        LogOutput(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @ProcessElement
+        public void processElement(ProcessContext c) throws Exception {
+            LOG.info(prefix + ": {}", c.element());
+        }
+    }
 }

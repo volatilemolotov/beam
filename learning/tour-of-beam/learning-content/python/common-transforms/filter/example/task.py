@@ -18,17 +18,32 @@
 #   name: filter
 #   description: Filter Transform example.
 #   multifile: false
-#   context_line: 27
+#   context_line: 42
 
 import apache_beam as beam
 
-from log_elements import LogElements
+# Output PCollection
+class Output(beam.PTransform):
+    class _OutputFn(beam.DoFn):
+        def __init__(self, prefix=''):
+            super().__init__()
+            self.prefix = prefix
+
+        def process(self, element):
+            print(self.prefix+str(element))
+
+    def __init__(self, label=None,prefix=''):
+        super().__init__(label)
+        self.prefix = prefix
+
+    def expand(self, input):
+        input | beam.ParDo(self._OutputFn(self.prefix))
 
 with beam.Pipeline() as p:
 
-    # List of elements
-    (p | beam.Create(range(1, 11))
-    # The elements filtered with the beam.Filter()
-     | beam.Filter(lambda num: num % 2 == 0)
-     | LogElements())
+  # List of elements
+  (p | beam.Create(range(1, 11))
+  # The elements filtered with the beam.Filter()
+   | beam.Filter(lambda num: num % 2 == 0)
+   | Output())
 

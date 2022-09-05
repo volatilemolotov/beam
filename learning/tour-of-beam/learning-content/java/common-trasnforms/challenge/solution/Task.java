@@ -4,9 +4,13 @@ import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Task {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
         Pipeline pipeline = Pipeline.create(options);
@@ -24,7 +28,7 @@ public class Task {
         // Return count numbers
         PCollection<KV<String,Long>> countPerKey = getCountPerKey(getCollectionWithKey);
 
-        output(countPerKey);
+        countPerKey.apply("Log", ParDo.of(new LogOutput<KV<String,Long>>()));
 
         pipeline.run();
     }
@@ -52,12 +56,20 @@ public class Task {
         return input.apply(Count.perKey());
     }
 
-    static <T> void output(PCollection<T> pCollection) {
-        pCollection.apply(ParDo.of(new DoFn<T, T>() {
-            @ProcessElement
-            public void processElement(ProcessContext c) {
-                System.out.println(c.element());
-            }
-        }));
+    static class LogOutput<T> extends DoFn<T, T> {
+        private String prefix;
+
+        LogOutput() {
+            this.prefix = "Processing element";
+        }
+
+        LogOutput(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @ProcessElement
+        public void processElement(ProcessContext c) throws Exception {
+            LOG.info(prefix + ": {}", c.element());
+        }
     }
 }

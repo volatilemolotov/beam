@@ -17,19 +17,22 @@
 //   name: branching
 //   description: Branching example.
 //   multifile: false
-//   context_line: 32
+//   context_line: 34
 
 import static org.apache.beam.sdk.values.TypeDescriptors.integers;
 
-import org.apache.beam.learning.katas.util.Log;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.transforms.*;
 import org.apache.beam.sdk.values.PCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Task {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
@@ -45,8 +48,8 @@ public class Task {
         // The applyMultiply10Transform() converts [numbers] to [mult10Results]
         PCollection<Integer> mult10Results = applyMultiply10Transform(numbers);
 
-        mult5Results.apply("Log multiply 5", Log.ofElements("Multiplied by 5: "));
-        mult10Results.apply("Log multiply 10", Log.ofElements("Multiplied by 10: "));
+        mult5Results.apply("Log multiplied by 5: ", ParDo.of(new LogOutput<Integer>("Multiplied by 5: ")));
+        mult10Results.apply("Log multiplied by 10: ", ParDo.of(new LogOutput<Integer>("Multiplied by 10: ")));
 
         pipeline.run();
     }
@@ -61,4 +64,21 @@ public class Task {
         return input.apply("Multiply by 10", MapElements.into(integers()).via(num -> num * 10));
     }
 
+    static class LogOutput<T> extends DoFn<T, T> {
+
+        private String prefix;
+
+        LogOutput() {
+            this.prefix = "Processing element";
+        }
+
+        LogOutput(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @ProcessElement
+        public void processElement(ProcessContext c) throws Exception {
+            LOG.info(prefix + ": {}", c.element());
+        }
+    }
 }

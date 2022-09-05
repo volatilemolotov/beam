@@ -18,11 +18,27 @@
 #   name: combine-per-key
 #   description: CombinePerKey example.
 #   multifile: false
-#   context_line: 27
+#   context_line: 48
 
 import apache_beam as beam
 
-from log_elements import LogElements
+# Output PCollection
+class Output(beam.PTransform):
+    class _OutputFn(beam.DoFn):
+        def __init__(self, prefix=''):
+            super().__init__()
+            self.prefix = prefix
+
+        def process(self, element):
+            print(self.prefix+str(element))
+
+    def __init__(self, label=None,prefix=''):
+        super().__init__(label)
+        self.prefix = prefix
+
+    def expand(self, input):
+        input | beam.ParDo(self._OutputFn(self.prefix))
+
 
 # Players as keys for combinations
 PLAYER_1 = 'Player 1'
@@ -36,4 +52,4 @@ with beam.Pipeline() as p:
                       (PLAYER_3, 25), (PLAYER_2, 75)])
     # There is a summation of the value for each key using a combination
      | beam.CombinePerKey(sum)
-     | LogElements())
+     | Output())

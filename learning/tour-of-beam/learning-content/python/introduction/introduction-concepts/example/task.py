@@ -18,13 +18,21 @@
 #   name: HelloBeam
 #   description: Hello Beam example.
 #   multifile: false
-#   context_line: 23
+#   context_line: 35
 
 import apache_beam as beam
 
-from log_elements import LogElements
+# Output PCollection
+class Output(beam.PTransform):
+    class _OutputFn(beam.DoFn):
+
+        def process(self, element):
+            print(element)
+
+    def expand(self, input):
+        input | beam.ParDo(self._OutputFn())
 
 with beam.Pipeline() as p:
-    (p | beam.Create(['Hello Beam'])
-    | LogElements())
+  (p | beam.Create(['Hello Beam'])
+   | Output())
 

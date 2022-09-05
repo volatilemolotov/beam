@@ -17,17 +17,16 @@
 //   name: side-inputs
 //   description: Side-inputs example.
 //   multifile: false
-//   context_line: 37
+//   context_line: 36
 
 package main
 
 import (
-	"beam.apache.org/learning/katas/core_transforms/side_input/side_input/pkg/task"
 	"context"
-	"github.com/apache/beam/sdks/go/pkg/beam"
-	"github.com/apache/beam/sdks/go/pkg/beam/log"
-	"github.com/apache/beam/sdks/go/pkg/beam/x/beamx"
-	"github.com/apache/beam/sdks/go/pkg/beam/x/debug"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/beamx"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
 )
 
 type Person struct {
@@ -49,11 +48,11 @@ func main() {
 	}, beam.Impulse(s))
 
 	persons := beam.Create(s,
-		task.Person{Name: "Henry", City: "Singapore"},
-		task.Person{Name: "Jane", City: "San Francisco"},
-		task.Person{Name: "Lee", City: "Beijing"},
-		task.Person{Name: "John", City: "Sydney"},
-		task.Person{Name: "Alfred", City: "London"},
+		Person{Name: "Henry", City: "Singapore"},
+		Person{Name: "Jane", City: "San Francisco"},
+		Person{Name: "Lee", City: "Beijing"},
+		Person{Name: "John", City: "Sydney"},
+		Person{Name: "Alfred", City: "London"},
 	)
 
     // The applyTransform() converts [input] to [output]

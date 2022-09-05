@@ -22,13 +22,12 @@
 package main
 
 import (
-	"beam.apache.org/learning/katas/core_transforms/composite/composite/pkg/common"
-	"beam.apache.org/learning/katas/core_transforms/composite/composite/pkg/task"
 	"context"
-	"github.com/apache/beam/sdks/go/pkg/beam"
-	"github.com/apache/beam/sdks/go/pkg/beam/log"
-	"github.com/apache/beam/sdks/go/pkg/beam/x/beamx"
-	"github.com/apache/beam/sdks/go/pkg/beam/x/debug"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/beamx"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/stats"
 )
 
 func main() {
@@ -71,7 +70,7 @@ func extractNonSpaceCharacters(s beam.Scope, input beam.PCollection) beam.PColle
 }
 
 // Function for create list of elements
-func CreateLines(s beam.Scope) beam.PCollection {
+func createLines(s beam.Scope) beam.PCollection {
 	return beam.Create(s,
 		"Apache Beam is an open source unified programming model",
 		"to define and execute data processing pipelines")

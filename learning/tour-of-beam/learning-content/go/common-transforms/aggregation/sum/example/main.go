@@ -23,11 +23,11 @@ package main
 
 import (
 	"context"
-	"github.com/apache/beam/sdks/go/pkg/beam"
-	"github.com/apache/beam/sdks/go/pkg/beam/log"
-	"github.com/apache/beam/sdks/go/pkg/beam/x/beamx"
-	"github.com/apache/beam/sdks/go/pkg/beam/x/debug"
-    "github.com/apache/beam/sdks/go/pkg/beam/transforms/stats"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/log"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/beamx"
+	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
+    "github.com/apache/beam/sdks/v2/go/pkg/beam/transforms/stats"
 )
 
 func main() {
@@ -39,7 +39,7 @@ func main() {
 	input := beam.Create(s, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
     // The applyTransform() converts [input] to [output]
-    output := input
+    output := applyTransform(s, input)
 
 	debug.Print(s, output)
 
@@ -48,7 +48,7 @@ func main() {
 	if err != nil {
 		log.Exitf(context.Background(), "Failed to execute job: %v", err)
 	}
-
+}
 // Return the sum of numbers from `PCollection`.
 func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
 	return stats.Sum(s, input)

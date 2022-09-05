@@ -18,15 +18,15 @@
 //   description: Branching example.
 //   multifile: false
 //   context_line: 32
-package task
+package main
 
 import (
 	"strings"
 	"context"
-    "github.com/apache/beam/sdks/go/pkg/beam"
-    "github.com/apache/beam/sdks/go/pkg/beam/log"
-    "github.com/apache/beam/sdks/go/pkg/beam/x/beamx"
-    "github.com/apache/beam/sdks/go/pkg/beam/x/debug"
+    "github.com/apache/beam/sdks/v2/go/pkg/beam"
+    "github.com/apache/beam/sdks/v2/go/pkg/beam/log"
+    "github.com/apache/beam/sdks/v2/go/pkg/beam/x/beamx"
+    "github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
 )
 
 func main() {
