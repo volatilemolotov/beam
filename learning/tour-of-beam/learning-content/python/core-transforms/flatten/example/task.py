@@ -42,14 +42,14 @@ class Output(beam.PTransform):
 with beam.Pipeline() as p:
 
     # List of elements start with a
-    wordsStartingWithA = \
+  wordsStartingWithA = \
         p | 'Words starting with A' >> beam.Create(['apple', 'ant', 'arrow'])
 
     # List of elements start with b
-    wordsStartingWithB = \
+  wordsStartingWithB = \
         p | 'Words starting with B' >> beam.Create(['ball', 'book', 'bow'])
 
-    ((wordsStartingWithA, wordsStartingWithB)
+  ((wordsStartingWithA, wordsStartingWithB)
     # Accept two PCollection data types are the same combines and returns one PCollection
      | beam.Flatten()
      | Output())

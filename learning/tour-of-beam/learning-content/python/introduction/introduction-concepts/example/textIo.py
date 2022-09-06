@@ -15,8 +15,8 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: group-by-key
-#   description: GroupByKey example.
+#   name: textIO-example
+#   description: TextIO example.
 #   multifile: false
 #   context_line: 43
 
@@ -41,9 +41,18 @@ class Output(beam.PTransform):
 
 
 with beam.Pipeline() as p:
+    lines = p | 'Log lines' >> beam.io.ReadFromText('gs://apache-beam-samples/shakespeare/kinglear.txt') \
+            | beam.Filter(lambda line: line != "")
 
-  (p | beam.Create(['apple', 'ball', 'car', 'bear', 'cheetah', 'ant'])
-    # Returns a map which key will be the first letter, and the values are a list of words
-     | beam.Map(lambda word: (word[0], word))
-     | beam.GroupByKey()
-     | Output())
+    lines | 'Log fixed lines' >> beam.combiners.Sample.FixedSizeGlobally(10) \
+    | beam.FlatMap(lambda sentence: sentence) \
+    | Output(prefix = 'Fixed first 10 lines: ')
+
+    words = p | 'Log words' >> beam.io.ReadFromText('gs://apache-beam-samples/shakespeare/kinglear.txt') \
+            | beam.FlatMap(lambda sentence: sentence.split()) \
+            | beam.Filter(lambda word: not word.isspace() or word.isalnum()) \
+            | beam.combiners.Sample.FixedSizeGlobally(10) \
+            | beam.FlatMap(lambda word: word) \
+            | 'Log output words' >> Output(prefix = 'Word: ')
+
+

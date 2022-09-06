@@ -15,6 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+// beam-playground:
+//   name: CSV
+//   description: CSV example.
+//   multifile: false
+//   context_line: 50
+
 package org.apache.beam.examples;
 
 import java.util.Arrays;

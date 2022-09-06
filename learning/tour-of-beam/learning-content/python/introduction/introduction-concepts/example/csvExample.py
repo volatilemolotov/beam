@@ -15,8 +15,8 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: group-by-key
-#   description: GroupByKey example.
+#   name: csv-example
+#   description: Csv file example.
 #   multifile: false
 #   context_line: 43
 
@@ -39,11 +39,25 @@ class Output(beam.PTransform):
     def expand(self, input):
         input | beam.ParDo(self._OutputFn(self.prefix))
 
+class ExtractTaxiRideCostFn(beam.DoFn):
+
+    def process(self, element):
+        line = element.split(',')
+        return tryParseTaxiRideCost(line,16)
+
+
+def tryParseTaxiRideCost(line,index):
+    if(len(line) > index):
+        yield line[index]
+    else:
+        yield 0.0
 
 with beam.Pipeline() as p:
+    lines = p | 'Log lines' >> beam.io.ReadFromText('gs://apache-beam-samples/nyc_taxi/misc/sample1000.csv') \
+            | beam.ParDo(ExtractTaxiRideCostFn()) \
+            | beam.combiners.Sample.FixedSizeGlobally(10) \
+            | beam.FlatMap(lambda cost: cost) \
+            | Output(prefix = 'Taxi cost: ')
 
-  (p | beam.Create(['apple', 'ball', 'car', 'bear', 'cheetah', 'ant'])
-    # Returns a map which key will be the first letter, and the values are a list of words
-     | beam.Map(lambda word: (word[0], word))
-     | beam.GroupByKey()
-     | Output())
+
+

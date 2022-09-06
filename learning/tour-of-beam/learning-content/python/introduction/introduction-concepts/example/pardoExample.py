@@ -15,10 +15,10 @@
 #   limitations under the License.
 
 # beam-playground:
-#   name: group-by-key
-#   description: GroupByKey example.
+#   name: pardo-example
+#   description: ParDo example.
 #   multifile: false
-#   context_line: 43
+#   context_line: 48
 
 import apache_beam as beam
 
@@ -39,11 +39,9 @@ class Output(beam.PTransform):
     def expand(self, input):
         input | beam.ParDo(self._OutputFn(self.prefix))
 
-
 with beam.Pipeline() as p:
+  (p | beam.Create(['Hello Beam','It`s introdction'])
+     | 'Log words' >> Output())
 
-  (p | beam.Create(['apple', 'ball', 'car', 'bear', 'cheetah', 'ant'])
-    # Returns a map which key will be the first letter, and the values are a list of words
-     | beam.Map(lambda word: (word[0], word))
-     | beam.GroupByKey()
-     | Output())
+  (p | beam.Create(range(1, 11))
+   | 'Log numbers' >> Output())

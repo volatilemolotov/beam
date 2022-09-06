@@ -47,7 +47,7 @@ import org.apache.beam.sdk.values.TypeDescriptors;
 
 public class Task {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DataFromFile.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
 
     public static void main(String[] args) {
@@ -64,6 +64,7 @@ public class Task {
 
         // Concept #2. Output first 10 elements PCollection to the console.
         final PTransform<PCollection<String>, PCollection<Iterable<String>>> sample = Sample.fixedSizeGlobally(10);
+
         PCollection<String> sampleLines = lines.apply(sample)
                 .apply(Flatten.iterables())
                 .apply("Log lines", ParDo.of(new LogStrings()));

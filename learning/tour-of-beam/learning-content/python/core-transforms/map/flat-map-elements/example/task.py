@@ -42,7 +42,7 @@ class Output(beam.PTransform):
 
 with beam.Pipeline() as p:
 
-    (p | beam.Create(['Apache Beam', 'Unified Batch and Streaming'])
+  (p | beam.Create(['Apache Beam', 'Unified Batch and Streaming'])
     # Lambda function that returns a list of words from a sentence
      | beam.FlatMap(lambda sentence: sentence.split())
      | Output())
