@@ -41,7 +41,7 @@ class Output(beam.PTransform):
 
 with beam.Pipeline() as p:
     # List of elements
-  (p | beam.Create(range(-5, 10))
+  (p | beam.Create([12, -34, -1, 0, 93, -66, 53, 133, -133, 6, 13, 15])
    | beam.Filter(lambda num: num >= 0)
    | beam.WithKeys(lambda num: 'Yes' if num % 2 == 0 else 'No')
    | beam.combiners.Count.PerKey()

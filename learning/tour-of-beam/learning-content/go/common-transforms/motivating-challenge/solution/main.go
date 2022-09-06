@@ -37,16 +37,23 @@ func main() {
 	p, s := beam.NewPipelineWithRoot()
 
 	// List of elements
-	input := beam.Create(s, 43, -12, 4, 532, -88, -79, 0, 7, 31)
+	input := beam.Create(s, 12, -34, -1, 0, 93, -66, 53, 133, -133, 6, 13, 15)
 
-	// The [input] filtered with the positiveNumbersFilter()
-	filtered := getPositiveNumbers(s, input)
+	debug.Print(s, input)
+	filtered := filter.Exclude(s, input, func(element int) bool {
+		return element < 0
+	})
 
-    // Returns map
-	numberMap := getMap(s, filtered)
+	tagged := beam.ParDo(s, func(input int) (string, int) {
+		if input%2 == 0 {
+			return "even", input
+		} else {
+			return "odd", input
+		}
+	}, filtered)
 
 	// Returns numbers count with the countingNumbers()
-	count := getCountingNumbersByKey(s, numberMap)
+	count := getCountingNumbersByKey(s, tagged)
 
 	debug.Print(s, count)
 
@@ -58,22 +65,8 @@ func main() {
 }
 
 // Returns positive numbers
-func getPositiveNumbers(s beam.Scope, input beam.PCollection) beam.PCollection {
-	return filter.Include(s, input, func(element int) bool {
-		return element >= 0
-	})
-}
 
 // Returns a map with a key that will not be odd or even , and the value will be the number itself at the input
-func getMap(s beam.Scope, input beam.PCollection) beam.PCollection {
-	return beam.ParDo(s, func(input int) (string, int) {
-		if input%2 == 0 {
-			return "even", input
-		} else {
-			return "odd", input
-		}
-	}, input)
-}
 
 // Returns the count of numbers
 func getCountingNumbersByKey(s beam.Scope, input beam.PCollection) beam.PCollection {

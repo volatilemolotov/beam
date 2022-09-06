@@ -41,7 +41,7 @@ class Output(beam.PTransform):
 
 with beam.Pipeline() as p:
     # List of elements
-    (p | beam.Create(range(-5, 10))
+    (p | beam.Create([12, -34, -1, 0, 93, -66, 53, 133, -133, 6, 13, 15])
     # Return filtered numbers
 
     # Set 'positive' for numbers

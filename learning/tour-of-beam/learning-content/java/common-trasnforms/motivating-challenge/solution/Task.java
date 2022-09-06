@@ -41,7 +41,7 @@ public class Task {
 
         // List of elements
         PCollection<Integer> numbers =
-                pipeline.apply(Create.of(-34, -1, 26, 0, 93, -66, 53));
+                pipeline.apply(Create.of(12, -34, -1, 0, 93, -66, 53, 133, -133, 6, 13, 15));
 
         // The [numbers] filtered with the positiveNumberFilter()
         PCollection<Integer> filtered = getPositiveNumbers(numbers);

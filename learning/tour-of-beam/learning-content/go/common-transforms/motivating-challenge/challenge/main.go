@@ -37,7 +37,7 @@ func main() {
 	p, s := beam.NewPipelineWithRoot()
 
 	// List of elements
-	input := beam.Create(s, -12, 4, 532, -88, -79, 0, 7, 31)
+	input := beam.Create(s, 12, -34, -1, 0, 93, -66, 53, 133, -133, 6, 13, 15)
 
 	// The [input] filtered with the positiveNumbersFilter()
 	filtered := getPositiveNumbers(s, input)
