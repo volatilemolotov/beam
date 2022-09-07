@@ -18,12 +18,12 @@
 
 const String kAnalyticsUA = 'UA-73650088-2';
 const String kApiClientURL =
-    'http://35.232.90.249:8080';
+    'https://130.211.5.132.nip.io/router';
 const String kApiJavaClientURL =
-    'http://34.173.7.61:8080';
+    'https://130.211.5.132.nip.io/java';
 const String kApiGoClientURL =
-    'http://34.69.121.59:8080';
+    'https://130.211.5.132.nip.io/go';
 const String kApiPythonClientURL =
-    'http://34.135.119.179:8080';
+    'https://130.211.5.132.nip.io/python';
 const String kApiScioClientURL =
-    'http://34.172.61.253:8080';
+    'https://130.211.5.132.nip.io/scio';
