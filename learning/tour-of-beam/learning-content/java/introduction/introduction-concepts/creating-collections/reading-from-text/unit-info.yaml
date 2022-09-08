@@ -17,7 +17,6 @@
 # under the License.
 #
 
-id: concepts
-name: Beam Concepts
-complexity: BASIC
-taskName: HelloBeam
+id: from-text
+name: Creating PCollections from text files
+taskName: TextIO
