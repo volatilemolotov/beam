@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: playground-router
+  labels:
+    app: backend-router
+    type: backend
+spec:
+  template:
+    metadata:
+     name: playground
+     labels: 
+       app: backend-router
+       type: backend
+    spec:
+     containers: 
+     - name: playground-backend-router
+       image: "{{ .Values.image.registry}}/{{ .Values.image.router_image }}:{{ .Values.image.tag }}"
+       imagePullPolicy: {{ .Values.image.pullPolicy }}
+       env:
+         - name: GOOGLE_CLOUD_PROJECT
+           value: {{ .Values.project }}
+  replicas: {{ .Values.replicaCount  }}
+  selector:
+    matchLabels:
+     app: backend-router

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: playground-scio
+  labels:
+    app: backend-scio
+    type: backend
+spec:
+  template:
+    metadata:
+     name: playground
+     labels: 
+       app: backend-scio
+       type: backend
+    spec:
+     containers: 
+     - name: playground-backend-scio
+       image: "{{ .Values.image.registry}}/{{ .Values.image.scio_image }}:{{ .Values.image.tag }}"
+       imagePullPolicy: {{ .Values.image.pullPolicy }}
+  replicas: {{ .Values.replicaCount  }}
+  selector:
+    matchLabels:
+     app: backend-scio
