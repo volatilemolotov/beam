@@ -41,4 +41,5 @@ jobs:
              ls -la
              ls -la playground
              ls -la playground/infrastructure
+             ls -la playground/infrastructure/helm-backend
 
