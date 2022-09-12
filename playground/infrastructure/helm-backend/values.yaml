@@ -6,7 +6,6 @@ image:
    scio_image: beam_playground-backend-scio
    python_image: beam_playground-backend-python
    pullPolicy: Always
-   registry: us-central1-docker.pkg.dev/s3d-pg/playground-repository
    tag: "beta"
 
 service:
