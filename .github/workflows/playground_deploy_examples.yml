@@ -21,6 +21,7 @@ on:
     types:
       - closed
     branches: ['master']
+    
 env:
   BEAM_ROOT_DIR: ../../
   BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
