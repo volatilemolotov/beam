@@ -43,10 +43,11 @@ jobs:
              echo "static_ip: $(gcloud compute addresses list --filter "NAME:${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}-static" --format="value(address)")" >> playground/infrastructure/helm-backend/values.yaml
              echo "static_ip_name: ${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}-static" >> playground/infrastructure/helm-backend/values.yaml
              cat playground/infrastructure/helm-backend/values.yaml
-             helm list
       - name: Get K8s Config
         run: gcloud container clusters get-credentials --region us-central1-a playground-examples
       - name: Login to Docker Registry
-        run: cat cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+        run: |
+              cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+              helm list
  
 
