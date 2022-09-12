@@ -48,6 +48,6 @@ jobs:
       - name: Login to Docker Registry
         run: |
               cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
-              helm list
+              helm uninstall backend
  
 
