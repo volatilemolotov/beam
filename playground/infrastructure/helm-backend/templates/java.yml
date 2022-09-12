@@ -9,14 +9,19 @@ spec:
   template:
     metadata:
      name: playground
-     labels: 
+     labels:
        app: backend-java
        type: backend
     spec:
-     containers: 
+     containers:
      - name: playground-backend-java
-       image: "{{ .Values.image.registry}}/{{ .Values.image.java_image }}:{{ .Values.image.tag }}"
+       image: "{{ .Values.registry}}:{{ .Values.image.tag }}"
        imagePullPolicy: {{ .Values.image.pullPolicy }}
+       env:
+         - name: CACHE_TYPE
+           value: "remote"
+         - name: CACHE_ADDRESS
+           value: "10.98.129.164:6379"
   replicas: {{ .Values.replicaCount  }}
   selector:
     matchLabels:
