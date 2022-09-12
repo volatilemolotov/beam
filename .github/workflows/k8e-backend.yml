@@ -1,5 +1,4 @@
-name: Collect And Deploy Playground Examples
-
+name: kuber-bkend
 on:
   push:  
 env:
@@ -33,7 +32,7 @@ jobs:
       - name: Get K8s Config
         run: gcloud container clusters get-credentials --region us-central1-a playground-examples
       - name: Login to Docker Registry
-        run: cat /home/serg3d/k8e/s3d-key.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
+        run: cat cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
       - name: Build And Push Backend
         run: ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag=${{ env.DOCKERTAG }}
       - name: Build And Push Go Backend
