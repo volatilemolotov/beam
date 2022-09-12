@@ -39,10 +39,9 @@ jobs:
              echo "redis_ip: $(gcloud redis instances list --region us-central1 --format="value(host)"):6379" >> playground/infrastructure/helm-backend/values.yaml
              echo "project_id: "${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}"" >> playground/infrastructure/helm-backend/values.yaml
              echo "registry: "${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository"" >> playground/infrastructure/helm-backend/values.yaml
-             echo "static_ip: $(gcloud compute addresses list --filter "NAME:${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}-static" --format="value(address)") >> playground/infrastructure/helm-backend/values.yaml
+             echo "static_ip: $(gcloud compute addresses list --filter "NAME:${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}-static" --format="value(address)")" >> playground/infrastructure/helm-backend/values.yaml
              echo "static_ip_name: "${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}-static" >> playground/infrastructure/helm-backend/values.yaml
              cat playground/infrastructure/helm-backend/values.yaml
-             helm uninstall backend playground/infrastructure/helm-backend
       - name: Get K8s Config
         run: gcloud container clusters get-credentials --region us-central1-a playground-examples
       - name: Login to Docker Registry
