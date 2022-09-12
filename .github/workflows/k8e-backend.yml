@@ -34,7 +34,7 @@ jobs:
              gcloud auth activate-service-account --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
       - name: Update variables
         run: |
-             echo "redis_id: $(gcloud redis instances list --region us-central1 --format="value(host)")" >> playground/infrastructure/helm-backend/values.yaml
+             echo "redis_ip: $(gcloud redis instances list --region us-central1 --format="value(host)")" >> playground/infrastructure/helm-backend/values.yaml
              echo "project_id: "${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}"" >> playground/infrastructure/helm-backend/values.yaml
              echo "registry: "${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository"" >> playground/infrastructure/helm-backend/values.yaml
              echo "-------------------"
