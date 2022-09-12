@@ -9,17 +9,21 @@ spec:
   template:
     metadata:
      name: playground
-     labels: 
+     labels:
        app: backend-router
        type: backend
     spec:
-     containers: 
+     containers:
      - name: playground-backend-router
-       image: "{{ .Values.image.registry}}/{{ .Values.image.router_image }}:{{ .Values.image.tag }}"
+       image: "{{ .Values.registry}}:{{ .Values.image.tag }}"
        imagePullPolicy: {{ .Values.image.pullPolicy }}
        env:
          - name: GOOGLE_CLOUD_PROJECT
            value: {{ .Values.project }}
+         - name: CACHE_TYPE
+           value: "remote"
+         - name: CACHE_ADDRESS
+           value: "10.98.129.164:6379"
   replicas: {{ .Values.replicaCount  }}
   selector:
     matchLabels:
