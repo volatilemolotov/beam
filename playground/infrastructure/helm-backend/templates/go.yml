@@ -9,17 +9,23 @@ spec:
   template:
     metadata:
      name: playground
-     labels: 
+     labels:
        app: backend-go
        type: backend
     spec:
-     containers: 
+     containers:
      - name: playground-backend-go
-       image: "{{ .Values.registry}}:{{ .Values.image.tag }}" 
+       image: "{{ .Values.registry}}:{{ .Values.image.tag }}"
        imagePullPolicy: {{ .Values.image.pullPolicy }}
        ports:
         - containerPort: 8080
+       env:
+         - name: CACHE_TYPE
+           value: "remote"
+         - name: CACHE_ADDRESS
+           value: "10.98.129.164:6379"
   replicas: {{ .Values.replicaCount  }}
   selector:
     matchLabels:
      app: backend-go
+
