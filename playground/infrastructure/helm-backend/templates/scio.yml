@@ -21,7 +21,7 @@ spec:
        - name: CACHE_TYPE
          value: "remote"
        - name: CACHE_ADDRESS
-         value: "10.98.129.164:6379"
+         value: {{ .Values.redis_ip }}
   replicas: {{ .Values.replicaCount  }}
   selector:
     matchLabels:
