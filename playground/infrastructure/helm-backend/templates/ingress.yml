@@ -3,15 +3,15 @@ kind: Ingress
 metadata:
   name: ingress-playground
   annotations: 
-     kubernetes.io/ingress.global-static-ip-name: pg-ext-ip
-     networking.gke.io/managed-certificates: playground-bkend
+     kubernetes.io/ingress.global-static-ip-name: {{ .Values.static_ip_name }}
+     networking.gke.io/managed-certificates: {{ .Values.project_id }}
      networking.gke.io/v1beta1.FrontendConfig: pg-frontend
      ingress.kubernetes.io/enable-cors: "true"
   labels:
      app: playground-go
 spec:
   rules:
-  - host: "go.130.211.5.132.nip.io"
+  - host: "go.{{ .Values.static_ip }}.nip.io"
     http:
       paths:
       - path: "/*"
@@ -20,8 +20,8 @@ spec:
           service:
             name: playground-go
             port:
-              number: 443
-  - host: "java.130.211.5.132.nip.io"
+              number: {{ .Values.service.port }}
+  - host: "java.{{ .Values.static_ip }}.nip.io"
     http:
       paths:
       - path: "/*"
@@ -30,8 +30,8 @@ spec:
           service:
             name: playground-java
             port:
-              number: 443
-  - host: "python.130.211.5.132.nip.io"
+              number: {{ .Values.service.port }}
+  - host: "python.{{ .Values.static_ip }}.nip.io"
     http:
       paths:
       - path: "/*"
@@ -40,8 +40,8 @@ spec:
           service:
             name: playground-python
             port:
-              number: 443
-  - host: "router.130.211.5.132.nip.io"
+              number: {{ .Values.service.port }}
+  - host: "router.{{ .Values.static_ip }}.nip.io"
     http:
       paths:
       - path: "/*"
@@ -50,8 +50,8 @@ spec:
           service:
             name: playground-router
             port:
-              number: 443
-  - host: "scio.130.211.5.132.nip.io"
+              number: {{ .Values.service.port }}
+  - host: "scio.{{ .Values.static_ip }}.nip.io"
     http:
       paths:
       - path: "/*"
@@ -60,8 +60,8 @@ spec:
           service:
             name: playground-scio
             port:
-              number: 443
-  - host: "router.130.211.5.132.nip.io"
+              number: {{ .Values.service.port }}
+  - host: "router.{{ .Values.static_ip }}.nip.io"
     http:
       paths:      
       - path: "/*"
