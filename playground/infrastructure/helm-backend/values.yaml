@@ -1,5 +1,4 @@
 replicaCount: 1
-project: s3d-pg
 image:
    java_image: beam_playground-backend-java
    go_image: beam_playground-backend-go
