@@ -31,10 +31,12 @@ The following items need to be setup for the Playground cluster deployment on GC
 ## GCP setup
 1. Create a Service Account and download JSON key
 2. Enable
+   - Identity and Access Management (IAM) API
    - Cloud Storage API
-   - Billing API
+   - Cloud Billing API
    - App Engine Admin API
-3. Set environment vaiables for below steps:
+3. Add a global `Owner` role to the Service Account in IAM console
+4. Set environment vaiables for below steps:
 ```
 export GOOGLE_APPLICATION_CREDENTIALS=<sa_credentials_file>
 export PROJECT_ID=<project_id>
@@ -46,6 +48,7 @@ gcloud auth activate-service-account --key-file <sa_credentials_file>
 ```
 
 ## 0. Create GCS bucket for state
+**note** Bucket name is unique across all your projects, including those you've shut down
 
 ```bash
 $ gsutil mb -p ${PROJECT_ID} gs://state-bucket-name
