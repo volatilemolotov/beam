@@ -33,7 +33,8 @@ jobs:
              echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
              which gcloud
              gcloud auth activate-service-account --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
-
+      - name: create static ip
+        run: gcloud compute addresses create ${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}-static --global
       - name: Update variables
         run: |
              echo "redis_ip: $(gcloud redis instances list --region us-central1 --format="value(host)"):6379" >> playground/infrastructure/helm-backend/values.yaml
@@ -47,6 +48,18 @@ jobs:
       - name: Login to Docker Registry
         run: |
               cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
-
+      - name: Build And Push Backend
+        run: ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag=${{ env.DOCKERTAG }}
+      - name: Build And Push Go Backend
+        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+      - name: Build And Push Python Backend
+        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+      - name: Build And Push Scio Backend
+        run: ./gradlew playground:backend:containers:scio:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+      - name: Build And Push Router Backend
+        run: ./gradlew playground:backend:containers:router:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+      - name: Index creation
+        run: |
+              gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
       - name: Backend setup
-        run: helm uninstall backend
+        run: helm install backend playground/infrastructure/helm-backend
