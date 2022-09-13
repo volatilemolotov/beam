@@ -14,6 +14,9 @@ resource "google_project_service" "firestore" {
 }
 
 resource "google_app_engine_flexible_app_version" "default_app" {
+  depends_on = [
+    google_app_engine_application.app_playground
+    ]
   count      = var.create_default_service ? 1 : 0
   service    = "default"
   version_id = "mlflow-default"
