@@ -80,3 +80,9 @@ module "gke" {
   subnetwork        = module.network.playground_subnetwork_id
   network           = module.network.playground_network_id
 }
+    
+module "appengine" {
+  depends_on        = [module.setup]
+  source            = "./appengine"
+  project_id        = var.project_id
+}
