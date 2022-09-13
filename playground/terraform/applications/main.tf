@@ -33,7 +33,7 @@ data "terraform_remote_state" "playground-state" {
 # }
 
 module "backend" {
-  depends_on              = [module.default]
+
   source                  = "./backend"
   project_id              = var.project_id
   cache_address           = data.terraform_remote_state.playground-state.outputs.playground_redis_ip
@@ -73,7 +73,7 @@ module "backend" {
 }
 
 module "frontend" {
-  depends_on              = [module.default]
+
   source                  = "./frontend"
   project_id              = var.project_id
   docker_registry_address = data.terraform_remote_state.playground-state.outputs.docker-repository-root
