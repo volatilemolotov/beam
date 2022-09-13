@@ -85,4 +85,4 @@ jobs:
       - name: Deploy Frontend Application
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-        run: ./gradlew playground:terraform:deployFrontend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment=${{env.PROJECT_ENV}} -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
+        run: ./gradlew playground:terraform:deployFrontend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment=${{env.PROJECT_ENV}} -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
