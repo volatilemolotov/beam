@@ -19,7 +19,7 @@ spec:
        imagePullPolicy: {{ .Values.image.pullPolicy }}
        env:
          - name: GOOGLE_CLOUD_PROJECT
-           value: {{ .Values.project }}
+           value: {{ .Values.project_id }}
          - name: CACHE_TYPE
            value: "remote"
          - name: CACHE_ADDRESS
