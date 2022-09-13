@@ -61,13 +61,3 @@ spec:
             name: playground-scio
             port:
               number: {{ .Values.service.port }}
-  - host: "router.{{ .Values.static_ip }}.nip.io"
-    http:
-      paths:      
-      - path: "/*"
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: playground-router
-            port:
-              number: 6379       
