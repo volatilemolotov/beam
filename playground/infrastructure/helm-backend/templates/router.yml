@@ -15,7 +15,7 @@ spec:
     spec:
      containers:
      - name: playground-backend-router
-       image: {{ .Values.image.registry}}/{{ .Values.image.router_image }}:{{ .Values.image.tag }}
+       image: {{ .Values.registry}}/{{ .Values.image.router_image }}:{{ .Values.image.tag }}
        imagePullPolicy: {{ .Values.image.pullPolicy }}
        env:
          - name: GOOGLE_CLOUD_PROJECT
