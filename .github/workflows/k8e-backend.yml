@@ -1,6 +1,7 @@
 name: kuber-bkend
 on:
   push:
+  
 env:
   BEAM_ROOT_DIR: ../../
   BEAM_EXAMPLE_CATEGORIES: ../categories.yaml
