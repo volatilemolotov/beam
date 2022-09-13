@@ -84,4 +84,5 @@ module "gke" {
 module "appengine" {
   depends_on        = [module.setup]
   source            = "./appengine"
+  project_id        = var.project_id
 }
