@@ -59,8 +59,8 @@ jobs:
         run: ./gradlew playground:backend:containers:router:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
       - name: Database and index creation
         run: |
-              gcloud app create --region=nam5
-              gcloud datastore databases create --region=nam5
+              gcloud app create --region=us-central
+              gcloud datastore databases create --region=us-central
               gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
       - name: Backend setup
         run: helm install backend playground/infrastructure/helm-backend
