@@ -40,14 +40,14 @@ Tag = namedtuple(
     "Tag",
     [
         TagFields.name,
-        TagFields.complexity,
+        # TagFields.complexity,
         TagFields.description,
         TagFields.multifile,
         TagFields.categories,
         TagFields.pipeline_options,
         TagFields.default_example,
         TagFields.context_line,
-        TagFields.tags
+        # TagFields.tags
     ],
     defaults=(None, None, None, False, None, None, False, None, None))
 
@@ -249,7 +249,7 @@ def _get_example(filepath: str, filename: str, tag: ExampleTag) -> Example:
         Parsed Example object.
     """
     name = tag.tag_as_dict[TagFields.name]
-    complexity = tag.tag_as_dict[TagFields.complexity]
+    # complexity = tag.tag_as_dict[TagFields.complexity]
     sdk = Config.EXTENSION_TO_SDK[filename.split(os.extsep)[-1]]
     object_type = _get_object_type(filename, filepath)
     with open(filepath, encoding="utf-8") as parsed_file:
@@ -265,7 +265,7 @@ def _get_example(filepath: str, filename: str, tag: ExampleTag) -> Example:
 
     example = Example(
         name=name,
-        complexity=complexity,
+        complexity="BASIC",
         sdk=sdk,
         filepath=filepath,
         code=content,
