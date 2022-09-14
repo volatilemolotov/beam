@@ -49,7 +49,7 @@ Tag = namedtuple(
         TagFields.context_line,
         # TagFields.tags
     ],
-    defaults=(None, None, None, False, None, None, False, None, None))
+    defaults=(None, None, False, None, None, False, None))
 
 
 @dataclass
