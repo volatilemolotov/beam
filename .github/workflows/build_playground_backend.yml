@@ -68,23 +68,23 @@ jobs:
         run: echo "DOCKERTAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Setup GCP account
         run: |
-             echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
+             echo "${{ secrets.EA_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
       - name: Login to Docker Registry
-        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME }}
+        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.EA_PLAYGROUND_REGISTRY_NAME }}
       - name: Changing bucket name
         run: |
-          echo "bucket  = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
-          echo "bucket_examples_name = "\"${{ secrets.S3D_BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
-          echo "state_bucket = "\"${{ secrets.S3D_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
-          echo "project_id = "\"${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "bucket  = "\"${{ secrets.EA_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
+          echo "bucket_examples_name = "\"${{ secrets.EA_BUCKET_NAME }}-1"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "state_bucket = "\"${{ secrets.EA_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
+          echo "project_id = "\"${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
       - name: Deploy Backend Applications
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-        run: ./gradlew playground:terraform:deployBackend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
+        run: ./gradlew playground:terraform:deployBackend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
 
       - name: DB Index creation
         run: |
-         gcloud auth activate-service-account --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
-         gcloud app deploy playground/index.yaml --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
+         gcloud auth activate-service-account --project=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
+         gcloud app deploy playground/index.yaml --project=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
