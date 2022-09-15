@@ -184,3 +184,7 @@ jobs:
         working-directory: playground/infrastructure
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
+      - name: Delete Helm Chart
+        if: always()
+        run: |
+             helm del --namespace $K8S_NAMESPACE $HELM_APP_NAME
