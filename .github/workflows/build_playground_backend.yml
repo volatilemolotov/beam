@@ -81,9 +81,9 @@ jobs:
         run: ./gradlew playground:terraform:deployBackend -Pdocker-tag=${{env.PROJECT_ENV}} -Pproject_id=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
-          TF_VAR_STATE_BUCKET: ${{ env.STATE_BUCKET_NAME }}
-          TF_VAR_PROJECT_ID: ${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}
-          TF_VAR_BUCKET_EXAMPLES_NAME: ${{ env.EXAMPLES_BUCKET_NAME }}
+          TF_VAR_state_bucket: ${{ env.STATE_BUCKET_NAME }}
+          TF_VAR_project_id: ${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}
+          TF_VAR_bucket_examples_name: ${{ env.EXAMPLES_BUCKET_NAME }}
 
       - name: DB Index creation
         run: |
