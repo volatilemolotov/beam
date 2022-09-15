@@ -16,8 +16,6 @@
 name: Collect And Deploy Playground Examples
 
 on:
-  push:
-  
   pull_request:
     types:
       - closed
