@@ -78,7 +78,7 @@ jobs:
           echo "bucket  = "\"${{ env.STATE_BUCKET_NAME }}"\"" > playground/terraform/environment/${{ env.PROJECT_ENV }}/state.tfbackend
           echo "bucket_examples_name = "\"${{ env.EXAMPLES_BUCKET_NAME }}"\"" >> playground/terraform/environment/${{ env.PROJECT_ENV }}/terraform.tfvars
       - name: Init Infrastructure
-        run: ./gradlew playground:terraform:InitInfrastructure -Pproject_id=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }} -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
+        run: ./gradlew playground:terraform:InitInfrastructure -Pproject_id='${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}' -Pproject_environment='beta' -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository'
         env:
           GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcp_access.json
           TF_VAR_state_bucket: ${{ env.STATE_BUCKET_NAME }}
