@@ -17,10 +17,13 @@ package utils
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/google/uuid"
+
+	"beam.apache.org/playground/backend/internal/constants"
 )
 
 const (
@@ -40,8 +43,16 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(fmt.Errorf("error during test setup: %s", err.Error()))
 	}
-	defer teardown()
-	m.Run()
+	exitValue := m.Run()
+	teardown()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
+	os.Exit(exitValue)
 }
 
 func setup() error {

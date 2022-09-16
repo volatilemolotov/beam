@@ -37,6 +37,13 @@ func TestMain(m *testing.M) {
 	setup()
 	code := m.Run()
 	teardown()
+	if code == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			code = -1
+		}
+	}
 	os.Exit(code)
 }
 

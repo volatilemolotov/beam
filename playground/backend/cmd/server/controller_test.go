@@ -70,6 +70,13 @@ func TestMain(m *testing.M) {
 	opt = goleak.IgnoreCurrent()
 	exitValue := m.Run()
 	teardown(server)
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
 	os.Exit(exitValue)
 }
 
