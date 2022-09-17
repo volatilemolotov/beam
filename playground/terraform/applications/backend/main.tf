@@ -18,7 +18,7 @@
 #
 
 
-
+/*
 module "backend-go" {
   source                  = "./backend-go"
   project_id              = var.project_id
@@ -75,7 +75,7 @@ module "backend-python" {
   max_instance            = var.python_max_instance
   min_instance            = var.python_min_instance
 }
-
+*/
 module "backend-router" {
   source                  = "./backend-router"
   project_id              = var.project_id
@@ -94,7 +94,7 @@ module "backend-router" {
   max_instance            = var.router_max_instance
   min_instance            = var.router_min_instance
 }
-
+/*
 module "backend-scio" {
   source                  = "./backend-scio"
   project_id              = var.project_id
@@ -115,4 +115,4 @@ module "backend-scio" {
 }
 
 
-
+*/

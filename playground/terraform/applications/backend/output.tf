@@ -16,7 +16,7 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-
+/*
 output "go-server-url" {
   value = module.backend-go.server-url
 }
@@ -28,11 +28,12 @@ output "java-server-url" {
 output "python-server-url" {
   value = module.backend-python.server-url
 }
-
+*/
 output "router-server-url" {
   value = module.backend-router.server-url
 }
-
+/*
 output "scio-server-url" {
   value = module.backend-scio.server-url
 }
+*/

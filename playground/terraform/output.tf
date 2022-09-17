@@ -53,7 +53,7 @@ output "playground_redis_ip" {
 output "docker-repository-root" {
   value = module.infrastructure.docker-repository-root
 }
-
+/*
 output "go-server-url" {
   value = module.applications.go-server-url
 }
@@ -65,15 +65,15 @@ output "java-server-url" {
 output "python-server-url" {
   value = module.applications.python-server-url
 }
-
+*/
 output "router-server-url" {
   value = module.applications.router-server-url
 }
-
+/*
 output "scio-server-url" {
   value = module.applications.scio-server-url
 }
-
+*/
 output "front-server-url" {
   value = module.applications.front-server-url
 }
