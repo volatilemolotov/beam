@@ -286,11 +286,12 @@ task("pushFront") {
 task("prepareConfig") {
     group = "deploy"
     doLast {
-        var playgroundBackendUrl = ""
-        var playgroundBackendJavaRouteUrl = ""
-        var playgroundBackendGoRouteUrl = ""
-        var playgroundBackendPythonRouteUrl = ""
-        var playgroundBackendScioRouteUrl = ""
+        var playgroundBackendUrl = "https://router.34.160.22.119.nip.io"
+        var playgroundBackendJavaRouteUrl = "https://java.34.160.22.119.nip.io"
+        var playgroundBackendGoRouteUrl = "https://go.34.160.22.119.nip.io"
+        var playgroundBackendPythonRouteUrl = "https://python.34.160.22.119.nip.io"
+        var playgroundBackendScioRouteUrl = "https://scio.34.160.22.119.nip.io"
+        /*
         var stdout = ByteArrayOutputStream()
         exec {
             commandLine = listOf("terraform", "output", "router-server-url")
@@ -321,6 +322,7 @@ task("prepareConfig") {
             standardOutput = stdout
         }
         playgroundBackendScioRouteUrl = stdout.toString().trim().replace("\"", "")
+        */
         val configFileName = "gradle.properties"
         val modulePath = project(":playground:frontend").projectDir.absolutePath
         var file = File(modulePath + "/" + configFileName)
