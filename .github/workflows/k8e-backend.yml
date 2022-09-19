@@ -1,7 +1,6 @@
 name: kuber-bkend
 on:
   workflow_dispatch:
-  push:
   
 env:
   BEAM_ROOT_DIR: ../../
