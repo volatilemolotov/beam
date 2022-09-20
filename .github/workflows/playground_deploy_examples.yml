@@ -28,6 +28,7 @@ env:
   BEAM_VERSION: 2.40.0
   K8S_NAMESPACE: playground-backend
   HELM_APP_NAME: playground-backend
+  DOCKERTAG: testing
 jobs:
   check_examples:
     name: Check examples
@@ -94,31 +95,31 @@ jobs:
         run: rm ~/.m2/settings.xml
       - name: Setup GCP account
         run: |
-             echo "${{ secrets.S3D_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
+             echo "${{ secrets.EA_GCP_PLAYGROUND_SA_KEY }}" | base64 -d > /tmp/gcp_access.json
              which gcloud
-             gcloud auth activate-service-account --project=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
-      - name: Set Docker Tag
-        run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
-      - name: Set Docker Tag If Github Tag was trigger
-        run: echo "DOCKERTAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        if: startsWith(github.ref, 'refs/tags/')
+             gcloud auth activate-service-account --project=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }} --key-file=/tmp/gcp_access.json
+#      - name: Set Docker Tag
+#        run: echo "DOCKERTAG=${GITHUB_SHA}" >> $GITHUB_ENV
+#      - name: Set Docker Tag If Github Tag was trigger
+#        run: echo "DOCKERTAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+#        if: startsWith(github.ref, 'refs/tags/')
       - name: Get K8s Config
         run: gcloud container clusters get-credentials --region     us-central1-a playground-examples
       - name: Login to Docker Registry
-        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME }}
-      - name: Build And Push Java Backend
-        run: |
-             ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag=${{ env.DOCKERTAG }}
-      - name: Build And Push Go Backend
-        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
-      - name: Build And Push Python Backend
-        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
-      - name: Clean All Build directories
-        run: ./gradlew clean
+        run: cat /tmp/gcp_access.json | docker login -u _json_key --password-stdin https://${{ secrets.EA_PLAYGROUND_REGISTRY_NAME }}
+#      - name: Build And Push Java Backend
+#        run: |
+#             ./gradlew playground:backend:containers:java:dockerTagPush -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pbase-image='apache/beam_java8_sdk:${{ env.BEAM_VERSION }}' -Pdocker-tag=${{ env.DOCKERTAG }}
+#      - name: Build And Push Go Backend
+#        run: ./gradlew playground:backend:containers:go:dockerTagPush -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+#      - name: Build And Push Python Backend
+#        run: ./gradlew playground:backend:containers:python:dockerTagPush -Pdocker-repository-root='${{ secrets.EA_PLAYGROUND_REGISTRY_NAME}}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository' -Pdocker-tag=${{ env.DOCKERTAG }}
+#      - name: Clean All Build directories
+#        run: ./gradlew clean
       - name: Install helm chart
         run: |
              kubectl create namespace $K8S_NAMESPACE --dry-run=client -o yaml | kubectl apply -f - &&\
-             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.S3D_PLAYGROUND_REGISTRY_NAME }}/${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
+             helm install  --namespace $K8S_NAMESPACE $HELM_APP_NAME . --set global.registry="${{ secrets.EA_PLAYGROUND_REGISTRY_NAME }}/${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}/playground-repository" --set global.tag=${{ env.DOCKERTAG }} &&\
              sleep 120
         working-directory: playground/infrastructure/helm
       - name: Run Python Examples CI
@@ -134,7 +135,7 @@ jobs:
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-python" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
              BEAM_ROOT_DIR="../../"
              BEAM_EXAMPLE_CATEGORIES="../../playground/categories.yaml"
-             GOOGLE_CLOUD_PROJECT_VALUE=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
+             GOOGLE_CLOUD_PROJECT_VALUE=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}
              SDK_CONFIG_VALUE="../../playground/sdks.yaml"
              export SDK_CONFIG="$SDK_CONFIG_VALUE"
              export GOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT_VALUE"
@@ -154,7 +155,7 @@ jobs:
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-go" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
              BEAM_ROOT_DIR="../../"
              BEAM_EXAMPLE_CATEGORIES="../../playground/categories.yaml"
-             GOOGLE_CLOUD_PROJECT_VALUE=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
+             GOOGLE_CLOUD_PROJECT_VALUE=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}
              SDK_CONFIG_VALUE="../../playground/sdks.yaml"
              export SDK_CONFIG="$SDK_CONFIG_VALUE"
              export GOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT_VALUE"
@@ -174,7 +175,7 @@ jobs:
              K8S_SERVER_ADDRESS=$(kubectl get svc -n $K8S_NAMESPACE -l "app=service-java" -o jsonpath='{.items[0].status.loadBalancer.ingress[0].ip}')
              BEAM_ROOT_DIR="../../"
              BEAM_EXAMPLE_CATEGORIES="../../playground/categories.yaml"
-             GOOGLE_CLOUD_PROJECT_VALUE=${{ secrets.S3D_GCP_PLAYGROUND_PROJECT_ID }}
+             GOOGLE_CLOUD_PROJECT_VALUE=${{ secrets.EA_GCP_PLAYGROUND_PROJECT_ID }}
              SDK_CONFIG_VALUE="../../playground/sdks.yaml"
              export SDK_CONFIG="$SDK_CONFIG_VALUE"
              export GOOGLE_CLOUD_PROJECT="$GOOGLE_CLOUD_PROJECT_VALUE"
