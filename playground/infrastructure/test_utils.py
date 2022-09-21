@@ -31,7 +31,6 @@ def _get_examples(number_of_examples: int) -> List[Example]:
         }
         example = Example(
             name=f"MOCK_NAME_{number}",
-            complexity="MEDIUM",
             pipeline_id=f"MOCK_PIPELINE_ID_{number}",
             sdk=SDK_JAVA,
             filepath=f"MOCK_FILEPATH_{number}",

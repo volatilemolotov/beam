@@ -18,7 +18,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"google.golang.org/grpc"
@@ -37,7 +36,7 @@ import (
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/logger"
 	"beam.apache.org/playground/backend/internal/tasks"
-	"beam.apache.org/playground/backend/internal/tests/test_data"
+	"beam.apache.org/playground/backend/internal/utils"
 )
 
 // runServer is starting http server wrapped on grpc
@@ -62,11 +61,15 @@ func runServer() error {
 	var dbClient db.Database
 	var entityMapper mapper.EntityMapper
 	var props *environment.Properties
-	var cacheComponent *components.CacheComponent
 
 	// Examples catalog should be retrieved and saved to cache only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	// Database setup only if the server doesn't suppose to run code, i.e. SDK is unspecified
 	if envService.BeamSdkEnvs.ApacheBeamSdk == pb.Sdk_SDK_UNSPECIFIED {
+		props, err = environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
+		if err != nil {
+			return err
+		}
+
 		props, err = environment.NewProperties(envService.ApplicationEnvs.PropertyPath())
 		if err != nil {
 			return err
@@ -83,17 +86,7 @@ func runServer() error {
 			return err
 		}
 
-		sdks, err := setupSdkCatalog(ctx, cacheService, dbClient)
-		if err != nil {
-			return err
-		}
-
-		if err = setupExamplesCatalogFromDatastore(ctx, cacheService, dbClient, sdks); err != nil {
-			return err
-		}
-
 		entityMapper = mapper.NewDatastoreMapper(ctx, &envService.ApplicationEnvs, props)
-		cacheComponent = components.NewService(cacheService, dbClient)
 
 		// Since only router server has the scheduled task, the task creation is here
 		scheduledTasks := tasks.New(ctx)
@@ -130,33 +123,6 @@ func runServer() error {
 			return nil
 		}
 	}
-}
-
-func downloadCatalogsToDatastoreEmulator(ctx context.Context) {
-	if _, ok := os.LookupEnv("DATASTORE_EMULATOR_HOST"); ok {
-		test_data.DownloadCatalogsWithMockData(ctx)
-	}
-}
-
-// setupSdkCatalog saves the sdk catalog from the cloud datastore to the cache
-func setupSdkCatalog(ctx context.Context, cacheService cache.Cache, db db.Database) ([]*entity.SDKEntity, error) {
-	sdks, err := db.GetSDKs(ctx)
-	if err != nil {
-		logger.Errorf("setupSdkCatalog() error during getting the sdk catalog, err: %s", err.Error())
-		return nil, err
-	}
-	sdkNames := pb.Sdk_value
-	delete(sdkNames, pb.Sdk_SDK_UNSPECIFIED.String())
-	if len(sdks) != len(sdkNames) {
-		errMsg := "setupSdkCatalog() database doesn't have all sdks"
-		logger.Error(errMsg)
-		return nil, fmt.Errorf(errMsg)
-	}
-	if err = cacheService.SetSdkCatalog(ctx, sdks); err != nil {
-		logger.Errorf("setupSdkCatalog() error during setting sdk catalog to the cache, err: %s", err.Error())
-		return nil, err
-	}
-	return sdks, nil
 }
 
 // setupEnvironment constructs the environment required by the app

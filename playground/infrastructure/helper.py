@@ -58,7 +58,6 @@ class Example:
     Class which contains all information about beam example
     """
     name: str
-    complexity: str
     sdk: SDK_UNSPECIFIED
     filepath: str
     code: str
@@ -97,10 +96,7 @@ def find_examples(work_dir: str, supported_categories: List[str],
             - category-1
             - category-2
         pipeline_options: --inputFile your_file --outputFile your_output_file
-        complexity: MEDIUM
-        tags:
-            - example
-    If some example contains beam tag with incorrect format raise an error.
+    If some example contain beam tag with incorrect format raise an error.
 
     Args:
         work_dir: directory where to search examples.
@@ -249,7 +245,6 @@ def _get_example(filepath: str, filename: str, tag: ExampleTag) -> Example:
         Parsed Example object.
     """
     name = tag.tag_as_dict[TagFields.name]
-    # complexity = tag.tag_as_dict[TagFields.complexity]
     sdk = Config.EXTENSION_TO_SDK[filename.split(os.extsep)[-1]]
     object_type = _get_object_type(filename, filepath)
     with open(filepath, encoding="utf-8") as parsed_file:
@@ -263,9 +258,8 @@ def _get_example(filepath: str, filename: str, tag: ExampleTag) -> Example:
     else:
         link = "{}/{}".format(Config.LINK_PREFIX, file_path_without_root)
 
-    example = Example(
+    return Example(
         name=name,
-        complexity="BASIC",
         sdk=sdk,
         filepath=filepath,
         code=content,
@@ -273,9 +267,6 @@ def _get_example(filepath: str, filename: str, tag: ExampleTag) -> Example:
         tag=Tag(**tag.tag_as_dict),
         type=object_type,
         link=link)
-
-    validate_example_fields(example)
-    return example
 
 
 def _validate(tag: dict, supported_categories: List[str]) -> bool:
@@ -444,37 +435,6 @@ def validate_examples_for_duplicates_by_name(examples: List[Example]):
             err_msg = f"Examples have duplicate names.\nDuplicates: \n - path #1: {duplicates[example.name].filepath} \n - path #2: {example.filepath}"
             logging.error(err_msg)
             raise ValidationException(err_msg)
-
-
-def validate_example_fields(example: Example):
-    """
-    Validate example fields to avoid side effects in the next step
-    :param example: example from the repository
-    """
-    if example.filepath == "":
-        err_msg = f"Example doesn't have a file path field. Example: {example}"
-        logging.error(err_msg)
-        raise ValidationException(err_msg)
-    if example.name == "":
-        err_msg = f"Example doesn't have a name field. Path: {example.filepath}"
-        logging.error(err_msg)
-        raise ValidationException(err_msg)
-    if example.sdk == SDK_UNSPECIFIED:
-        err_msg = f"Example doesn't have a sdk field. Path: {example.filepath}"
-        logging.error(err_msg)
-        raise ValidationException(err_msg)
-    if example.code == "":
-        err_msg = f"Example doesn't have a code field. Path: {example.filepath}"
-        logging.error(err_msg)
-        raise ValidationException(err_msg)
-    if example.link == "":
-        err_msg = f"Example doesn't have a link field. Path: {example.filepath}"
-        logging.error(err_msg)
-        raise ValidationException(err_msg)
-    if example.complexity == "":
-        err_msg = f"Example doesn't have a complexity field. Path: {example.filepath}"
-        logging.error(err_msg)
-        raise ValidationException(err_msg)
 
 
 class ValidationException(Exception):

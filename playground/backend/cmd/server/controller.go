@@ -17,7 +17,6 @@ package main
 import (
 	"context"
 
-	"cloud.google.com/go/datastore"
 	"github.com/google/uuid"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"

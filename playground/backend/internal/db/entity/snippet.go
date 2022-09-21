@@ -77,11 +77,15 @@ func combineUniqueSnippetContent(snippet *Snippet) string {
 			contentBuilder.WriteString(fmt.Sprintf("%v%s", snippet.Snippet.Sdk, strings.TrimSpace(snippet.Snippet.PipeOpts)))
 		}
 	}
-
-	return contentBuilder.String()
+	id, err := generateID(s.Salt, contentBuilder.String(), s.IdLength)
+	if err != nil {
+		return "", err
+	}
+	return id, nil
 }
 
-func generateIDBasedOnContent(salt, content string, length int8) (string, error) {
+//TODO after removing the cloud storage this method should be deleted. It's a duplicate code from utils package
+func generateID(salt, content string, length int8) (string, error) {
 	hash := sha256.New()
 	if _, err := io.WriteString(hash, salt); err != nil {
 		logger.Errorf("ID(): error during hash generation: %s", err.Error())
