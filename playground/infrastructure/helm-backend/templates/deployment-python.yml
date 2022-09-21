@@ -14,21 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
+  name: playground-python
   labels:
-    app: backend-java
+    app: backend-python
     type: backend
-  name: playground-java
-  annotations:
-    cloud.google.com/backend-config: '{"default": "bkend-health"}'
-    cloud.google.com/neg: '{"ingress": true}'
 spec:
-  ports:
-  - port: {{ .Values.service.port }}
-    protocol: TCP
-    targetPort: {{ .Values.service.targetPort }}
+  template:
+    metadata:
+     name: playground
+     labels:
+       app: backend-python
+       type: backend
+    spec:
+     containers:
+     - name: playground-backend-python
+       image: {{ .Values.registry}}/{{ .Values.image.python_image }}:{{ .Values.image.tag }}
+       imagePullPolicy: {{ .Values.image.pullPolicy }}
+       env:
+        - name: CACHE_TYPE
+          value: "remote"
+        - name: CACHE_ADDRESS
+          value: {{ .Values.redis_ip }}
+  replicas: {{ .Values.replicaCount  }}
   selector:
-    app: backend-java
-  type: {{ .Values.service.type }}
+    matchLabels:
+     app: backend-python

@@ -1,4 +1,3 @@
-
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -14,21 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
+  name: playground-scio
   labels:
-    app: backend-java
+    app: backend-scio
     type: backend
-  name: playground-java
-  annotations:
-    cloud.google.com/backend-config: '{"default": "bkend-health"}'
-    cloud.google.com/neg: '{"ingress": true}'
 spec:
-  ports:
-  - port: {{ .Values.service.port }}
-    protocol: TCP
-    targetPort: {{ .Values.service.targetPort }}
+  template:
+    metadata:
+     name: playground
+     labels:
+       app: backend-scio
+       type: backend
+    spec:
+     containers:
+     - name: playground-backend-scio
+       image: {{ .Values.registry}}/{{ .Values.image.scio_image }}:{{ .Values.image.tag }}
+       imagePullPolicy: {{ .Values.image.pullPolicy }}
+       env:
+       - name: CACHE_TYPE
+         value: "remote"
+       - name: CACHE_ADDRESS
+         value: {{ .Values.redis_ip }}
+  replicas: {{ .Values.replicaCount  }}
   selector:
-    app: backend-java
-  type: {{ .Values.service.type }}
+    matchLabels:
+     app: backend-scio

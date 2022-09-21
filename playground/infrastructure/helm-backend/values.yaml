@@ -1,3 +1,19 @@
+
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 replicaCount: 1
 image:
    java_image: beam_playground-backend-java
@@ -6,7 +22,7 @@ image:
    scio_image: beam_playground-backend-scio
    python_image: beam_playground-backend-python
    pullPolicy: Always
-   tag: "testing"
+   tag: "beta"
 
 service:
    type: NodePort
@@ -18,9 +34,3 @@ autoscaling:
    minReplicas: 1
    maxReplicas: 4
    targetCPUUtilizationPercentage: 80
-
-redis_ip: 10.87.130.148:6379
-project_id: tour-of-beam-2
-registry: us-central1-docker.pkg.dev/tour-of-beam-2/playground-repository
-static_ip: 34.160.22.119
-static_ip_name: tour-of-beam-2-static
