@@ -16,15 +16,28 @@
  * limitations under the License.
  */
 
+import java.io.FileOutputStream
+
 description = "Apache Beam :: Playground :: playground_components Flutter Package"
 
+tasks.register("configure") {
+  group = "build"
+  description = "After checkout, gets everything ready for local development, test, or build."
+
+  dependsOn("generateCode")
+  dependsOn("extractBeamSymbols")
+}
+
 tasks.register("precommit") {
+  group = "verification"
+  description = "All possible checks before a commit."
+
   dependsOn("analyze")
   dependsOn("test")
 }
 
 tasks.register("analyze") {
-  dependsOn("generate")
+  dependsOn("generateCode")
 
   group = "verification"
   description = "Run dart analyzer"
@@ -38,7 +51,7 @@ tasks.register("analyze") {
 }
 
 tasks.register("test") {
-  dependsOn("generate")
+  dependsOn("generateCode")
 
   group = "verification"
   description = "Run tests"
@@ -74,7 +87,7 @@ tasks.register("pubGet") {
   }
 }
 
-tasks.register("generate") {
+tasks.register("generateCode") {
   dependsOn("clean")
   dependsOn("pubGet")
 
@@ -85,6 +98,36 @@ tasks.register("generate") {
     exec {
       executable("flutter")
       args("pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
+    }
+  }
+}
+
+tasks.register("extractBeamSymbols") {
+  dependsOn("ensureSymbolsDirectoryExists")
+  dependsOn("extractBeamSymbolsPython")
+
+  group = "build"
+  description = "Build Beam symbols dictionaries"
+}
+
+tasks.register("ensureSymbolsDirectoryExists") {
+  doLast {
+    exec {
+      executable("mkdir")
+      args("-p", "assets/symbols")
+    }
+  }
+}
+
+tasks.register("extractBeamSymbolsPython") {
+  doLast {
+    exec {
+      executable("python3")
+      args(
+        "tools/extract_symbols_python/extract_python_symbols.py",
+        "../../../sdks/python/apache_beam",
+      )
+      standardOutput = FileOutputStream("playground/frontend/playground_components/assets/symbols/python.yaml")
     }
   }
 }
