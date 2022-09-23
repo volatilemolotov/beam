@@ -17,6 +17,6 @@
 # under the License.
 #
 
-output "address" {
+output "playground_static_ip_address" {
  value = google_compute_global_address.pg-ip.address
 }
