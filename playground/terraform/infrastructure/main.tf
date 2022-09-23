@@ -28,13 +28,9 @@ module "network" {
   depends_on      = [module.setup]
   source          = "./network"
   project_id      = var.project_id
-  region          = var.region
+  region          = var.network_region
   network_name    = var.network_name
   subnetwork_name = var.subnetwork_name
-}
-
-module "ip_address" {
-  source          = "./ip_address"
 }
 
 module "buckets" {
@@ -54,7 +50,7 @@ module "artifact_registry" {
   source     = "./artifact_registry"
   project_id = var.project_id
   id         = var.repository_id
-  location   = var.region
+  location   = var.repository_location
 }
 
 module "memorystore" {
@@ -62,7 +58,7 @@ module "memorystore" {
   source         = "./memorystore"
   project_id     = var.project_id
   redis_version  = var.redis_version
-  region         = var.region
+  region         = var.redis_region
   name           = var.redis_name
   tier           = var.redis_tier
   replica_count  = var.redis_replica_count
@@ -73,20 +69,18 @@ module "memorystore" {
 }
 
 module "gke" {
-  depends_on            = [module.setup, module.artifact_registry, module.memorystore, module.network,module.ip_address]
+  depends_on            = [module.setup, module.artifact_registry, module.memorystore, module.network]
   source                = "./gke"
   project_id            = var.project_id
   service_account_email = module.setup.service_account_email
   machine_type      = var.gke_machine_type
   node_count        = var.gke_node_count
   name              = var.gke_name
-  location          = var.region
+  location          = var.gke_location
   subnetwork        = module.network.playground_subnetwork_id
   network           = module.network.playground_network_id
 }
-    
-module "appengine" {
-  depends_on        = [module.setup]
-  source            = "./appengine"
-  project_id        = var.project_id
+
+module "ip_address" {
+  source          = "./ip_address"
 }

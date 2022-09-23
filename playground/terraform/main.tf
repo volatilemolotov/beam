@@ -28,7 +28,8 @@ module "infrastructure" {
   bucket_examples_storage_class = var.bucket_examples_storage_class
   #Artifact Registry
   repository_id                 = var.repository_id
-  repository_location           = var.region
+  repository_location           = var.repository_location
+  #Redis
   redis_version                 = var.redis_version
   redis_name                    = var.redis_name
   redis_tier                    = var.redis_tier
@@ -40,7 +41,7 @@ module "infrastructure" {
   gke_machine_type              = var.gke_machine_type
   gke_node_count                = var.gke_node_count
   gke_name                      = var.gke_name
-  gke_location                  = var.location
+  gke_location                  = var.gke_location
   service_account               = var.service_account
 }
 
@@ -80,11 +81,10 @@ module "applications" {
   scio_max_instance   = var.scio_max_instance
   scio_min_instance   = var.scio_min_instance
 
-  location               = var.region
+  location               = var.application_location
   create_default_service = var.create_default_service
   state_bucket           = var.state_bucket
   state_prefix           = var.state_prefix
 }
-
 
 
