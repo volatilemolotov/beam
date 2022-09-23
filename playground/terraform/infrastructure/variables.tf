@@ -29,7 +29,6 @@ variable "environment" {
 
 variable "region" {
   description = "Infrastructure Region"
-  default     = "us-central1"
 }
 
 
@@ -87,7 +86,6 @@ variable "repository_id" {
 
 variable "repository_location" {
   description = "Location of Artifact Registry"
-  default     = "us-central1"
 }
 
 variable "repository_domain" {
@@ -103,7 +101,6 @@ variable "redis_version" {
 
 variable "redis_region" {
   description = "Region of Redis"
-  default     = "us-central1"
 }
 
 variable "redis_name" {
@@ -145,7 +142,6 @@ variable "subnetwork_name" {
 
 variable "network_region" {
   description = "Region of Redis"
-  default     = "us-central1"
 }
 
 # GKE
@@ -167,5 +163,4 @@ variable "gke_name" {
 
 variable "gke_location" {
   description = "Location of GKE cluster"
-  default     = "us-central1-a"
 }
