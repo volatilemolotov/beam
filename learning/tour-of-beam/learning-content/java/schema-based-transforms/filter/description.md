@@ -32,10 +32,10 @@ public class Location {
 In order to examine only locations in south Manhattan, you would write:
 
 ```
- PCollection<Location> locations = readLocations();
- locations.apply(Filter
-    .whereFieldName("latitude", lat -> lat < 40.720 && lat > 40.699)
-    .whereFieldName("longitude", long -> long < -73.969 && long > -74.747));
+PCollection<Location> locations = readLocations();
+locations.apply(Filter
+   .whereFieldName("latitude", latitude -> latitude < 40.720 && latitude > 40.699)
+   .whereFieldName("longitude", longitude -> longitude < -73.969 && longitude > -74.747));
 ```
 
 ### Multiple fields filter

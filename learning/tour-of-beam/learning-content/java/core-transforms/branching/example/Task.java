@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory;
 public class Task {
 
     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
-     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
