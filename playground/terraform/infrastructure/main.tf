@@ -28,7 +28,7 @@ module "network" {
   depends_on      = [module.setup]
   source          = "./network"
   project_id      = var.project_id
-  region          = var.network_region
+  region          = var.region
   network_name    = var.network_name
   subnetwork_name = var.subnetwork_name
 }
@@ -54,7 +54,7 @@ module "artifact_registry" {
   source     = "./artifact_registry"
   project_id = var.project_id
   id         = var.repository_id
-  location   = var.repository_location
+  location   = var.region
 }
 
 module "memorystore" {
@@ -62,7 +62,7 @@ module "memorystore" {
   source         = "./memorystore"
   project_id     = var.project_id
   redis_version  = var.redis_version
-  region         = var.redis_region
+  region         = var.region
   name           = var.redis_name
   tier           = var.redis_tier
   replica_count  = var.redis_replica_count
@@ -80,7 +80,7 @@ module "gke" {
   machine_type      = var.gke_machine_type
   node_count        = var.gke_node_count
   name              = var.gke_name
-  location          = var.gke_location
+  location          = var.region
   subnetwork        = module.network.playground_subnetwork_id
   network           = module.network.playground_network_id
 }
