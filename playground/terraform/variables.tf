@@ -29,7 +29,6 @@ variable "environment" {
 
 variable "region" {
   description = "Infrastructure Region"
-  default     = "us-central1"
 }
 
 # Infrastructure variables
@@ -48,12 +47,10 @@ variable "gke_node_count" {
 
 variable "gke_name" {
   description = "Name of GKE cluster"
-  default     = "playground-examples"
 }
 
 variable "gke_location" {
   description = "Location of GKE cluster"
-  default     = "us-central1-a"
 }
 
 variable "service_account" {
@@ -87,7 +84,6 @@ variable "repository_id" {
 
 variable "repository_location" {
   description = "Location of Artifact Registry"
-  default     = "us-central1"
 }
 
 #Redis
@@ -143,7 +139,6 @@ variable "docker_image_name" {
 
 variable "application_location" {
   description = "Location of App"
-  default     = "us-central"
 }
 
 # Frontend variables

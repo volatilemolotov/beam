@@ -33,6 +33,10 @@ module "network" {
   subnetwork_name = var.subnetwork_name
 }
 
+module "ip_address" {
+  source          = "./ip_address"
+}
+
 module "buckets" {
   depends_on    = [module.setup]
   source        = "./buckets"
@@ -69,7 +73,7 @@ module "memorystore" {
 }
 
 module "gke" {
-  depends_on            = [module.setup, module.artifact_registry, module.memorystore, module.network]
+  depends_on            = [module.setup, module.artifact_registry, module.memorystore, module.network,module.ip_address]
   source                = "./gke"
   project_id            = var.project_id
   service_account_email = module.setup.service_account_email
