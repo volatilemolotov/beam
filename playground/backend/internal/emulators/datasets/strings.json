@@ -1,0 +1,24 @@
+{
+  "strings": [
+    {
+      "key": 1,
+      "value": "hi there"
+    },
+    {
+      "key": 2,
+      "value": "hi"
+    },
+    {
+      "key": 3,
+      "value": "hi sue bob"
+    },
+    {
+      "key": 4,
+      "value": "hi sue"
+    },
+    {
+      "key": 5,
+      "value": "hi bob"
+    }
+  ]
+}
