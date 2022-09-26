@@ -17,49 +17,32 @@
  */
 package org.apache.beam.examples.complete.cdap.transforms;
 
-import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.plugin.hubspot.sink.batch.HubspotBatchSink;
 import io.cdap.plugin.hubspot.sink.batch.SinkHubspotConfig;
-import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
+import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
-import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.values.KV;
-import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PDone;
 import org.apache.hadoop.io.NullWritable;
 
-import java.util.Map;
-
 /** Different transformations over the processed data in the pipeline. */
-public class FormatOutputTransform extends PTransform<PCollection<KV<NullWritable, String>>, PDone> {
+public class FormatOutputTransform {
 
   /**
-   * Configures Cdap Hubspot receiver.
+   * Configures Cdap Hubspot Write transform.
    *
-   * @param params Cdap Hubspot plugin config
-   * @return configured writing to Cdap Hubspot
+   * @param pluginConfigParams Cdap Hubspot plugin config parameters
+   * @return configured Write transform to Cdap Hubspot
    */
-  public static CdapIO.Write<NullWritable, String> writeToCdapHubspot(Map<String, Object> params) {
+  public static CdapIO.Write<NullWritable, String> writeToCdapHubspot(
+      Map<String, Object> pluginConfigParams, String locksDirPath) {
     final SinkHubspotConfig pluginConfig =
-        new ConfigWrapper<>(SinkHubspotConfig.class)
-            .withParams(params)
-            .build();
+        new ConfigWrapper<>(SinkHubspotConfig.class).withParams(pluginConfigParams).build();
 
     return CdapIO.<NullWritable, String>write()
-        .withCdapPluginClass(HubspotBatchSource.class)
+        .withCdapPluginClass(HubspotBatchSink.class)
         .withPluginConfig(pluginConfig)
         .withKeyClass(NullWritable.class)
-        .withValueClass(String.class);
-  }
-
-  private final Map<String, Object> params;
-
-  public FormatOutputTransform(Map<String, Object> params) {
-    this.params = params;
-  }
-
-  @Override
-  public PDone expand(PCollection<KV<NullWritable, String>> input) {
-    return input.apply("writeToCdapHubspot", writeToCdapHubspot(params));
+        .withValueClass(String.class)
+        .withLocksDirPath(locksDirPath);
   }
 }

@@ -17,35 +17,29 @@
  */
 package org.apache.beam.examples.complete.cdap;
 
-import io.cdap.cdap.api.data.format.StructuredRecord;
-import org.apache.beam.examples.complete.cdap.options.CdapZendeskToCdapHubspotOptions;
+import com.google.gson.JsonElement;
+import java.util.Map;
+import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
-import org.apache.beam.examples.complete.cdap.transforms.FormatOutputTransform;
+import org.apache.beam.examples.complete.cdap.utils.JsonElementCoder;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
-import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapValues;
+import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.hadoop.io.NullWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link CdapZendeskToCdapHubspot} pipeline is a streaming pipeline which ingests data in JSON
- * format from CDAP Zendesk, and outputs the resulting records to CDAP Hubspot. Input topics, output
- * topic, Bootstrap servers are specified by the user as template parameters. <br>
- *
- * <p><b>Pipeline Requirements</b>
- *
- * <ul>
- *   <li>CDAP Bootstrap Server(s).
- *   <li>The CDAP Zendesk input stream.
- *   <li>The CDAP Hubspot output stream.
- * </ul>
+ * The {@link CdapHubspotToTxt} pipeline is a batch pipeline which ingests data in JSON format from
+ * CDAP Hubspot, and outputs the resulting records to .txt file. Hubspot parameters and outputut txt
+ * file path are specified by the user as template parameters. <br>
  *
  * <p><b>Example Usage</b>
  *
@@ -65,22 +59,17 @@ import org.slf4j.LoggerFactory;
  *
  * This task allows to run the pipeline via the following command:
  * {@code
- * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapZendeskToCdapHubspot \
+ * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapHubspotToTxt \
  *      -Dexec.args="--<argument>=<value> --<argument>=<value>"
  * }
  *
  * # Running the pipeline
- * To execute this pipeline, specify the parameters:
- *
- * - CDAP Bootstrap servers
- * - CDAP Zendesk input stream
- * - CDAP Hubspot output stream
- *
- * in the following format:
+ * To execute this pipeline, specify the parameters in the following format:
  * {@code
- * --bootstrapServers=host:port \
- * --inputTopics=your-input-topic \
- * --outputTopic=projects/your-project-id/topics/your-topic-name
+ * --apikey=your-api-key \
+ * --referenceName=your-reference-name \
+ * --objectType=your-object-type \
+ * --outputTxtFilePath=your-path-to-file
  * }
  *
  * By default this will run the pipeline locally with the DirectRunner. To change the runner, specify:
@@ -88,17 +77,11 @@ import org.slf4j.LoggerFactory;
  * --runner=YOUR_SELECTED_RUNNER
  * }
  * </pre>
- *
- * <p><b>Example Zendesk and Hubspot usage</b>
- *
- * <pre>
- * This template contains an example Class to deserialize Zendesk messages and send them to Hubspot via Cdap.
- * </pre>
  */
-public class CdapZendeskToCdapHubspot {
+public class CdapHubspotToTxt {
 
   /* Logger for class.*/
-  private static final Logger LOG = LoggerFactory.getLogger(CdapZendeskToCdapHubspot.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CdapHubspotToTxt.class);
 
   /**
    * Main entry point for pipeline execution.
@@ -106,10 +89,8 @@ public class CdapZendeskToCdapHubspot {
    * @param args Command line arguments to the pipeline.
    */
   public static void main(String[] args) {
-    CdapZendeskToCdapHubspotOptions options =
-        PipelineOptionsFactory.fromArgs(args)
-            .withValidation()
-            .as(CdapZendeskToCdapHubspotOptions.class);
+    CdapHubspotOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapHubspotOptions.class);
 
     // Create the pipeline
     Pipeline pipeline = Pipeline.create(options);
@@ -121,33 +102,37 @@ public class CdapZendeskToCdapHubspot {
    *
    * @param options arguments to the pipeline
    */
-  public static PipelineResult run(Pipeline pipeline, CdapZendeskToCdapHubspotOptions options) {
-    LOG.info(
-        "Starting Cdap-Zendesk-To-Cdap-Hubspot pipeline with parameters bootstrap servers:"
-            + "\nZendesk parameters:\n"
-            + options.getCdapZendeskParams()
-            + "\nHubspot parameters"
-            + options.getCdapHubspotParams());
+  public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
+    Map<String, Object> paramsMap = options.toPluginConfigParamsMap();
+    LOG.info("Starting Cdap-Hubspot pipeline with parameters: {}", paramsMap);
 
     /*
      * Steps:
-     *  1) Read messages in from Cdap Zendesk
+     *  1) Read messages in from Cdap Hubspot
      *  2) Extract values only
-     *  3) Write successful records to Cdap Hubspot
+     *  3) Write successful records to .txt file
      */
+    pipeline.getCoderRegistry().registerCoderForClass(JsonElement.class, JsonElementCoder.of());
 
     pipeline
-        .apply(
-            "readFromCdapZendesk",
-            FormatInputTransform.readFromCdapZendesk(options.getCdapZendeskParams()))
+        .apply("readFromCdapHubspot", FormatInputTransform.readFromCdapHubspot(paramsMap))
         .setCoder(
             KvCoder.of(
-                NullableCoder.of(WritableCoder.of(NullWritable.class)),
-                SerializableCoder.of(StructuredRecord.class)))
-        .apply(MapValues.into(TypeDescriptors.strings()).via(Object::toString))
+                NullableCoder.of(WritableCoder.of(NullWritable.class)), JsonElementCoder.of()))
         .apply(
-            "writeToCdapHubspot",
-            FormatOutputTransform.writeToCdapHubspot(options.getCdapHubspotParams(), ""));
+            MapValues.into(TypeDescriptors.strings())
+                .via(
+                    jsonElement -> {
+                      if (jsonElement == null) {
+                        return "{}";
+                      }
+                      return jsonElement
+                          .getAsJsonObject()
+                          .getAsJsonObject("properties")
+                          .getAsString();
+                    }))
+        .apply(Values.create())
+        .apply("writeToTxt", TextIO.write().to(options.outputTxtFilePath()));
 
     return pipeline.run();
   }

@@ -17,23 +17,16 @@
  */
 package org.apache.beam.examples.complete.cdap.transforms;
 
+import com.google.gson.JsonElement;
 import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.plugin.hubspot.common.SourceHubspotConfig;
+import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSourceConfig;
-import org.apache.beam.examples.complete.kafkatopubsub.options.KafkaToPubsubOptions;
+import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
-import org.apache.beam.sdk.io.gcp.pubsub.PubsubMessage;
-import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PDone;
-import org.apache.beam.sdk.values.TypeDescriptor;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Charsets;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
 import org.apache.hadoop.io.NullWritable;
-
-import java.util.Map;
 
 /** Different transformations over the processed data in the pipeline. */
 public class FormatInputTransform {
@@ -41,20 +34,38 @@ public class FormatInputTransform {
   /**
    * Configures Cdap Zendesk consumer.
    *
-   * @param params Cdap Zendesk plugin config
+   * @param pluginConfigParams Cdap Zendesk plugin config parameters
    * @return configured reading from Cdap
    */
-  public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapZendesk(Map<String, Object> params) {
+  public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapZendesk(
+      Map<String, Object> pluginConfigParams) {
 
     final ZendeskBatchSourceConfig pluginConfig =
-        new ConfigWrapper<>(ZendeskBatchSourceConfig.class)
-        .withParams(params)
-        .build();
+        new ConfigWrapper<>(ZendeskBatchSourceConfig.class).withParams(pluginConfigParams).build();
 
     return CdapIO.<NullWritable, StructuredRecord>read()
         .withCdapPluginClass(ZendeskBatchSource.class)
         .withPluginConfig(pluginConfig)
         .withKeyClass(NullWritable.class)
         .withValueClass(StructuredRecord.class);
+  }
+
+  /**
+   * Configures Cdap Hubspot Read transform.
+   *
+   * @param pluginConfigParams Cdap Hubspot plugin config parameters
+   * @return configured Read transform
+   */
+  public static CdapIO.Read<NullWritable, JsonElement> readFromCdapHubspot(
+      Map<String, Object> pluginConfigParams) {
+
+    SourceHubspotConfig pluginConfig =
+        new ConfigWrapper<>(SourceHubspotConfig.class).withParams(pluginConfigParams).build();
+
+    return CdapIO.<NullWritable, JsonElement>read()
+        .withCdapPluginClass(HubspotBatchSource.class)
+        .withPluginConfig(pluginConfig)
+        .withKeyClass(NullWritable.class)
+        .withValueClass(JsonElement.class);
   }
 }

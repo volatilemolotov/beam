@@ -17,12 +17,10 @@
  */
 package org.apache.beam.examples.complete.cdap.options;
 
-import org.apache.beam.sdk.io.cdap.Plugin;
+import java.util.Map;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation;
-
-import java.util.Map;
 
 public interface CdapZendeskToCdapHubspotOptions extends PipelineOptions {
 
