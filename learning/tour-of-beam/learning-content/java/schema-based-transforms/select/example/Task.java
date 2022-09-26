@@ -1,8 +1,9 @@
-import com.example.demo.Location;
-import com.example.demo.User;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.schemas.JavaFieldSchema;
+import org.apache.beam.sdk.schemas.annotations.DefaultSchema;
+import org.apache.beam.sdk.schemas.annotations.SchemaCreate;
 import org.apache.beam.sdk.schemas.transforms.Select;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
@@ -16,12 +17,44 @@ import org.slf4j.LoggerFactory;
 public class Task {
     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
 
+    // Location schema
+    @DefaultSchema(JavaFieldSchema.class)
+    public static class Location {
+        public Long userId;
+        public double latitude;
+        public double longtitude;
+
+        @SchemaCreate
+        public Location(Long userId, double latitude, double longtitude) {
+            this.userId = userId;
+            this.latitude = latitude;
+            this.longtitude = longtitude;
+        }
+    }
+
+    // User schema
+    @DefaultSchema(JavaFieldSchema.class)
+    public static class User {
+        public Long userId;
+        public String userName;
+        public String userSurname;
+        public Location location;
+
+        @SchemaCreate
+        public User(Long userId, String userName, String userSurname, Location location) {
+            this.userName = userName;
+            this.userSurname = userSurname;
+            this.userId = userId;
+            this.location = location;
+        }
+    }
+
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
         Pipeline pipeline = Pipeline.create(options);
 
-        User user = new User(1L, "Andy", "Gross", new Location(2L, 24,553));
-        PCollection<User> input = pipeline.apply(Create.of(user));
+        User user = new User(1L, "Andy", "Gross", new Location(2L, 24, 553));
+        PCollection<Object> input = pipeline.apply(Create.of(user));
 
         // Select [userName] and [userSurname]
         PCollection<Row> fullName = input.apply(Select.fieldNames("userName", "userSurname"));

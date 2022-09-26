@@ -3,6 +3,7 @@
   "run_cmd": "java",
   "test_cmd": "java",
   "compile_args": [
+    "-parameters",
     "-d",
     "bin",
     "-classpath"

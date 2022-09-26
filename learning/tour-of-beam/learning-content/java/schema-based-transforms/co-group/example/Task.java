@@ -9,12 +9,59 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionTuple;
 import org.apache.beam.sdk.values.Row;
+import org.apache.beam.sdk.schemas.annotations.DefaultSchema;
+import org.apache.beam.sdk.schemas.annotations.SchemaCreate;
+import org.apache.beam.sdk.schemas.JavaFieldSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 public class Task {
     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
+    // User schema
+    @DefaultSchema(JavaFieldSchema.class)
+    public static class User {
+        public Long userId;
+        public String userName;
+        public String userSurname;
+
+        @SchemaCreate
+        public User(Long userId, String userName, String userSurname) {
+            this.userName = userName;
+            this.userSurname = userSurname;
+            this.userId = userId;
+        }
+    }
+
+    // UserPurchase schema
+    @DefaultSchema(JavaFieldSchema.class)
+    public static class UserPurchase {
+        public Long userId;
+        public long cost;
+        public double transactionDuration;
+
+        @SchemaCreate
+        public UserPurchase(Long userId, long cost, double transactionDuration) {
+            this.userId = userId;
+            this.cost = cost;
+            this.transactionDuration = transactionDuration;
+        }
+    }
+
+    // Location schema
+    @DefaultSchema(JavaFieldSchema.class)
+    public static class Location {
+        public Long userId;
+        public String countryName;
+
+        @SchemaCreate
+        public Location(Long userId, String countryName) {
+            this.userId = userId;
+            this.countryName = countryName;
+        }
+    }
+
 
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
@@ -44,14 +91,14 @@ public class Task {
                         .apply(CoGroup.join(CoGroup.By.fieldNames("userId")));
 
 
-        coGroupPCollection.apply(Select.fieldNames("user.userName","user.userSurname","location.countryName","userPurchase.cost","userPurchase.transactionDuration"))
+        coGroupPCollection.apply(Select.fieldNames("user.userName", "user.userSurname", "location.countryName", "userPurchase.cost", "userPurchase.transactionDuration"))
                 .apply("User Purchase", ParDo.of(new LogOutput<>("CoGroup")));
         pipeline.run();
     }
 
     static class LogOutput<T> extends DoFn<T, T> {
 
-        private String prefix;
+        private final String prefix;
 
         LogOutput() {
             this.prefix = "Processing element";

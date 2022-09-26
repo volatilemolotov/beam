@@ -1,21 +1,38 @@
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
+import org.apache.beam.sdk.schemas.JavaFieldSchema;
+import org.apache.beam.sdk.schemas.annotations.DefaultSchema;
+import org.apache.beam.sdk.schemas.annotations.SchemaCreate;
 import org.apache.beam.sdk.schemas.transforms.Filter;
-import org.apache.beam.sdk.schemas.transforms.Group;
 import org.apache.beam.sdk.schemas.transforms.Select;
 import org.apache.beam.sdk.transforms.Create;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.Sum;
 import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 public class Task {
     private static final Logger LOG = LoggerFactory.getLogger(Task.class);
+
+    // UserPurchase schema
+    @DefaultSchema(JavaFieldSchema.class)
+    public static class UserPurchase {
+        public Long userId;
+        public String country;
+        public long cost;
+        public double transactionDuration;
+
+        @SchemaCreate
+        public UserPurchase(Long userId, String country, long cost, double transactionDuration) {
+            this.userId = userId;
+            this.country = country;
+            this.cost = cost;
+            this.transactionDuration = transactionDuration;
+        }
+    }
 
     public static void main(String[] args) {
         PipelineOptions options = PipelineOptionsFactory.fromArgs(args).create();
