@@ -16,4 +16,5 @@
  * limitations under the License.
  */
 
+/** Cdap Plugins template. */
 package org.apache.beam.examples.complete.cdap.transforms;

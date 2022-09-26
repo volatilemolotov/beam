@@ -65,6 +65,9 @@ dependencies {
   implementation library.java.avro
   implementation library.java.bigdataoss_util
   implementation library.java.cdap_api
+  implementation library.java.cdap_api_commons
+  implementation library.java.cdap_etl_api
+  implementation library.java.cdap_hydrator_common
   implementation library.java.cdap_plugin_hubspot
   implementation library.java.cdap_plugin_zendesk
   implementation library.java.google_api_client

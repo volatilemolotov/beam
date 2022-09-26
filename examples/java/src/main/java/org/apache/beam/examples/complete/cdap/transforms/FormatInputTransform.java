@@ -28,6 +28,8 @@ import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 /** Different transformations over the processed data in the pipeline. */
 public class FormatInputTransform {
 
@@ -42,6 +44,8 @@ public class FormatInputTransform {
 
     final ZendeskBatchSourceConfig pluginConfig =
         new ConfigWrapper<>(ZendeskBatchSourceConfig.class).withParams(pluginConfigParams).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
 
     return CdapIO.<NullWritable, StructuredRecord>read()
         .withCdapPluginClass(ZendeskBatchSource.class)
@@ -61,6 +65,8 @@ public class FormatInputTransform {
 
     SourceHubspotConfig pluginConfig =
         new ConfigWrapper<>(SourceHubspotConfig.class).withParams(pluginConfigParams).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
 
     return CdapIO.<NullWritable, JsonElement>read()
         .withCdapPluginClass(HubspotBatchSource.class)

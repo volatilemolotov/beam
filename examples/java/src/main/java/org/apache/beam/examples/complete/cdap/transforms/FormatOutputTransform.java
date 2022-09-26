@@ -24,6 +24,8 @@ import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 /** Different transformations over the processed data in the pipeline. */
 public class FormatOutputTransform {
 
@@ -37,6 +39,8 @@ public class FormatOutputTransform {
       Map<String, Object> pluginConfigParams, String locksDirPath) {
     final SinkHubspotConfig pluginConfig =
         new ConfigWrapper<>(SinkHubspotConfig.class).withParams(pluginConfigParams).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
 
     return CdapIO.<NullWritable, String>write()
         .withCdapPluginClass(HubspotBatchSink.class)
