@@ -50,6 +50,7 @@ dependencies {
     implementation library.java.cdap_plugin_salesforce
     implementation library.java.cdap_plugin_service_now
     implementation library.java.cdap_plugin_zendesk
+    implementation 'io.cdap.plugin:salesforce-plugins:1.4.0'
     implementation 'com.sendgrid:sendgrid-java:4.4.1'
     implementation 'javax.mail:mail:1.4.1'
     implementation library.java.commons_lang3

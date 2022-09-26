@@ -17,18 +17,11 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-
+import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.common.Constants;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import io.cdap.plugin.salesforce.plugin.OAuthInfo;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import io.cdap.plugin.sendgrid.batch.source.SendGridSource;
 import io.cdap.plugin.sendgrid.batch.source.SendGridSourceConfig;
 import io.cdap.plugin.sendgrid.common.helpers.IBaseObject;
@@ -36,15 +29,25 @@ import io.cdap.plugin.zuora.plugin.batch.source.ZuoraBatchSource;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSourceConfig;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSplitArgument;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
+import org.apache.beam.sdk.coders.Coder;
+import org.apache.beam.sdk.coders.CoderException;
 import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.coders.MapCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.cdap.context.BatchSinkContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
+import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.Values;
+import org.apache.beam.sdk.transforms.windowing.AfterWatermark;
+import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
+import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
@@ -58,8 +61,24 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
 /** Test class for {@link CdapIO}. */
 @RunWith(JUnit4.class)
+@SuppressWarnings("rawtypes")
 public class CdapIOTest {
 
   @Rule public final transient TestPipeline p = TestPipeline.create();
@@ -88,6 +107,18 @@ public class CdapIOTest {
           .put("dataSourceTypes", "MarketingCampaign")
           .put("dataSourceMarketing", "Senders")
           .put("dataSourceFields", "id,nickname")
+          .build();
+
+  private static final ImmutableMap<String, Object> TEST_SALESFORCE_PARAMS_MAP =
+      ImmutableMap.<String, Object>builder()
+          .put("referenceName", "referenceName")
+          .put("username", "akarys.shorabek@akvelon.com")
+          .put("password", "Akarys2001#")
+          .put("securityToken", "9h0BXK5zefgIwxzEzdqxv5Trv")
+          .put("consumerKey", "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
+          .put("consumerSecret", "77B38C597867F12182E33E98C188EF966E2754676F67308EE61AFB95F84E3C6E")
+          .put("loginUrl", "https://login.salesforce.com/services/oauth2/token")
+          .put("sObjectName", "Opportunity")
           .build();
 
   @Before
@@ -162,6 +193,39 @@ public class CdapIOTest {
               return null;
             }
         );
+
+    p.run();
+  }
+
+  @Test
+  public void testReadFromSalesForce() {
+    SalesforceSourceConfig sourceConfig = new ConfigWrapper<>(SalesforceSourceConfig.class)
+        .withParams(TEST_SALESFORCE_PARAMS_MAP)
+        .build();
+
+    CdapIO.Read<Schema, LinkedHashMap> reader =
+        CdapIO.<Schema, LinkedHashMap>read()
+            .withCdapPluginClass(SalesforceBatchSource.class)
+            .withPluginConfig(sourceConfig)
+            .withKeyClass(Schema.class)
+            .withValueClass(LinkedHashMap.class);
+
+    assertNotNull(reader.getPluginConfig());
+    assertNotNull(reader.getCdapPlugin());
+    assertFalse(reader.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
+
+    PCollection<KV<Schema, LinkedHashMap>> input = p.apply(reader).setCoder(
+        KvCoder.of(
+            SerializableCoder.of(Schema.class),
+            SerializableCoder.of(LinkedHashMap.class)
+        )
+    );
+
+    PAssert.thatSingleton(input.apply(Values.create()).apply(Window.<LinkedHashMap>into(new GlobalWindows())
+        .discardingFiredPanes()
+        .triggering(AfterWatermark.
+            pastEndOfWindow())).apply(Count.globally())).isEqualTo(31L);
 
     p.run();
   }
