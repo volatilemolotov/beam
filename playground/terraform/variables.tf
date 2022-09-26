@@ -45,13 +45,16 @@ variable "gke_node_count" {
   default     = 1
 }
 
+variable "pg_location" {
+}
+
 variable "gke_name" {
   description = "Name of GKE cluster"
 }
 
-variable "gke_location" {
-  description = "Location of GKE cluster"
-}
+#  variable "gke_location" {
+#    description = "Location of GKE cluster"
+#  }
 
 variable "service_account" {
   description = "Service account id"
@@ -82,9 +85,9 @@ variable "repository_id" {
   default     = "playground-repository"
 }
 
-variable "repository_location" {
-  description = "Location of Artifact Registry"
-}
+# variable "repository_location" {
+#   description = "Location of Artifact Registry"
+# }
 
 #Redis
 
@@ -137,9 +140,9 @@ variable "docker_image_name" {
   description = "Base prefix for docker images"
 }
 
-variable "application_location" {
-  description = "Location of App"
-}
+# variable "application_location" {
+#   description = "Location of App"
+# }
 
 # Frontend variables
 

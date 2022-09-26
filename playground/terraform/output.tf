@@ -77,3 +77,7 @@ output "scio-server-url" {
 output "front-server-url" {
   value = module.applications.front-server-url
 }
+
+output "playground_static_ip_address" {
+  value = module.infrastructure.playground_static_ip_address
+}

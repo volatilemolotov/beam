@@ -22,6 +22,9 @@ module "infrastructure" {
   project_id                    = var.project_id
   environment                   = var.environment
   region                        = var.region
+  network_region                = var.region
+  redis_region                  = var.region
+  pg_location                   = var.pg_location
   #GCS
   bucket_examples_name          = var.bucket_examples_name
   bucket_examples_location      = var.bucket_examples_location
@@ -40,7 +43,7 @@ module "infrastructure" {
   gke_machine_type              = var.gke_machine_type
   gke_node_count                = var.gke_node_count
   gke_name                      = var.gke_name
-  gke_location                  = var.location
+  gke_location                  = var.pg_location
   service_account               = var.service_account
 }
 

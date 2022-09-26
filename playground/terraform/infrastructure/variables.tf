@@ -164,3 +164,7 @@ variable "gke_name" {
 variable "gke_location" {
   description = "Location of GKE cluster"
 }
+
+variable "pg_location" {
+  description = "Location of GKE cluster"
+}
