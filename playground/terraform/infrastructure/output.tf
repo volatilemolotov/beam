@@ -56,3 +56,11 @@ output "docker-repository-root" {
 output "playground_static_ip_address" {
  value = module.ip_address.playground_static_ip_address
 }
+
+output "playground_gke_project" {
+ value = module.gke.gke_project
+}
+
+output "playground_static_ip_address_name" {
+ value = module.ip_address.playground_static_ip_address_name
+}

@@ -20,3 +20,7 @@
 output "playground_static_ip_address" {
  value = google_compute_global_address.pg-ip.address
 }
+
+output "playground_static_ip_address_name" {
+ value = google_compute_global_address.pg-ip.name
+}

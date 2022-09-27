@@ -31,7 +31,7 @@ module "infrastructure" {
   bucket_examples_storage_class = var.bucket_examples_storage_class
   #Artifact Registry
   repository_id                 = var.repository_id
-  repository_location           = var.repository_location
+  repository_location           = var.region
   #Redis
   redis_version                 = var.redis_version
   redis_name                    = var.redis_name
@@ -44,11 +44,7 @@ module "infrastructure" {
   gke_machine_type              = var.gke_machine_type
   gke_node_count                = var.gke_node_count
   gke_name                      = var.gke_name
-<<<<<<< HEAD
   gke_location                  = var.pg_location
-=======
-  gke_location                  = var.gke_location
->>>>>>> 445661c105d1fbf270e5803c88d90067df3938a3
   service_account               = var.service_account
 }
 

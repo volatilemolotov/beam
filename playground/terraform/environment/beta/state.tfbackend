@@ -17,4 +17,4 @@
 # under the License.
 #
 
-bucket  = "pg-kuber-tst"
+bucket  = "pg_playground"

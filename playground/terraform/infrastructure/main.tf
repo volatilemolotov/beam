@@ -76,15 +76,18 @@ module "gke" {
   machine_type      = var.gke_machine_type
   node_count        = var.gke_node_count
   name              = var.gke_name
-<<<<<<< HEAD
   location          = var.pg_location
-=======
-  location          = var.gke_location
->>>>>>> 445661c105d1fbf270e5803c88d90067df3938a3
   subnetwork        = module.network.playground_subnetwork_id
   network           = module.network.playground_network_id
 }
 
 module "ip_address" {
   source          = "./ip_address"
+}
+
+module "appengine" {
+ depends_on         = [module.setup]
+ source             = "./appengine"
+ project_id         = var.project_id
+ region             = var.region
 }
