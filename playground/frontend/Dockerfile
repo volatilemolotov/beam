@@ -18,8 +18,12 @@
 
 FROM debian:11 as build
 ARG FLUTTER_VERSION=3.3.2
+ARG BEAM_VERSION=2.40.0
+ARG BEAM_REF=release-$BEAM_VERSION
 
-RUN apt-get update && apt-get install -y wget xz-utils git
+RUN apt-get update && apt-get install -y wget xz-utils git curl python3 python3-pip
+RUN pip3 install pyyaml
+
 RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$FLUTTER_VERSION-stable.tar.xz &&\
     tar -xf flutter_linux_$FLUTTER_VERSION-stable.tar.xz &&\
     mv flutter /opt/ &&\
@@ -31,6 +35,15 @@ RUN wget https://storage.googleapis.com/flutter_infra_release/releases/stable/li
 
 COPY . /app
 WORKDIR /app
+
+RUN cd /app/playground_components &&\
+    git clone https://github.com/apache/beam.git &&\
+    cd beam &&\
+    git checkout $BEAM_REF &&\
+    cd .. &&\
+    mkdir -p assets/symbols &&\
+    python3 tools/extract_symbols_python/extract_python_symbols.py sdks/python/apache_beam > assets/symbols/python.yaml &&\
+    ls -la assets/symbols/python.yaml
 
 RUN cd /app/playground_components &&\
     flutter pub get -v &&\

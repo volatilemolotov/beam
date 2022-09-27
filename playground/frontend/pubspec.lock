@@ -275,9 +275,9 @@ packages:
   flutter_code_editor:
     dependency: transitive
     description:
-      path: "../../../flutter-code-editor"
-      relative: true
-    source: path
+      name: flutter_code_editor
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.1.0"
   flutter_highlight:
     dependency: transitive
