@@ -17,18 +17,20 @@
  */
 package org.apache.beam.examples.complete.cdap.transforms;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 import com.google.gson.JsonElement;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.plugin.hubspot.common.SourceHubspotConfig;
 import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
+import io.cdap.plugin.servicenow.source.ServiceNowSource;
+import io.cdap.plugin.servicenow.source.ServiceNowSourceConfig;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSourceConfig;
 import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
-
-import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
 /** Different transformations over the processed data in the pipeline. */
 public class FormatInputTransform {
@@ -73,5 +75,26 @@ public class FormatInputTransform {
         .withPluginConfig(pluginConfig)
         .withKeyClass(NullWritable.class)
         .withValueClass(JsonElement.class);
+  }
+
+  /**
+   * Configures Cdap ServiceNow Read transform.
+   *
+   * @param pluginConfigParams Cdap ServiceNow plugin config parameters
+   * @return configured Read transform
+   */
+  public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapServiceNow(
+      Map<String, Object> pluginConfigParams) {
+
+    ServiceNowSourceConfig pluginConfig =
+        new ConfigWrapper<>(ServiceNowSourceConfig.class).withParams(pluginConfigParams).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
+
+    return CdapIO.<NullWritable, StructuredRecord>read()
+        .withCdapPluginClass(ServiceNowSource.class)
+        .withPluginConfig(pluginConfig)
+        .withKeyClass(NullWritable.class)
+        .withValueClass(StructuredRecord.class);
   }
 }
