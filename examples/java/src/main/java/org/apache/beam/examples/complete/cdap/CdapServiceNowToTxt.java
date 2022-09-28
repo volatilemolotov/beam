@@ -21,6 +21,7 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapServiceNowOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
+import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
@@ -109,7 +110,7 @@ public class CdapServiceNowToTxt {
    * @param options arguments to the pipeline
    */
   public static PipelineResult run(Pipeline pipeline, CdapServiceNowOptions options) {
-    Map<String, Object> paramsMap = options.toPluginConfigParamsMap();
+    Map<String, Object> paramsMap = PluginConfigOptionsConverter.zendeskOptionsToParamsMap(options);
     LOG.info("Starting Cdap-ServiceNow pipeline with parameters: {}", paramsMap);
 
     /*
@@ -135,7 +136,7 @@ public class CdapServiceNowToTxt {
                       return structuredRecord.get("name");
                     }))
         .apply(Values.create())
-        .apply("writeToTxt", TextIO.write().to(options.outputTxtFilePath()));
+        .apply("writeToTxt", TextIO.write().to(options.getOutputTxtFilePath()));
 
     return pipeline.run();
   }

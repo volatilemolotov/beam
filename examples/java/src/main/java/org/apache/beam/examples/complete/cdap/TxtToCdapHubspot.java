@@ -22,6 +22,7 @@ import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatOutputTransform;
+import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.io.TextIO;
@@ -90,7 +91,7 @@ public class TxtToCdapHubspot {
     CdapHubspotOptions options =
         PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapHubspotOptions.class);
 
-    checkStateNotNull(options.locksDirPath(), "locksDirPath can not be null!");
+    checkStateNotNull(options.getLocksDirPath(), "locksDirPath can not be null!");
 
     // Create the pipeline
     Pipeline pipeline = Pipeline.create(options);
@@ -103,7 +104,7 @@ public class TxtToCdapHubspot {
    * @param options arguments to the pipeline
    */
   public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
-    Map<String, Object> paramsMap = options.toPluginConfigParamsMap();
+    Map<String, Object> paramsMap = PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options);
     LOG.info("Starting Txt-to-Cdap-Hubspot pipeline with parameters: {}", paramsMap);
 
     /*
@@ -114,14 +115,15 @@ public class TxtToCdapHubspot {
      */
 
     pipeline
-        .apply("readFromTxt", TextIO.read().from(options.txtFilePath()))
+        .apply("readFromTxt", TextIO.read().from(options.getTxtFilePath()))
         .apply(
             MapElements.into(new TypeDescriptor<KV<NullWritable, String>>() {})
                 .via(json -> KV.of(NullWritable.get(), json)))
         .apply(
             "writeToCdapHubspot",
             FormatOutputTransform.writeToCdapHubspot(
-                options.toPluginConfigParamsMap(), options.locksDirPath()));
+                PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options),
+                options.getLocksDirPath()));
 
     return pipeline.run();
   }

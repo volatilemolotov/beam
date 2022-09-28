@@ -22,10 +22,12 @@ import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
 import org.apache.beam.examples.complete.cdap.utils.JsonElementCoder;
+import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
@@ -68,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * {@code
  * --apikey=your-api-key \
  * --referenceName=your-reference-name \
- * --objectType=your-object-type \
+ * --objectType=Contacts \
  * --txtFilePath=your-path-to-output-file
  * }
  *
@@ -103,7 +105,7 @@ public class CdapHubspotToTxt {
    * @param options arguments to the pipeline
    */
   public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
-    Map<String, Object> paramsMap = options.toPluginConfigParamsMap();
+    Map<String, Object> paramsMap = PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options);
     LOG.info("Starting Cdap-Hubspot-to-txt pipeline with parameters: {}", paramsMap);
 
     /*
@@ -126,13 +128,13 @@ public class CdapHubspotToTxt {
                       if (jsonElement == null) {
                         return "{}";
                       }
-                      return jsonElement
-                          .getAsJsonObject()
-                          .getAsJsonObject("properties")
-                          .getAsString();
+                      return jsonElement.toString();
                     }))
+        .setCoder(
+            KvCoder.of(
+                NullableCoder.of(WritableCoder.of(NullWritable.class)), StringUtf8Coder.of()))
         .apply(Values.create())
-        .apply("writeToTxt", TextIO.write().to(options.txtFilePath()));
+        .apply("writeToTxt", TextIO.write().to(options.getTxtFilePath()));
 
     return pipeline.run();
   }

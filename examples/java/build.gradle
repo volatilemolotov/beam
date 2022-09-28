@@ -179,3 +179,10 @@ task wordCount(type:JavaExec) {
   systemProperties = System.getProperties()
   args = ["--output=/tmp/ouput.txt"]
 }
+
+task executeCdap (type:JavaExec) {
+  mainClass = System.getProperty("mainClass")
+  classpath = sourceSets.main.runtimeClasspath
+  systemProperties System.getProperties()
+  args System.getProperty("exec.args", "").split()
+}

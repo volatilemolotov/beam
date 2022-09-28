@@ -18,12 +18,9 @@
 package org.apache.beam.examples.complete.cdap.options;
 
 import io.cdap.plugin.common.Constants;
-import io.cdap.plugin.servicenow.source.util.ServiceNowConstants;
-import java.util.Map;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
 
 /**
  * The {@link CdapServiceNowOptions} interface provides the custom execution options passed by the
@@ -33,37 +30,51 @@ public interface CdapServiceNowOptions extends PipelineOptions {
 
   @Validation.Required
   @Description("The Client ID for ServiceNow Instance.")
-  String clientId();
+  String getClientId();
+
+  void setClientId(String clientId);
 
   @Validation.Required
   @Description("The Client Secret for ServiceNow Instance.")
-  String clientSecret();
+  String getClientSecret();
+
+  void setClientSecret(String clientSecret);
 
   @Validation.Required
   @Description("The user name for ServiceNow Instance.")
-  String user();
+  String getUser();
+
+  void setUser(String user);
 
   @Validation.Required
   @Description("The password for ServiceNow Instance.")
-  String password();
+  String getPassword();
+
+  void setPassword(String password);
 
   @Validation.Required
   @Description(
       "The REST API Endpoint for ServiceNow Instance. For example, https://instance.service-now.com")
-  String restApiEndpoint();
+  String getRestApiEndpoint();
+
+  void setRestApiEndpoint(String restApiEndpoint);
 
   @Validation.Required
   @Description(
       "Mode of query. The mode can be one of two values: "
           + "`Reporting` - will allow user to choose application for which data will be fetched for all tables, "
           + "`Table` - will allow user to enter table name for which data will be fetched.")
-  String queryMode();
+  String getQueryMode();
+
+  void setQueryMode(String queryMode);
 
   @Validation.Required
   @Description(
       "The name of the ServiceNow table from which data to be fetched. Note, the Table name value "
           + "will be ignored if the Mode is set to `Reporting`.")
-  String tableName();
+  String getTableName();
+
+  void setTableName(String tableName);
 
   @Validation.Required
   @Description(
@@ -71,27 +82,19 @@ public interface CdapServiceNowOptions extends PipelineOptions {
           + "`Actual` -  will fetch the actual values from the ServiceNow tables"
           + "`Display` - will fetch the display values from the ServiceNow tables."
           + "Default is Actual.")
-  String valueType();
+  String getValueType();
+
+  void setValueType(String valueType);
 
   @Validation.Required
   @Description(Constants.Reference.REFERENCE_NAME_DESCRIPTION)
-  String referenceName();
+  String getReferenceName();
+
+  void setReferenceName(String referenceName);
 
   @Validation.Required
   @Description("Path to output .txt file.")
-  String outputTxtFilePath();
+  String getOutputTxtFilePath();
 
-  default Map<String, Object> toPluginConfigParamsMap() {
-    return ImmutableMap.<String, Object>builder()
-        .put(ServiceNowConstants.PROPERTY_CLIENT_ID, clientId())
-        .put(ServiceNowConstants.PROPERTY_CLIENT_SECRET, clientSecret())
-        .put(ServiceNowConstants.PROPERTY_USER, user())
-        .put(ServiceNowConstants.PROPERTY_PASSWORD, password())
-        .put(ServiceNowConstants.PROPERTY_API_ENDPOINT, restApiEndpoint())
-        .put(ServiceNowConstants.PROPERTY_QUERY_MODE, queryMode())
-        .put(ServiceNowConstants.PROPERTY_TABLE_NAME, tableName())
-        .put(ServiceNowConstants.PROPERTY_VALUE_TYPE, valueType())
-        .put(Constants.Reference.REFERENCE_NAME, referenceName())
-        .build();
-  }
+  void setOutputTxtFilePath(String outputTxtFilePath);
 }
