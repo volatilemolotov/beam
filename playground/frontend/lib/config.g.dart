@@ -18,7 +18,7 @@
 
 const String kAnalyticsUA = 'UA-73650088-2';
 const String kApiClientURL =
-    'https://backend-router-beta-dot-apache-beam-testing.appspot.com';
+    'http://localhost:8082';
 const String kApiJavaClientURL =
     'https://backend-java-beta-dot-apache-beam-testing.appspot.com';
 const String kApiGoClientURL =
