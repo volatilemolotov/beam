@@ -16,15 +16,18 @@
 package life_cycle
 
 import (
-	playground "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/fs_tool"
-	"beam.apache.org/playground/backend/internal/utils"
 	"fmt"
-	"github.com/google/uuid"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/google/uuid"
+
+	playground "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/fs_tool"
+	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
@@ -44,8 +47,16 @@ const (
 
 func TestMain(m *testing.M) {
 	setup()
-	defer teardown()
-	m.Run()
+	exitValue := m.Run()
+	teardown()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
+	os.Exit(exitValue)
 }
 
 func setup() {

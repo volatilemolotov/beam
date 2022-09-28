@@ -16,8 +16,12 @@
 package executors
 
 import (
+	"fmt"
+	"os"
 	"reflect"
 	"testing"
+
+	"beam.apache.org/playground/backend/internal/constants"
 )
 
 var handlers []handler
@@ -31,7 +35,15 @@ func TestMain(m *testing.M) {
 			e.runArgs.pipelineOptions = []string{"--opt val"}
 		},
 	}
-	m.Run()
+	exitValue := m.Run()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
+	os.Exit(exitValue)
 }
 
 func TestNewExecutorBuilder(t *testing.T) {

@@ -21,9 +21,25 @@
 package errors
 
 import (
+	"fmt"
+	"os"
 	"strings"
 	"testing"
+
+	"beam.apache.org/playground/backend/internal/constants"
 )
+
+func TestMain(m *testing.M) {
+	exitValue := m.Run()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
+	os.Exit(exitValue)
+}
 
 func TestInternalError(t *testing.T) {
 	type args struct {

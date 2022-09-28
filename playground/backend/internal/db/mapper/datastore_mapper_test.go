@@ -17,6 +17,7 @@ package mapper
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 
@@ -36,6 +37,13 @@ func TestMain(m *testing.M) {
 	props, _ := environment.NewProperties(appEnv.PropertyPath())
 	testable = NewDatastoreMapper(datastoreMapperCtx, appEnv, props)
 	exitValue := m.Run()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
 	os.Exit(exitValue)
 }
 

@@ -16,14 +16,17 @@
 package fs_tool
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/utils"
 	"fmt"
-	"github.com/google/uuid"
 	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"github.com/google/uuid"
+
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
@@ -40,8 +43,16 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(fmt.Errorf("error during test setup: %s", err.Error()))
 	}
-	defer teardownFiles()
-	m.Run()
+	exitValue := m.Run()
+	teardownFiles()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
+	os.Exit(exitValue)
 }
 
 func prepareFiles() error {

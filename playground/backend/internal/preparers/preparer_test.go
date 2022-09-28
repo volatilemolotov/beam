@@ -1,14 +1,16 @@
 package preparers
 
 import (
-	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/validators"
 	"fmt"
 	"os"
 	"reflect"
 	"sync"
 	"testing"
+
+	pb "beam.apache.org/playground/backend/internal/api/v1"
+	"beam.apache.org/playground/backend/internal/constants"
+	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/validators"
 )
 
 const (
@@ -28,8 +30,16 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		logger.Fatal(err)
 	}
-	defer teardown()
-	m.Run()
+	exitValue := m.Run()
+	teardown()
+	if exitValue == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		if coverage < constants.MinTestCoverage {
+			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
+			exitValue = -1
+		}
+	}
+	os.Exit(exitValue)
 }
 
 // setupPreparedFiles creates go files used for tests
