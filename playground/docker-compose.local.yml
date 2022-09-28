@@ -41,6 +41,50 @@ services:
     depends_on:
       - redis
       - datastore
+  go_runner:
+    image: apache/beam_playground-backend-go
+    environment:
+      GOOGLE_CLOUD_PROJECT: test
+      CACHE_TYPE: remote
+      CACHE_ADDRESS: redis:6379
+      SERVER_PORT: 8084
+    ports:
+      - "8084:8084"
+    depends_on:
+      - redis
+  java_runner:
+    image: apache/beam_playground-backend-java
+    environment:
+      GOOGLE_CLOUD_PROJECT: test
+      CACHE_TYPE: remote
+      CACHE_ADDRESS: redis:6379
+      SERVER_PORT: 8086
+    ports:
+      - "8086:8086"
+    depends_on:
+      - redis
+  python_runner:
+    image: apache/beam_playground-backend-python
+    environment:
+      GOOGLE_CLOUD_PROJECT: test
+      CACHE_TYPE: remote
+      CACHE_ADDRESS: redis:6379
+      SERVER_PORT: 8088
+    ports:
+      - "8088:8088"
+    depends_on:
+      - redis
+  scio_runner:
+    image: apache/beam_playground-backend-scio
+    environment:
+      GOOGLE_CLOUD_PROJECT: test
+      CACHE_TYPE: remote
+      CACHE_ADDRESS: redis:6379
+      SERVER_PORT: 8090
+    ports:
+      - "8090:8090"
+    depends_on:
+      - redis
   frontend:
     image: apache/beam_playground-frontend
     ports:
