@@ -92,3 +92,19 @@ cd beam
 
 See [terraform](./terraform/README.md) for details on how to build and deploy
 the application and its dependent infrastructure.
+
+# Local deployment using docker compose
+
+Before running these gradle tasks it needs to set URLs manually in [config.g.dart](./frontend/lib/config.g.dart)
+
+To deploy the playground application in Docker:
+```
+cd beam
+./gradlew playground:dockerComposeLocalUp
+```
+
+To shut down the playground application in Docker:
+```
+cd beam
+./gradlew playground:dockerComposeLocalDown
+```
