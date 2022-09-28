@@ -41,7 +41,7 @@ task("lintProto") {
 
 // local deployment playground application - up
 task("dockerComposeLocalUp") {
-    dependsOn(":playground:backend:containers:router:docker", ":playground:frontend:docker")
+    dependsOn(":playground:backend:containers:router:docker", ":playground:frontend:docker", ":playground:backend:containers:go:docker", ":playground:backend:containers:java:docker", ":playground:backend:containers:python:docker", ":playground:backend:containers:scio:docker")
     group = "build"
     doLast {
         exec {
