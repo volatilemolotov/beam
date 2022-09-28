@@ -132,11 +132,11 @@ Beam can infer a schema from an `AutoValue` class. For example:
 @DefaultSchema(AutoValueSchema.class)
 @AutoValue
 public abstract class ShippingAddress {
-  public abstract String getStreetAddress();
-  public abstract String getCity();
-  public abstract String getState();
-  public abstract String getCountry();
-  public abstract String getPostCode();
+  public abstract String streetAddress();
+  public abstract String city();
+  public abstract String state();
+  public abstract String country();
+  public abstract String postCode();
 }
 ```
 
