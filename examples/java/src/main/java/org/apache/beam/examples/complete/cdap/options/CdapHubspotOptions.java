@@ -48,8 +48,11 @@ public interface CdapHubspotOptions extends PipelineOptions {
   String referenceName();
 
   @Validation.Required
-  @Description("Path to output .txt file.")
-  String outputTxtFilePath();
+  @Description("Path to input/output .txt file.")
+  String txtFilePath();
+
+  @Description("Locks directory path where locks will be stored.")
+  String locksDirPath();
 
   default Map<String, Object> toPluginConfigParamsMap() {
     String apiServerUrl = apiServerUrl();

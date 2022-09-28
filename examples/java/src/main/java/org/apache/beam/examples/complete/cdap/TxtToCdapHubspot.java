@@ -17,29 +17,26 @@
  */
 package org.apache.beam.examples.complete.cdap;
 
-import com.google.gson.JsonElement;
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
-import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
-import org.apache.beam.examples.complete.cdap.utils.JsonElementCoder;
+import org.apache.beam.examples.complete.cdap.transforms.FormatOutputTransform;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
-import org.apache.beam.sdk.coders.KvCoder;
-import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.io.TextIO;
-import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
-import org.apache.beam.sdk.transforms.MapValues;
-import org.apache.beam.sdk.transforms.Values;
-import org.apache.beam.sdk.values.TypeDescriptors;
+import org.apache.beam.sdk.transforms.MapElements;
+import org.apache.beam.sdk.values.KV;
+import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.hadoop.io.NullWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link CdapHubspotToTxt} pipeline is a batch pipeline which ingests data in JSON format from
- * CDAP Hubspot, and outputs the resulting records to .txt file. Hubspot parameters and output .txt
- * file path are specified by the user as template parameters. <br>
+ * The {@link TxtToCdapHubspot} pipeline is a batch pipeline which ingests data in JSON format from
+ * .txt file, and outputs the resulting records to Hubspot. Hubspot parameters and input .txt file
+ * path are specified by the user as template parameters. <br>
  *
  * <p><b>Example Usage</b>
  *
@@ -69,7 +66,8 @@ import org.slf4j.LoggerFactory;
  * --apikey=your-api-key \
  * --referenceName=your-reference-name \
  * --objectType=your-object-type \
- * --txtFilePath=your-path-to-output-file
+ * --txtFilePath=your-path-to-input-file \
+ * --locksDirPath=your-path-to-locks-dir
  * }
  *
  * By default this will run the pipeline locally with the DirectRunner. To change the runner, specify:
@@ -78,10 +76,10 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  */
-public class CdapHubspotToTxt {
+public class TxtToCdapHubspot {
 
   /* Logger for class.*/
-  private static final Logger LOG = LoggerFactory.getLogger(CdapHubspotToTxt.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TxtToCdapHubspot.class);
 
   /**
    * Main entry point for pipeline execution.
@@ -92,47 +90,38 @@ public class CdapHubspotToTxt {
     CdapHubspotOptions options =
         PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapHubspotOptions.class);
 
+    checkStateNotNull(options.locksDirPath(), "locksDirPath can not be null!");
+
     // Create the pipeline
     Pipeline pipeline = Pipeline.create(options);
     run(pipeline, options);
   }
 
   /**
-   * Runs a pipeline which reads records from CDAP Hubspot and writes it to .txt file.
+   * Runs a pipeline which reads records from .txt file and writes it to CDAP Hubspot.
    *
    * @param options arguments to the pipeline
    */
   public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
     Map<String, Object> paramsMap = options.toPluginConfigParamsMap();
-    LOG.info("Starting Cdap-Hubspot-to-txt pipeline with parameters: {}", paramsMap);
+    LOG.info("Starting Txt-to-Cdap-Hubspot pipeline with parameters: {}", paramsMap);
 
     /*
      * Steps:
-     *  1) Read messages in from Cdap Hubspot
-     *  2) Extract values only
-     *  3) Write successful records to .txt file
+     *  1) Read messages in from .txt file
+     *  2) Map to KV
+     *  3) Write successful records to Cdap Hubspot
      */
-    pipeline.getCoderRegistry().registerCoderForClass(JsonElement.class, JsonElementCoder.of());
 
     pipeline
-        .apply("readFromCdapHubspot", FormatInputTransform.readFromCdapHubspot(paramsMap))
-        .setCoder(
-            KvCoder.of(
-                NullableCoder.of(WritableCoder.of(NullWritable.class)), JsonElementCoder.of()))
+        .apply("readFromTxt", TextIO.read().from(options.txtFilePath()))
         .apply(
-            MapValues.into(TypeDescriptors.strings())
-                .via(
-                    jsonElement -> {
-                      if (jsonElement == null) {
-                        return "{}";
-                      }
-                      return jsonElement
-                          .getAsJsonObject()
-                          .getAsJsonObject("properties")
-                          .getAsString();
-                    }))
-        .apply(Values.create())
-        .apply("writeToTxt", TextIO.write().to(options.txtFilePath()));
+            MapElements.into(new TypeDescriptor<KV<NullWritable, String>>() {})
+                .via(json -> KV.of(NullWritable.get(), json)))
+        .apply(
+            "writeToCdapHubspot",
+            FormatOutputTransform.writeToCdapHubspot(
+                options.toPluginConfigParamsMap(), options.locksDirPath()));
 
     return pipeline.run();
   }
