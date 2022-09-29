@@ -112,7 +112,7 @@ public abstract class Plugin {
       }
     } catch (Exception e) {
       LOG.error("Error while prepareRun", e);
-      throw new IllegalStateException("Error while prepareRun");
+      throw new IllegalStateException("Error while prepareRun", e);
     }
   }
 

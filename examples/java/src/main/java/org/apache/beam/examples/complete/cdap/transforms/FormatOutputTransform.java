@@ -24,6 +24,8 @@ import io.cdap.plugin.hubspot.sink.batch.SinkHubspotConfig;
 import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
+import org.apache.beam.sdk.io.FileIO;
+import org.apache.beam.sdk.io.TextIO;
 import org.apache.hadoop.io.NullWritable;
 
 /** Different transformations over the processed data in the pipeline. */
@@ -48,5 +50,18 @@ public class FormatOutputTransform {
         .withKeyClass(NullWritable.class)
         .withValueClass(String.class)
         .withLocksDirPath(locksDirPath);
+  }
+
+  /**
+   * Configures FileIO receiver.
+   *
+   * @param directory Path to directory FileIO should write to
+   * @return configured writing to FileIO
+   */
+  public static FileIO.Write<Void, String> writeToFileIO(String directory) {
+    return FileIO.<String>write()
+        .to(directory)
+        .withSuffix(".txt")
+        .via(TextIO.sink());
   }
 }

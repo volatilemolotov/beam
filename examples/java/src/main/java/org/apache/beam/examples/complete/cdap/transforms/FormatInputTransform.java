@@ -41,10 +41,10 @@ import org.apache.hadoop.io.NullWritable;
 public class FormatInputTransform {
 
   /**
-   * Configures Cdap Zendesk consumer.
+   * Configures Cdap Zendesk Read transform.
    *
    * @param pluginConfigParams Cdap Zendesk plugin config parameters
-   * @return configured reading from Cdap
+   * @return configured Read transform
    */
   public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapZendesk(
       Map<String, Object> pluginConfigParams) {
