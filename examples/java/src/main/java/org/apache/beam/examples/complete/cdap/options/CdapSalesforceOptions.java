@@ -23,58 +23,60 @@ import io.cdap.plugin.salesforce.plugin.source.batch.util.SalesforceSourceConsta
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
-
-import java.util.Map;
 
 public interface CdapSalesforceOptions extends PipelineOptions {
 
     @Validation.Required
     @Description(Constants.Reference.REFERENCE_NAME_DESCRIPTION)
-    String referenceName();
+    String getReferenceName();
+
+    void setReferenceName(String referenceName);
 
     @Validation.Required
     @Description(SalesforceConstants.PROPERTY_USERNAME)
-    String username();
+    String getUsername();
+
+    void setUsername(String username);
 
     @Validation.Required
     @Description(SalesforceConstants.PROPERTY_PASSWORD)
-    String password();
+    String getPassword();
+
+    void setPassword(String password);
 
     @Validation.Required
     @Description(SalesforceConstants.PROPERTY_SECURITY_TOKEN)
-    String securityToken();
+    String getSecurityToken();
+
+    void setSecurityToken(String securityToken);
 
     @Validation.Required
     @Description(SalesforceConstants.PROPERTY_CONSUMER_KEY)
-    String consumerKey();
+    String getConsumerKey();
+
+    void setConsumerKey(String consumerKey);
 
     @Validation.Required
     @Description(SalesforceConstants.PROPERTY_CONSUMER_SECRET)
-    String consumerSecret();
+    String getConsumerSecret();
+
+    void setConsumerSecret(String consumerSecret);
 
     @Validation.Required
     @Description(SalesforceConstants.PROPERTY_LOGIN_URL)
-    String loginUrl();
+    String getLoginUrl();
+
+    void setLoginUrl(String loginUrl);
 
     @Validation.Required
     @Description(SalesforceSourceConstants.PROPERTY_SOBJECT_NAME)
-    String sObjectName();
+    String getSObjectName();
+
+    void setSObjectName(String sObjectName);
 
     @Validation.Required
     @Description("Path to output .txt file.")
-    String outputTxtFilePath();
+    String getOutputTxtFilePath();
 
-    default Map<String, Object> toPluginConfigParamsMap() {
-        return ImmutableMap.<String, Object>builder()
-            .put(Constants.Reference.REFERENCE_NAME, referenceName())
-            .put(SalesforceConstants.PROPERTY_USERNAME, username())
-            .put(SalesforceConstants.PROPERTY_PASSWORD, password())
-            .put(SalesforceConstants.PROPERTY_SECURITY_TOKEN, securityToken())
-            .put(SalesforceConstants.PROPERTY_CONSUMER_KEY, consumerKey())
-            .put(SalesforceConstants.PROPERTY_CONSUMER_SECRET, consumerSecret())
-            .put(SalesforceConstants.PROPERTY_LOGIN_URL, loginUrl())
-            .put(SalesforceSourceConstants.PROPERTY_SOBJECT_NAME, sObjectName())
-            .build();
-    }
+    void setOutputTxtFilePath(String outputTxtFilePath);
 }

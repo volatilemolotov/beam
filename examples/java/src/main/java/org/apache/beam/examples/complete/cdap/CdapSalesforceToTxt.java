@@ -20,6 +20,7 @@ package org.apache.beam.examples.complete.cdap;
 import io.cdap.cdap.api.data.schema.Schema;
 import org.apache.beam.examples.complete.cdap.options.CdapSalesforceOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
+import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
@@ -61,7 +62,7 @@ public class CdapSalesforceToTxt {
      * @param options arguments to the pipeline
      */
     public static PipelineResult run(Pipeline pipeline, CdapSalesforceOptions options) {
-        Map<String, Object> paramsMap = options.toPluginConfigParamsMap();
+        Map<String, Object> paramsMap = PluginConfigOptionsConverter.salesforceOptionsToParamsMap(options);
         LOG.info("Starting Cdap-Salesforce pipeline with parameters: {}", paramsMap);
 
         /*
@@ -84,7 +85,7 @@ public class CdapSalesforceToTxt {
                 MapValues.into(TypeDescriptors.strings())
                     .via(LinkedHashMap::toString))
             .apply(Values.create())
-            .apply("writeToTxt", TextIO.write().to(options.outputTxtFilePath()));
+            .apply("writeToTxt", TextIO.write().to(options.getOutputTxtFilePath()));
 
         return pipeline.run();
     }
