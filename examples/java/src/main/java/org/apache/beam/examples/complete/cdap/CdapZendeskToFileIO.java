@@ -17,34 +17,36 @@
  */
 package org.apache.beam.examples.complete.cdap;
 
+import static org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform.readFromCdapZendesk;
+
 import io.cdap.cdap.api.data.format.StructuredRecord;
-import org.apache.beam.examples.complete.cdap.options.CdapZendeskToCdapHubspotOptions;
-import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
+import org.apache.beam.examples.complete.cdap.options.CdapZendeskOptions;
+import org.apache.beam.examples.complete.cdap.options.OptionsToParamMapConverter;
 import org.apache.beam.examples.complete.cdap.transforms.FormatOutputTransform;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapValues;
+import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.hadoop.io.NullWritable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link CdapZendeskToCdapHubspot} pipeline is a streaming pipeline which ingests data in JSON
- * format from CDAP Zendesk, and outputs the resulting records to CDAP Hubspot. Input topics, output
- * topic, Bootstrap servers are specified by the user as template parameters. <br>
+ * The {@link CdapZendeskToFileIO} pipeline is a streaming pipeline which ingests data in JSON
+ * format from CDAP Zendesk, and outputs the resulting records to FileIO. <br>
  *
  * <p><b>Pipeline Requirements</b>
  *
  * <ul>
  *   <li>CDAP Bootstrap Server(s).
  *   <li>The CDAP Zendesk input stream.
- *   <li>The CDAP Hubspot output stream.
  * </ul>
  *
  * <p><b>Example Usage</b>
@@ -65,7 +67,7 @@ import org.slf4j.LoggerFactory;
  *
  * This task allows to run the pipeline via the following command:
  * {@code
- * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapZendeskToCdapHubspot \
+ * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.zendesk.CdapZendeskToFileIO \
  *      -Dexec.args="--<argument>=<value> --<argument>=<value>"
  * }
  *
@@ -74,7 +76,7 @@ import org.slf4j.LoggerFactory;
  *
  * - CDAP Bootstrap servers
  * - CDAP Zendesk input stream
- * - CDAP Hubspot output stream
+ * - FileIO output stream
  *
  * in the following format:
  * {@code
@@ -89,16 +91,16 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  *
- * <p><b>Example Zendesk and Hubspot usage</b>
+ * <p><b>Example CDAP Zendesk Plugin usage</b>
  *
  * <pre>
- * This template contains an example Class to deserialize Zendesk messages and send them to Hubspot via Cdap.
+ * This template contains an example Class to deserialize Zendesk messages and send them to FileIO via Cdap.
  * </pre>
  */
-public class CdapZendeskToCdapHubspot {
+public class CdapZendeskToFileIO {
 
   /* Logger for class.*/
-  private static final Logger LOG = LoggerFactory.getLogger(CdapZendeskToCdapHubspot.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CdapZendeskToFileIO.class);
 
   /**
    * Main entry point for pipeline execution.
@@ -106,10 +108,8 @@ public class CdapZendeskToCdapHubspot {
    * @param args Command line arguments to the pipeline.
    */
   public static void main(String[] args) {
-    CdapZendeskToCdapHubspotOptions options =
-        PipelineOptionsFactory.fromArgs(args)
-            .withValidation()
-            .as(CdapZendeskToCdapHubspotOptions.class);
+    CdapZendeskOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapZendeskOptions.class);
 
     // Create the pipeline
     Pipeline pipeline = Pipeline.create(options);
@@ -117,37 +117,43 @@ public class CdapZendeskToCdapHubspot {
   }
 
   /**
-   * Runs a pipeline which reads message from CDAP and writes it to RabbitMq.
+   * Runs a pipeline which reads message from CDAP and writes it to FileIO.
    *
    * @param options arguments to the pipeline
    */
-  public static PipelineResult run(Pipeline pipeline, CdapZendeskToCdapHubspotOptions options) {
+  public static PipelineResult run(Pipeline pipeline, CdapZendeskOptions options) {
     LOG.info(
-        "Starting Cdap-Zendesk-To-Cdap-Hubspot pipeline with parameters bootstrap servers:"
-            + "\nZendesk parameters:\n"
-            + options.getCdapZendeskParams()
-            + "\nHubspot parameters"
-            + options.getCdapHubspotParams());
+        String.format(
+            "Starting Cdap-Zendesk-To-FileIO pipeline with parameters bootstrap servers:\nZendesk parameters:\n%s",
+            OptionsToParamMapConverter.getParams(options)));
 
     /*
      * Steps:
      *  1) Read messages in from Cdap Zendesk
      *  2) Extract values only
-     *  3) Write successful records to Cdap Hubspot
+     *  3) Write successful records to FileIO
      */
 
     pipeline
         .apply(
             "readFromCdapZendesk",
-            FormatInputTransform.readFromCdapZendesk(options.getCdapZendeskParams()))
+            readFromCdapZendesk(OptionsToParamMapConverter.getParams(options)))
         .setCoder(
             KvCoder.of(
                 NullableCoder.of(WritableCoder.of(NullWritable.class)),
                 SerializableCoder.of(StructuredRecord.class)))
-        .apply(MapValues.into(TypeDescriptors.strings()).via(Object::toString))
         .apply(
-            "writeToCdapHubspot",
-            FormatOutputTransform.writeToCdapHubspot(options.getCdapHubspotParams(), ""));
+            MapValues.into(TypeDescriptors.strings())
+                .via(
+                    (structuredRecord ->
+                        structuredRecord != null ? structuredRecord.toString() : "")))
+        .setCoder(
+            KvCoder.of(
+                NullableCoder.of(WritableCoder.of(NullWritable.class)), StringUtf8Coder.of()))
+        .apply(Values.create())
+        .apply(
+            "writeToFileIO",
+            FormatOutputTransform.writeToFileIO(options.getFileIoOutputDirectory()));
 
     return pipeline.run();
   }
