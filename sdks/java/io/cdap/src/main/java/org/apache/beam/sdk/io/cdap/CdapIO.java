@@ -18,6 +18,7 @@
 package org.apache.beam.sdk.io.cdap;
 
 import static org.apache.beam.sdk.util.Preconditions.checkArgumentNotNull;
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 import static org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Preconditions.checkArgument;
 
 import com.google.auto.value.AutoValue;
@@ -80,28 +81,28 @@ public class CdapIO {
     }
 
     public Read<K, V> withCdapPlugin(Plugin plugin) {
-      checkArgument(plugin != null, "Cdap plugin can not be null");
+      checkStateNotNull(plugin, "Cdap plugin can not be null");
       return toBuilder().setCdapPlugin(plugin).build();
     }
 
     public Read<K, V> withCdapPluginClass(Class<?> cdapPluginClass) {
-      checkArgument(cdapPluginClass != null, "Cdap plugin class can not be null");
+      checkStateNotNull(cdapPluginClass, "Cdap plugin class can not be null");
       Plugin plugin = MappingUtils.getPluginByClass(cdapPluginClass);
       return toBuilder().setCdapPlugin(plugin).build();
     }
 
     public Read<K, V> withPluginConfig(PluginConfig pluginConfig) {
-      checkArgument(pluginConfig != null, "Plugin config can not be null");
+      checkStateNotNull(pluginConfig, "Plugin config can not be null");
       return toBuilder().setPluginConfig(pluginConfig).build();
     }
 
     public Read<K, V> withKeyClass(Class<K> keyClass) {
-      checkArgument(keyClass != null, "Key class can not be null");
+      checkStateNotNull(keyClass, "Key class can not be null");
       return toBuilder().setKeyClass(keyClass).build();
     }
 
     public Read<K, V> withValueClass(Class<V> valueClass) {
-      checkArgument(valueClass != null, "Value class can not be null");
+      checkStateNotNull(valueClass, "Value class can not be null");
       return toBuilder().setValueClass(valueClass).build();
     }
 

@@ -65,6 +65,9 @@ dependencies {
   implementation library.java.avro
   implementation library.java.bigdataoss_util
   implementation library.java.cdap_api
+  implementation library.java.cdap_api_commons
+  implementation library.java.cdap_etl_api
+  implementation library.java.cdap_hydrator_common
   implementation library.java.cdap_plugin_hubspot
   implementation library.java.cdap_plugin_zendesk
   implementation library.java.google_api_client
@@ -162,6 +165,13 @@ task preCommit() {
 
 task execute (type:JavaExec) {
   mainClass = System.getProperty("mainClass")
+  classpath = sourceSets.main.runtimeClasspath
+  systemProperties System.getProperties()
+  args System.getProperty("exec.args", "").split()
+}
+
+task execute_zendesk (type:JavaExec) {
+  mainClass = "org.apache.beam.examples.complete.cdap.CdapZendeskToFileIO"
   classpath = sourceSets.main.runtimeClasspath
   systemProperties System.getProperties()
   args System.getProperty("exec.args", "").split()

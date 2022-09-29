@@ -15,26 +15,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.examples.complete.cdap.options;
 
-import org.apache.beam.sdk.io.cdap.Plugin;
-import org.apache.beam.sdk.options.Description;
-import org.apache.beam.sdk.options.PipelineOptions;
-import org.apache.beam.sdk.options.Validation;
-
-import java.util.Map;
-
-public interface CdapZendeskToCdapHubspotOptions extends PipelineOptions {
-
-  @Validation.Required
-  @Description("Cdap Zendesk plugin configuration parameters.")
-  Map<String, Object> getCdapZendeskParams();
-
-  void setCdapZendeskParams(Map<String, Object> params);
-
-  @Validation.Required
-  @Description("Cdap Hubspot plugin configuration parameters.")
-  Map<String, Object> getCdapHubspotParams();
-
-  void setCdapHubspotParams(Map<String, Object> params);
-}
+/** Cdap Zendesk to FileIO template. */
+package org.apache.beam.examples.complete.cdap;

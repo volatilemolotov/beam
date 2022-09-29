@@ -17,23 +17,15 @@
  */
 package org.apache.beam.examples.complete.cdap.transforms;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSourceConfig;
-import org.apache.beam.examples.complete.kafkatopubsub.options.KafkaToPubsubOptions;
+import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
-import org.apache.beam.sdk.io.gcp.pubsub.PubsubMessage;
-import org.apache.beam.sdk.transforms.MapElements;
-import org.apache.beam.sdk.transforms.PTransform;
-import org.apache.beam.sdk.values.PCollection;
-import org.apache.beam.sdk.values.PDone;
-import org.apache.beam.sdk.values.TypeDescriptor;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.base.Charsets;
-import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
 import org.apache.hadoop.io.NullWritable;
-
-import java.util.Map;
 
 /** Different transformations over the processed data in the pipeline. */
 public class FormatInputTransform {
@@ -44,12 +36,13 @@ public class FormatInputTransform {
    * @param params Cdap Zendesk plugin config
    * @return configured reading from Cdap
    */
-  public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapZendesk(Map<String, Object> params) {
+  public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapZendesk(
+      Map<String, Object> params) {
 
     final ZendeskBatchSourceConfig pluginConfig =
-        new ConfigWrapper<>(ZendeskBatchSourceConfig.class)
-        .withParams(params)
-        .build();
+        new ConfigWrapper<>(ZendeskBatchSourceConfig.class).withParams(params).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can not be null");
 
     return CdapIO.<NullWritable, StructuredRecord>read()
         .withCdapPluginClass(ZendeskBatchSource.class)
