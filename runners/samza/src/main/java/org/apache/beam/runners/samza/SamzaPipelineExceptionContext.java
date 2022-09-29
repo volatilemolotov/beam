@@ -15,27 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.runners.samza.runtime;
+package org.apache.beam.runners.samza;
 
-import java.util.Collection;
-import java.util.concurrent.CompletionStage;
-import org.apache.beam.sdk.util.WindowedValue;
-import org.joda.time.Instant;
+/** Helper that is used to metadata associated with an exception thrown by Samza Runner. */
+public class SamzaPipelineExceptionContext {
+  private final String transformFullName;
+  private final Exception exception;
 
-/** Output emitter for Samza {@link Op}. */
-public interface OpEmitter<OutT> {
+  public SamzaPipelineExceptionContext(String transformFullName, Exception exception) {
+    this.transformFullName = transformFullName;
+    this.exception = exception;
+  }
 
-  void emitFuture(CompletionStage<Collection<WindowedValue<OutT>>> resultFuture);
+  public String getTransformFullName() {
+    return transformFullName;
+  }
 
-  void emitElement(WindowedValue<OutT> element);
-
-  void emitWatermark(Instant watermark);
-
-  <T> void emitView(String id, WindowedValue<Iterable<T>> elements);
-
-  Collection<OpMessage<OutT>> collectOutput();
-
-  CompletionStage<Collection<OpMessage<OutT>>> collectFuture();
-
-  Long collectWatermark();
+  public Exception getException() {
+    return exception;
+  }
 }

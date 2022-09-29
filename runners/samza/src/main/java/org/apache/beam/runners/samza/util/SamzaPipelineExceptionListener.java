@@ -15,27 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.beam.runners.samza.runtime;
+package org.apache.beam.runners.samza.util;
 
-import java.util.Collection;
-import java.util.concurrent.CompletionStage;
-import org.apache.beam.sdk.util.WindowedValue;
-import org.joda.time.Instant;
+import org.apache.beam.runners.samza.SamzaPipelineExceptionContext;
 
-/** Output emitter for Samza {@link Op}. */
-public interface OpEmitter<OutT> {
+/**
+ * An ExceptionListener following Observer pattern. Any runtime exception caught by {@code
+ * OpAdapter} will be notified to any concrete SamzaPipelineExceptionListener at Runtime
+ */
+public interface SamzaPipelineExceptionListener {
 
-  void emitFuture(CompletionStage<Collection<WindowedValue<OutT>>> resultFuture);
+  void onException(SamzaPipelineExceptionContext exceptionContext);
 
-  void emitElement(WindowedValue<OutT> element);
-
-  void emitWatermark(Instant watermark);
-
-  <T> void emitView(String id, WindowedValue<Iterable<T>> elements);
-
-  Collection<OpMessage<OutT>> collectOutput();
-
-  CompletionStage<Collection<OpMessage<OutT>>> collectFuture();
-
-  Long collectWatermark();
+  interface Registrar {
+    SamzaPipelineExceptionListener getExceptionListener();
+  }
 }
