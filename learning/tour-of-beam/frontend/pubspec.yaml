@@ -27,10 +27,6 @@ environment:
   flutter: ">=3.3.2"
 
 dependencies:
-  code_text_field:
-    git:
-      url: https://github.com/BertrandBev/code_field.git
-      ref: 9e2c9fe52a69481f038f4b6609e8a0a776429437
   easy_localization: ^3.0.1
   easy_localization_ext: ^0.1.0
   easy_localization_loader: ^1.0.0
