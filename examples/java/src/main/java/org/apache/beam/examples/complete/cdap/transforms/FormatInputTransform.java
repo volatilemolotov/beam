@@ -19,10 +19,15 @@ package org.apache.beam.examples.complete.cdap.transforms;
 
 import com.google.gson.JsonElement;
 import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.hubspot.common.SourceHubspotConfig;
 import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
+import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSourceConfig;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
@@ -31,6 +36,7 @@ import org.apache.hadoop.io.NullWritable;
 import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
 /** Different transformations over the processed data in the pipeline. */
+@SuppressWarnings("rawtypes")
 public class FormatInputTransform {
 
   /**
@@ -73,5 +79,26 @@ public class FormatInputTransform {
         .withPluginConfig(pluginConfig)
         .withKeyClass(NullWritable.class)
         .withValueClass(JsonElement.class);
+  }
+
+  /**
+   * Configures Cdap Salesforce Read transform.
+   *
+   * @param pluginConfigParams Cdap Salesforce plugin config parameters
+   * @return configured Read transform
+   */
+  public static CdapIO.Read<Schema, LinkedHashMap> readFromCdapSalesforce(
+      Map<String, Object> pluginConfigParams) {
+
+    SalesforceSourceConfig pluginConfig =
+        new ConfigWrapper<>(SalesforceSourceConfig.class).withParams(pluginConfigParams).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
+
+    return CdapIO.<Schema, LinkedHashMap>read()
+        .withCdapPluginClass(SalesforceBatchSource.class)
+        .withPluginConfig(pluginConfig)
+        .withKeyClass(Schema.class)
+        .withValueClass(LinkedHashMap.class);
   }
 }
