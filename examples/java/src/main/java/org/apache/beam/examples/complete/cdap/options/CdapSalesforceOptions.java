@@ -26,57 +26,57 @@ import org.apache.beam.sdk.options.Validation;
 
 public interface CdapSalesforceOptions extends PipelineOptions {
 
-    @Validation.Required
-    @Description(Constants.Reference.REFERENCE_NAME_DESCRIPTION)
-    String getReferenceName();
+  @Validation.Required
+  @Description(Constants.Reference.REFERENCE_NAME_DESCRIPTION)
+  String getReferenceName();
 
-    void setReferenceName(String referenceName);
+  void setReferenceName(String referenceName);
 
-    @Validation.Required
-    @Description(SalesforceConstants.PROPERTY_USERNAME)
-    String getUsername();
+  @Validation.Required
+  @Description(SalesforceConstants.PROPERTY_USERNAME)
+  String getUsername();
 
-    void setUsername(String username);
+  void setUsername(String username);
 
-    @Validation.Required
-    @Description(SalesforceConstants.PROPERTY_PASSWORD)
-    String getPassword();
+  @Validation.Required
+  @Description(SalesforceConstants.PROPERTY_PASSWORD)
+  String getPassword();
 
-    void setPassword(String password);
+  void setPassword(String password);
 
-    @Validation.Required
-    @Description(SalesforceConstants.PROPERTY_SECURITY_TOKEN)
-    String getSecurityToken();
+  @Validation.Required
+  @Description(SalesforceConstants.PROPERTY_SECURITY_TOKEN)
+  String getSecurityToken();
 
-    void setSecurityToken(String securityToken);
+  void setSecurityToken(String securityToken);
 
-    @Validation.Required
-    @Description(SalesforceConstants.PROPERTY_CONSUMER_KEY)
-    String getConsumerKey();
+  @Validation.Required
+  @Description(SalesforceConstants.PROPERTY_CONSUMER_KEY)
+  String getConsumerKey();
 
-    void setConsumerKey(String consumerKey);
+  void setConsumerKey(String consumerKey);
 
-    @Validation.Required
-    @Description(SalesforceConstants.PROPERTY_CONSUMER_SECRET)
-    String getConsumerSecret();
+  @Validation.Required
+  @Description(SalesforceConstants.PROPERTY_CONSUMER_SECRET)
+  String getConsumerSecret();
 
-    void setConsumerSecret(String consumerSecret);
+  void setConsumerSecret(String consumerSecret);
 
-    @Validation.Required
-    @Description(SalesforceConstants.PROPERTY_LOGIN_URL)
-    String getLoginUrl();
+  @Validation.Required
+  @Description(SalesforceConstants.PROPERTY_LOGIN_URL)
+  String getLoginUrl();
 
-    void setLoginUrl(String loginUrl);
+  void setLoginUrl(String loginUrl);
 
-    @Validation.Required
-    @Description(SalesforceSourceConstants.PROPERTY_SOBJECT_NAME)
-    String getSObjectName();
+  @Validation.Required
+  @Description(SalesforceSourceConstants.PROPERTY_SOBJECT_NAME)
+  String getSObjectName();
 
-    void setSObjectName(String sObjectName);
+  void setSObjectName(String sObjectName);
 
-    @Validation.Required
-    @Description("Path to output .txt file.")
-    String getOutputTxtFilePath();
+  @Validation.Required
+  @Description("Path to output .txt file.")
+  String getOutputTxtFilePath();
 
-    void setOutputTxtFilePath(String outputTxtFilePath);
+  void setOutputTxtFilePath(String outputTxtFilePath);
 }

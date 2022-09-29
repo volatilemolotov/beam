@@ -30,7 +30,6 @@ import io.cdap.plugin.servicenow.source.ServiceNowSource;
 import io.cdap.plugin.servicenow.source.ServiceNowSourceConfig;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSource;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSourceConfig;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;

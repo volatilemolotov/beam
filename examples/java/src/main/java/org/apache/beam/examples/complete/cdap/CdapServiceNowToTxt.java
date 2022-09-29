@@ -113,7 +113,8 @@ public class CdapServiceNowToTxt {
    * @param options arguments to the pipeline
    */
   public static PipelineResult run(Pipeline pipeline, CdapServiceNowOptions options) {
-    Map<String, Object> paramsMap = PluginConfigOptionsConverter.zendeskOptionsToParamsMap(options);
+    Map<String, Object> paramsMap =
+        PluginConfigOptionsConverter.serviceNowOptionsToParamsMap(options);
     LOG.info("Starting Cdap-ServiceNow pipeline with parameters: {}", paramsMap);
 
     /*

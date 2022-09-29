@@ -46,7 +46,7 @@ public class PluginConfigOptionsConverter {
         .build();
   }
 
-  public static Map<String, Object> zendeskOptionsToParamsMap(CdapServiceNowOptions options) {
+  public static Map<String, Object> serviceNowOptionsToParamsMap(CdapServiceNowOptions options) {
     return ImmutableMap.<String, Object>builder()
         .put(ServiceNowConstants.PROPERTY_CLIENT_ID, options.getClientId())
         .put(ServiceNowConstants.PROPERTY_CLIENT_SECRET, options.getClientSecret())
