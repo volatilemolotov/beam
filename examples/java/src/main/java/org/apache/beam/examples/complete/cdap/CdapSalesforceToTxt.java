@@ -25,6 +25,7 @@ import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
+import org.apache.beam.sdk.coders.StringUtf8Coder;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapValues;
@@ -84,6 +85,7 @@ public class CdapSalesforceToTxt {
             .apply(
                 MapValues.into(TypeDescriptors.strings())
                     .via(LinkedHashMap::toString))
+            .setCoder(KvCoder.of(SerializableCoder.of(Schema.class), StringUtf8Coder.of()))
             .apply(Values.create())
             .apply("writeToTxt", TextIO.write().to(options.getOutputTxtFilePath()));
 
