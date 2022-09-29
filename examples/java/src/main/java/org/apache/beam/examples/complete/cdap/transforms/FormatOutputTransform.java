@@ -17,14 +17,14 @@
  */
 package org.apache.beam.examples.complete.cdap.transforms;
 
+import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
+
 import io.cdap.plugin.hubspot.sink.batch.HubspotBatchSink;
 import io.cdap.plugin.hubspot.sink.batch.SinkHubspotConfig;
 import java.util.Map;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
-
-import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
 /** Different transformations over the processed data in the pipeline. */
 public class FormatOutputTransform {

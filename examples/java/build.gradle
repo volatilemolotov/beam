@@ -69,6 +69,7 @@ dependencies {
   implementation library.java.cdap_etl_api
   implementation library.java.cdap_hydrator_common
   implementation library.java.cdap_plugin_hubspot
+  implementation library.java.cdap_plugin_service_now
   implementation library.java.cdap_plugin_zendesk
   implementation 'io.cdap.plugin:salesforce-plugins:1.4.0'
   implementation library.java.google_api_client
@@ -178,4 +179,11 @@ task wordCount(type:JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   systemProperties = System.getProperties()
   args = ["--output=/tmp/ouput.txt"]
+}
+
+task executeCdap (type:JavaExec) {
+  mainClass = System.getProperty("mainClass")
+  classpath = sourceSets.main.runtimeClasspath
+  systemProperties System.getProperties()
+  args System.getProperty("exec.args", "").split()
 }

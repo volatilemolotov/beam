@@ -17,17 +17,16 @@
  */
 package org.apache.beam.examples.complete.cdap;
 
-import com.google.gson.JsonElement;
+import io.cdap.cdap.api.data.format.StructuredRecord;
 import java.util.Map;
-import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
+import org.apache.beam.examples.complete.cdap.options.CdapServiceNowOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
-import org.apache.beam.examples.complete.cdap.utils.JsonElementCoder;
 import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
-import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.io.TextIO;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
@@ -39,9 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link CdapHubspotToTxt} pipeline is a batch pipeline which ingests data in JSON format from
- * CDAP Hubspot, and outputs the resulting records to .txt file. Hubspot parameters and output .txt
- * file path are specified by the user as template parameters. <br>
+ * The {@link CdapServiceNowToTxt} pipeline is a batch pipeline which ingests data in JSON format
+ * from CDAP ServiceNow, and outputs the resulting records to .txt file. ServiceNow parameters and
+ * output txt file path are specified by the user as template parameters. <br>
  *
  * <p><b>Example Usage</b>
  *
@@ -61,17 +60,23 @@ import org.slf4j.LoggerFactory;
  *
  * This task allows to run the pipeline via the following command:
  * {@code
- * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapHubspotToTxt \
+ * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapServiceNowToTxt \
  *      -Dexec.args="--<argument>=<value> --<argument>=<value>"
  * }
  *
  * # Running the pipeline
  * To execute this pipeline, specify the parameters in the following format:
  * {@code
- * --apikey=your-api-key \
+ * --clientId=your-client-id \
+ * --clientSecret=your-client-secret \
+ * --user=your-user \
+ * --password=your-password \
+ * --restApiEndpoint=your-endpoint \
+ * --queryMode=Table \
+ * --tableName=your-table \
+ * --valueType=Actual \
  * --referenceName=your-reference-name \
- * --objectType=Contacts \
- * --txtFilePath=your-path-to-output-file
+ * --outputTxtFilePath=your-path-to-file
  * }
  *
  * By default this will run the pipeline locally with the DirectRunner. To change the runner, specify:
@@ -80,10 +85,10 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  */
-public class CdapHubspotToTxt {
+public class CdapServiceNowToTxt {
 
   /* Logger for class.*/
-  private static final Logger LOG = LoggerFactory.getLogger(CdapHubspotToTxt.class);
+  private static final Logger LOG = LoggerFactory.getLogger(CdapServiceNowToTxt.class);
 
   /**
    * Main entry point for pipeline execution.
@@ -91,8 +96,8 @@ public class CdapHubspotToTxt {
    * @param args Command line arguments to the pipeline.
    */
   public static void main(String[] args) {
-    CdapHubspotOptions options =
-        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapHubspotOptions.class);
+    CdapServiceNowOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapServiceNowOptions.class);
 
     // Create the pipeline
     Pipeline pipeline = Pipeline.create(options);
@@ -100,41 +105,38 @@ public class CdapHubspotToTxt {
   }
 
   /**
-   * Runs a pipeline which reads records from CDAP Hubspot and writes it to .txt file.
+   * Runs a pipeline which reads records from CDAP ServiceNow and writes it to .txt file.
    *
    * @param options arguments to the pipeline
    */
-  public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
-    Map<String, Object> paramsMap = PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options);
-    LOG.info("Starting Cdap-Hubspot-to-txt pipeline with parameters: {}", paramsMap);
+  public static PipelineResult run(Pipeline pipeline, CdapServiceNowOptions options) {
+    Map<String, Object> paramsMap = PluginConfigOptionsConverter.zendeskOptionsToParamsMap(options);
+    LOG.info("Starting Cdap-ServiceNow pipeline with parameters: {}", paramsMap);
 
     /*
      * Steps:
-     *  1) Read messages in from Cdap Hubspot
+     *  1) Read messages in from Cdap ServiceNow
      *  2) Extract values only
      *  3) Write successful records to .txt file
      */
-    pipeline.getCoderRegistry().registerCoderForClass(JsonElement.class, JsonElementCoder.of());
 
     pipeline
-        .apply("readFromCdapHubspot", FormatInputTransform.readFromCdapHubspot(paramsMap))
+        .apply("readFromCdapServiceNow", FormatInputTransform.readFromCdapServiceNow(paramsMap))
         .setCoder(
             KvCoder.of(
-                NullableCoder.of(WritableCoder.of(NullWritable.class)), JsonElementCoder.of()))
+                NullableCoder.of(WritableCoder.of(NullWritable.class)),
+                SerializableCoder.of(StructuredRecord.class)))
         .apply(
             MapValues.into(TypeDescriptors.strings())
                 .via(
-                    jsonElement -> {
-                      if (jsonElement == null) {
+                    structuredRecord -> {
+                      if (structuredRecord == null) {
                         return "{}";
                       }
-                      return jsonElement.toString();
+                      return structuredRecord.get("name");
                     }))
-        .setCoder(
-            KvCoder.of(
-                NullableCoder.of(WritableCoder.of(NullWritable.class)), StringUtf8Coder.of()))
         .apply(Values.create())
-        .apply("writeToTxt", TextIO.write().to(options.getTxtFilePath()));
+        .apply("writeToTxt", TextIO.write().to(options.getOutputTxtFilePath()));
 
     return pipeline.run();
   }
