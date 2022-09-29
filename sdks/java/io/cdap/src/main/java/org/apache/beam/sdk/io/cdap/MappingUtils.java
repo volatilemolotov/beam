@@ -25,6 +25,9 @@ import io.cdap.plugin.hubspot.sink.batch.HubspotOutputFormat;
 import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
 import io.cdap.plugin.hubspot.source.batch.HubspotInputFormat;
 import io.cdap.plugin.hubspot.source.batch.HubspotInputFormatProvider;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceBatchSink;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceOutputFormat;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceOutputFormatProvider;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormat;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormatProvider;
@@ -47,6 +50,8 @@ public class MappingUtils {
     if (pluginClass.equals(SalesforceBatchSource.class)) {
       return Plugin.create(
           pluginClass, SalesforceInputFormat.class, SalesforceInputFormatProvider.class);
+    } else if (pluginClass.equals(SalesforceBatchSink.class)) {
+      return Plugin.create(pluginClass, SalesforceOutputFormat.class, SalesforceOutputFormatProvider.class);
     } else if (pluginClass.equals(HubspotBatchSource.class)) {
       return Plugin.create(pluginClass, HubspotInputFormat.class, HubspotInputFormatProvider.class);
     } else if (pluginClass.equals(ZendeskBatchSource.class)) {

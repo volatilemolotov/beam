@@ -17,9 +17,14 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
+import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.common.Constants;
 import io.cdap.plugin.salesforce.plugin.OAuthInfo;
+import io.cdap.plugin.salesforce.plugin.sink.batch.CSVRecord;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceBatchSink;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConfig;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConstants;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import io.cdap.plugin.sendgrid.batch.source.SendGridSource;
@@ -31,11 +36,14 @@ import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSplitArgument;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
 import org.apache.beam.sdk.coders.Coder;
 import org.apache.beam.sdk.coders.CoderException;
+import org.apache.beam.sdk.coders.CustomCoder;
+import org.apache.beam.sdk.coders.IterableCoder;
 import org.apache.beam.sdk.coders.KvCoder;
 import org.apache.beam.sdk.coders.MapCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
+import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.cdap.context.BatchSinkContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
@@ -43,6 +51,7 @@ import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
+import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.transforms.windowing.AfterWatermark;
@@ -50,7 +59,10 @@ import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
 import org.apache.beam.sdk.transforms.windowing.Window;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
+import org.apache.beam.sdk.values.TypeDescriptor;
+import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.junit.Before;
@@ -63,7 +75,11 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.Serializable;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -119,6 +135,22 @@ public class CdapIOTest {
           .put("consumerSecret", "77B38C597867F12182E33E98C188EF966E2754676F67308EE61AFB95F84E3C6E")
           .put("loginUrl", "https://login.salesforce.com/services/oauth2/token")
           .put("sObjectName", "Opportunity")
+          .build();
+
+  private static final ImmutableMap<String, Object> TEST_SALESFORCE_SINK_PARAMS_MAP =
+      ImmutableMap.<String, Object>builder()
+          .put("referenceName", "referenceName")
+          .put("username", "akarys.shorabek@akvelon.com")
+          .put("password", "Akarys2001#")
+          .put("securityToken", "9h0BXK5zefgIwxzEzdqxv5Trv")
+          .put("consumerKey", "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
+          .put("consumerSecret", "77B38C597867F12182E33E98C188EF966E2754676F67308EE61AFB95F84E3C6E")
+          .put("loginUrl", "https://login.salesforce.com/services/oauth2/token")
+          .put("sObjectName", "Opportunity")
+          .put("operation", "Insert")
+          .put("errorHandling", "Skip on error")
+          .put("maxBytesPerBatch", "9999999")
+          .put("maxRecordsPerBatch", "2")
           .build();
 
   @Before
@@ -193,39 +225,6 @@ public class CdapIOTest {
               return null;
             }
         );
-
-    p.run();
-  }
-
-  @Test
-  public void testReadFromSalesForce() {
-    SalesforceSourceConfig sourceConfig = new ConfigWrapper<>(SalesforceSourceConfig.class)
-        .withParams(TEST_SALESFORCE_PARAMS_MAP)
-        .build();
-
-    CdapIO.Read<Schema, LinkedHashMap> reader =
-        CdapIO.<Schema, LinkedHashMap>read()
-            .withCdapPluginClass(SalesforceBatchSource.class)
-            .withPluginConfig(sourceConfig)
-            .withKeyClass(Schema.class)
-            .withValueClass(LinkedHashMap.class);
-
-    assertNotNull(reader.getPluginConfig());
-    assertNotNull(reader.getCdapPlugin());
-    assertFalse(reader.getCdapPlugin().isUnbounded());
-    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
-
-    PCollection<KV<Schema, LinkedHashMap>> input = p.apply(reader).setCoder(
-        KvCoder.of(
-            SerializableCoder.of(Schema.class),
-            SerializableCoder.of(LinkedHashMap.class)
-        )
-    );
-
-    PAssert.thatSingleton(input.apply(Values.create()).apply(Window.<LinkedHashMap>into(new GlobalWindows())
-        .discardingFiredPanes()
-        .triggering(AfterWatermark.
-            pastEndOfWindow())).apply(Count.globally())).isEqualTo(31L);
 
     p.run();
   }
@@ -408,6 +407,85 @@ public class CdapIOTest {
     assertThrows(
         UnsupportedOperationException.class,
         () -> CdapIO.<String, String>write().withCdapPluginClass(EmployeeBatchSink.class));
+  }
+
+  @Test
+  public void testReadFromSalesForce() {
+    SalesforceSourceConfig sourceConfig = new ConfigWrapper<>(SalesforceSourceConfig.class)
+        .withParams(TEST_SALESFORCE_PARAMS_MAP)
+        .build();
+
+    CdapIO.Read<Schema, LinkedHashMap> reader =
+        CdapIO.<Schema, LinkedHashMap>read()
+            .withCdapPluginClass(SalesforceBatchSource.class)
+            .withPluginConfig(sourceConfig)
+            .withKeyClass(Schema.class)
+            .withValueClass(LinkedHashMap.class);
+
+    assertNotNull(reader.getPluginConfig());
+    assertNotNull(reader.getCdapPlugin());
+    assertFalse(reader.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
+
+    PCollection<KV<Schema, LinkedHashMap>> input = p.apply(reader).setCoder(
+        KvCoder.of(
+            SerializableCoder.of(Schema.class),
+            SerializableCoder.of(LinkedHashMap.class)
+        )
+    );
+
+    PAssert.thatSingleton(input.apply(Values.create()).apply(Window.<LinkedHashMap>into(new GlobalWindows())
+        .discardingFiredPanes()
+        .triggering(AfterWatermark.
+            pastEndOfWindow())).apply(Count.globally())).isEqualTo(31L);
+
+    p.run();
+  }
+
+  @Test
+  public void testWriteToSalesForce() {
+    SalesforceSinkConfig sinkConfig = new ConfigWrapper<>(SalesforceSinkConfig.class)
+        .withParams(TEST_SALESFORCE_SINK_PARAMS_MAP)
+        .build();
+
+    CdapIO.Write<NullWritable, SerializableCSVRecord> writer =
+        CdapIO.<NullWritable, SerializableCSVRecord>write()
+            .withCdapPluginClass(SalesforceBatchSink.class)
+            .withPluginConfig(sinkConfig)
+            .withKeyClass(NullWritable.class)
+            .withValueClass(SerializableCSVRecord.class)
+            .withLocksDirPath(tmpFolder.getRoot().getAbsolutePath());
+
+    assertNotNull(writer.getPluginConfig());
+    assertNotNull(writer.getCdapPlugin());
+    assertFalse(writer.getCdapPlugin().isUnbounded());
+    assertEquals(BatchSinkContextImpl.class, writer.getCdapPlugin().getContext().getClass());
+
+    List<String> fieldNames = new ArrayList<>();
+    List<String> values = new ArrayList<>();
+
+    fieldNames.add("Name");
+    values.add("asdasdsad");
+
+    p.apply(Create.of(
+          KV.of(NullWritable.get(),new SerializableCSVRecord(fieldNames, values))
+        ).withCoder(
+            KvCoder.of(
+              NullableCoder.of(WritableCoder.of(NullWritable.class)),
+              SerializableCoder.of(SerializableCSVRecord.class)
+            )
+        )).setTypeDescriptor(
+        TypeDescriptors.kvs(
+            new TypeDescriptor<NullWritable>() {}, new TypeDescriptor<SerializableCSVRecord>() {})).apply(writer);
+
+    p.run();
+  }
+
+  private static class SerializableCSVRecord extends CSVRecord implements Serializable {
+
+    public SerializableCSVRecord(List<String> columnNames, List<String> values) {
+      super(columnNames, values);
+    }
   }
 
   @Test
