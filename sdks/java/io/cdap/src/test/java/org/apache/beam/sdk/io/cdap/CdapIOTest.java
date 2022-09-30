@@ -460,6 +460,7 @@ public class CdapIOTest {
     assertNotNull(writer.getCdapPlugin());
     assertFalse(writer.getCdapPlugin().isUnbounded());
     assertEquals(BatchSinkContextImpl.class, writer.getCdapPlugin().getContext().getClass());
+    writer.getCdapPlugin().getContext().getInputSchema();
 
     List<String> fieldNames = new ArrayList<>();
     List<String> values = new ArrayList<>();

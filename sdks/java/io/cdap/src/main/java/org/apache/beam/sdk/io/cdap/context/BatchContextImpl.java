@@ -36,11 +36,12 @@ import io.cdap.cdap.etl.api.SubmitterLifecycle;
 import io.cdap.cdap.etl.api.action.SettableArguments;
 import io.cdap.cdap.etl.api.batch.BatchContext;
 import io.cdap.cdap.etl.api.lineage.field.FieldOperation;
+
+import javax.annotation.Nullable;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /** Class for Batch, Sink and Stream CDAP wrapper classes that use it to provide common details. */
 @SuppressWarnings({"TypeParameterUnusedInFormals", "nullness"})
