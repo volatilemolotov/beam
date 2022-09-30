@@ -244,7 +244,8 @@ class DatastoreClient:
                 "created": now,
                 "origin": origin,
                 "numberOfFiles": 1,
-                "schVer": schema_key
+                "schVer": schema_key,
+                "complexity": f"COMPLEXITY_{example.complexity}"
             }
         )
         return snippet_entity
@@ -270,7 +271,6 @@ class DatastoreClient:
                 "descr": example.tag.description,
                 "tags": example.tag.tags,
                 "cats": example.tag.categories,
-                "complexity": example.complexity,
                 "path": example.link,
                 "type": PrecompiledObjectType.Name(example.type),
                 "origin": origin,
