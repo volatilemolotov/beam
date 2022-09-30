@@ -19,16 +19,18 @@ package org.apache.beam.examples.complete.cdap.transforms;
 
 import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
+import io.cdap.cdap.api.plugin.PluginConfig;
+import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.plugin.hubspot.sink.batch.HubspotBatchSink;
 import io.cdap.plugin.hubspot.sink.batch.SinkHubspotConfig;
 import java.util.Map;
-import org.apache.beam.sdk.io.cdap.CdapIO;
-import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.sdk.io.cdap.CdapIO;
+import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
 
-/** Different transformations over the processed data in the pipeline. */
+/** Different output transformations over the processed data in the pipeline. */
 public class FormatOutputTransform {
 
   /**
@@ -39,13 +41,14 @@ public class FormatOutputTransform {
    */
   public static CdapIO.Write<NullWritable, String> writeToCdapHubspot(
       Map<String, Object> pluginConfigParams, String locksDirPath) {
-    final SinkHubspotConfig pluginConfig =
+    final PluginConfig pluginConfig =
         new ConfigWrapper<>(SinkHubspotConfig.class).withParams(pluginConfigParams).build();
 
     checkStateNotNull(pluginConfig, "Plugin config can't be null.");
+    Class<? extends BatchSink<?, ?, ?>> pluginClass = HubspotBatchSink.class;
 
     return CdapIO.<NullWritable, String>write()
-        .withCdapPluginClass(HubspotBatchSink.class)
+        .withCdapPluginClass(pluginClass)
         .withPluginConfig(pluginConfig)
         .withKeyClass(NullWritable.class)
         .withValueClass(String.class)
@@ -59,9 +62,6 @@ public class FormatOutputTransform {
    * @return configured writing to FileIO
    */
   public static FileIO.Write<Void, String> writeToFileIO(String directory) {
-    return FileIO.<String>write()
-        .to(directory)
-        .withSuffix(".txt")
-        .via(TextIO.sink());
+    return FileIO.<String>write().to(directory).withSuffix(".txt").via(TextIO.sink());
   }
 }

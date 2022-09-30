@@ -18,12 +18,11 @@
 package org.apache.beam.examples.complete.cdap;
 
 import io.cdap.cdap.api.data.format.StructuredRecord;
-import io.cdap.cdap.api.data.schema.Schema;
-import java.util.List;
 import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapServiceNowOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
 import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
+import org.apache.beam.examples.complete.cdap.utils.StructuredRecordUtils;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
@@ -132,7 +131,7 @@ public class CdapServiceNowToTxt {
                 SerializableCoder.of(StructuredRecord.class)))
         .apply(
             MapValues.into(TypeDescriptors.strings())
-                .via(CdapServiceNowToTxt::structuredRecordToString))
+                .via(StructuredRecordUtils::structuredRecordToString))
         .setCoder(
             KvCoder.of(
                 NullableCoder.of(WritableCoder.of(NullWritable.class)), StringUtf8Coder.of()))
@@ -140,30 +139,5 @@ public class CdapServiceNowToTxt {
         .apply("writeToTxt", TextIO.write().to(options.getOutputTxtFilePath()));
 
     return pipeline.run();
-  }
-
-  private static String structuredRecordToString(StructuredRecord structuredRecord) {
-    if (structuredRecord == null) {
-      return "{}";
-    }
-    Schema schema = structuredRecord.getSchema();
-    StringBuilder stringBuilder = new StringBuilder();
-    stringBuilder.append("{");
-    List<Schema.Field> fields = schema.getFields();
-    if (fields != null) {
-      for (int i = 0; i < fields.size(); i++) {
-        Schema.Field field = fields.get(i);
-        Object value = structuredRecord.get(field.getName());
-        if (value != null) {
-          stringBuilder.append("\"").append(field.getName()).append("\": ");
-          stringBuilder.append(value);
-          if (i != fields.size() - 1) {
-            stringBuilder.append(",");
-          }
-        }
-      }
-    }
-    stringBuilder.append("}");
-    return stringBuilder.toString();
   }
 }

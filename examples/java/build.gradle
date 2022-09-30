@@ -71,7 +71,7 @@ dependencies {
   implementation library.java.cdap_plugin_hubspot
   implementation library.java.cdap_plugin_service_now
   implementation library.java.cdap_plugin_zendesk
-  implementation 'io.cdap.plugin:salesforce-plugins:1.4.0'
+  implementation library.java.cdap_plugin_salesforce
   implementation library.java.google_api_client
   implementation library.java.google_api_services_bigquery
   implementation library.java.google_api_services_pubsub
@@ -167,13 +167,6 @@ task preCommit() {
 
 task execute (type:JavaExec) {
   mainClass = System.getProperty("mainClass")
-  classpath = sourceSets.main.runtimeClasspath
-  systemProperties System.getProperties()
-  args System.getProperty("exec.args", "").split()
-}
-
-task execute_zendesk (type:JavaExec) {
-  mainClass = "org.apache.beam.examples.complete.cdap.CdapZendeskToFileIO"
   classpath = sourceSets.main.runtimeClasspath
   systemProperties System.getProperties()
   args System.getProperty("exec.args", "").split()

@@ -17,11 +17,16 @@
  */
 package org.apache.beam.examples.complete.cdap.options;
 
+import io.cdap.plugin.common.Constants;
 import org.apache.beam.sdk.options.Default;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation;
 
+/**
+ * The {@link CdapZendeskOptions} interface provides the custom execution options passed by the
+ * executor at the command-line.
+ */
 public interface CdapZendeskOptions extends PipelineOptions {
 
   @Validation.Required
@@ -78,15 +83,21 @@ public interface CdapZendeskOptions extends PipelineOptions {
 
   void setReadTimeout(Integer readTimeout);
 
-  @Default.String("Groups")
+  @Validation.Required
   @Description("Zendesk objectsToPull.")
   String getObjectsToPull();
 
   void setObjectsToPull(String objectsToPull);
 
-  @Default.String("/Users/andrey/work/cdapZendeskOutput")
-  @Description("FileIO output directory.")
-  String getFileIoOutputDirectory();
+  @Validation.Required
+  @Description("Path to output .txt file.")
+  String getOutputTxtFilePath();
 
-  void setFileIoOutputDirectory(String fileIoOutputDirectory);
+  void setOutputTxtFilePath(String outputTxtFilePath);
+
+  @Validation.Required
+  @Description(Constants.Reference.REFERENCE_NAME_DESCRIPTION)
+  String getReferenceName();
+
+  void setReferenceName(String referenceName);
 }

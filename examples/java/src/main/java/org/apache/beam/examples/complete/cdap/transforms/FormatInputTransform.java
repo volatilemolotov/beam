@@ -36,8 +36,7 @@ import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
 
-/** Different transformations over the processed data in the pipeline. */
-@SuppressWarnings("rawtypes")
+/** Different input transformations over the processed data in the pipeline. */
 public class FormatInputTransform {
 
   /**
@@ -70,7 +69,7 @@ public class FormatInputTransform {
   public static CdapIO.Read<NullWritable, JsonElement> readFromCdapHubspot(
       Map<String, Object> pluginConfigParams) {
 
-    SourceHubspotConfig pluginConfig =
+    final SourceHubspotConfig pluginConfig =
         new ConfigWrapper<>(SourceHubspotConfig.class).withParams(pluginConfigParams).build();
 
     checkStateNotNull(pluginConfig, "Plugin config can't be null.");
@@ -91,7 +90,7 @@ public class FormatInputTransform {
   public static CdapIO.Read<NullWritable, StructuredRecord> readFromCdapServiceNow(
       Map<String, Object> pluginConfigParams) {
 
-    ServiceNowSourceConfig pluginConfig =
+    final ServiceNowSourceConfig pluginConfig =
         new ConfigWrapper<>(ServiceNowSourceConfig.class).withParams(pluginConfigParams).build();
 
     checkStateNotNull(pluginConfig, "Plugin config can't be null.");
@@ -109,10 +108,11 @@ public class FormatInputTransform {
    * @param pluginConfigParams Cdap Salesforce plugin config parameters
    * @return configured Read transform
    */
+  @SuppressWarnings("rawtypes")
   public static CdapIO.Read<Schema, LinkedHashMap> readFromCdapSalesforce(
       Map<String, Object> pluginConfigParams) {
 
-    SalesforceSourceConfig pluginConfig =
+    final SalesforceSourceConfig pluginConfig =
         new ConfigWrapper<>(SalesforceSourceConfig.class).withParams(pluginConfigParams).build();
 
     checkStateNotNull(pluginConfig, "Plugin config can't be null.");
