@@ -40,17 +40,9 @@ dependencies {
   dockerDependency project(path: playgroundJobServerProject, configuration: "shadow")
 }
 
-task configure {
-  group = "build"
-  description = "After checkout, gets everything ready for local development, test, or build."
-
-  dependsOn("playground_components:configure")
-  dependsOn("generateCode")
-}
-
 task analyze  {
-  dependsOn("playground_components:generateCode")
-  dependsOn("generateCode")
+  dependsOn("playground_components:generate")
+  dependsOn("generate")
 
   group = "verification"
   description = "Analyze dart code"
@@ -99,8 +91,8 @@ task run {
 }
 
 task test {
-  dependsOn("playground_components:generateCode")
-  dependsOn("generateCode")
+  dependsOn("playground_components:generate")
+  dependsOn("generate")
 
   group = "verification"
   description = "flutter test"
@@ -120,7 +112,7 @@ task precommit {
   dependsOn("test")
 }
 
-task generateCode {
+task generate {
   dependsOn("flutterClean")
   dependsOn("pubGet")
 
@@ -174,7 +166,7 @@ docker {
   tags containerImageTags()
   buildArgs(['FLUTTER_VERSION': project.rootProject.hasProperty(["flutter-version"]) ?
                                 project.rootProject["flutter-version"] :
-                                "3.3.2" ])
+                                "3.0.1-stable" ])
 }
 
 // Ensure that we build the required resources and copy and file dependencies from related projects

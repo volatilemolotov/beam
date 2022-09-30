@@ -16,28 +16,15 @@
  * limitations under the License.
  */
 
-import java.io.FileOutputStream
-
 description = "Apache Beam :: Playground :: playground_components Flutter Package"
-
-tasks.register("configure") {
-  dependsOn("generateCode")
-  dependsOn("extractBeamSymbols")
-
-  group = "build"
-  description = "After checkout, gets everything ready for local development, test, or build."
-}
 
 tasks.register("precommit") {
   dependsOn("analyze")
   dependsOn("test")
-
-  group = "verification"
-  description = "All possible checks before a commit."
 }
 
 tasks.register("analyze") {
-  dependsOn("generateCode")
+  dependsOn("generate")
 
   group = "verification"
   description = "Run dart analyzer"
@@ -51,7 +38,7 @@ tasks.register("analyze") {
 }
 
 tasks.register("test") {
-  dependsOn("generateCode")
+  dependsOn("generate")
 
   group = "verification"
   description = "Run tests"
@@ -67,7 +54,6 @@ tasks.register("test") {
 tasks.register("clean") {
   group = "build"
   description = "Remove build artifacts"
-
   doLast {
     exec {
       executable("flutter")
@@ -88,7 +74,7 @@ tasks.register("pubGet") {
   }
 }
 
-tasks.register("generateCode") {
+tasks.register("generate") {
   dependsOn("clean")
   dependsOn("pubGet")
 
@@ -99,36 +85,6 @@ tasks.register("generateCode") {
     exec {
       executable("flutter")
       args("pub", "run", "build_runner", "build", "--delete-conflicting-outputs")
-    }
-  }
-}
-
-tasks.register("extractBeamSymbols") {
-  dependsOn("ensureSymbolsDirectoryExists")
-  dependsOn("extractBeamSymbolsPython")
-
-  group = "build"
-  description = "Build Beam symbols dictionaries"
-}
-
-tasks.register("ensureSymbolsDirectoryExists") {
-  doLast {
-    exec {
-      executable("mkdir")
-      args("-p", "assets/symbols")
-    }
-  }
-}
-
-tasks.register("extractBeamSymbolsPython") {
-  doLast {
-    exec {
-      executable("python3")
-      args(
-        "tools/extract_symbols_python/extract_python_symbols.py",
-        "../../../sdks/python/apache_beam",
-      )
-      standardOutput = FileOutputStream("playground/frontend/playground_components/assets/symbols/python.yaml")
     }
   }
 }
