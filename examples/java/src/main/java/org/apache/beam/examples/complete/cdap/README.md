@@ -103,3 +103,28 @@ To execute this pipeline, specify the parameters in the following format:
  --referenceName=your-reference-name \
  --outputTxtFilePath=your-path-to-file
 ```
+
+## Running the CdapZendeskToTxt pipeline example
+
+Gradle 'executeCdap' task allows to run the pipeline via the following command:
+
+```bash
+gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapZendeskToTxt \
+     -Dexec.args="--<argument>=<value> --<argument>=<value>"
+```
+
+To execute this pipeline, specify the parameters in the following format:
+
+```bash
+ --zendeskBaseUrl=zendesk-url-key-followed-by-/%s/%s (example: https://support.zendesk.com/%s/%s) \
+ --adminEmail=your-admin-admin-email \
+ --apiToken=your-api-token \
+ --subdomains=your-subdomains (example: api/v2) \
+ --maxRetryCount=your-max-retry-count \
+ --maxRetryWait=your-max-retry-wait \
+ --maxRetryJitterWait=your-max-retry-jitter-wait \
+ --connectTimeout=your-connection-timeout \
+ --readTimeout=your-read-timeout \
+ --objectsToPull=your-objects-to-pull (example: Groups) \
+ --outputTxtFilePath=your-path-to-file
+```
