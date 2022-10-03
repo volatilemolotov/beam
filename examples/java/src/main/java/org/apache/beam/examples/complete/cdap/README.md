@@ -48,7 +48,7 @@ task executeCdap (type:JavaExec) {
 Gradle 'executeCdap' task allows to run the pipeline via the following command:
 
 ```bash
-gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapHubspotToTxt \
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.CdapHubspotToTxt \
      -Dexec.args="--<argument>=<value> --<argument>=<value>"
 ```
 
@@ -66,7 +66,7 @@ To execute this pipeline, specify the parameters in the following format:
 Gradle 'executeCdap' task allows to run the pipeline via the following command:
 
 ```bash
-gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.TxtToCdapHubspot \
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.TxtToCdapHubspot \
      -Dexec.args="--<argument>=<value> --<argument>=<value>"
 ```
 
@@ -85,7 +85,7 @@ To execute this pipeline, specify the parameters in the following format:
 Gradle 'executeCdap' task allows to run the pipeline via the following command:
 
 ```bash
-gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapServiceNowToTxt \
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.CdapServiceNowToTxt \
      -Dexec.args="--<argument>=<value> --<argument>=<value>"
 ```
 
@@ -104,12 +104,35 @@ To execute this pipeline, specify the parameters in the following format:
  --outputTxtFilePath=your-path-to-file
 ```
 
+## Running the CdapSalesforceToTxt pipeline example
+
+Gradle 'executeCdap' task allows to run the pipeline via the following command:
+
+```bash
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.CdapSalesforceToTxt \
+     -Dexec.args="--<argument>=<value> --<argument>=<value>"
+```
+
+To execute this pipeline, specify the parameters in the following format:
+
+```bash
+ --username=your-user-name\
+ --password=your-password \
+ --securityToken=your-token \
+ --consumerKey=your-key \
+ --consumerSecret=your-secret \
+ --loginUrl=your-login-url \
+ --sObjectName=object-name \
+ --referenceName=your-reference-name \
+ --outputTxtFilePath=your-path-to-file
+```
+
 ## Running the CdapZendeskToTxt pipeline example
 
 Gradle 'executeCdap' task allows to run the pipeline via the following command:
 
 ```bash
-gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.CdapZendeskToTxt \
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.CdapZendeskToTxt \
      -Dexec.args="--<argument>=<value> --<argument>=<value>"
 ```
 

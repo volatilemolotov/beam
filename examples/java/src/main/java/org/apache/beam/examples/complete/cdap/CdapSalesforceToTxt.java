@@ -36,7 +36,53 @@ import org.apache.beam.sdk.values.TypeDescriptors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("rawtypes")
+/**
+ * The {@link CdapSalesforceToTxt} pipeline is a batch pipeline which ingests data in JSON format
+ * from CDAP Salesforce, and outputs the resulting records to .txt file. Salesforce parameters and
+ * output txt file path are specified by the user as template parameters. <br>
+ *
+ * <p><b>Example Usage</b>
+ *
+ * <pre>
+ * # Gradle preparation
+ *
+ * To run this example your {@code build.gradle} file should contain the following task
+ * to execute the pipeline:
+ * {@code
+ * task executeCdap (type:JavaExec) {
+ *     mainClass = System.getProperty("mainClass")
+ *     classpath = sourceSets.main.runtimeClasspath
+ *     systemProperties System.getProperties()
+ *     args System.getProperty("exec.args", "").split()
+ * }
+ * }
+ *
+ * This task allows to run the pipeline via the following command:
+ * {@code
+ * gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.CdapSalesforceToTxt \
+ *      -Dexec.args="--<argument>=<value> --<argument>=<value>"
+ * }
+ *
+ * # Running the pipeline
+ * To execute this pipeline, specify the parameters in the following format:
+ * {@code
+ * --username=your-user-name\
+ * --password=your-password \
+ * --securityToken=your-token \
+ * --consumerKey=your-key \
+ * --consumerSecret=your-secret \
+ * --loginUrl=your-login-url \
+ * --sObjectName=object-name \
+ * --referenceName=your-reference-name \
+ * --outputTxtFilePath=your-path-to-file
+ * }
+ *
+ * By default this will run the pipeline locally with the DirectRunner. To change the runner, specify:
+ * {@code
+ * --runner=YOUR_SELECTED_RUNNER
+ * }
+ * </pre>
+ */
 public class CdapSalesforceToTxt {
 
   /* Logger for class.*/

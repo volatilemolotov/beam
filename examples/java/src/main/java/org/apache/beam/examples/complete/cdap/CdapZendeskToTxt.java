@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * To run this example your {@code build.gradle} file should contain the following task
  * to execute the pipeline:
  * {@code
- * task execute (type:JavaExec) {
+ * task executeCdap (type:JavaExec) {
  *     mainClass = System.getProperty("mainClass")
  *     classpath = sourceSets.main.runtimeClasspath
  *     systemProperties System.getProperties()
@@ -63,7 +63,7 @@ import org.slf4j.LoggerFactory;
  *
  * This task allows to run the pipeline via the following command:
  * {@code
- * gradle clean execute -DmainClass=org.apache.beam.examples.complete.cdap.zendesk.CdapZendeskToTxt \
+ * gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.zendesk.CdapZendeskToTxt \
  *      -Dexec.args="--<argument>=<value> --<argument>=<value>"
  * }
  *
