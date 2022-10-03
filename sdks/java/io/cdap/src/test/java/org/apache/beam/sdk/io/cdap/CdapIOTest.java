@@ -146,11 +146,11 @@ public class CdapIOTest {
           .put("consumerKey", "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
           .put("consumerSecret", "77B38C597867F12182E33E98C188EF966E2754676F67308EE61AFB95F84E3C6E")
           .put("loginUrl", "https://login.salesforce.com/services/oauth2/token")
-          .put("sObjectName", "Opportunity")
+          .put("sObjectName", "CustomObject")
           .put("operation", "Insert")
-          .put("errorHandling", "Skip on error")
+          .put("errorHandling", "Stop on error")
           .put("maxBytesPerBatch", "9999999")
-          .put("maxRecordsPerBatch", "2")
+          .put("maxRecordsPerBatch", "10")
           .build();
 
   @Before
@@ -466,7 +466,7 @@ public class CdapIOTest {
     List<String> values = new ArrayList<>();
 
     fieldNames.add("Name");
-    values.add("asdasdsad");
+    values.add("CustomObject");
 
     p.apply(Create.of(
           KV.of(NullWritable.get(),new SerializableCSVRecord(fieldNames, values))
