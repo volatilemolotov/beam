@@ -47,6 +47,9 @@ import javax.annotation.Nullable;
 @SuppressWarnings({"TypeParameterUnusedInFormals", "nullness"})
 public abstract class BatchContextImpl implements BatchContext {
 
+  public static final String DEFAULT_SCHEMA_FIELD_NAME = "Name";
+  public static final String DEFAULT_SCHEMA_RECORD_NAME = "Record";
+
   private final FailureCollectorWrapper failureCollector = new FailureCollectorWrapper();
 
   /**
@@ -120,8 +123,8 @@ public abstract class BatchContextImpl implements BatchContext {
   @Override
   public Schema getInputSchema() {
     List<Schema.Field> fields = new ArrayList<>();
-    fields.add(Schema.Field.of("Name", Schema.of(Schema.Type.STRING)));
-    return Schema.recordOf("record", fields);
+    fields.add(Schema.Field.of(DEFAULT_SCHEMA_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+    return Schema.recordOf(DEFAULT_SCHEMA_RECORD_NAME, fields);
   }
 
   @Override
@@ -130,8 +133,10 @@ public abstract class BatchContextImpl implements BatchContext {
   }
 
   @Override
-  public @Nullable Schema getOutputSchema() {
-    return Schema.of(Schema.Type.STRING);
+  public Schema getOutputSchema() {
+    List<Schema.Field> fields = new ArrayList<>();
+    fields.add(Schema.Field.of(DEFAULT_SCHEMA_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+    return Schema.recordOf(DEFAULT_SCHEMA_RECORD_NAME, fields);
   }
 
   @Override
