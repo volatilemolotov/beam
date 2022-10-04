@@ -1,17 +1,19 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.sendgrid.batch.sink;
 
@@ -22,15 +24,12 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.sendgrid.common.config.BaseConfig;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 
-/**
- * SendGrid Sink Plugin configuration.
- */
+/** SendGrid Sink Plugin configuration. */
 public class SendGridSinkConfig extends BaseConfig {
   public static final String PROPERTY_RECIPIENT_ADDRESS_SOURCE = "recipientAddressSource";
   public static final String PROPERTY_RECIPIENT_CONFIG_ADDRESS = "recipientConfigAddressList";
@@ -53,15 +52,14 @@ public class SendGridSinkConfig extends BaseConfig {
     return mailSubject;
   }
 
-  /**
-   * Available sources for recipient addresses.
-   */
+  /** Available sources for recipient addresses. */
   public enum ToAddressSource {
     CONFIG,
     INPUT;
 
     /**
      * Returns the ToAddressSource.
+     *
      * @param toType the to type
      * @return ToAddressSource
      */
@@ -72,8 +70,10 @@ public class SendGridSinkConfig extends BaseConfig {
         case TO_TYPE_CONFIG:
           return ToAddressSource.CONFIG;
         default:
-          throw new IllegalArgumentException(String.format("Unknown address source '%s', allowed: '%s', '%s'",
-              toType, TO_TYPE_INPUT, TO_TYPE_CONFIG));
+          throw new IllegalArgumentException(
+              String.format(
+                  "Unknown address source '%s', allowed: '%s', '%s'",
+                  toType, TO_TYPE_INPUT, TO_TYPE_CONFIG));
       }
     }
   }
@@ -102,7 +102,8 @@ public class SendGridSinkConfig extends BaseConfig {
   private String footerHTML;
 
   @Name(PROPERTY_SANDBOX_MODE)
-  @Description("Allows to send a test email to ensure that your request body is valid and formatted correctly")
+  @Description(
+      "Allows to send a test email to ensure that your request body is valid and formatted correctly")
   @Nullable
   @Macro
   private String sandboxMode;
@@ -114,15 +115,17 @@ public class SendGridSinkConfig extends BaseConfig {
   private String clickTracking;
 
   @Name(PROPERTY_OPEN_TRACKING)
-  @Description("Allows to track whether the email was opened or not, by including a single pixel image in the" +
-      " body of the content. When the pixel is loaded, SendGrid can log that the email was opened")
+  @Description(
+      "Allows to track whether the email was opened or not, by including a single pixel image in the"
+          + " body of the content. When the pixel is loaded, SendGrid can log that the email was opened")
   @Nullable
   @Macro
   private String openTracking;
 
   @Name(PROPERTY_SUBSCRIPTION_TRACKING)
-  @Description("Allows to insert a subscription management link at the bottom of the text and html" +
-      " bodies of an email")
+  @Description(
+      "Allows to insert a subscription management link at the bottom of the text and html"
+          + " bodies of an email")
   @Nullable
   @Macro
   private String subscriptionTracking;
@@ -170,27 +173,32 @@ public class SendGridSinkConfig extends BaseConfig {
 
   private void validateField(Schema.Field field, String name) {
     if (field == null) {
-      throw new IllegalArgumentException(String.format("Plugin is configured to use column '%s' for" +
-          " recipient addresses, but input schema did not provide such column", recipientColumnName));
+      throw new IllegalArgumentException(
+          String.format(
+              "Plugin is configured to use column '%s' for"
+                  + " recipient addresses, but input schema did not provide such column",
+              recipientColumnName));
     }
 
     Schema fieldSchema = field.getSchema();
     if (fieldSchema.getType() == Schema.Type.UNION) {
-      if (fieldSchema.getUnionSchemas().stream().noneMatch(x -> x.getType() == Schema.Type.STRING)) {
-        throw new IllegalArgumentException(String.format("The input schema column '%s' expected to be of type STRING",
-            name));
+      if (fieldSchema.getUnionSchemas().stream()
+          .noneMatch(x -> x.getType() == Schema.Type.STRING)) {
+        throw new IllegalArgumentException(
+            String.format("The input schema column '%s' expected to be of type STRING", name));
       }
       return;
     }
 
     if (fieldSchema.getType() != Schema.Type.STRING) {
-      throw new IllegalArgumentException(String.format("The input schema column '%s' expected to be of type STRING",
-          name));
+      throw new IllegalArgumentException(
+          String.format("The input schema column '%s' expected to be of type STRING", name));
     }
   }
 
   /**
    * Validate that the given schema is compatible with the given extension.
+   *
    * @param schema the schema
    */
   public void validate(Schema schema) {
@@ -207,11 +215,13 @@ public class SendGridSinkConfig extends BaseConfig {
 
   /**
    * Returns the author of the message.
+   *
    * @return string
    */
   public String getFrom() {
     if (Strings.isNullOrEmpty(from)) {
-      throw new IllegalArgumentException(String.format("Property '%s' cannot be empty", PROPERTY_FROM));
+      throw new IllegalArgumentException(
+          String.format("Property '%s' cannot be empty", PROPERTY_FROM));
     }
     return from;
   }
@@ -222,6 +232,7 @@ public class SendGridSinkConfig extends BaseConfig {
 
   /**
    * Returns the list of mail recipients.
+   *
    * @return list of string
    */
   public List<String> getRecipientAddresses() {

@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,110 +22,97 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: ProxyGetProductRatePlan (ProxyGetProductRatePlan).
-* Related objects:
-**/
+/** Object name: ProxyGetProductRatePlan (ProxyGetProductRatePlan). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "ProxyGetProductRatePlan",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED
-)
+    Name = "ProxyGetProductRatePlan",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED)
 public class ProxyGetProductRatePlan extends BaseObject {
   /**
-  * Name: CreatedById (CreatedById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: CreatedById (CreatedById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdById;
 
   /**
-  * Name: CreatedDate (CreatedDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: CreatedDate (CreatedDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdDate;
 
   /**
-  * Name: Description (Description), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: Description (Description), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("description")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String description;
 
   /**
-  * Name: EffectiveEndDate (EffectiveEndDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: EffectiveEndDate (EffectiveEndDate), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("effectiveEndDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String effectiveEndDate;
 
   /**
-  * Name: EffectiveStartDate (EffectiveStartDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: EffectiveStartDate (EffectiveStartDate), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("effectiveStartDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String effectiveStartDate;
 
-  /**
-  * Name: Id (Id), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: Id (Id), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("id")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String id;
 
-  /**
-  * Name: Name (Name), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: Name (Name), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("name")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String name;
 
   /**
-  * Name: ProductId (ProductId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: ProductId (ProductId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("productId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String productId;
 
   /**
-  * Name: UpdatedById (UpdatedById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: UpdatedById (UpdatedById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("updatedById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String updatedById;
 
   /**
-  * Name: UpdatedDate (UpdatedDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: UpdatedDate (UpdatedDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("updatedDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String updatedDate;
-
 
   @Override
   public void addFields() {

@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.client.schema;
 
 import com.google.gson.annotations.SerializedName;
@@ -22,9 +23,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
 
-/**
- * Zuora object field definition.
- */
+/** Zuora object field definition. */
 public class ZuoraObjectField {
 
   @XmlElement(name = "name")
@@ -132,7 +131,7 @@ public class ZuoraObjectField {
   }
 
   @SuppressWarnings("AnnotateFormatMethod")
-  private void appendLine(StringBuilder sb, String line, Object ... args) {
+  private void appendLine(StringBuilder sb, String line, Object... args) {
     if (args != null) {
       line = String.format(line, args);
     }
@@ -141,6 +140,7 @@ public class ZuoraObjectField {
 
   /**
    * Returns the string.
+   *
    * @return string
    */
   public String getJavaName() {
@@ -154,8 +154,12 @@ public class ZuoraObjectField {
     StringBuilder builder = new StringBuilder();
     appendLine(builder, "/**");
     appendLine(builder, "* Name: %s (%s), Type: %s", getName(), getLabel(), type);
-    appendLine(builder, "* Options (custom, update, select): %s, %s, %s",
-        getCustom(), getUpdatable(), getSelectable());
+    appendLine(
+        builder,
+        "* Options (custom, update, select): %s, %s, %s",
+        getCustom(),
+        getUpdatable(),
+        getSelectable());
 
     if (options != null && !options.isEmpty()) {
       appendLine(builder, "*");
@@ -163,16 +167,17 @@ public class ZuoraObjectField {
 
       final int[] lineWidth = {0};
 
-      options.forEach(x -> {
-        if (lineWidth[0] == 0) {
-          builder.append("  * ");
-        } else if (lineWidth[0] >= 80) {
-          lineWidth[0] = 0;
-          builder.append(System.lineSeparator()).append("  * ");
-        }
-        lineWidth[0] += x.length() + 2;
-        builder.append(String.format("%s, ", x));
-      });
+      options.forEach(
+          x -> {
+            if (lineWidth[0] == 0) {
+              builder.append("  * ");
+            } else if (lineWidth[0] >= 80) {
+              lineWidth[0] = 0;
+              builder.append(System.lineSeparator()).append("  * ");
+            }
+            lineWidth[0] += x.length() + 2;
+            builder.append(String.format("%s, ", x));
+          });
       appendLine(builder, "%s  *", System.lineSeparator());
     }
     appendLine(builder, "**/");
@@ -180,13 +185,18 @@ public class ZuoraObjectField {
       appendLine(builder, "@Nullable");
     }
 
-    // even while describe return field names with first upper case letter, real response comes with lower case
+    // even while describe return field names with first upper case letter, real response comes with
+    // lower case
     appendLine(builder, "@SerializedName(\"%s\")", getJavaName());
     if (getType().getCDAPType().equalsIgnoreCase("array")) {
-      appendLine(builder, "@ObjectFieldDefinition(FieldType = Schema.Type.%s, NestedClass = \"%s\")",
-        getType().getCDAPType(), subtype);
+      appendLine(
+          builder,
+          "@ObjectFieldDefinition(FieldType = Schema.Type.%s, NestedClass = \"%s\")",
+          getType().getCDAPType(),
+          subtype);
     } else {
-      appendLine(builder, "@ObjectFieldDefinition(FieldType = Schema.Type.%s)", getType().getCDAPType());
+      appendLine(
+          builder, "@ObjectFieldDefinition(FieldType = Schema.Type.%s)", getType().getCDAPType());
     }
     appendLine(builder, "private %s %s;", getType().getJavaType(true), getJavaName());
     return builder.toString();

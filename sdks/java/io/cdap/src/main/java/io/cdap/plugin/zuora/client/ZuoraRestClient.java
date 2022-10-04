@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.client;
 
@@ -32,20 +34,6 @@ import io.cdap.plugin.zuora.restobjects.ObjectInfo;
 import io.cdap.plugin.zuora.restobjects.SendObject;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
 import io.cdap.plugin.zuora.restobjects.objects.BaseResult;
-import org.apache.commons.lang3.text.StrSubstitutor;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.EntityBuilder;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,10 +52,24 @@ import javax.annotation.Nullable;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.EntityBuilder;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 
 /**
- * Zuora Rest Client based on {@link HttpClients} with added support authorization and pagination logic of the API.
- *
+ * Zuora Rest Client based on {@link HttpClients} with added support authorization and pagination
+ * logic of the API.
  */
 @SuppressWarnings("DefaultCharset")
 public class ZuoraRestClient {
@@ -105,25 +107,28 @@ public class ZuoraRestClient {
 
   /**
    * Constructor for ZuoraRestClient object.
+   *
    * @param apiEndpoint the api end point
    * @param clientId the client id
    * @param clientSecret the client secret
    * @param basicAuth the basic auth
    */
-  public ZuoraRestClient(String apiEndpoint, String clientId, String clientSecret, boolean basicAuth) {
+  public ZuoraRestClient(
+      String apiEndpoint, String clientId, String clientSecret, boolean basicAuth) {
     this.apiEnpoint = (apiEndpoint == null) ? REST_API : apiEndpoint;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.basicAuth = basicAuth;
-    this.client = HttpClients.custom()
-      .setUserAgent(CLIENT_NAME)
-      .setDefaultHeaders(Lists.newArrayList(
-        new BasicHeader("zuora-version", REST_ZUORA_VERSION)
-      ))
-      .build();
+    this.client =
+        HttpClients.custom()
+            .setUserAgent(CLIENT_NAME)
+            .setDefaultHeaders(
+                Lists.newArrayList(new BasicHeader("zuora-version", REST_ZUORA_VERSION)))
+            .build();
 
     try {
-      JAXBContext jaxbContext = JAXBContext.newInstance(ZuoraDefinitions.class, ZuoraObjectSchema.class);
+      JAXBContext jaxbContext =
+          JAXBContext.newInstance(ZuoraDefinitions.class, ZuoraObjectSchema.class);
       this.jaxbUnmarshaller = jaxbContext.createUnmarshaller();
     } catch (JAXBException e) {
       throw new RuntimeException("Invalid XML format", e);
@@ -131,8 +136,11 @@ public class ZuoraRestClient {
   }
 
   public ZuoraRestClient(BaseConfig config) {
-    this(config.getApiEndpoint(), config.getAuthUsername(), config.getAuthPassword(),
-      config.getAuthType() == AuthType.BASIC);
+    this(
+        config.getApiEndpoint(),
+        config.getAuthUsername(),
+        config.getAuthPassword(),
+        config.getAuthType() == AuthType.BASIC);
   }
 
   private String readFromStream(InputStream stream) throws IOException {
@@ -143,7 +151,9 @@ public class ZuoraRestClient {
 
   private String getOAuth2Token() throws IOException {
     if (basicAuth) {
-      authToken = Base64.getEncoder().encodeToString((String.format("%s:%s", clientId, clientSecret).getBytes()));
+      authToken =
+          Base64.getEncoder()
+              .encodeToString((String.format("%s:%s", clientId, clientSecret).getBytes()));
       return authToken;
     }
 
@@ -172,7 +182,7 @@ public class ZuoraRestClient {
 
       OAuthHttpResponse oAuthResponse;
       try (InputStream stream = httpEntity.getContent();
-           InputStreamReader reader = new InputStreamReader(stream)) {
+          InputStreamReader reader = new InputStreamReader(stream)) {
 
         oAuthResponse = GSON.fromJson(reader, OAuthHttpResponse.class);
       }
@@ -198,22 +208,24 @@ public class ZuoraRestClient {
   }
 
   /**
-   * Checks connection to the service by testing API, in case of exception would be generated {@link IOException}.
+   * Checks connection to the service by testing API, in case of exception would be generated {@link
+   * IOException}.
    */
   public void checkConnection() throws IOException {
     ImmutableMap.Builder<String, String> args = new ImmutableMap.Builder<>();
-    args
-      .put("page", "0")
-      .put("pageSize", "1");
+    args.put("page", "0").put("pageSize", "1");
 
     String response = makeApiRequest(Method.GET, CONNECTION_CHECK_ENDPOINT, args.build(), null);
     BaseResult<BaseObject> result = fetchObject("BaseObject", BaseObject.class, response);
     if (!result.isSuccess()) {
       if (result.getHttpCode() == 401) {
-        throw new IOException(String.format("Please check authentication data: %s", result.getReason(true)));
+        throw new IOException(
+            String.format("Please check authentication data: %s", result.getReason(true)));
       }
-      throw new IllegalArgumentException(String.format("Connection check failed: http code %s, message: %s",
-        result.getHttpCode(), result.getReason(false)));
+      throw new IllegalArgumentException(
+          String.format(
+              "Connection check failed: http code %s, message: %s",
+              result.getHttpCode(), result.getReason(false)));
     }
   }
 
@@ -226,7 +238,8 @@ public class ZuoraRestClient {
           int retryAfter;
           Header header = response.getLastHeader("Retry-After");
           try {
-            retryAfter = (header == null) ? HTTP_RATE_RETRY_TIME : Integer.parseInt(header.getValue());
+            retryAfter =
+                (header == null) ? HTTP_RATE_RETRY_TIME : Integer.parseInt(header.getValue());
           } catch (NumberFormatException e) {
             retryAfter = HTTP_RATE_RETRY_TIME;
           }
@@ -234,7 +247,7 @@ public class ZuoraRestClient {
           try {
             response.close();
           } catch (IOException e) {
-            //no-op
+            // no-op
           }
           Thread.sleep(retryAfter * 1000);
         } else {
@@ -246,13 +259,12 @@ public class ZuoraRestClient {
     }
   }
 
-  private String formatExceptionJsonFromString(InputStream message, Integer responseCode) throws IOException {
+  private String formatExceptionJsonFromString(InputStream message, Integer responseCode)
+      throws IOException {
     String data = readFromStream(message);
     return String.format(
-      "{\"success\": false, \"httpCode\": %s, \"reasons\": [{\"code\": \"%s\", \"message\": \"%s\"}]}",
-      responseCode,
-      responseCode,
-      (data == null) ? "" : data.replace("\"", "'"));
+        "{\"success\": false, \"httpCode\": %s, \"reasons\": [{\"code\": \"%s\", \"message\": \"%s\"}]}",
+        responseCode, responseCode, (data == null) ? "" : data.replace("\"", "'"));
   }
 
   private String requestWithTokenRefresh(HttpUriRequest request) throws IOException {
@@ -267,8 +279,8 @@ public class ZuoraRestClient {
           getOAuth2Token(request, true);
         }
       } else if (responseCode == HTTP_NOT_FOUND) {
-        throw new IllegalArgumentException(String.format("Requested resource '%s' not found",
-          request.getURI().toString()));
+        throw new IllegalArgumentException(
+            String.format("Requested resource '%s' not found", request.getURI().toString()));
       } else if (responseCode == HTTP_OK_STATUS || responseCode == HTTP_ACCEPTED_STATUS) {
         return readFromStream(response.getEntity().getContent());
       } else {
@@ -290,25 +302,25 @@ public class ZuoraRestClient {
   /**
    * Makes API request using {@code method} to the {@code endpoint} with {@code arguments}.
    *
-   * If {@code} endpoint does contain {@link VAR_OPEN_CHAR}, argument would be added to the headers. Otherwise
-   * would be added to the request parameters
+   * <p>If {@code} endpoint does contain {@link VAR_OPEN_CHAR}, argument would be added to the
+   * headers. Otherwise would be added to the request parameters
    *
    * @param method GET, POST, or PUT request
    * @param endpoint relative endpoint to make the request
    * @param arguments arguments to pass with the request
    * @param data data to post
-
    * @throws IOException
    */
-  private String makeApiRequest(Method method, String endpoint, @Nullable Map<String, String> arguments,
-                                @Nullable String data) throws IOException {
+  private String makeApiRequest(
+      Method method,
+      String endpoint,
+      @Nullable Map<String, String> arguments,
+      @Nullable String data)
+      throws IOException {
     RequestBuilder builder = RequestBuilder.create(method.name());
 
     if (method == Method.POST || method == Method.PUT) {
-      HttpEntity entity = EntityBuilder
-        .create()
-        .setText(data)
-        .build();
+      HttpEntity entity = EntityBuilder.create().setText(data).build();
       builder.setEntity(entity);
     }
     String uri = endpoint;
@@ -332,45 +344,52 @@ public class ZuoraRestClient {
    * @throws IllegalArgumentException if any validation issue
    */
   private void checkIncomingArguments(ObjectInfo objectInfo, Map<String, String> arguments)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
 
     if (objectInfo.getRequiredArguments() != null && !objectInfo.getRequiredArguments().isEmpty()) {
       if (arguments == null || arguments.isEmpty()) {
-        throw new IllegalArgumentException(String.format(
-          "Object '%s' requires input arguments to be passed, nothing found",
-          objectInfo.getCdapObjectName()
-        ));
+        throw new IllegalArgumentException(
+            String.format(
+                "Object '%s' requires input arguments to be passed, nothing found",
+                objectInfo.getCdapObjectName()));
       }
       List<String> exceptions = new ArrayList<>();
 
-      objectInfo.getRequiredArguments().forEach(x -> {
-        try {
-          if (Strings.isNullOrEmpty(x)) {
-            return;
-          }
+      objectInfo
+          .getRequiredArguments()
+          .forEach(
+              x -> {
+                try {
+                  if (Strings.isNullOrEmpty(x)) {
+                    return;
+                  }
 
-          String argument = arguments.keySet().stream()
-            .filter(x::equals)
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(String.format(
-              "Object '%s' requires '%s' argument, but nothing provided",
-              objectInfo.getCdapObjectName(),
-              x
-            )));
+                  String argument =
+                      arguments.keySet().stream()
+                          .filter(x::equals)
+                          .findFirst()
+                          .orElseThrow(
+                              () ->
+                                  new IllegalArgumentException(
+                                      String.format(
+                                          "Object '%s' requires '%s' argument, but nothing provided",
+                                          objectInfo.getCdapObjectName(), x)));
 
-          System.out.println(argument);
-        } catch (IllegalArgumentException e) {
-          exceptions.add(e.getMessage());
-        }
-      });
+                  System.out.println(argument);
+                } catch (IllegalArgumentException e) {
+                  exceptions.add(e.getMessage());
+                }
+              });
       if (!exceptions.isEmpty()) {
-        throw new IllegalArgumentException(exceptions.stream().collect(Collectors.joining(System.lineSeparator())));
+        throw new IllegalArgumentException(
+            exceptions.stream().collect(Collectors.joining(System.lineSeparator())));
       }
     }
   }
 
   /**
    * Returns the ZuoraDefinitions.
+   *
    * @return ZuoraDefinitions
    * @throws IOException in case if resource not found
    */
@@ -385,14 +404,19 @@ public class ZuoraRestClient {
 
   /**
    * Returns the ZuoraObjectSchema.
+   *
    * @param name the name
    * @return ZuoraObjectSchema
    * @throws IOException in case if resource not found
    * @throws JAXBException in case if unmarshal failed
    */
   public ZuoraObjectSchema getObjectSchema(String name) throws IOException, JAXBException {
-    String data = makeApiRequest(Method.GET, String.format("%s/%s/%s", REST_API_VERSION, DESCRIBE_API, name),
-      null, null);
+    String data =
+        makeApiRequest(
+            Method.GET,
+            String.format("%s/%s/%s", REST_API_VERSION, DESCRIBE_API, name),
+            null,
+            null);
     try (StringReader reader = new StringReader(data)) {
       return (ZuoraObjectSchema) jaxbUnmarshaller.unmarshal(reader);
     }
@@ -401,18 +425,8 @@ public class ZuoraRestClient {
   /**
    * Converts per-object response structure to generic
    *
-   * Example:
-   *   {
-   *     "myobjectname": [
-   *      {
-   *        "object field: "object value",
-   *        ....
-   *      },
-   *      ......
-   *     ],
-   *     "responseField: "value",
-   *     ....
-   *   }
+   * <p>Example: { "myobjectname": [ { "object field: "object value", .... }, ...... ],
+   * "responseField: "value", .... }
    *
    * @param objectInfo object information
    * @param data raw Json
@@ -429,6 +443,7 @@ public class ZuoraRestClient {
 
   /**
    * Convert prepared json to the result object.
+   *
    * @param objectInfo Object Definition
    * @param json prepared JSON
    */
@@ -441,28 +456,30 @@ public class ZuoraRestClient {
 
   /**
    * Convert prepared json to the result object.
+   *
    * @param cdapObjectName object name
    * @param clazz Object Definition
    * @param json prepared JSON
    * @return
    */
   private BaseResult<BaseObject> fetchObject(String cdapObjectName, Class<?> clazz, String json) {
-    Type typeToken = new ParameterizedType() {
-      @Override
-      public Type[] getActualTypeArguments() {
-        return new Type[] { clazz };
-      }
+    Type typeToken =
+        new ParameterizedType() {
+          @Override
+          public Type[] getActualTypeArguments() {
+            return new Type[] {clazz};
+          }
 
-      @Override
-      public Type getRawType() {
-        return BaseResult.class;
-      }
+          @Override
+          public Type getRawType() {
+            return BaseResult.class;
+          }
 
-      @Override
-      public Type getOwnerType() {
-        return null;
-      }
-    };
+          @Override
+          public Type getOwnerType() {
+            return null;
+          }
+        };
 
     BaseResult<BaseObject> result = GSON.fromJson(json, typeToken);
     result.setCdapObjectName(cdapObjectName);
@@ -473,18 +490,19 @@ public class ZuoraRestClient {
 
   /**
    * Post object to the API.
+   *
    * @param sendObject object to send
    */
   public void sendObject(SendObject sendObject) throws IOException {
     Map<String, String> arguments = new HashMap<>(sendObject.getArguments());
     arguments.remove("body");
 
-    String response = makeApiRequest(
-      Method.POST,
-      REST_API_VERSION + "/" + sendObject.getApiUrl(),
-      arguments,
-      sendObject.getBody()
-    );
+    String response =
+        makeApiRequest(
+            Method.POST,
+            REST_API_VERSION + "/" + sendObject.getApiUrl(),
+            arguments,
+            sendObject.getBody());
 
     BaseResult<BaseObject> result = fetchObject("BaseObject", BaseObject.class, response);
     if (!result.isSuccess()) {
@@ -500,11 +518,13 @@ public class ZuoraRestClient {
    * @return object representation of the query
    * @throws IOException if any issue with query the API happen
    */
-  public BaseResult<BaseObject> getObject(ObjectInfo objectInfo, Map<String, String> arguments) throws IOException {
+  public BaseResult<BaseObject> getObject(ObjectInfo objectInfo, Map<String, String> arguments)
+      throws IOException {
     checkIncomingArguments(objectInfo, arguments);
 
     String endpoint = objectInfo.getRestAPIUrl();
-    String response = makeApiRequest(Method.GET, REST_API_VERSION + "/" + endpoint, arguments, null);
+    String response =
+        makeApiRequest(Method.GET, REST_API_VERSION + "/" + endpoint, arguments, null);
 
     return fetchObject(objectInfo, response);
   }
@@ -522,8 +542,9 @@ public class ZuoraRestClient {
       return null;
     }
 
-    String response = makeApiRequest(Method.GET, previousResult.getNextPage(),
-      previousResult.getNextPageArguments(), null);
+    String response =
+        makeApiRequest(
+            Method.GET, previousResult.getNextPage(), previousResult.getNextPageArguments(), null);
 
     ObjectInfo objectInfo = ObjectHelper.getObjectInfo(previousResult.getCdapObjectName());
     if (objectInfo == null) {

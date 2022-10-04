@@ -51,7 +51,8 @@ public class MappingUtils {
       return Plugin.create(
           pluginClass, SalesforceInputFormat.class, SalesforceInputFormatProvider.class);
     } else if (pluginClass.equals(SalesforceBatchSink.class)) {
-      return Plugin.create(pluginClass, SalesforceOutputFormat.class, SalesforceOutputFormatProvider.class);
+      return Plugin.create(
+          pluginClass, SalesforceOutputFormat.class, SalesforceOutputFormatProvider.class);
     } else if (pluginClass.equals(HubspotBatchSource.class)) {
       return Plugin.create(pluginClass, HubspotInputFormat.class, HubspotInputFormatProvider.class);
     } else if (pluginClass.equals(ZendeskBatchSource.class)) {
@@ -59,11 +60,13 @@ public class MappingUtils {
     } else if (pluginClass.equals(HubspotBatchSink.class)) {
       return Plugin.create(pluginClass, HubspotOutputFormat.class, SourceInputFormatProvider.class);
     } else if (pluginClass.equals(ServiceNowSource.class)) {
-      return Plugin.create(pluginClass, ServiceNowInputFormat.class, SourceInputFormatProvider.class);
+      return Plugin.create(
+          pluginClass, ServiceNowInputFormat.class, SourceInputFormatProvider.class);
     } else if (pluginClass.equals(ZuoraBatchSource.class)) {
       return Plugin.create(pluginClass, ZuoraInputFormat.class, ZuoraInputFormatProvider.class);
     } else if (pluginClass.equals(SendGridSource.class)) {
-      return Plugin.create(pluginClass, SendGridInputFormat.class, SendGridInputFormatProvider.class);
+      return Plugin.create(
+          pluginClass, SendGridInputFormat.class, SendGridInputFormatProvider.class);
     }
     throw new UnsupportedOperationException(
         String.format("Given plugin class '%s' is not supported!", pluginClass.getName()));

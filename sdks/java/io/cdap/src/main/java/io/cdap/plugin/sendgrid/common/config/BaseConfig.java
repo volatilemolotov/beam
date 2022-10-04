@@ -1,17 +1,19 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.sendgrid.common.config;
 
@@ -21,12 +23,9 @@ import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.common.ReferencePluginConfig;
 import io.cdap.plugin.sendgrid.common.objects.SendGridAuthType;
-
 import javax.annotation.Nullable;
 
-/**
- * Provides all required configuration for reading SendGrid information.
- */
+/** Provides all required configuration for reading SendGrid information. */
 public abstract class BaseConfig extends ReferencePluginConfig {
   public static final String PLUGIN_NAME = "SendGrid";
 
@@ -67,14 +66,10 @@ public abstract class BaseConfig extends ReferencePluginConfig {
     super(referenceName);
   }
 
-  /**
-   * Validate configuration for the issues.
-   */
+  /** Validate configuration for the issues. */
   protected abstract void validate(FailureCollector failureCollector);
 
-  /**
-   * Client authentication way.
-   */
+  /** Client authentication way. */
   public SendGridAuthType getAuthType() {
     switch (authType) {
       case "api":
@@ -82,29 +77,24 @@ public abstract class BaseConfig extends ReferencePluginConfig {
       case "basic":
         return SendGridAuthType.BASIC;
       default:
-        throw new IllegalArgumentException(String.format("Authentication using '%s' is not supported", authType));
+        throw new IllegalArgumentException(
+            String.format("Authentication using '%s' is not supported", authType));
     }
   }
 
-  /**
-   * Retrieves Api Key.
-   */
+  /** Retrieves Api Key. */
   @Nullable
   public String getSendGridApiKey() {
     return sendGridApiKey;
   }
 
-  /**
-   * Retrieves username.
-   */
+  /** Retrieves username. */
   @Nullable
   public String getAuthUserName() {
     return authUserName;
   }
 
-  /**
-   * Retrieves password.
-   */
+  /** Retrieves password. */
   @Nullable
   public String getAuthPassword() {
     return authPassword;

@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.plugin.batch.source;
 
 import io.cdap.plugin.zuora.client.ZuoraRestClient;
@@ -25,9 +26,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-/**
- * Iterates over ever object on every page.
- */
+/** Iterates over ever object on every page. */
 public class PageIterator {
   private final ObjectInfo objectInfo;
   private final Map<String, String> arguments;
@@ -40,12 +39,14 @@ public class PageIterator {
 
   /**
    * Constructor for iteratorPosition object.
+   *
    * @param client the client
    * @param objectInfo the object info
    * @param arguments the arguments
    * @throws IOException in case if resource not found
    */
-  public PageIterator(ZuoraRestClient client, ObjectInfo objectInfo, Map<String, String> arguments) throws IOException {
+  public PageIterator(ZuoraRestClient client, ObjectInfo objectInfo, Map<String, String> arguments)
+      throws IOException {
     this.client = client;
     this.objectInfo = objectInfo;
     this.arguments = arguments;
@@ -54,7 +55,8 @@ public class PageIterator {
 
   /**
    * Returns the boolean.
-   * @return  boolean
+   *
+   * @return boolean
    * @throws IOException in case if resource not found
    */
   public boolean hasNext() throws IOException {
@@ -73,6 +75,7 @@ public class PageIterator {
 
   /**
    * Returns the BaseObject.
+   *
    * @return BaseObject
    * @throws IOException in case if resource not found
    */
@@ -87,6 +90,7 @@ public class PageIterator {
 
   /**
    * Just reload the current page.
+   *
    * @throws IOException
    */
   public void reloadCurrentPage() throws IOException {
@@ -103,8 +107,10 @@ public class PageIterator {
     }
 
     if (!currentPage.isSuccess()) {
-      throw new RuntimeException(String.format("API exception of the query id %s: %s",
-                                               currentPage.getProcessId(), currentPage.getReason(false)));
+      throw new RuntimeException(
+          String.format(
+              "API exception of the query id %s: %s",
+              currentPage.getProcessId(), currentPage.getReason(false)));
     }
 
     iteratorPosition = 0;

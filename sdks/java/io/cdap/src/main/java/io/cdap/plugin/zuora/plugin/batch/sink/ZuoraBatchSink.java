@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.plugin.batch.sink;
 
 import io.cdap.cdap.api.annotation.Description;
@@ -28,17 +29,14 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.cdap.etl.api.batch.BatchSinkContext;
-import io.cdap.plugin.common.IdUtils;
 import io.cdap.plugin.common.LineageRecorder;
 import io.cdap.plugin.zuora.plugin.common.BaseConfig;
 import io.cdap.plugin.zuora.restobjects.SendObject;
-import org.apache.hadoop.io.NullWritable;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.apache.hadoop.io.NullWritable;
 
-/**
- * Sink Plugin.
- */
+/** Sink Plugin. */
 @Plugin(type = BatchSink.PLUGIN_TYPE)
 @Name(BaseConfig.PLUGIN_NAME)
 @Description("Sends data to Zuora")
@@ -53,9 +51,11 @@ public class ZuoraBatchSink extends BatchSink<StructuredRecord, NullWritable, Se
   @Override
   @SuppressWarnings("ThrowableNotThrown")
   public void configurePipeline(PipelineConfigurer pipelineConfigurer) {
-    FailureCollector failureCollector = pipelineConfigurer.getStageConfigurer().getFailureCollector();
+    FailureCollector failureCollector =
+        pipelineConfigurer.getStageConfigurer().getFailureCollector();
 
-    validateConfiguration(failureCollector, pipelineConfigurer.getStageConfigurer().getInputSchema());
+    validateConfiguration(
+        failureCollector, pipelineConfigurer.getStageConfigurer().getInputSchema());
   }
 
   @Override
@@ -63,19 +63,20 @@ public class ZuoraBatchSink extends BatchSink<StructuredRecord, NullWritable, Se
     Schema inputSchema = batchSinkContext.getInputSchema();
     config.validate(inputSchema);
 
-    batchSinkContext.addOutput(Output.of(config.referenceName, new ZuoraOutputFormatProvider(config)));
+    batchSinkContext.addOutput(
+        Output.of(config.referenceName, new ZuoraOutputFormatProvider(config)));
 
     LineageRecorder lineageRecorder = new LineageRecorder(batchSinkContext, config.referenceName);
     lineageRecorder.createExternalDataset(inputSchema);
 
     if (Objects.requireNonNull(inputSchema).getFields() != null
-      && !Objects.requireNonNull(inputSchema.getFields()).isEmpty()) {
+        && !Objects.requireNonNull(inputSchema.getFields()).isEmpty()) {
 
       String operationDescription = "Wrote to Zuora %s";
-      lineageRecorder.recordWrite("Write", operationDescription,
-        inputSchema.getFields().stream()
-          .map(Schema.Field::getName)
-          .collect(Collectors.toList()));
+      lineageRecorder.recordWrite(
+          "Write",
+          operationDescription,
+          inputSchema.getFields().stream().map(Schema.Field::getName).collect(Collectors.toList()));
     }
   }
 
@@ -87,9 +88,9 @@ public class ZuoraBatchSink extends BatchSink<StructuredRecord, NullWritable, Se
   }
 
   @Override
-  public void transform(StructuredRecord record, Emitter<KeyValue<NullWritable, SendObject>> emitter) {
+  public void transform(
+      StructuredRecord record, Emitter<KeyValue<NullWritable, SendObject>> emitter) {
     SendObject sendObject = ZuoraSinkTransformer.transform(config, record);
     emitter.emit(new KeyValue<>(null, sendObject));
   }
-
 }

@@ -1,38 +1,30 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.sendgrid.common;
 
-/**
- * The way, how SendGrid API return the objects.
- *
- */
+/** The way, how SendGrid API return the objects. */
 public enum APIResponseType {
-  /**
-   * Objects come to the response as part of the list.
-   */
+  /** Objects come to the response as part of the list. */
   LIST,
 
-  /**
-   * Objects come as part of wrapper, which consists from the metadata and the result.
-   */
+  /** Objects come as part of wrapper, which consists from the metadata and the result. */
   RESULT,
 
-  /**
-   * Same as {@link APIResponseType#RESULT}.
-   */
+  /** Same as {@link APIResponseType#RESULT}. */
   RESULTS
 }

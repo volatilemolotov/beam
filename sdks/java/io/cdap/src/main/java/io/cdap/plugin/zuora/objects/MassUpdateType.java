@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,155 +22,143 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: MassUpdateType (MassUpdateType).
-* Related objects:
-**/
+/** Object name: MassUpdateType (MassUpdateType). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "MassUpdateType",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED
-)
+    Name = "MassUpdateType",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED)
 public class MassUpdateType extends BaseObject {
   /**
-  * Name: actionType (actionType), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: actionType (actionType), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("actionType")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String actionType;
 
   /**
-  * Name: endedOn (endedOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: endedOn (endedOn), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("endedOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String endedOn;
 
   /**
-  * Name: errorCount (errorCount), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: errorCount (errorCount), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("errorCount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String errorCount;
 
   /**
-  * Name: inputSize (inputSize), Type: integer.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: inputSize (inputSize), Type: integer. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("inputSize")
   @ObjectFieldDefinition(FieldType = Schema.Type.INT)
   private Integer inputSize;
 
   /**
-  * Name: outputSize (outputSize), Type: integer.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: outputSize (outputSize), Type: integer. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("outputSize")
   @ObjectFieldDefinition(FieldType = Schema.Type.INT)
   private Integer outputSize;
 
   /**
-  * Name: outputType (outputType), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: outputType (outputType), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("outputType")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String outputType;
 
   /**
-  * Name: outputURL (outputURL), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: outputURL (outputURL), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("outputURL")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String outputURL;
 
   /**
-  * Name: processedCount (processedCount), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: processedCount (processedCount), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("processedCount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String processedCount;
 
   /**
-  * Name: startedOn (startedOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: startedOn (startedOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("startedOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String startedOn;
 
-  /**
-  * Name: status (status), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: status (status), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("status")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String status;
 
   /**
-  * Name: success (success), Type: boolean.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: success (success), Type: boolean. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("success")
   @ObjectFieldDefinition(FieldType = Schema.Type.BOOLEAN)
   private Boolean success;
 
   /**
-  * Name: successCount (successCount), Type: string..
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: successCount (successCount), Type: string.. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("successCount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String successCount;
 
   /**
-  * Name: totalCount (totalCount), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: totalCount (totalCount), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("totalCount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String totalCount;
 
   /**
-  * Name: uploadedBy (uploadedBy), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: uploadedBy (uploadedBy), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("uploadedBy")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String uploadedBy;
 
   /**
-  * Name: uploadedOn (uploadedOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: uploadedOn (uploadedOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("uploadedOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String uploadedOn;
-
 
   @Override
   public void addFields() {

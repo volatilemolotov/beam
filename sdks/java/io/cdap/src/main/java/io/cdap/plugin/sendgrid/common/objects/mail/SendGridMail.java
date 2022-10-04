@@ -1,17 +1,19 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.sendgrid.common.objects.mail;
 
@@ -20,17 +22,11 @@ import com.google.gson.annotations.SerializedName;
 import io.cdap.plugin.sendgrid.common.helpers.BaseObject;
 import io.cdap.plugin.sendgrid.common.helpers.IBaseObject;
 import io.cdap.plugin.sendgrid.common.helpers.ObjectDefinition;
-
 import java.util.List;
 import java.util.Map;
 
-/**
- * SendGrid Mail.
- */
-@ObjectDefinition(
-    APIUrl = "mail/send",
-    ObjectType = ObjectDefinition.ObjectDefinitionType.CUSTOM
-)
+/** SendGrid Mail. */
+@ObjectDefinition(APIUrl = "mail/send", ObjectType = ObjectDefinition.ObjectDefinitionType.CUSTOM)
 public class SendGridMail extends BaseObject implements IBaseObject {
 
   @SerializedName("personalizations")
@@ -56,6 +52,7 @@ public class SendGridMail extends BaseObject implements IBaseObject {
 
   /**
    * Constructor for SendGridMailSettings object.
+   *
    * @param personalizations the list of SendGridPersonalizations
    * @param from the from
    * @param replyTo the reply to
@@ -64,12 +61,17 @@ public class SendGridMail extends BaseObject implements IBaseObject {
    * @param mailSettings the mail settings
    * @param trackingSettings the tracking settings
    */
-  public SendGridMail(List<SendGridPersonalizations> personalizations, SendGridMailPerson from,
-                      SendGridMailPerson replyTo, String subject, List<SendGridMailContent> content,
-                      SendGridMailSettings mailSettings, SendGridTrackingSettings trackingSettings) {
+  public SendGridMail(
+      List<SendGridPersonalizations> personalizations,
+      SendGridMailPerson from,
+      SendGridMailPerson replyTo,
+      String subject,
+      List<SendGridMailContent> content,
+      SendGridMailSettings mailSettings,
+      SendGridTrackingSettings trackingSettings) {
     this.personalizations = personalizations;
     this.from = from;
-    this.replyTo  = replyTo;
+    this.replyTo = replyTo;
     this.subject = subject;
     this.content = content;
     this.mailSettings = mailSettings;
@@ -136,9 +138,7 @@ public class SendGridMail extends BaseObject implements IBaseObject {
     this.trackingSettings = trackingSettings;
   }
 
-  /**
-   * Map of all object fields with values.
-   */
+  /** Map of all object fields with values. */
   @Override
   public Map<String, Object> asMap() {
     return new ImmutableMap.Builder<String, Object>()

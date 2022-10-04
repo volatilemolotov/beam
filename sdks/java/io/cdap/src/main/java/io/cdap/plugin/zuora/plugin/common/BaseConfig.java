@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.plugin.common;
 
 import io.cdap.cdap.api.annotation.Description;
@@ -23,9 +24,7 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.plugin.common.ReferencePluginConfig;
 import javax.annotation.Nullable;
 
-/**
- * Base plugin configuration.
- */
+/** Base plugin configuration. */
 public abstract class BaseConfig extends ReferencePluginConfig {
   public static final String PROPERTY_CONFIG_JSON = "cdap.zuora.config";
 
@@ -74,19 +73,16 @@ public abstract class BaseConfig extends ReferencePluginConfig {
   @Description("REST API Endpoint")
   private String apiEndpoint;
 
-
   public BaseConfig(String referenceName) {
     super(referenceName);
   }
 
-  /**
-   * Validate configuration for the issues.
-   *
-   */
+  /** Validate configuration for the issues. */
   protected abstract void validate(FailureCollector failureCollector);
 
   /**
    * Returns the string.
+   *
    * @return string
    */
   public String getAuthUsername() {
@@ -101,6 +97,7 @@ public abstract class BaseConfig extends ReferencePluginConfig {
 
   /**
    * Returns the string.
+   *
    * @return string
    */
   public String getAuthPassword() {
@@ -115,6 +112,7 @@ public abstract class BaseConfig extends ReferencePluginConfig {
 
   /**
    * Returns the AuthType.
+   *
    * @return AuthType
    */
   public AuthType getAuthType() {
@@ -124,7 +122,8 @@ public abstract class BaseConfig extends ReferencePluginConfig {
       case "oauth2":
         return AuthType.OAUTH2;
       default:
-        throw new IllegalArgumentException(String.format("Authentication using '%s' is not supported", authType));
+        throw new IllegalArgumentException(
+            String.format("Authentication using '%s' is not supported", authType));
     }
   }
 

@@ -1,17 +1,19 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.restobjects.objects;
 
@@ -19,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.client.schema.SchemaFieldType;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
-
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
@@ -28,24 +29,24 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
-
 /**
  * Interface for all REST objects
  *
- * Any child, implemented current interface should provide all
- * fields outside through {@link BaseObject#asMap()} method.
+ * <p>Any child, implemented current interface should provide all fields outside through {@link
+ * BaseObject#asMap()} method.
  *
- * No getters allowed, unless any custom object usage planed.
+ * <p>No getters allowed, unless any custom object usage planed.
  */
 public abstract class BaseObject implements Serializable {
-  /**
-   * Custom object fields.
-   */
-  private transient ImmutableMap.Builder<String, Object> objectFieldsBuilder = new ImmutableMap.Builder<>();
+  /** Custom object fields. */
+  private transient ImmutableMap.Builder<String, Object> objectFieldsBuilder =
+      new ImmutableMap.Builder<>();
+
   private transient Map<String, Object> objectFields;
 
   /**
    * Add custom field to the object .
+   *
    * @param name name of the field
    * @param value value of the field
    */
@@ -55,7 +56,9 @@ public abstract class BaseObject implements Serializable {
       throw new IllegalStateException("Object fields r already constructed and cannot be modified");
     }
     //  check if it is a list of BaseObjects
-    if (value instanceof List && ((List) value).size() > 0 && ((List) value).get(0) instanceof BaseObject) {
+    if (value instanceof List
+        && ((List) value).size() > 0
+        && ((List) value).get(0) instanceof BaseObject) {
       List<BaseObject> objects = (List<BaseObject>) value;
       value = objects.parallelStream().map(BaseObject::asMap).collect(Collectors.toList());
     }
@@ -64,6 +67,7 @@ public abstract class BaseObject implements Serializable {
 
   /**
    * Add custom field to the object.
+   *
    * @param name name of the field
    * @param value value of the field
    * @param type type of the field
@@ -73,7 +77,8 @@ public abstract class BaseObject implements Serializable {
       try {
         value = SchemaFieldType.getDefaultValue(type);
       } catch (IllegalAccessException | InstantiationException e) {
-        throw new IllegalArgumentException(String.format("Field '%s' doe not provide default value", name));
+        throw new IllegalArgumentException(
+            String.format("Field '%s' doe not provide default value", name));
       }
     }
     addCustomField(name, value);
@@ -81,6 +86,7 @@ public abstract class BaseObject implements Serializable {
 
   /**
    * Add custom field to the object.
+   *
    * @param name name of the field
    * @param object value of the field
    */
@@ -94,6 +100,7 @@ public abstract class BaseObject implements Serializable {
 
   /**
    * Add custom field to the object if the value is not null.
+   *
    * @param name name of the field
    * @param object value of the field
    * @param skipAddIfNull add field if it's value is not {@code null}
@@ -107,26 +114,26 @@ public abstract class BaseObject implements Serializable {
 
   /**
    * Add custom field to the object.
+   *
    * @param name name of the field
    * @param value value of the field
    * @param type type of the field
    * @param skipAddIfNull add field if it's value is not {@code null}
    */
-  public void addCustomField(String name, @Nullable Object value, Class<?> type, Boolean skipAddIfNull) {
+  public void addCustomField(
+      String name, @Nullable Object value, Class<?> type, Boolean skipAddIfNull) {
     if (skipAddIfNull) {
       return;
     }
     addCustomField(name, value, type);
   }
 
-  /**
-   * Each field of the object should be added.
-   */
+  /** Each field of the object should be added. */
   public abstract void addFields();
 
   /**
-   * Construct object fields and return the map of them. No more fields could be added after
-   * calling this method.
+   * Construct object fields and return the map of them. No more fields could be added after calling
+   * this method.
    */
   @ObjectFieldDefinition(FieldName = "customFields", FieldType = Schema.Type.MAP)
   public Map<String, Object> asMap() {

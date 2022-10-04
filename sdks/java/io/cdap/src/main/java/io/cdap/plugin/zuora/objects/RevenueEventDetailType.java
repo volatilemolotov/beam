@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,129 +22,114 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
 import java.util.List;
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: RevenueEventDetailType (RevenueEventDetailType).
-* Related objects:
-**/
+/** Object name: RevenueEventDetailType (RevenueEventDetailType). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "RevenueEventDetailType",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED
-)
+    Name = "RevenueEventDetailType",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED)
 public class RevenueEventDetailType extends BaseObject {
   /**
-  * Name: accountId (accountId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: accountId (accountId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("accountId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String accountId;
 
   /**
-  * Name: createdOn (createdOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: createdOn (createdOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdOn;
 
   /**
-  * Name: currency (currency), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: currency (currency), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("currency")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String currency;
 
   /**
-  * Name: eventType (eventType), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: eventType (eventType), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("eventType")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String eventType;
 
-  /**
-  * Name: notes (notes), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: notes (notes), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("notes")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String notes;
 
-  /**
-  * Name: number (number), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: number (number), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("number")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String number;
 
   /**
-  * Name: recognitionEnd (recognitionEnd), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: recognitionEnd (recognitionEnd), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("recognitionEnd")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String recognitionEnd;
 
   /**
-  * Name: recognitionStart (recognitionStart), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: recognitionStart (recognitionStart), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("recognitionStart")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String recognitionStart;
 
   /**
-  * Name: revenueItems (revenueItems), Type: array|RevenueItemType.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: revenueItems (revenueItems), Type: array|RevenueItemType. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("revenueItems")
   @ObjectFieldDefinition(FieldType = Schema.Type.ARRAY, NestedClass = "RevenueItemType")
   private List<RevenueItemType> revenueItems;
 
   /**
-  * Name: subscriptionChargeId (subscriptionChargeId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: subscriptionChargeId (subscriptionChargeId), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("subscriptionChargeId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String subscriptionChargeId;
 
   /**
-  * Name: subscriptionId (subscriptionId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: subscriptionId (subscriptionId), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("subscriptionId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String subscriptionId;
 
   /**
-  * Name: success (success), Type: boolean.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: success (success), Type: boolean. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("success")
   @ObjectFieldDefinition(FieldType = Schema.Type.BOOLEAN)
   private Boolean success;
-
 
   @Override
   public void addFields() {

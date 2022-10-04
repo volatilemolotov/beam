@@ -1,17 +1,19 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.sendgrid.common;
 
@@ -32,7 +34,6 @@ import io.cdap.plugin.sendgrid.common.objects.BasicResult;
 import io.cdap.plugin.sendgrid.common.objects.SendGridAuthType;
 import io.cdap.plugin.sendgrid.common.objects.mail.SendGridMail;
 import io.cdap.plugin.sendgrid.common.objects.marketing.MarketingNewContacts;
-
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -44,16 +45,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
-/**
- * SendGrid Client.
- */
+/** SendGrid Client. */
 @SuppressWarnings({"rawtypes", "DefaultCharset", "StringSplitter"})
 public class SendGridClient {
   private static final String CONNECTION_CHECK_ENDPOINT = "alerts";
 
-  /**
-   * Extended version of the original SendGrid API wrapper with added support of basic auth.
-   */
+  /** Extended version of the original SendGrid API wrapper with added support of basic auth. */
   private static class SendGridAPIClient extends SendGrid {
 
     SendGridAPIClient(String apiKey) {
@@ -61,7 +58,7 @@ public class SendGridClient {
     }
 
     SendGridAPIClient(String username, String password) {
-      super("");  // actual key is not required due to it would be rewritten with basic auth data
+      super(""); // actual key is not required due to it would be rewritten with basic auth data
       initializeSendGrid(username, password);
     }
 
@@ -72,7 +69,9 @@ public class SendGridClient {
      * @param password password of the user
      */
     private void initializeSendGrid(String username, String password) {
-      String encoding = Base64.getEncoder().encodeToString((String.format("%s:%s", username, password).getBytes()));
+      String encoding =
+          Base64.getEncoder()
+              .encodeToString((String.format("%s:%s", username, password).getBytes()));
       addRequestHeader("Authorization", String.format("Basic %s", encoding));
     }
   }
@@ -86,6 +85,7 @@ public class SendGridClient {
 
   /**
    * Constructor for SendGridClient object.
+   *
    * @param config the BaseConfig
    */
   public SendGridClient(BaseConfig config) {
@@ -95,8 +95,9 @@ public class SendGridClient {
     } else if (config.getAuthType() == SendGridAuthType.BASIC) {
       sendGrid = new SendGridAPIClient(config.getAuthUserName(), config.getAuthPassword());
     } else {
-      throw new IllegalArgumentException(String.format("Invalid authentication method '%s'",
-        SendGridClient.class.getCanonicalName()));
+      throw new IllegalArgumentException(
+          String.format(
+              "Invalid authentication method '%s'", SendGridClient.class.getCanonicalName()));
     }
   }
 
@@ -120,8 +121,9 @@ public class SendGridClient {
    * @return query body
    * @throws IOException if any issue with query the API happen
    */
-  private String makeApiRequest(Method method, String endpoint, @Nullable Map<String, String> arguments,
-                                String data) throws IOException {
+  private String makeApiRequest(
+      Method method, String endpoint, @Nullable Map<String, String> arguments, String data)
+      throws IOException {
 
     Request request = new Request();
     request.setMethod(method);
@@ -143,15 +145,16 @@ public class SendGridClient {
       // Parse error response from the server
       if (e.getMessage().contains("Body:")) {
         String[] messages = e.getMessage().split("Body:");
-        HashMap<String, List<HashMap<String, String>>> errors = gson.fromJson(
-          messages[1],
-          new TypeToken<HashMap<String, List<HashMap<String, String>>>>() { }.getType()
-        );
+        HashMap<String, List<HashMap<String, String>>> errors =
+            gson.fromJson(
+                messages[1],
+                new TypeToken<HashMap<String, List<HashMap<String, String>>>>() {}.getType());
         if (errors.containsKey("errors")) {
-          String description = errors.get("errors").stream()
-            .filter(x -> x.containsKey("message"))
-            .map(x -> x.get("message"))
-            .collect(Collectors.joining(";"));
+          String description =
+              errors.get("errors").stream()
+                  .filter(x -> x.containsKey("message"))
+                  .map(x -> x.get("message"))
+                  .collect(Collectors.joining(";"));
 
           serverMessage = String.format("%s, API response: %s", messages[0], description);
         }
@@ -163,11 +166,11 @@ public class SendGridClient {
   }
 
   /**
-   * Checks connection to the service by testing API endpoint, in case.
-   * of exception would be generated {@link IOException}
+   * Checks connection to the service by testing API endpoint, in case. of exception would be
+   * generated {@link IOException}
    */
   public void checkConnection() throws IOException {
-      makeApiRequest(Method.GET, CONNECTION_CHECK_ENDPOINT, null, null);
+    makeApiRequest(Method.GET, CONNECTION_CHECK_ENDPOINT, null, null);
   }
 
   /**
@@ -178,39 +181,45 @@ public class SendGridClient {
    * @throws IllegalArgumentException if any validation issue
    */
   private void checkIncomingArguments(ObjectInfo objectInfo, Map<String, String> arguments)
-    throws IllegalArgumentException {
+      throws IllegalArgumentException {
 
     if (objectInfo.getRequiredArguments() != null && !objectInfo.getRequiredArguments().isEmpty()) {
       if (arguments == null || arguments.isEmpty()) {
-        throw new IllegalArgumentException(String.format(
-          "Object '%s' require input arguments to be passed, nothing found",
-          objectInfo.getCdapObjectName()
-        ));
+        throw new IllegalArgumentException(
+            String.format(
+                "Object '%s' require input arguments to be passed, nothing found",
+                objectInfo.getCdapObjectName()));
       }
       List<String> exceptions = new ArrayList<>();
 
-      objectInfo.getRequiredArguments().forEach(x -> {
-        try {
-          if (Strings.isNullOrEmpty(x)) {
-            return;
-          }
+      objectInfo
+          .getRequiredArguments()
+          .forEach(
+              x -> {
+                try {
+                  if (Strings.isNullOrEmpty(x)) {
+                    return;
+                  }
 
-          String stream = arguments.keySet().stream()
-            .filter(x::equals)
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException(String.format(
-              "Object '%s' require %s argument, but nothing provided",
-              objectInfo.getCdapObjectName(),
-              x
-            )));
+                  String stream =
+                      arguments.keySet().stream()
+                          .filter(x::equals)
+                          .findFirst()
+                          .orElseThrow(
+                              () ->
+                                  new IllegalArgumentException(
+                                      String.format(
+                                          "Object '%s' require %s argument, but nothing provided",
+                                          objectInfo.getCdapObjectName(), x)));
 
-          System.out.println(stream);
-        } catch (IllegalArgumentException e) {
-          exceptions.add(e.getMessage());
-        }
-      });
+                  System.out.println(stream);
+                } catch (IllegalArgumentException e) {
+                  exceptions.add(e.getMessage());
+                }
+              });
       if (!exceptions.isEmpty()) {
-        throw new IllegalArgumentException(exceptions.stream().collect(Collectors.joining(System.lineSeparator())));
+        throw new IllegalArgumentException(
+            exceptions.stream().collect(Collectors.joining(System.lineSeparator())));
       }
     }
   }
@@ -220,11 +229,11 @@ public class SendGridClient {
    *
    * @param mail Mail object to send
    */
-  public void  sendMail(SendGridMail mail) throws IOException {
-     ObjectInfo objectInfo = ObjectHelper.getObjectInfo(SendGridMail.class);
-     String data = gson.toJson(mail);
+  public void sendMail(SendGridMail mail) throws IOException {
+    ObjectInfo objectInfo = ObjectHelper.getObjectInfo(SendGridMail.class);
+    String data = gson.toJson(mail);
 
-     makeApiRequest(Method.POST, objectInfo.getSendGridAPIUrl(), null, data);
+    makeApiRequest(Method.POST, objectInfo.getSendGridAPIUrl(), null, data);
   }
 
   /**
@@ -238,7 +247,7 @@ public class SendGridClient {
    * @throws IllegalArgumentException if any validation issue
    */
   public List<IBaseObject> getObject(ObjectInfo objectInfo, Map<String, String> arguments)
-    throws IOException, IllegalStateException, IllegalArgumentException {
+      throws IOException, IllegalStateException, IllegalArgumentException {
     checkIncomingArguments(objectInfo, arguments);
 
     String endpoint = objectInfo.getSendGridAPIUrl();
@@ -246,49 +255,50 @@ public class SendGridClient {
     Class clazz = objectInfo.getObjectClass();
 
     if (objectInfo.getApiResponseType() == APIResponseType.RESULT) {
-      Type typeToken = new ParameterizedType() {
-        @Override
-        public Type[] getActualTypeArguments() {
-          return new Type[] { clazz };
-        }
+      Type typeToken =
+          new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+              return new Type[] {clazz};
+            }
 
-        @Override
-        public Type getRawType() {
-          return BasicResult.class;
-        }
+            @Override
+            public Type getRawType() {
+              return BasicResult.class;
+            }
 
-        @Override
-        public Type getOwnerType() {
-          return null;
-        }
-      };
+            @Override
+            public Type getOwnerType() {
+              return null;
+            }
+          };
       BasicResult<IBaseObject> result = gson.fromJson(response, typeToken);
 
       return result.getResult();
     } else if (objectInfo.getApiResponseType() == APIResponseType.LIST) {
-      Type typeToken = new ParameterizedType() {
-        @Override
-        public Type[] getActualTypeArguments() {
-          return new Type[] { clazz };
-        }
+      Type typeToken =
+          new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+              return new Type[] {clazz};
+            }
 
-        @Override
-        public Type getRawType() {
-          return List.class;
-        }
+            @Override
+            public Type getRawType() {
+              return List.class;
+            }
 
-        @Override
-        public Type getOwnerType() {
-          return null;
-        }
-      };
+            @Override
+            public Type getOwnerType() {
+              return null;
+            }
+          };
 
       return gson.fromJson(response, typeToken);
     } else {
-      throw new IllegalStateException(String.format(
-        "Unsupported API Response type: %s",
-        objectInfo.getApiResponseType().name()
-      ));
+      throw new IllegalStateException(
+          String.format(
+              "Unsupported API Response type: %s", objectInfo.getApiResponseType().name()));
     }
   }
 
@@ -299,9 +309,9 @@ public class SendGridClient {
    * @throws IOException if any issue with query the API happen
    */
   public void createContacts(MarketingNewContacts contacts) throws IOException {
-     ObjectInfo objectInfo = ObjectHelper.getObjectInfoFromClass(MarketingNewContacts.class);
-     String data = gson.toJson(contacts);
-     makeApiRequest(Method.PUT, objectInfo.getSendGridAPIUrl(), null, data);
+    ObjectInfo objectInfo = ObjectHelper.getObjectInfoFromClass(MarketingNewContacts.class);
+    String data = gson.toJson(contacts);
+    makeApiRequest(Method.PUT, objectInfo.getSendGridAPIUrl(), null, data);
   }
 
   /**
@@ -313,7 +323,8 @@ public class SendGridClient {
   public void deleteContacts(List<String> ids) throws IOException {
     ObjectInfo objectInfo = ObjectHelper.getObjectInfoFromClass(MarketingNewContacts.class);
     String idsToRemove = String.join(",", ids);
-    Map<String, String> args = new ImmutableMap.Builder<String, String>()
+    Map<String, String> args =
+        new ImmutableMap.Builder<String, String>()
             .put("delete_all_contacts", "false")
             .put("ids", idsToRemove)
             .build();
@@ -330,7 +341,7 @@ public class SendGridClient {
    * @throws IllegalArgumentException if any validation issue
    */
   public List<IBaseObject> getObject(ObjectInfo objectInfo)
-    throws IOException, IllegalStateException, IllegalArgumentException {
+      throws IOException, IllegalStateException, IllegalArgumentException {
 
     return getObject(objectInfo, null);
   }

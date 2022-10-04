@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,245 +22,219 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: PutInvoiceResponseType (PutInvoiceResponseType).
-* Related objects:
-**/
+/** Object name: PutInvoiceResponseType (PutInvoiceResponseType). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "PutInvoiceResponseType",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED
-)
+    Name = "PutInvoiceResponseType",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED)
 public class PutInvoiceResponseType extends BaseObject {
   /**
-  * Name: accountId (accountId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: accountId (accountId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("accountId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String accountId;
 
-  /**
-  * Name: amount (amount), Type: number.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: amount (amount), Type: number. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("amount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String amount;
 
   /**
-  * Name: autoPay (autoPay), Type: boolean.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: autoPay (autoPay), Type: boolean. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("autoPay")
   @ObjectFieldDefinition(FieldType = Schema.Type.BOOLEAN)
   private Boolean autoPay;
 
   /**
-  * Name: balance (balance), Type: number.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: balance (balance), Type: number. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("balance")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String balance;
 
   /**
-  * Name: cancelledById (cancelledById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: cancelledById (cancelledById), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("cancelledById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String cancelledById;
 
   /**
-  * Name: cancelledOn (cancelledOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: cancelledOn (cancelledOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("cancelledOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String cancelledOn;
 
   /**
-  * Name: comment (comment), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: comment (comment), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("comment")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String comment;
 
   /**
-  * Name: createdById (createdById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: createdById (createdById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdById;
 
   /**
-  * Name: createdDate (createdDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: createdDate (createdDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdDate;
 
   /**
-  * Name: creditBalanceAdjustmentAmount (creditBalanceAdjustmentAmount), Type: number.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: creditBalanceAdjustmentAmount (creditBalanceAdjustmentAmount), Type: number. Options
+   * (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("creditBalanceAdjustmentAmount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String creditBalanceAdjustmentAmount;
 
   /**
-  * Name: currency (currency), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: currency (currency), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("currency")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String currency;
 
   /**
-  * Name: dueDate (dueDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: dueDate (dueDate), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("dueDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String dueDate;
 
-  /**
-  * Name: id (id), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: id (id), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("id")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String id;
 
   /**
-  * Name: invoiceDate (invoiceDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: invoiceDate (invoiceDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("invoiceDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String invoiceDate;
 
-  /**
-  * Name: number (number), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: number (number), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("number")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String number;
 
   /**
-  * Name: postedById (postedById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: postedById (postedById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("postedById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String postedById;
 
   /**
-  * Name: postedOn (postedOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: postedOn (postedOn), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("postedOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String postedOn;
 
-  /**
-  * Name: status (status), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: status (status), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("status")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String status;
 
   /**
-  * Name: success (success), Type: boolean.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: success (success), Type: boolean. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("success")
   @ObjectFieldDefinition(FieldType = Schema.Type.BOOLEAN)
   private Boolean success;
 
   /**
-  * Name: targetDate (targetDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: targetDate (targetDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("targetDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String targetDate;
 
   /**
-  * Name: taxAmount (taxAmount), Type: number.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: taxAmount (taxAmount), Type: number. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("taxAmount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String taxAmount;
 
   /**
-  * Name: totalTaxExemptAmount (totalTaxExemptAmount), Type: number.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: totalTaxExemptAmount (totalTaxExemptAmount), Type: number. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("totalTaxExemptAmount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String totalTaxExemptAmount;
 
   /**
-  * Name: transferredToAccounting (transferredToAccounting), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: transferredToAccounting (transferredToAccounting), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("transferredToAccounting")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String transferredToAccounting;
 
   /**
-  * Name: updatedById (updatedById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: updatedById (updatedById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("updatedById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String updatedById;
 
   /**
-  * Name: updatedDate (updatedDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: updatedDate (updatedDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("updatedDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String updatedDate;
-
 
   @Override
   public void addFields() {

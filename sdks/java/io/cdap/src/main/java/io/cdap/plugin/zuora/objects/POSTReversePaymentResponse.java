@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,321 +22,296 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: POSTReversePaymentResponse (POSTReversePaymentResponse).
-* Related objects:
-**/
+/** Object name: POSTReversePaymentResponse (POSTReversePaymentResponse). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "POSTReversePaymentResponse",
-  RequiredArguments = {
-    "payment-id", "Request"
-  },
-  APIUrl = "gateway-settlement/payments/{payment-id}/chargeback",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.BASE
-)
+    Name = "POSTReversePaymentResponse",
+    RequiredArguments = {"payment-id", "Request"},
+    APIUrl = "gateway-settlement/payments/{payment-id}/chargeback",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.BASE)
 public class POSTReversePaymentResponse extends BaseObject {
   /**
-  * Name: accountId (accountId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: accountId (accountId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("accountId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String accountId;
 
-  /**
-  * Name: amount (amount), Type: number.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: amount (amount), Type: number. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("amount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String amount;
 
   /**
-  * Name: cancelledOn (cancelledOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: cancelledOn (cancelledOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("cancelledOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String cancelledOn;
 
   /**
-  * Name: comment (comment), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: comment (comment), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("comment")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String comment;
 
   /**
-  * Name: createdById (createdById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: createdById (createdById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdById;
 
   /**
-  * Name: createdDate (createdDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: createdDate (createdDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("createdDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String createdDate;
 
   /**
-  * Name: creditMemoId (creditMemoId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: creditMemoId (creditMemoId), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("creditMemoId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String creditMemoId;
 
   /**
-  * Name: financeInformation (financeInformation), Type: POSTReversePaymentResponseFinanceInformationItem.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: financeInformation (financeInformation), Type:
+   * POSTReversePaymentResponseFinanceInformationItem. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("financeInformation")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String financeInformation;
 
   /**
-  * Name: gatewayId (gatewayId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: gatewayId (gatewayId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("gatewayId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String gatewayId;
 
   /**
-  * Name: gatewayResponse (gatewayResponse), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: gatewayResponse (gatewayResponse), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("gatewayResponse")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String gatewayResponse;
 
   /**
-  * Name: gatewayResponseCode (gatewayResponseCode), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: gatewayResponseCode (gatewayResponseCode), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("gatewayResponseCode")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String gatewayResponseCode;
 
   /**
-  * Name: gatewayState (gatewayState), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: gatewayState (gatewayState), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("gatewayState")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String gatewayState;
 
-  /**
-  * Name: id (id), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: id (id), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("id")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String id;
 
   /**
-  * Name: markedForSubmissionOn (markedForSubmissionOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: markedForSubmissionOn (markedForSubmissionOn), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("markedForSubmissionOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String markedForSubmissionOn;
 
   /**
-  * Name: methodType (methodType), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: methodType (methodType), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("methodType")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String methodType;
 
-  /**
-  * Name: number (number), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: number (number), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("number")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String number;
 
   /**
-  * Name: paymentId (paymentId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: paymentId (paymentId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("paymentId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String paymentId;
 
   /**
-  * Name: paymentMethodId (paymentMethodId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: paymentMethodId (paymentMethodId), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("paymentMethodId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String paymentMethodId;
 
   /**
-  * Name: paymentMethodSnapshotId (paymentMethodSnapshotId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: paymentMethodSnapshotId (paymentMethodSnapshotId), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("paymentMethodSnapshotId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String paymentMethodSnapshotId;
 
   /**
-  * Name: reasonCode (reasonCode), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: reasonCode (reasonCode), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("reasonCode")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String reasonCode;
 
   /**
-  * Name: referenceId (referenceId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: referenceId (referenceId), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("referenceId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String referenceId;
 
   /**
-  * Name: refundDate (refundDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: refundDate (refundDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("refundDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String refundDate;
 
   /**
-  * Name: refundTransactionTime (refundTransactionTime), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: refundTransactionTime (refundTransactionTime), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("refundTransactionTime")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String refundTransactionTime;
 
   /**
-  * Name: secondRefundReferenceId (secondRefundReferenceId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: secondRefundReferenceId (secondRefundReferenceId), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("secondRefundReferenceId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String secondRefundReferenceId;
 
   /**
-  * Name: settledOn (settledOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: settledOn (settledOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("settledOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String settledOn;
 
   /**
-  * Name: softDescriptor (softDescriptor), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: softDescriptor (softDescriptor), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("softDescriptor")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String softDescriptor;
 
   /**
-  * Name: softDescriptorPhone (softDescriptorPhone), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: softDescriptorPhone (softDescriptorPhone), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("softDescriptorPhone")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String softDescriptorPhone;
 
-  /**
-  * Name: status (status), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: status (status), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("status")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String status;
 
   /**
-  * Name: submittedOn (submittedOn), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: submittedOn (submittedOn), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("submittedOn")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String submittedOn;
 
   /**
-  * Name: success (success), Type: boolean.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: success (success), Type: boolean. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("success")
   @ObjectFieldDefinition(FieldType = Schema.Type.BOOLEAN)
   private Boolean success;
 
-  /**
-  * Name: type (type), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: type (type), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("type")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String type;
 
   /**
-  * Name: updatedById (updatedById), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: updatedById (updatedById), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("updatedById")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String updatedById;
 
   /**
-  * Name: updatedDate (updatedDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: updatedDate (updatedDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("updatedDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String updatedDate;
-
 
   @Override
   public void addFields() {

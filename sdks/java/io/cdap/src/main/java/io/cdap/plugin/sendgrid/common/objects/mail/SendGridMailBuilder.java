@@ -1,30 +1,29 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.sendgrid.common.objects.mail;
 
 import com.google.common.base.Strings;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 
-/**
- *  {@link SendGridMail} object builder.
- */
+/** {@link SendGridMail} object builder. */
 public class SendGridMailBuilder {
   private SendGridMail mail;
   private SendGridPersonalizations personalizations;
@@ -56,10 +55,9 @@ public class SendGridMailBuilder {
   private SendGridMailSettings getMailSetting() {
     SendGridMailSettings settings = mail.getMailSettings();
     if (settings == null) {
-      settings = new SendGridMailSettings(
-          new SendGridMailFooter(false, null, null),
-          new SendGridSwitch(false)
-      );
+      settings =
+          new SendGridMailSettings(
+              new SendGridMailFooter(false, null, null), new SendGridSwitch(false));
       mail.setMailSettings(settings);
     }
     return settings;
@@ -76,11 +74,9 @@ public class SendGridMailBuilder {
   private SendGridTrackingSettings getTrackingSettings() {
     SendGridTrackingSettings trackingSettings = mail.getTrackingSettings();
     if (trackingSettings == null) {
-      trackingSettings = new SendGridTrackingSettings(
-          new SendGridSwitch(false),
-          new SendGridSwitch(false),
-          new SendGridSwitch(false)
-      );
+      trackingSettings =
+          new SendGridTrackingSettings(
+              new SendGridSwitch(false), new SendGridSwitch(false), new SendGridSwitch(false));
       mail.setTrackingSettings(trackingSettings);
     }
     return trackingSettings;
@@ -88,6 +84,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param email the email
    * @return SendGridMailBuilder
    */
@@ -100,10 +97,11 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param subject the subject of email
    * @return SendGridMailBuilder
    */
-  public  SendGridMailBuilder subject(@Nullable String subject) {
+  public SendGridMailBuilder subject(@Nullable String subject) {
     if (!Strings.isNullOrEmpty(subject)) {
       mail.setSubject(subject);
     }
@@ -112,6 +110,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param email the email
    * @return SendGridMailBuilder
    */
@@ -124,6 +123,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param email the email
    * @return SendGridMailBuilder
    */
@@ -136,6 +136,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param email the email
    * @return SendGridMailBuilder
    */
@@ -148,6 +149,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param email the email
    * @return SendGridMailBuilder
    */
@@ -168,6 +170,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param enabled the enabled
    * @return SendGridMailBuilder
    */
@@ -180,6 +183,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param enabled the enabled
    * @param content the content
    * @return SendGridMailBuilder
@@ -193,6 +197,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param enabled the enabled
    * @param content the content
    * @return SendGridMailBuilder
@@ -206,6 +211,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param enabled the enabled
    * @return SendGridMailBuilder
    */
@@ -218,6 +224,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param enabled the enabled
    * @return SendGridMailBuilder
    */
@@ -230,6 +237,7 @@ public class SendGridMailBuilder {
 
   /**
    * Returns the SendGridMailBuilder.
+   *
    * @param enabled the enabled
    * @return SendGridMailBuilder
    */

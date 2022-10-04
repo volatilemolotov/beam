@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.client.schema;
 
 import java.util.Arrays;
@@ -21,9 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Zuora Schema types.
- */
+/** Zuora Schema types. */
 @SuppressWarnings({"ImmutableEnumChecker", "StringSplitter", "ClassNewInstance"})
 public class SchemaFieldType {
   public static final String PICKLIST = "picklist";
@@ -53,9 +52,9 @@ public class SchemaFieldType {
 
     public static FieldType fromString(String s) {
       return Arrays.stream(FieldType.values())
-        .filter(x -> x.getType().equals(s))
-        .findFirst()
-        .orElse(FieldType.UNKNOWN);
+          .filter(x -> x.getType().equals(s))
+          .findFirst()
+          .orElse(FieldType.UNKNOWN);
     }
   }
 
@@ -63,11 +62,11 @@ public class SchemaFieldType {
   private String subtype;
 
   SchemaFieldType(String type) {
-   String [] data = type.split("\\|");
-   this.type = data[0];
-   if (data.length == 2) {
-     this.subtype = data[1];
-   }
+    String[] data = type.split("\\|");
+    this.type = data[0];
+    if (data.length == 2) {
+      this.subtype = data[1];
+    }
   }
 
   public String getType() {
@@ -80,6 +79,7 @@ public class SchemaFieldType {
 
   /**
    * Returns the string.
+   *
    * @param complete the complete is boolean variable.
    * @return string
    */
@@ -102,7 +102,7 @@ public class SchemaFieldType {
   /**
    * Map Zuora type to CDAP Type.
    *
-   * For reference {@link io.cdap.cdap.api.data.schema.Schema.Type}
+   * <p>For reference {@link io.cdap.cdap.api.data.schema.Schema.Type}
    */
   public String getCDAPType() {
     FieldType fieldType = FieldType.fromString(type);
@@ -122,6 +122,7 @@ public class SchemaFieldType {
 
   /**
    * Returns the string.
+   *
    * @param variableName the variable name
    * @return string
    */
@@ -132,7 +133,8 @@ public class SchemaFieldType {
       case "Boolean":
         return String.format("(%s == null) ? false : %s", variableName, variableName);
       case "List":
-        return String.format("(%s == null) ? Collections.EMPTY_LIST : %s", variableName, variableName);
+        return String.format(
+            "(%s == null) ? Collections.EMPTY_LIST : %s", variableName, variableName);
       case "Integer":
         return String.format("(%s == null) ? 0 : %s", variableName, variableName);
       case "Double":
@@ -143,18 +145,20 @@ public class SchemaFieldType {
 
   /**
    * Returns the object.
+   *
    * @param type the class type
    * @return object
    * @throws IllegalAccessException if any validation issue
    * @throws InstantiationException if any validation issue
    */
-  public static Object getDefaultValue(Class<?> type) throws IllegalAccessException, InstantiationException {
+  public static Object getDefaultValue(Class<?> type)
+      throws IllegalAccessException, InstantiationException {
     if (type == Integer.class) {
-      return  0;
+      return 0;
     } else if (type == String.class) {
-      return  "";
+      return "";
     } else if (type == Double.class) {
-      return  0d;
+      return 0d;
     } else if (type == Boolean.class) {
       return false;
     } else if (type == List.class) {
@@ -167,6 +171,6 @@ public class SchemaFieldType {
   }
 
   public static SchemaFieldType fromString(String type) {
-      return new SchemaFieldType(type);
+    return new SchemaFieldType(type);
   }
 }

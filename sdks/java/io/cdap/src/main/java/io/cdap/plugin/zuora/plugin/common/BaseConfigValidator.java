@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.plugin.common;
 
 import com.google.common.base.Strings;
@@ -22,9 +23,7 @@ import io.cdap.cdap.etl.api.validation.ValidationFailure;
 import io.cdap.plugin.zuora.client.ZuoraRestClient;
 import java.io.IOException;
 
-/**
- * Base Config Validator.
- */
+/** Base Config Validator. */
 public abstract class BaseConfigValidator {
   protected FailureCollector failureCollector;
   protected ZuoraRestClient client = null;
@@ -39,8 +38,10 @@ public abstract class BaseConfigValidator {
     try {
       config.getAuthType();
     } catch (IllegalArgumentException e) {
-      failureCollector.addFailure(String.format("Wrong authentication method selected: %s", e.getMessage()), null)
-        .withConfigProperty(BaseConfig.PROPERTY_AUTH_TYPE);
+      failureCollector
+          .addFailure(
+              String.format("Wrong authentication method selected: %s", e.getMessage()), null)
+          .withConfigProperty(BaseConfig.PROPERTY_AUTH_TYPE);
     }
   }
 
@@ -48,13 +49,15 @@ public abstract class BaseConfigValidator {
     boolean tryToLogin = true;
 
     if (Strings.isNullOrEmpty(config.getAuthUsername())) {
-      failureCollector.addFailure("User name is not set", null)
-        .withConfigProperty(BaseConfig.PROPERTY_USERNAMENAME);
+      failureCollector
+          .addFailure("User name is not set", null)
+          .withConfigProperty(BaseConfig.PROPERTY_USERNAMENAME);
       tryToLogin = false;
     }
     if (Strings.isNullOrEmpty(config.getAuthPassword())) {
-      failureCollector.addFailure("Password is not set", null)
-        .withConfigProperty(BaseConfig.PROPERTY_PASSWORD);
+      failureCollector
+          .addFailure("Password is not set", null)
+          .withConfigProperty(BaseConfig.PROPERTY_PASSWORD);
       tryToLogin = false;
     }
 
@@ -67,14 +70,15 @@ public abstract class BaseConfigValidator {
     try {
       client.checkConnection();
     } catch (IOException e) {
-      ValidationFailure failure = failureCollector
-        .addFailure(String.format("Connectivity issues: %s", e.getMessage()), null)
-        .withStacktrace(e.getStackTrace());
+      ValidationFailure failure =
+          failureCollector
+              .addFailure(String.format("Connectivity issues: %s", e.getMessage()), null)
+              .withStacktrace(e.getStackTrace());
 
       if (config.getAuthType() == AuthType.BASIC) {
         failure
-          .withConfigProperty(BaseConfig.PROPERTY_USERNAMENAME)
-          .withConfigProperty(BaseConfig.PROPERTY_PASSWORD);
+            .withConfigProperty(BaseConfig.PROPERTY_USERNAMENAME)
+            .withConfigProperty(BaseConfig.PROPERTY_PASSWORD);
       }
       if (config.getAuthType() == AuthType.OAUTH2) {
         failure.withConfigProperty(BaseConfig.PROPERTY_CLIENT_ID);
@@ -85,19 +89,15 @@ public abstract class BaseConfigValidator {
 
   private boolean authContainsMacro() {
     return config.containsMacro(BaseConfig.PROPERTY_USERNAMENAME)
-      || config.containsMacro(BaseConfig.PROPERTY_PASSWORD)
-      || config.containsMacro(BaseConfig.PROPERTY_CLIENT_ID)
-      || config.containsMacro(BaseConfig.PROPERTY_CLIENT_SECRET);
+        || config.containsMacro(BaseConfig.PROPERTY_PASSWORD)
+        || config.containsMacro(BaseConfig.PROPERTY_CLIENT_ID)
+        || config.containsMacro(BaseConfig.PROPERTY_CLIENT_SECRET);
   }
 
-  /**
-   * Perform validation tasks which did not involve API Client usage.
-   */
+  /** Perform validation tasks which did not involve API Client usage. */
   public abstract void doValidation();
 
-  /**
-   * Validate the required properties of the config file.
-   */
+  /** Validate the required properties of the config file. */
   public void validate() {
     client = null;
 

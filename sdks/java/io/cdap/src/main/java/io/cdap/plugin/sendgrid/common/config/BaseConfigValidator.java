@@ -1,17 +1,19 @@
 /*
- * Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.sendgrid.common.config;
 
@@ -20,12 +22,9 @@ import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.validation.ValidationFailure;
 import io.cdap.plugin.sendgrid.common.SendGridClient;
 import io.cdap.plugin.sendgrid.common.objects.SendGridAuthType;
-
 import java.io.IOException;
 
-/**
- * Validates configuration.
- */
+/** Validates configuration. */
 public abstract class BaseConfigValidator {
   protected FailureCollector failureCollector;
   protected SendGridClient client = null;
@@ -40,8 +39,10 @@ public abstract class BaseConfigValidator {
     try {
       config.getAuthType();
     } catch (IllegalArgumentException e) {
-      failureCollector.addFailure(String.format("Wrong authentication method selected: %s", e.getMessage()), null)
-        .withConfigProperty(BaseConfig.PROPERTY_AUTH_TYPE);
+      failureCollector
+          .addFailure(
+              String.format("Wrong authentication method selected: %s", e.getMessage()), null)
+          .withConfigProperty(BaseConfig.PROPERTY_AUTH_TYPE);
     }
   }
 
@@ -51,13 +52,15 @@ public abstract class BaseConfigValidator {
     switch (config.getAuthType()) {
       case BASIC:
         if (Strings.isNullOrEmpty(config.getAuthUserName())) {
-          failureCollector.addFailure("User name is not set", null)
-            .withConfigProperty(BaseConfig.PROPERTY_AUTH_USERNAME);
+          failureCollector
+              .addFailure("User name is not set", null)
+              .withConfigProperty(BaseConfig.PROPERTY_AUTH_USERNAME);
           tryToLogin = false;
         }
         if (Strings.isNullOrEmpty(config.getAuthPassword())) {
-          failureCollector.addFailure("Password is not set", null)
-            .withConfigProperty(BaseConfig.PROPERTY_AUTH_PASSWORD);
+          failureCollector
+              .addFailure("Password is not set", null)
+              .withConfigProperty(BaseConfig.PROPERTY_AUTH_PASSWORD);
           tryToLogin = false;
         }
 
@@ -67,8 +70,9 @@ public abstract class BaseConfigValidator {
         break;
       case API:
         if (Strings.isNullOrEmpty(config.getSendGridApiKey())) {
-          failureCollector.addFailure("API Key is not set", null)
-            .withConfigProperty(BaseConfig.PROPERTY_SENDGRID_API_KEY);
+          failureCollector
+              .addFailure("API Key is not set", null)
+              .withConfigProperty(BaseConfig.PROPERTY_SENDGRID_API_KEY);
           tryToLogin = false;
         }
 
@@ -83,14 +87,15 @@ public abstract class BaseConfigValidator {
     try {
       client.checkConnection();
     } catch (IOException e) {
-      ValidationFailure failure = failureCollector
-        .addFailure(String.format("Connectivity issues: %s", e.getMessage()), null)
-        .withStacktrace(e.getStackTrace());
+      ValidationFailure failure =
+          failureCollector
+              .addFailure(String.format("Connectivity issues: %s", e.getMessage()), null)
+              .withStacktrace(e.getStackTrace());
 
       if (config.getAuthType() == SendGridAuthType.BASIC) {
         failure
-          .withConfigProperty(BaseConfig.PROPERTY_AUTH_USERNAME)
-          .withConfigProperty(BaseConfig.PROPERTY_AUTH_PASSWORD);
+            .withConfigProperty(BaseConfig.PROPERTY_AUTH_USERNAME)
+            .withConfigProperty(BaseConfig.PROPERTY_AUTH_PASSWORD);
       }
       if (config.getAuthType() == SendGridAuthType.API) {
         failure.withConfigProperty(BaseConfig.PROPERTY_SENDGRID_API_KEY);
@@ -98,23 +103,19 @@ public abstract class BaseConfigValidator {
     }
   }
 
-  /**
-   * Perform validation tasks which did not involve API Client usage.
-   */
+  /** Perform validation tasks which did not involve API Client usage. */
   public abstract void doValidation();
 
-  /**
-   * Check the validation.
-   */
+  /** Check the validation. */
   public void validate() {
     client = null;
 
     if (!config.containsMacro(BaseConfig.PROPERTY_AUTH_TYPE)) {
       checkAuthType();
     }
-    if (!config.containsMacro(BaseConfig.PROPERTY_AUTH_USERNAME) &&
-        !config.containsMacro(BaseConfig.PROPERTY_AUTH_PASSWORD) &&
-        !config.containsMacro(BaseConfig.PROPERTY_SENDGRID_API_KEY)) {
+    if (!config.containsMacro(BaseConfig.PROPERTY_AUTH_USERNAME)
+        && !config.containsMacro(BaseConfig.PROPERTY_AUTH_PASSWORD)
+        && !config.containsMacro(BaseConfig.PROPERTY_SENDGRID_API_KEY)) {
       checkAuthData();
     }
 
@@ -122,10 +123,9 @@ public abstract class BaseConfigValidator {
 
     // client could be not constructed, if any of checkAuth tests failed
     if (client != null
-        && (!config.containsMacro(BaseConfig.PROPERTY_AUTH_USERNAME) &&
-            !config.containsMacro(BaseConfig.PROPERTY_AUTH_PASSWORD) &&
-            !config.containsMacro(BaseConfig.PROPERTY_SENDGRID_API_KEY)
-        )) {
+        && (!config.containsMacro(BaseConfig.PROPERTY_AUTH_USERNAME)
+            && !config.containsMacro(BaseConfig.PROPERTY_AUTH_PASSWORD)
+            && !config.containsMacro(BaseConfig.PROPERTY_SENDGRID_API_KEY))) {
       checkClientConnectivity();
     }
   }

@@ -17,14 +17,18 @@
  */
 package org.apache.beam.sdk.io.cdap;
 
-import io.cdap.cdap.api.data.format.StructuredRecord;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
+import com.google.common.collect.Lists;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.common.Constants;
-import io.cdap.plugin.salesforce.plugin.OAuthInfo;
 import io.cdap.plugin.salesforce.plugin.sink.batch.CSVRecord;
 import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceBatchSink;
 import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConfig;
-import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConstants;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import io.cdap.plugin.sendgrid.batch.source.SendGridSource;
@@ -34,16 +38,19 @@ import io.cdap.plugin.zuora.plugin.batch.source.ZuoraBatchSource;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSourceConfig;
 import io.cdap.plugin.zuora.plugin.batch.source.ZuoraSplitArgument;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-import org.apache.beam.sdk.coders.Coder;
-import org.apache.beam.sdk.coders.CoderException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.beam.sdk.coders.CustomCoder;
-import org.apache.beam.sdk.coders.IterableCoder;
 import org.apache.beam.sdk.coders.KvCoder;
-import org.apache.beam.sdk.coders.MapCoder;
 import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.coders.SerializableCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
-import org.apache.beam.sdk.io.FileIO;
 import org.apache.beam.sdk.io.cdap.context.BatchSinkContextImpl;
 import org.apache.beam.sdk.io.cdap.context.BatchSourceContextImpl;
 import org.apache.beam.sdk.io.hadoop.WritableCoder;
@@ -51,8 +58,6 @@ import org.apache.beam.sdk.testing.PAssert;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.transforms.Count;
 import org.apache.beam.sdk.transforms.Create;
-import org.apache.beam.sdk.transforms.DoFn;
-import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Values;
 import org.apache.beam.sdk.transforms.windowing.AfterWatermark;
 import org.apache.beam.sdk.transforms.windowing.GlobalWindows;
@@ -62,7 +67,6 @@ import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.sdk.values.TypeDescriptors;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.OutputCommitter;
 import org.junit.Before;
@@ -72,25 +76,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.Serializable;
-import java.nio.channels.Channels;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 /** Test class for {@link CdapIO}. */
 @RunWith(JUnit4.class)
@@ -110,8 +95,8 @@ public class CdapIOTest {
       ImmutableMap.<String, Object>builder()
           .put("authType", "basic")
           .put("referenceName", "referenceName")
-          .put("authUsername", System.getenv("ZUORA_USERNAME"))
-          .put("authPassword", System.getenv("ZUORA_PASSWORD"))
+          .put("authUsername", "zuoraName")
+          .put("authPassword", "zuoraPassword")
           .put("baseObjects", "Orders")
           .build();
 
@@ -119,7 +104,7 @@ public class CdapIOTest {
       ImmutableMap.<String, Object>builder()
           .put("authType", "api")
           .put("referenceName", "referenceName")
-          .put("sendGridApiKey", System.getenv("SENDGRID_API_KEY"))
+          .put("sendGridApiKey", "sendgridApiKey")
           .put("dataSourceTypes", "MarketingCampaign")
           .put("dataSourceMarketing", "Senders")
           .put("dataSourceFields", "id,nickname")
@@ -131,7 +116,9 @@ public class CdapIOTest {
           .put("username", "akarys.shorabek@akvelon.com")
           .put("password", "Akarys2001#")
           .put("securityToken", "9h0BXK5zefgIwxzEzdqxv5Trv")
-          .put("consumerKey", "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
+          .put(
+              "consumerKey",
+              "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
           .put("consumerSecret", "77B38C597867F12182E33E98C188EF966E2754676F67308EE61AFB95F84E3C6E")
           .put("loginUrl", "https://login.salesforce.com/services/oauth2/token")
           .put("sObjectName", "Opportunity")
@@ -143,10 +130,12 @@ public class CdapIOTest {
           .put("username", "akarys.shorabek@akvelon.com")
           .put("password", "Akarys2001#")
           .put("securityToken", "9h0BXK5zefgIwxzEzdqxv5Trv")
-          .put("consumerKey", "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
+          .put(
+              "consumerKey",
+              "3MVG9t0sl2P.pByr4TRAiAY43fPIry8GgeN22WuRUTiIVg7j7o9KTlSGhRDTvuIZ2ivTLew3_Bfc6MRPDcErC")
           .put("consumerSecret", "77B38C597867F12182E33E98C188EF966E2754676F67308EE61AFB95F84E3C6E")
           .put("loginUrl", "https://login.salesforce.com/services/oauth2/token")
-          .put("sObjectName", "CustomObject")
+          .put("sObject", "CustomObject__c")
           .put("operation", "Insert")
           .put("errorHandling", "Stop on error")
           .put("maxBytesPerBatch", "9999999")
@@ -191,9 +180,8 @@ public class CdapIOTest {
 
   @Test
   public void testReadFromZuora() {
-    ZuoraSourceConfig zuoraSourceConfig = new ConfigWrapper<>(ZuoraSourceConfig.class)
-        .withParams(TEST_ZUORA_PARAMS_MAP)
-        .build();
+    ZuoraSourceConfig zuoraSourceConfig =
+        new ConfigWrapper<>(ZuoraSourceConfig.class).withParams(TEST_ZUORA_PARAMS_MAP).build();
 
     CdapIO.Read<ZuoraSplitArgument, BaseObject> reader =
         CdapIO.<ZuoraSplitArgument, BaseObject>read()
@@ -207,12 +195,12 @@ public class CdapIOTest {
     assertFalse(reader.getCdapPlugin().isUnbounded());
     assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
 
-    PCollection<KV<ZuoraSplitArgument, BaseObject>> input = p.apply(reader).setCoder(
-        KvCoder.of(
-            SerializableCoder.of(ZuoraSplitArgument.class),
-            SerializableCoder.of(BaseObject.class)
-        )
-    );
+    PCollection<KV<ZuoraSplitArgument, BaseObject>> input =
+        p.apply(reader)
+            .setCoder(
+                KvCoder.of(
+                    SerializableCoder.of(ZuoraSplitArgument.class),
+                    SerializableCoder.of(BaseObject.class)));
 
     int expectedRecordsCount = 336;
 
@@ -223,17 +211,17 @@ public class CdapIOTest {
                   (List<KV<ZuoraSplitArgument, BaseObject>>) iterable;
               assertEquals(expectedRecordsCount, list.size());
               return null;
-            }
-        );
+            });
 
     p.run();
   }
 
   @Test
   public void testReadFromSendGrid() {
-    SendGridSourceConfig sourceConfig = new ConfigWrapper<>(SendGridSourceConfig.class)
-        .withParams(TEST_SENDGRID_PARAMS_MAP)
-        .build();
+    SendGridSourceConfig sourceConfig =
+        new ConfigWrapper<>(SendGridSourceConfig.class)
+            .withParams(TEST_SENDGRID_PARAMS_MAP)
+            .build();
 
     CdapIO.Read<NullWritable, IBaseObject> reader =
         CdapIO.<NullWritable, IBaseObject>read()
@@ -247,12 +235,12 @@ public class CdapIOTest {
     assertFalse(reader.getCdapPlugin().isUnbounded());
     assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
 
-    PCollection<KV<NullWritable, IBaseObject>> input = p.apply(reader).setCoder(
-        KvCoder.of(
-            NullableCoder.of(WritableCoder.of(NullWritable.class)),
-            SerializableCoder.of(IBaseObject.class)
-        )
-    );
+    PCollection<KV<NullWritable, IBaseObject>> input =
+        p.apply(reader)
+            .setCoder(
+                KvCoder.of(
+                    NullableCoder.of(WritableCoder.of(NullWritable.class)),
+                    SerializableCoder.of(IBaseObject.class)));
 
     PAssert.that(input)
         .satisfies(
@@ -262,12 +250,10 @@ public class CdapIOTest {
               assertEquals(2, list.size());
               assertEquals("tommy", list.get(1).getValue().asMap().get("nickname"));
               return null;
-            }
-        );
+            });
 
     p.run();
   }
-
 
   @Test
   public void testReadObjectCreationFailsIfCdapPluginClassIsNull() {
@@ -411,9 +397,10 @@ public class CdapIOTest {
 
   @Test
   public void testReadFromSalesForce() {
-    SalesforceSourceConfig sourceConfig = new ConfigWrapper<>(SalesforceSourceConfig.class)
-        .withParams(TEST_SALESFORCE_PARAMS_MAP)
-        .build();
+    SalesforceSourceConfig sourceConfig =
+        new ConfigWrapper<>(SalesforceSourceConfig.class)
+            .withParams(TEST_SALESFORCE_PARAMS_MAP)
+            .build();
 
     CdapIO.Read<Schema, LinkedHashMap> reader =
         CdapIO.<Schema, LinkedHashMap>read()
@@ -427,26 +414,56 @@ public class CdapIOTest {
     assertFalse(reader.getCdapPlugin().isUnbounded());
     assertEquals(BatchSourceContextImpl.class, reader.getCdapPlugin().getContext().getClass());
 
-    PCollection<KV<Schema, LinkedHashMap>> input = p.apply(reader).setCoder(
-        KvCoder.of(
-            SerializableCoder.of(Schema.class),
-            SerializableCoder.of(LinkedHashMap.class)
-        )
-    );
+    PCollection<KV<Schema, LinkedHashMap>> input =
+        p.apply(reader)
+            .setCoder(
+                KvCoder.of(
+                    SerializableCoder.of(Schema.class), SerializableCoder.of(LinkedHashMap.class)));
 
-    PAssert.thatSingleton(input.apply(Values.create()).apply(Window.<LinkedHashMap>into(new GlobalWindows())
-        .discardingFiredPanes()
-        .triggering(AfterWatermark.
-            pastEndOfWindow())).apply(Count.globally())).isEqualTo(31L);
+    PAssert.thatSingleton(
+            input
+                .apply(Values.create())
+                .apply(
+                    Window.<LinkedHashMap>into(new GlobalWindows())
+                        .discardingFiredPanes()
+                        .triggering(AfterWatermark.pastEndOfWindow()))
+                .apply(Count.globally()))
+        .isEqualTo(31L);
 
     p.run();
   }
 
+  public static class CsvRecordCoder extends CustomCoder<SerializableCSVRecord> {
+    private static final CsvRecordCoder CODER = new CsvRecordCoder();
+    private static final StringUtf8Coder STRING_CODER = StringUtf8Coder.of();
+
+    public static CsvRecordCoder of() {
+      return CODER;
+    }
+
+    @Override
+    public void encode(SerializableCSVRecord value, OutputStream outStream) throws IOException {
+      STRING_CODER.encode(value.toString(), outStream);
+    }
+
+    @SuppressWarnings("StringSplitter")
+    @Override
+    public SerializableCSVRecord decode(InputStream inStream) throws IOException {
+      String recordStr = STRING_CODER.decode(inStream);
+      String columnNamesStr = recordStr.split("columnNames=\\[")[1].split("]")[0];
+      String[] columnNames = columnNamesStr.split(", ");
+      String valuesStr = recordStr.split("values=\\[")[1].split("]")[0];
+      String[] values = valuesStr.split(", ");
+      return new SerializableCSVRecord(Lists.newArrayList(columnNames), Lists.newArrayList(values));
+    }
+  }
+
   @Test
   public void testWriteToSalesForce() {
-    SalesforceSinkConfig sinkConfig = new ConfigWrapper<>(SalesforceSinkConfig.class)
-        .withParams(TEST_SALESFORCE_SINK_PARAMS_MAP)
-        .build();
+    SalesforceSinkConfig sinkConfig =
+        new ConfigWrapper<>(SalesforceSinkConfig.class)
+            .withParams(TEST_SALESFORCE_SINK_PARAMS_MAP)
+            .build();
 
     CdapIO.Write<NullWritable, SerializableCSVRecord> writer =
         CdapIO.<NullWritable, SerializableCSVRecord>write()
@@ -466,18 +483,19 @@ public class CdapIOTest {
     List<String> values = new ArrayList<>();
 
     fieldNames.add("Name");
-    values.add("CustomObject");
+    values.add("Custom name 1");
 
-    p.apply(Create.of(
-          KV.of(NullWritable.get(),new SerializableCSVRecord(fieldNames, values))
-        ).withCoder(
-            KvCoder.of(
-              NullableCoder.of(WritableCoder.of(NullWritable.class)),
-              SerializableCoder.of(SerializableCSVRecord.class)
-            )
-        )).setTypeDescriptor(
-        TypeDescriptors.kvs(
-            new TypeDescriptor<NullWritable>() {}, new TypeDescriptor<SerializableCSVRecord>() {})).apply(writer);
+    p.apply(
+            Create.of(KV.of(NullWritable.get(), new SerializableCSVRecord(fieldNames, values)))
+                .withCoder(
+                    KvCoder.of(
+                        NullableCoder.of(WritableCoder.of(NullWritable.class)),
+                        CsvRecordCoder.of())))
+        .setTypeDescriptor(
+            TypeDescriptors.kvs(
+                new TypeDescriptor<NullWritable>() {},
+                new TypeDescriptor<SerializableCSVRecord>() {}))
+        .apply(writer);
 
     p.run();
   }

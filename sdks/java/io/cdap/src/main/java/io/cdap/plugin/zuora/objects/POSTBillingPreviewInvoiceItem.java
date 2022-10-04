@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,191 +22,179 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: POSTBillingPreviewInvoiceItem (POSTBillingPreviewInvoiceItem).
-* Related objects:
-**/
+/** Object name: POSTBillingPreviewInvoiceItem (POSTBillingPreviewInvoiceItem). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "POSTBillingPreviewInvoiceItem",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED
-)
+    Name = "POSTBillingPreviewInvoiceItem",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED)
 public class POSTBillingPreviewInvoiceItem extends BaseObject {
   /**
-  * Name: appliedToItemId (appliedToItemId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: appliedToItemId (appliedToItemId), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("appliedToItemId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String appliedToItemId;
 
   /**
-  * Name: chargeAmount (chargeAmount), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeAmount (chargeAmount), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("chargeAmount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeAmount;
 
   /**
-  * Name: chargeDate (chargeDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeDate (chargeDate), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("chargeDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeDate;
 
   /**
-  * Name: chargeDescription (chargeDescription), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeDescription (chargeDescription), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("chargeDescription")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeDescription;
 
   /**
-  * Name: chargeId (chargeId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeId (chargeId), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("chargeId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeId;
 
   /**
-  * Name: chargeName (chargeName), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeName (chargeName), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("chargeName")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeName;
 
   /**
-  * Name: chargeNumber (chargeNumber), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeNumber (chargeNumber), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("chargeNumber")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeNumber;
 
   /**
-  * Name: chargeType (chargeType), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeType (chargeType), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("chargeType")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeType;
 
-  /**
-  * Name: id (id), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+  /** Name: id (id), Type: string. Options (custom, update, select): false, false, false */
   @Nullable
   @SerializedName("id")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String id;
 
   /**
-  * Name: processingType (processingType), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: processingType (processingType), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("processingType")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String processingType;
 
   /**
-  * Name: productName (productName), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: productName (productName), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("productName")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String productName;
 
   /**
-  * Name: quantity (quantity), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: quantity (quantity), Type: string. Options (custom, update, select): false, false, false
+   */
   @Nullable
   @SerializedName("quantity")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String quantity;
 
   /**
-  * Name: serviceEndDate (serviceEndDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: serviceEndDate (serviceEndDate), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("serviceEndDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String serviceEndDate;
 
   /**
-  * Name: serviceStartDate (serviceStartDate), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: serviceStartDate (serviceStartDate), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("serviceStartDate")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String serviceStartDate;
 
   /**
-  * Name: subscriptionId (subscriptionId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: subscriptionId (subscriptionId), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("subscriptionId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String subscriptionId;
 
   /**
-  * Name: subscriptionName (subscriptionName), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: subscriptionName (subscriptionName), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("subscriptionName")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String subscriptionName;
 
   /**
-  * Name: subscriptionNumber (subscriptionNumber), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: subscriptionNumber (subscriptionNumber), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("subscriptionNumber")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String subscriptionNumber;
 
   /**
-  * Name: taxAmount (taxAmount), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: taxAmount (taxAmount), Type: string. Options (custom, update, select): false, false,
+   * false
+   */
   @Nullable
   @SerializedName("taxAmount")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String taxAmount;
 
   /**
-  * Name: unitOfMeasure (unitOfMeasure), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: unitOfMeasure (unitOfMeasure), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("unitOfMeasure")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String unitOfMeasure;
-
 
   @Override
   public void addFields() {

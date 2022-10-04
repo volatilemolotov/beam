@@ -1,17 +1,19 @@
 /*
- *  Copyright © 2019 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package io.cdap.plugin.zuora.objects;
 
@@ -20,93 +22,94 @@ import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectDefinition;
 import io.cdap.plugin.zuora.restobjects.annotations.ObjectFieldDefinition;
 import io.cdap.plugin.zuora.restobjects.objects.BaseObject;
-
 import java.util.List;
-
 import javax.annotation.Nullable;
 
-/**
-* Object name: OrderMetricsForEvergreen (OrderMetricsForEvergreen).
-* Related objects:
-**/
+/** Object name: OrderMetricsForEvergreen (OrderMetricsForEvergreen). Related objects: */
 @SuppressWarnings("unused")
 @ObjectDefinition(
-  Name = "OrderMetricsForEvergreen",
-  ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED
-)
+    Name = "OrderMetricsForEvergreen",
+    ObjectType = ObjectDefinition.ObjectDefinitionType.NESTED)
 public class OrderMetricsForEvergreen extends BaseObject {
   /**
-  * Name: chargeNumber (chargeNumber), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: chargeNumber (chargeNumber), Type: string. Options (custom, update, select): false,
+   * false, false
+   */
   @Nullable
   @SerializedName("chargeNumber")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String chargeNumber;
 
   /**
-  * Name: mrr (mrr), Type: array|TimeSlicedNetMetricsForEvergreen.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: mrr (mrr), Type: array|TimeSlicedNetMetricsForEvergreen. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("mrr")
-  @ObjectFieldDefinition(FieldType = Schema.Type.ARRAY, NestedClass = "TimeSlicedNetMetricsForEvergreen")
+  @ObjectFieldDefinition(
+      FieldType = Schema.Type.ARRAY,
+      NestedClass = "TimeSlicedNetMetricsForEvergreen")
   private List<TimeSlicedNetMetricsForEvergreen> mrr;
 
   /**
-  * Name: originRatePlanId (originRatePlanId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: originRatePlanId (originRatePlanId), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("originRatePlanId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String originRatePlanId;
 
   /**
-  * Name: productRatePlanChargeId (productRatePlanChargeId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: productRatePlanChargeId (productRatePlanChargeId), Type: string. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("productRatePlanChargeId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String productRatePlanChargeId;
 
   /**
-  * Name: productRatePlanId (productRatePlanId), Type: string.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: productRatePlanId (productRatePlanId), Type: string. Options (custom, update, select):
+   * false, false, false
+   */
   @Nullable
   @SerializedName("productRatePlanId")
   @ObjectFieldDefinition(FieldType = Schema.Type.STRING)
   private String productRatePlanId;
 
   /**
-  * Name: quantity (quantity), Type: array|TimeSlicedMetricsForEvergreen.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: quantity (quantity), Type: array|TimeSlicedMetricsForEvergreen. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("quantity")
-  @ObjectFieldDefinition(FieldType = Schema.Type.ARRAY, NestedClass = "TimeSlicedMetricsForEvergreen")
+  @ObjectFieldDefinition(
+      FieldType = Schema.Type.ARRAY,
+      NestedClass = "TimeSlicedMetricsForEvergreen")
   private List<TimeSlicedMetricsForEvergreen> quantity;
 
   /**
-  * Name: tcb (tcb), Type: array|TimeSlicedTcbNetMetricsForEvergreen.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: tcb (tcb), Type: array|TimeSlicedTcbNetMetricsForEvergreen. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("tcb")
-  @ObjectFieldDefinition(FieldType = Schema.Type.ARRAY, NestedClass = "TimeSlicedTcbNetMetricsForEvergreen")
+  @ObjectFieldDefinition(
+      FieldType = Schema.Type.ARRAY,
+      NestedClass = "TimeSlicedTcbNetMetricsForEvergreen")
   private List<TimeSlicedTcbNetMetricsForEvergreen> tcb;
 
   /**
-  * Name: tcv (tcv), Type: array|TimeSlicedNetMetricsForEvergreen.
-  * Options (custom, update, select): false, false, false
-  **/
+   * Name: tcv (tcv), Type: array|TimeSlicedNetMetricsForEvergreen. Options (custom, update,
+   * select): false, false, false
+   */
   @Nullable
   @SerializedName("tcv")
-  @ObjectFieldDefinition(FieldType = Schema.Type.ARRAY, NestedClass = "TimeSlicedNetMetricsForEvergreen")
+  @ObjectFieldDefinition(
+      FieldType = Schema.Type.ARRAY,
+      NestedClass = "TimeSlicedNetMetricsForEvergreen")
   private List<TimeSlicedNetMetricsForEvergreen> tcv;
-
 
   @Override
   public void addFields() {

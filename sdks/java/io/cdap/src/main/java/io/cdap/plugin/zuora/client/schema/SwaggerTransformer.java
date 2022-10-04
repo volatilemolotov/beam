@@ -1,19 +1,20 @@
 /*
- *  Copyright © 2020 Cask Data, Inc.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not
- *  use this file except in compliance with the License. You may obtain a copy of
- *  the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *  License for the specific language governing permissions and limitations under
- *  the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 package io.cdap.plugin.zuora.client.schema;
 
 import com.google.gson.Gson;
@@ -36,12 +37,11 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 
-/**
- * Data transformer from swagger.
- */
+/** Data transformer from swagger. */
 @SuppressWarnings({"DefaultCharset", "StringSplitter"})
 public class SwaggerTransformer {
-  private static boolean topLevelObjects = false;  // process only top-level objects and ignore nested
+  private static boolean topLevelObjects =
+      false; // process only top-level objects and ignore nested
   private static Gson gson = new GsonBuilder().create();
 
   private JsonObject rawObjects;
@@ -53,6 +53,7 @@ public class SwaggerTransformer {
 
   /**
    * Constructor for SwaggerTransformer object.
+   *
    * @param uri the uri
    * @throws IOException in case if resource not found
    */
@@ -71,7 +72,7 @@ public class SwaggerTransformer {
 
     if (allOf != null) {
       JsonArray array = (JsonArray) allOf;
-      for (JsonElement arrayItem: array) {
+      for (JsonElement arrayItem : array) {
         if (arrayItem.getAsJsonObject().get("properties") != null) {
           return transformElement(name, arrayItem);
         }
@@ -81,21 +82,26 @@ public class SwaggerTransformer {
     JsonArray jsonFields = new JsonArray();
 
     if (properties != null) {
-      properties.getAsJsonObject().entrySet().forEach(x -> {
-        JsonElement field = addField(name, x.getKey(), x.getValue());
-        if (field != null) {
-          jsonFields.add(field);
-        }
-      });
+      properties
+          .getAsJsonObject()
+          .entrySet()
+          .forEach(
+              x -> {
+                JsonElement field = addField(name, x.getKey(), x.getValue());
+                if (field != null) {
+                  jsonFields.add(field);
+                }
+              });
     }
     return jsonFields;
   }
 
   /**
    * Add resolved object to the list of objects.
+   *
    * @param name name of the object
    * @param fields fields of the object
-   * @param onlyIfWithPath  add only object with the rest api path notation
+   * @param onlyIfWithPath add only object with the rest api path notation
    */
   private void addObject(String name, JsonElement fields, boolean onlyIfWithPath) {
     JsonObject el = new JsonObject();
@@ -103,25 +109,32 @@ public class SwaggerTransformer {
 
     JsonArray jsonFields = transformElement(objectName, fields);
 
-    Spliterator<JsonElement> spliterator = Spliterators.spliterator(jsonFields.iterator(), jsonFields.size(), 0);
-    List<JsonObject> fieldNames = StreamSupport.stream(spliterator, true)
-      .map(JsonElement::getAsJsonObject)
-      .collect(Collectors.toList());
+    Spliterator<JsonElement> spliterator =
+        Spliterators.spliterator(jsonFields.iterator(), jsonFields.size(), 0);
+    List<JsonObject> fieldNames =
+        StreamSupport.stream(spliterator, true)
+            .map(JsonElement::getAsJsonObject)
+            .collect(Collectors.toList());
 
-    boolean isTransitiveObject = fieldNames.stream()
-      .map(x -> x.get("name").getAsString())
-      .anyMatch(x -> x.equals("nextPage") || x.equals("success"));
+    boolean isTransitiveObject =
+        fieldNames.stream()
+            .map(x -> x.get("name").getAsString())
+            .anyMatch(x -> x.equals("nextPage") || x.equals("success"));
 
     if (isTransitiveObject) {
-      List<JsonObject> filteredFields = fieldNames.stream()
-        .filter(x -> !x.get("name").getAsString().equals("nextPage") && !x.get("name").getAsString().equals("success"))
-        .collect(Collectors.toList());
+      List<JsonObject> filteredFields =
+          fieldNames.stream()
+              .filter(
+                  x ->
+                      !x.get("name").getAsString().equals("nextPage")
+                          && !x.get("name").getAsString().equals("success"))
+              .collect(Collectors.toList());
 
       if (filteredFields.size() == 1) {
         String newType = filteredFields.get(0).get("subtype").getAsString();
         objectMapping.put(name, newType);
 
-        if (paths.containsKey(objectName)) {  // copy meta info for the mapped object
+        if (paths.containsKey(objectName)) { // copy meta info for the mapped object
           paths.put(newType, paths.get(objectName));
         }
         return;
@@ -137,17 +150,18 @@ public class SwaggerTransformer {
     if (paths.containsKey(objectName)) {
       Pair<String, List<String>> objectMeta = paths.get(objectName);
       fieldsObject.addProperty("api", objectMeta.getKey());
-      fieldsObject.addProperty("requiredFields", objectMeta.getValue().stream()
-        .map(x -> String.format("\"%s\"", x))
-        .collect(Collectors.joining(","))
-      );
+      fieldsObject.addProperty(
+          "requiredFields",
+          objectMeta.getValue().stream()
+              .map(x -> String.format("\"%s\"", x))
+              .collect(Collectors.joining(",")));
     } else if (onlyIfWithPath) {
       return;
     }
 
     el.addProperty("name", objectName);
     el.addProperty("label", objectName);
-    el.addProperty("href",  fieldsObject.toString());
+    el.addProperty("href", fieldsObject.toString());
 
     objectsArray.add(el);
   }
@@ -186,7 +200,14 @@ public class SwaggerTransformer {
         fieldType = "array|" + subType;
         addObject(subType, field.getAsJsonObject().get("items"), topLevelObjects);
       } else {
-        String [] refPath = field.getAsJsonObject().get("items").getAsJsonObject().get("$ref").getAsString().split("/");
+        String[] refPath =
+            field
+                .getAsJsonObject()
+                .get("items")
+                .getAsJsonObject()
+                .get("$ref")
+                .getAsString()
+                .split("/");
         subType = getObjectName(refPath[refPath.length - 1]);
         if (objectMapping.containsKey(subType)) {
           subType = objectMapping.get(subType);
@@ -226,56 +247,67 @@ public class SwaggerTransformer {
 
   private void parsePaths() {
     paths = new HashMap<>();
-    rawPaths.entrySet().forEach(x -> {
-      String path = x.getKey();
-      if (!path.contains("/v1")) {
-        return;
-      }
-      String[] pathChunks = path.split("/v1/");
-      path = pathChunks[pathChunks.length - 1];
-      JsonObject pathObject = x.getValue().getAsJsonObject();
-      JsonElement reqType = pathObject.get("post");
-      if (reqType == null) {
-        return;
-      }
+    rawPaths
+        .entrySet()
+        .forEach(
+            x -> {
+              String path = x.getKey();
+              if (!path.contains("/v1")) {
+                return;
+              }
+              String[] pathChunks = path.split("/v1/");
+              path = pathChunks[pathChunks.length - 1];
+              JsonObject pathObject = x.getValue().getAsJsonObject();
+              JsonElement reqType = pathObject.get("post");
+              if (reqType == null) {
+                return;
+              }
 
-      JsonArray parameters = reqType.getAsJsonObject().getAsJsonArray("parameters");
-      String schemaName;
+              JsonArray parameters = reqType.getAsJsonObject().getAsJsonArray("parameters");
+              String schemaName;
 
-      try {
-        schemaName = reqType.getAsJsonObject()
-          .get("responses").getAsJsonObject()
-          .get("200").getAsJsonObject()
-          .get("schema").getAsJsonObject()
-          .get("$ref").getAsString();
-      } catch (NullPointerException e) {
-        // no interest in api endpoint without schema assigned
-        return;
-      }
+              try {
+                schemaName =
+                    reqType
+                        .getAsJsonObject()
+                        .get("responses")
+                        .getAsJsonObject()
+                        .get("200")
+                        .getAsJsonObject()
+                        .get("schema")
+                        .getAsJsonObject()
+                        .get("$ref")
+                        .getAsString();
+              } catch (NullPointerException e) {
+                // no interest in api endpoint without schema assigned
+                return;
+              }
 
-      String[] schemaNameArr = schemaName.split("/");
-      schemaName = getObjectName(schemaNameArr[schemaNameArr.length - 1]);
-      List<String> arguments = new ArrayList<>();
+              String[] schemaNameArr = schemaName.split("/");
+              schemaName = getObjectName(schemaNameArr[schemaNameArr.length - 1]);
+              List<String> arguments = new ArrayList<>();
 
-      parameters.forEach(y -> {
-        JsonElement argName = y.getAsJsonObject().get("name");
-        if (argName == null) {
-          return;
-        }
+              parameters.forEach(
+                  y -> {
+                    JsonElement argName = y.getAsJsonObject().get("name");
+                    if (argName == null) {
+                      return;
+                    }
 
-        JsonElement requiredEl = y.getAsJsonObject().get("required");
-        boolean required = (requiredEl != null) && requiredEl.getAsBoolean();
+                    JsonElement requiredEl = y.getAsJsonObject().get("required");
+                    boolean required = (requiredEl != null) && requiredEl.getAsBoolean();
 
-        if (required) {
-          arguments.add(argName.getAsString());
-        }
-      });
-      paths.put(schemaName, new Pair<>(path, arguments));
-    });
+                    if (required) {
+                      arguments.add(argName.getAsString());
+                    }
+                  });
+              paths.put(schemaName, new Pair<>(path, arguments));
+            });
   }
 
   /**
    * Retrieves definition of the objects.
+   *
    * @param onlyWithPath only objects with rest api endpoint and all their children
    */
   public ZuoraDefinitions getDefinitions(boolean onlyWithPath) {
@@ -287,9 +319,12 @@ public class SwaggerTransformer {
 
     newDocument = new JsonObject();
     objectMapping.clear();
-    rawObjects.entrySet().forEach(e -> {
-      addObject(e.getKey(), e.getValue(), onlyWithPath || topLevelObjects);
-    });
+    rawObjects
+        .entrySet()
+        .forEach(
+            e -> {
+              addObject(e.getKey(), e.getValue(), onlyWithPath || topLevelObjects);
+            });
 
     newDocument.addProperty("isSwagger", true);
     newDocument.add("objects", objectsArray);
