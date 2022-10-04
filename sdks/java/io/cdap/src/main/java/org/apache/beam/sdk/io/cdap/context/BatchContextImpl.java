@@ -38,6 +38,7 @@ import io.cdap.cdap.etl.api.batch.BatchContext;
 import io.cdap.cdap.etl.api.lineage.field.FieldOperation;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -47,6 +48,9 @@ import javax.annotation.Nullable;
 /** Class for Batch, Sink and Stream CDAP wrapper classes that use it to provide common details. */
 @SuppressWarnings({"TypeParameterUnusedInFormals", "nullness"})
 public abstract class BatchContextImpl implements BatchContext {
+
+  public static final String DEFAULT_SCHEMA_FIELD_NAME = "Name";
+  public static final String DEFAULT_SCHEMA_RECORD_NAME = "Record";
 
   private final FailureCollectorWrapper failureCollector = new FailureCollectorWrapper();
 
@@ -126,7 +130,9 @@ public abstract class BatchContextImpl implements BatchContext {
   @Nullable
   @Override
   public Schema getInputSchema() {
-    return null;
+    List<Schema.Field> fields = new ArrayList<>();
+    fields.add(Schema.Field.of(DEFAULT_SCHEMA_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+    return Schema.recordOf(DEFAULT_SCHEMA_RECORD_NAME, fields);
   }
 
   @Override
@@ -135,8 +141,10 @@ public abstract class BatchContextImpl implements BatchContext {
   }
 
   @Override
-  public @Nullable Schema getOutputSchema() {
-    return null;
+  public Schema getOutputSchema() {
+    List<Schema.Field> fields = new ArrayList<>();
+    fields.add(Schema.Field.of(DEFAULT_SCHEMA_FIELD_NAME, Schema.of(Schema.Type.STRING)));
+    return Schema.recordOf(DEFAULT_SCHEMA_RECORD_NAME, fields);
   }
 
   @Override

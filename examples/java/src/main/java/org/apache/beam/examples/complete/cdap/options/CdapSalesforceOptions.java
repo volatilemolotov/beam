@@ -19,7 +19,6 @@ package org.apache.beam.examples.complete.cdap.options;
 
 import io.cdap.plugin.common.Constants;
 import io.cdap.plugin.salesforce.SalesforceConstants;
-import io.cdap.plugin.salesforce.plugin.source.batch.util.SalesforceSourceConstants;
 import org.apache.beam.sdk.options.Description;
 import org.apache.beam.sdk.options.PipelineOptions;
 import org.apache.beam.sdk.options.Validation;
@@ -69,14 +68,8 @@ public interface CdapSalesforceOptions extends PipelineOptions {
   void setLoginUrl(String loginUrl);
 
   @Validation.Required
-  @Description(SalesforceSourceConstants.PROPERTY_SOBJECT_NAME)
-  String getSObjectName();
+  @Description("Path to input/output .txt file.")
+  String getTxtFilePath();
 
-  void setSObjectName(String sObjectName);
-
-  @Validation.Required
-  @Description("Path to output .txt file.")
-  String getOutputTxtFilePath();
-
-  void setOutputTxtFilePath(String outputTxtFilePath);
+  void setTxtFilePath(String txtFilePath);
 }

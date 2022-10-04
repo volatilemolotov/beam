@@ -124,7 +124,35 @@ To execute this pipeline, specify the parameters in the following format:
  --loginUrl=your-login-url \
  --sObjectName=object-name \
  --referenceName=your-reference-name \
- --outputTxtFilePath=your-path-to-file
+ --txtFilePath=your-path-to-file
+```
+
+## Running the TxtToCdapSalesforce pipeline example
+
+Gradle 'executeCdap' task allows to run the pipeline via the following command:
+
+```bash
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.TxtToCdapSalesforce \
+     -Dexec.args="--<argument>=<value> --<argument>=<value>"
+```
+
+To execute this pipeline, specify the parameters in the following format:
+
+```bash
+ --username=your-user-name\
+ --password=your-password \
+ --securityToken=your-token \
+ --consumerKey=your-key \
+ --consumerSecret=your-secret \
+ --loginUrl=your-login-url \
+ --sObject=CustomObject__c \
+ --referenceName=your-reference-name \
+ --txtFilePath=your-path-to-file \
+ --operation=Insert \
+ --errorHandling=Stop on error \
+ --maxRecordsPerBatch=10 \
+ --maxBytesPerBatch=9999999 \
+ --locksDirPath=your-path
 ```
 
 ## Running the CdapZendeskToTxt pipeline example

@@ -20,7 +20,7 @@ package org.apache.beam.examples.complete.cdap;
 import io.cdap.cdap.api.data.schema.Schema;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.apache.beam.examples.complete.cdap.options.CdapSalesforceOptions;
+import org.apache.beam.examples.complete.cdap.options.CdapSalesforceSourceOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatInputTransform;
 import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
 import org.apache.beam.sdk.Pipeline;
@@ -74,7 +74,7 @@ import org.slf4j.LoggerFactory;
  * --loginUrl=your-login-url \
  * --sObjectName=object-name \
  * --referenceName=your-reference-name \
- * --outputTxtFilePath=your-path-to-file
+ * --txtFilePath=your-path-to-file
  * }
  *
  * By default this will run the pipeline locally with the DirectRunner. To change the runner, specify:
@@ -94,8 +94,10 @@ public class CdapSalesforceToTxt {
    * @param args Command line arguments to the pipeline.
    */
   public static void main(String[] args) {
-    CdapSalesforceOptions options =
-        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapSalesforceOptions.class);
+    CdapSalesforceSourceOptions options =
+        PipelineOptionsFactory.fromArgs(args)
+            .withValidation()
+            .as(CdapSalesforceSourceOptions.class);
 
     // Create the pipeline
     Pipeline pipeline = Pipeline.create(options);
@@ -107,9 +109,10 @@ public class CdapSalesforceToTxt {
    *
    * @param options arguments to the pipeline
    */
-  public static PipelineResult run(Pipeline pipeline, CdapSalesforceOptions options) {
+  @SuppressWarnings("rawtypes")
+  public static PipelineResult run(Pipeline pipeline, CdapSalesforceSourceOptions options) {
     Map<String, Object> paramsMap =
-        PluginConfigOptionsConverter.salesforceOptionsToParamsMap(options);
+        PluginConfigOptionsConverter.salesforceSourceOptionsToParamsMap(options);
     LOG.info("Starting Cdap-Salesforce pipeline with parameters: {}", paramsMap);
 
     /*
@@ -127,7 +130,7 @@ public class CdapSalesforceToTxt {
         .apply(MapValues.into(TypeDescriptors.strings()).via(LinkedHashMap::toString))
         .setCoder(KvCoder.of(SerializableCoder.of(Schema.class), StringUtf8Coder.of()))
         .apply(Values.create())
-        .apply("writeToTxt", TextIO.write().to(options.getOutputTxtFilePath()));
+        .apply("writeToTxt", TextIO.write().to(options.getTxtFilePath()));
 
     return pipeline.run();
   }

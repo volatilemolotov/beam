@@ -19,13 +19,19 @@ package org.apache.beam.examples.complete.cdap;
 
 import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
+import com.google.gson.Gson;
 import java.util.Map;
-import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
+import org.apache.beam.examples.complete.cdap.options.CdapSalesforceSinkOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatOutputTransform;
+import org.apache.beam.examples.complete.cdap.utils.CsvRecordCoder;
 import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
+import org.apache.beam.examples.complete.cdap.utils.SerializableCsvRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
+import org.apache.beam.sdk.coders.KvCoder;
+import org.apache.beam.sdk.coders.NullableCoder;
 import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.sdk.io.hadoop.WritableCoder;
 import org.apache.beam.sdk.options.PipelineOptionsFactory;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.values.KV;
@@ -35,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link TxtToCdapHubspot} pipeline is a batch pipeline which ingests data in JSON format from
- * .txt file, and outputs the resulting records to Hubspot. Hubspot parameters and input .txt file
- * path are specified by the user as template parameters. <br>
+ * The {@link TxtToCdapSalesforce} pipeline is a batch pipeline which ingests data from .txt file,
+ * and outputs the resulting records to Salesforce. Salesforce parameters and input .txt file path
+ * are specified by the user as template parameters. <br>
  *
  * <p><b>Example Usage</b>
  *
@@ -57,18 +63,26 @@ import org.slf4j.LoggerFactory;
  *
  * This task allows to run the pipeline via the following command:
  * {@code
- * gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.TxtToCdapHubspot \
+ * gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.TxtToCdapSalesforce \
  *      -Dexec.args="--<argument>=<value> --<argument>=<value>"
  * }
  *
  * # Running the pipeline
  * To execute this pipeline, specify the parameters in the following format:
  * {@code
- * --apikey=your-api-key \
+ * --username=your-user-name\
+ * --password=your-password \
+ * --securityToken=your-token \
+ * --consumerKey=your-key \
+ * --consumerSecret=your-secret \
+ * --loginUrl=your-login-url \
+ * --sObject=CustomObject__c \
  * --referenceName=your-reference-name \
- * --objectType=your-object-type \
- * --txtFilePath=your-path-to-input-file \
- * --locksDirPath=your-path-to-locks-dir
+ * --txtFilePath=your-path-to-file \
+ * --maxRecordsPerBatch=10 \
+ * --maxBytesPerBatch=9999999 \
+ * --operation=Insert \
+ * --errorHandling=Stop on error
  * }
  *
  * By default this will run the pipeline locally with the DirectRunner. To change the runner, specify:
@@ -77,10 +91,12 @@ import org.slf4j.LoggerFactory;
  * }
  * </pre>
  */
-public class TxtToCdapHubspot {
+public class TxtToCdapSalesforce {
+
+  private static final Gson GSON = new Gson();
 
   /* Logger for class.*/
-  private static final Logger LOG = LoggerFactory.getLogger(TxtToCdapHubspot.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TxtToCdapSalesforce.class);
 
   /**
    * Main entry point for pipeline execution.
@@ -88,8 +104,8 @@ public class TxtToCdapHubspot {
    * @param args Command line arguments to the pipeline.
    */
   public static void main(String[] args) {
-    CdapHubspotOptions options =
-        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapHubspotOptions.class);
+    CdapSalesforceSinkOptions options =
+        PipelineOptionsFactory.fromArgs(args).withValidation().as(CdapSalesforceSinkOptions.class);
 
     checkStateNotNull(options.getLocksDirPath(), "locksDirPath can not be null!");
 
@@ -99,30 +115,38 @@ public class TxtToCdapHubspot {
   }
 
   /**
-   * Runs a pipeline which reads records from .txt file and writes it to CDAP Hubspot.
+   * Runs a pipeline which reads records from .txt file and writes it to CDAP Salesforce.
    *
    * @param options arguments to the pipeline
    */
-  public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
-    Map<String, Object> paramsMap = PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options);
-    LOG.info("Starting Txt-to-Cdap-Hubspot pipeline with parameters: {}", paramsMap);
+  public static PipelineResult run(Pipeline pipeline, CdapSalesforceSinkOptions options) {
+    Map<String, Object> paramsMap =
+        PluginConfigOptionsConverter.salesforceSinkOptionsToParamsMap(options);
+    LOG.info("Starting Txt-to-Cdap-Salesforce pipeline with parameters: {}", paramsMap);
 
     /*
      * Steps:
      *  1) Read messages in from .txt file
      *  2) Map to KV
-     *  3) Write successful records to Cdap Hubspot
+     *  3) Write successful records to Cdap Salesforce
      */
 
     pipeline
         .apply("readFromTxt", TextIO.read().from(options.getTxtFilePath()))
         .apply(
-            MapElements.into(new TypeDescriptor<KV<NullWritable, String>>() {})
-                .via(json -> KV.of(NullWritable.get(), json)))
+            MapElements.into(new TypeDescriptor<KV<NullWritable, SerializableCsvRecord>>() {})
+                .via(
+                    json -> {
+                      SerializableCsvRecord csvRecord =
+                          GSON.fromJson(json, SerializableCsvRecord.class);
+                      return KV.of(NullWritable.get(), csvRecord);
+                    }))
+        .setCoder(
+            KvCoder.of(NullableCoder.of(WritableCoder.of(NullWritable.class)), CsvRecordCoder.of()))
         .apply(
-            "writeToCdapHubspot",
-            FormatOutputTransform.writeToCdapHubspot(
-                PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options),
+            "writeToCdapSalesforce",
+            FormatOutputTransform.writeToCdapSalesforce(
+                PluginConfigOptionsConverter.salesforceSinkOptionsToParamsMap(options),
                 options.getLocksDirPath()));
 
     return pipeline.run();

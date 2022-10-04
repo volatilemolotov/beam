@@ -23,9 +23,10 @@ import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.batch.BatchSink;
 import io.cdap.plugin.hubspot.sink.batch.HubspotBatchSink;
 import io.cdap.plugin.hubspot.sink.batch.SinkHubspotConfig;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceBatchSink;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConfig;
 import java.util.Map;
-import org.apache.beam.sdk.io.FileIO;
-import org.apache.beam.sdk.io.TextIO;
+import org.apache.beam.examples.complete.cdap.utils.SerializableCsvRecord;
 import org.apache.beam.sdk.io.cdap.CdapIO;
 import org.apache.beam.sdk.io.cdap.ConfigWrapper;
 import org.apache.hadoop.io.NullWritable;
@@ -56,12 +57,24 @@ public class FormatOutputTransform {
   }
 
   /**
-   * Configures FileIO receiver.
+   * Configures Cdap Salesforce Write transform.
    *
-   * @param directory Path to directory FileIO should write to
-   * @return configured writing to FileIO
+   * @param pluginConfigParams Cdap Salesforce plugin config parameters
+   * @return configured Write transform to Cdap Salesforce
    */
-  public static FileIO.Write<Void, String> writeToFileIO(String directory) {
-    return FileIO.<String>write().to(directory).withSuffix(".txt").via(TextIO.sink());
+  public static CdapIO.Write<NullWritable, SerializableCsvRecord> writeToCdapSalesforce(
+      Map<String, Object> pluginConfigParams, String locksDirPath) {
+    final PluginConfig pluginConfig =
+        new ConfigWrapper<>(SalesforceSinkConfig.class).withParams(pluginConfigParams).build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
+    Class<? extends BatchSink<?, ?, ?>> pluginClass = SalesforceBatchSink.class;
+
+    return CdapIO.<NullWritable, SerializableCsvRecord>write()
+        .withCdapPluginClass(pluginClass)
+        .withPluginConfig(pluginConfig)
+        .withKeyClass(NullWritable.class)
+        .withValueClass(SerializableCsvRecord.class)
+        .withLocksDirPath(locksDirPath);
   }
 }

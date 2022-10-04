@@ -25,6 +25,8 @@ import io.cdap.plugin.hubspot.sink.batch.HubspotOutputFormat;
 import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
 import io.cdap.plugin.hubspot.source.batch.HubspotInputFormat;
 import io.cdap.plugin.hubspot.source.batch.HubspotInputFormatProvider;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceBatchSink;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceOutputFormat;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormat;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceInputFormatProvider;
@@ -50,6 +52,9 @@ public class MappingUtils {
     } else if (pluginClass.equals(ServiceNowSource.class)) {
       return Plugin.create(
           pluginClass, ServiceNowInputFormat.class, SourceInputFormatProvider.class);
+    } else if (pluginClass.equals(SalesforceBatchSink.class)) {
+      return Plugin.create(
+          pluginClass, SalesforceOutputFormat.class, SalesforceInputFormatProvider.class);
     }
     throw new UnsupportedOperationException(
         String.format("Given plugin class '%s' is not supported!", pluginClass.getName()));

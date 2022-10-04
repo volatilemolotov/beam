@@ -20,13 +20,16 @@ package org.apache.beam.examples.complete.cdap.utils;
 import io.cdap.plugin.common.Constants;
 import io.cdap.plugin.hubspot.common.BaseHubspotConfig;
 import io.cdap.plugin.salesforce.SalesforceConstants;
+import io.cdap.plugin.salesforce.plugin.sink.batch.ErrorHandling;
+import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConfig;
 import io.cdap.plugin.salesforce.plugin.source.batch.util.SalesforceSourceConstants;
 import io.cdap.plugin.servicenow.source.util.ServiceNowConstants;
 import io.cdap.plugin.zendesk.source.batch.ZendeskBatchSourceConfig;
 import io.cdap.plugin.zendesk.source.common.config.BaseZendeskSourceConfig;
 import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapHubspotOptions;
-import org.apache.beam.examples.complete.cdap.options.CdapSalesforceOptions;
+import org.apache.beam.examples.complete.cdap.options.CdapSalesforceSinkOptions;
+import org.apache.beam.examples.complete.cdap.options.CdapSalesforceSourceOptions;
 import org.apache.beam.examples.complete.cdap.options.CdapServiceNowOptions;
 import org.apache.beam.examples.complete.cdap.options.CdapZendeskOptions;
 import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.ImmutableMap;
@@ -63,7 +66,8 @@ public class PluginConfigOptionsConverter {
         .build();
   }
 
-  public static Map<String, Object> salesforceOptionsToParamsMap(CdapSalesforceOptions options) {
+  public static Map<String, Object> salesforceSourceOptionsToParamsMap(
+      CdapSalesforceSourceOptions options) {
     return ImmutableMap.<String, Object>builder()
         .put(Constants.Reference.REFERENCE_NAME, options.getReferenceName())
         .put(SalesforceConstants.PROPERTY_USERNAME, options.getUsername())
@@ -73,6 +77,26 @@ public class PluginConfigOptionsConverter {
         .put(SalesforceConstants.PROPERTY_CONSUMER_SECRET, options.getConsumerSecret())
         .put(SalesforceConstants.PROPERTY_LOGIN_URL, options.getLoginUrl())
         .put(SalesforceSourceConstants.PROPERTY_SOBJECT_NAME, options.getSObjectName())
+        .build();
+  }
+
+  public static Map<String, Object> salesforceSinkOptionsToParamsMap(
+      CdapSalesforceSinkOptions options) {
+    return ImmutableMap.<String, Object>builder()
+        .put(Constants.Reference.REFERENCE_NAME, options.getReferenceName())
+        .put(SalesforceConstants.PROPERTY_USERNAME, options.getUsername())
+        .put(SalesforceConstants.PROPERTY_PASSWORD, options.getPassword())
+        .put(SalesforceConstants.PROPERTY_SECURITY_TOKEN, options.getSecurityToken())
+        .put(SalesforceConstants.PROPERTY_CONSUMER_KEY, options.getConsumerKey())
+        .put(SalesforceConstants.PROPERTY_CONSUMER_SECRET, options.getConsumerSecret())
+        .put(SalesforceConstants.PROPERTY_LOGIN_URL, options.getLoginUrl())
+        .put(SalesforceSinkConfig.PROPERTY_SOBJECT, options.getsObject())
+        .put(SalesforceSinkConfig.PROPERTY_OPERATION, options.getOperation())
+        .put(
+            SalesforceSinkConfig.PROPERTY_ERROR_HANDLING,
+            ErrorHandling.valueOf(options.getErrorHandling()).getValue())
+        .put(SalesforceSinkConfig.PROPERTY_MAX_BYTES_PER_BATCH, options.getMaxBytesPerBatch())
+        .put(SalesforceSinkConfig.PROPERTY_MAX_RECORDS_PER_BATCH, options.getMaxRecordsPerBatch())
         .build();
   }
 
