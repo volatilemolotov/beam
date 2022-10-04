@@ -37,20 +37,12 @@ public class CsvRecordCoder extends CustomCoder<SerializableCsvRecord> {
 
   @Override
   public void encode(SerializableCsvRecord value, OutputStream outStream) throws IOException {
-    //        STRING_CODER.encode(value.toString(), outStream);
     STRING_CODER.encode(GSON.toJson(value), outStream);
   }
 
   @SuppressWarnings("StringSplitter")
   @Override
   public SerializableCsvRecord decode(InputStream inStream) throws IOException {
-    String recordStr = STRING_CODER.decode(inStream);
-    //        String columnNamesStr = recordStr.split("columnNames=\\[")[1].split("]")[0];
-    //        String[] columnNames = columnNamesStr.split(", ");
-    //        String valuesStr = recordStr.split("values=\\[")[1].split("]")[0];
-    //        String[] values = valuesStr.split(", ");
-    //        return new SerializableCsvRecord(Lists.newArrayList(columnNames),
-    // Lists.newArrayList(values));
-    return GSON.fromJson(recordStr, SerializableCsvRecord.class);
+    return GSON.fromJson(STRING_CODER.decode(inStream), SerializableCsvRecord.class);
   }
 }
