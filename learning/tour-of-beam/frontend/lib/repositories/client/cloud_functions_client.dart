@@ -21,6 +21,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../../models/content_tree.dart';
+import '../../models/unit_content.dart';
+import '../models/get_content_tree_response.dart';
 import '../models/get_sdks_response.dart';
 import 'client.dart';
 
@@ -38,13 +40,27 @@ class CloudFunctionsTobClient extends TobClient {
   }
 
   @override
-  Future<ContentTreeModel> getContentTree() async {
+  Future<ContentTreeModel> getContentTree(String sdkId) async {
     final json = await http.get(
       Uri.parse(
-        'https://us-central1-tour-of-beam-2.cloudfunctions.net/getContentTree?sdk=Python',
+        'https://us-central1-tour-of-beam-2.cloudfunctions.net/getContentTree?sdk=$sdkId',
       ),
     );
+
     final map = jsonDecode(utf8.decode(json.bodyBytes)) as Map<String, dynamic>;
-    return ContentTreeModel.fromJson(map);
+    final response = GetContentTreeResponse.fromJson(map);
+    return ContentTreeModel.fromResponse(response);
+  }
+
+  @override
+  Future<UnitContentModel> getUnitContent(String sdkId, String unitId) async {
+    final json = await http.get(
+      Uri.parse(
+        'https://us-central1-tour-of-beam-2.cloudfunctions.net/getUnitContent?sdk=$sdkId&id=$unitId',
+      ),
+    );
+
+    final map = jsonDecode(utf8.decode(json.bodyBytes)) as Map<String, dynamic>;
+    return UnitContentModel.fromJson(map);
   }
 }

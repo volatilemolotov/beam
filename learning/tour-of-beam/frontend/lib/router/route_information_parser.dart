@@ -16,32 +16,18 @@
  * limitations under the License.
  */
 
+// ignore_for_file: avoid_renaming_method_parameters
+
+import 'package:app_state/app_state.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get_it/get_it.dart';
 
-import '../../cache/content_tree.dart';
-import '../../models/content_tree.dart';
+import '../pages/tour/path.dart';
+import '../pages/welcome/path.dart';
 
-class ContentTreeBuilder extends StatelessWidget {
-  final String sdkId;
-  final ValueWidgetBuilder<ContentTreeModel?> builder;
-
-  const ContentTreeBuilder({
-    required this.sdkId,
-    required this.builder,
-  });
-
+class TobRouteInformationParser extends PageStackRouteInformationParser {
   @override
-  Widget build(BuildContext context) {
-    final cache = GetIt.instance.get<ContentTreeCache>();
-
-    return AnimatedBuilder(
-      animation: cache,
-      builder: (context, child) => builder(
-        context,
-        cache.getContentTree(sdkId),
-        child,
-      ),
-    );
+  Future<PagePath> parsePagePath(RouteInformation ri) async {
+    return TourPath.tryParse(ri) ??
+        const WelcomePath(); // The default page if nothing worked.
   }
 }
