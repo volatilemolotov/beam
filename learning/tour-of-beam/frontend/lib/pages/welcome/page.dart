@@ -25,6 +25,7 @@ import 'state.dart';
 class WelcomePage extends StatefulMaterialPage<void, WelcomeNotifier> {
   static const classFactoryKey = 'Welcome';
 
+  /// Called when navigating to the page programmatically.
   WelcomePage()
       : super(
           key: const ValueKey(classFactoryKey),
@@ -32,6 +33,7 @@ class WelcomePage extends StatefulMaterialPage<void, WelcomeNotifier> {
           createScreen: WelcomeScreen.new,
         );
 
+  /// Called when re-creating the page at a navigation intent.
   // ignore: avoid_unused_constructor_parameters
   WelcomePage.fromStateMap(Map map) : this();
 }

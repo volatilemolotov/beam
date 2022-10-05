@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-// ignore_for_file: avoid_renaming_method_parameters
-
 import 'package:app_state/app_state.dart';
 import 'package:flutter/widgets.dart';
 
@@ -26,6 +24,7 @@ import '../pages/welcome/path.dart';
 
 class TobRouteInformationParser extends PageStackRouteInformationParser {
   @override
+  // ignore: avoid_renaming_method_parameters
   Future<PagePath> parsePagePath(RouteInformation ri) async {
     return TourPath.tryParse(ri) ??
         const WelcomePath(); // The default page if nothing worked.
