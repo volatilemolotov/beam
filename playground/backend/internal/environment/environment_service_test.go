@@ -25,7 +25,6 @@ import (
 	"time"
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
-	"beam.apache.org/playground/backend/internal/constants"
 )
 
 const (
@@ -44,16 +43,8 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(fmt.Errorf("error during test setup: %s", err.Error()))
 	}
-	exitValue := m.Run()
-	teardown()
-	if exitValue == 0 && testing.CoverMode() != "" {
-		coverage := testing.Coverage()
-		if coverage < constants.MinTestCoverage {
-			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
-			exitValue = -1
-		}
-	}
-	os.Exit(exitValue)
+	defer teardown()
+	m.Run()
 }
 
 func setup() error {

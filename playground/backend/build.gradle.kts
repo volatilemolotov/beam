@@ -93,31 +93,11 @@ val testWithoutCache by tasks.registering {
     }
 }
 
-val testWithCoverage by tasks.registering {
-    group = "verification"
-    description = "Test the backend"
-    doFirst {
-        exec {
-            executable("go")
-            args("clean", "-testcache")
-        }
-    }
-    doLast {
-        exec {
-            executable("go")
-            args("test", "-cover", "./...")
-        }
-    }
-}
-
 test { dependsOn(startDatastoreEmulator) }
 test { finalizedBy(stopDatastoreEmulator) }
 
 testWithoutCache { dependsOn(startDatastoreEmulator) }
 testWithoutCache { finalizedBy(stopDatastoreEmulator) }
-
-testWithCoverage { dependsOn(startDatastoreEmulator) }
-testWithCoverage { finalizedBy(stopDatastoreEmulator) }
 
 task("removeUnusedSnippet") {
     doLast {

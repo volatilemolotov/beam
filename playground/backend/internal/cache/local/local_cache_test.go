@@ -18,7 +18,6 @@ package local
 import (
 	"context"
 	"fmt"
-	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -28,21 +27,8 @@ import (
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
-	"beam.apache.org/playground/backend/internal/constants"
 	"beam.apache.org/playground/backend/internal/db/entity"
 )
-
-func TestMain(m *testing.M) {
-	exitValue := m.Run()
-	if exitValue == 0 && testing.CoverMode() != "" {
-		coverage := testing.Coverage()
-		if coverage < constants.MinTestCoverage {
-			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
-			exitValue = -1
-		}
-	}
-	os.Exit(exitValue)
-}
 
 func samePipelineIdSlices(x, y []uuid.UUID) bool {
 	if len(x) != len(y) {

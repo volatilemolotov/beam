@@ -37,7 +37,6 @@ import (
 	"beam.apache.org/playground/backend/internal/cache"
 	"beam.apache.org/playground/backend/internal/cache/local"
 	"beam.apache.org/playground/backend/internal/cache/redis"
-	"beam.apache.org/playground/backend/internal/constants"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
@@ -67,13 +66,6 @@ func TestMain(m *testing.M) {
 	opt = goleak.IgnoreCurrent()
 	exitValue := m.Run()
 	teardown()
-	if exitValue == 0 && testing.CoverMode() != "" {
-		coverage := testing.Coverage()
-		if coverage < constants.MinTestCoverage {
-			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
-			exitValue = -1
-		}
-	}
 	os.Exit(exitValue)
 }
 

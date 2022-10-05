@@ -16,8 +16,6 @@
 package entity
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"cloud.google.com/go/datastore"
@@ -25,18 +23,6 @@ import (
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/constants"
 )
-
-func TestMain(m *testing.M) {
-	exitValue := m.Run()
-	if exitValue == 0 && testing.CoverMode() != "" {
-		coverage := testing.Coverage()
-		if coverage < constants.MinTestCoverage {
-			fmt.Printf(constants.BadTestCoverageErrTemplate, coverage, constants.MinTestCoverage*100)
-			exitValue = -1
-		}
-	}
-	os.Exit(exitValue)
-}
 
 func TestSnippet_ID(t *testing.T) {
 	sdkKey := datastore.NameKey(constants.SdkKind, pb.Sdk_SDK_GO.String(), nil)
