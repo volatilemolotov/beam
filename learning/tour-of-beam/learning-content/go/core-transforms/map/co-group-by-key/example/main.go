@@ -23,39 +23,47 @@ import (
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
 )
 
-
-const (
-	Player1 = "Player 1"
-	Player2 = "Player 2"
-	Player3 = "Player 3"
-)
-
 func main() {
 	ctx := context.Background()
 
 	p, s := beam.NewPipelineWithRoot()
 
-	input := beam.ParDo(s, func(_ []byte, emit func(string, int)){
-		emit(task.Player1, 15)
-		emit(task.Player2, 10)
-		emit(task.Player1, 100)
-		emit(task.Player3, 25)
-		emit(task.Player2, 75)
-	}, beam.Impulse(s))
+	fruits := beam.Create(s.Scope("Fruits"), "apple", "banana", "cherry")
+	countries := beam.Create(s.Scope("Countries"), "australia", "brazil", "canada")
 
-	output := applyTransform(s, input)
+	output := applyTransform(s, fruits, countries)
 
 	debug.Print(s, output)
 
 	err := beamx.Run(ctx, p)
 
 	if err != nil {
-		log.Exitf(context.Background(), "Failed to execute job: %v", err)
+		log.Exitf(ctx, "Failed to execute job: %v", err)
 	}
 }
 
-func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
-	return beam.CombinePerKey(s, func(score1, score2 int) int {
-		return score1 + score2
-	}, input)
+func applyTransform(s beam.Scope, fruits beam.PCollection, countries beam.PCollection) beam.PCollection {
+	fruitsKV := beam.ParDo(s, func(word string) (string, string) {
+		return string(word[0]), word
+	}, fruits)
+
+	countriesKV := beam.ParDo(s, func(word string) (string, string) {
+		return string(word[0]), word
+	}, countries)
+
+	grouped := beam.CoGroupByKey(s, fruitsKV, countriesKV)
+	return beam.ParDo(s, func(key string, fruitsIter func(*string) bool, countriesIter func(*string) bool, emit func(string)) {
+		wa := &WordsAlphabet{
+			Alphabet: key,
+		}
+		fruitsIter(&wa.Fruit)
+		countriesIter(&wa.Country)
+		emit(wa.String())
+	}, grouped)
+}
+
+type WordsAlphabet struct {
+	Alphabet string
+	Fruit string
+	Country string
 }

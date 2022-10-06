@@ -1,17 +1,17 @@
-# Combining values in a keyed PCollection
+# Combine
 
-After creating a keyed `PCollection` (for example, by using a GroupByKey transform), a common pattern is to combine the collection of values associated with each key into a single, merged value. Drawing on the previous example from GroupByKey, a key-grouped `PCollection` called groupedWords looks like this:
+For `Map` collection with a key (for example, using the groupByKey transformation), a common pattern is to combine a collection of values associated with each key into one combined value. Approximately it will look like this:
 
 ```
-cat, [1,5,9]
-dog, [5,2]
-and, [1,2,6]
-jump, [3]
-tree, [2]
-...
+  cat, [1,5,9]
+  dog, [5,2]
+  and, [1,2,6]
+  jump, [3]
+  tree, [2]
+  ...
 ```
 
-In the above `PCollection`, each element has a string key (for example, “cat”) and an iterable of integers for its value (in the first element, containing [1, 5, 9]). If our pipeline’s next processing step combines the values (rather than considering them individually), you can combine the iterable of integers to create a single, merged value to be paired with each key. This pattern of a `GroupByKey` followed by merging the collection of values is equivalent to Beam’s Combine PerKey transform. The combine function you supply to Combine PerKey must be an associative reduction function or a subclass of `CombineFn`.
+In the above `PCollection`, each element has a string key (for example, “cat”) and an iterable of integers for its value (in the first element, containing [1, 5, 9]). If our pipeline’s next processing step combines the values (rather than considering them individually), you can combine the iterable of integers to create a single, merged value to be paired with each key. This pattern of a GroupByKey followed by merging the collection of values is equivalent to Beam’s `Combine` `PerKey` transform. The combine function you supply to `Combine` `PerKey` must be an associative reduction function or a subclass of `CombineFn`.
 
 ```
 // PCollection is grouped by key and the Double values associated with each key are combined into a Double.
@@ -27,7 +27,3 @@ PCollection<KV<String, Double>> avgAccuracyPerPlayer =
   playerAccuracy.apply(Combine.<String, Integer, Double>perKey(
     new MeanInts())));
 ```
-
-### Description for example 
-
-At the input we have 3 keys with different values, `Combine.perKey` creates a combination of sums, sums up all the values.

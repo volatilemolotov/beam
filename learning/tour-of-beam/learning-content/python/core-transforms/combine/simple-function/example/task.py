@@ -34,14 +34,18 @@ class Output(beam.PTransform):
         input | beam.ParDo(self._OutputFn(self.prefix))
 
 
-PLAYER_1 = 'Player 1'
-PLAYER_2 = 'Player 2'
-PLAYER_3 = 'Player 3'
+def sum(numbers):
+    total = 0
+
+    for num in numbers:
+        total += num
+
+    return total
+
 
 with beam.Pipeline() as p:
 
-  (p | beam.Create([(PLAYER_1, 15), (PLAYER_2, 10), (PLAYER_1, 100),
-                    (PLAYER_3, 25), (PLAYER_2, 75)])
-     | beam.CombinePerKey(sum)
+  (p | beam.Create([1, 2, 3, 4, 5])
+     | beam.CombineGlobally(sum)
      | Output())
 

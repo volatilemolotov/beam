@@ -23,25 +23,12 @@ import (
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
 )
 
-
-const (
-	Player1 = "Player 1"
-	Player2 = "Player 2"
-	Player3 = "Player 3"
-)
-
 func main() {
 	ctx := context.Background()
 
 	p, s := beam.NewPipelineWithRoot()
 
-	input := beam.ParDo(s, func(_ []byte, emit func(string, int)){
-		emit(task.Player1, 15)
-		emit(task.Player2, 10)
-		emit(task.Player1, 100)
-		emit(task.Player3, 25)
-		emit(task.Player2, 75)
-	}, beam.Impulse(s))
+	input := beam.Create(s, 10, 20, 50, 70, 90)
 
 	output := applyTransform(s, input)
 
@@ -54,8 +41,38 @@ func main() {
 	}
 }
 
+
 func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
-	return beam.CombinePerKey(s, func(score1, score2 int) int {
-		return score1 + score2
-	}, input)
+	return beam.Combine(s, &averageFn{}, input)
+}
+
+type averageAccum struct {
+	Count int
+	Sum int
+}
+
+type averageFn struct{}
+
+func (c *averageFn) CreateAccumulator() averageAccum {
+	return averageAccum{}
+}
+
+func (c *averageFn) AddInput(accum averageAccum, input int) averageAccum {
+	accum.Count++
+	accum.Sum += input
+	return accum
+}
+
+func (c *averageFn) MergeAccumulators(accumA, accumB averageAccum) averageAccum {
+	return averageAccum{
+		Count: accumA.Count + accumB.Count,
+		Sum:   accumA.Sum + accumB.Sum,
+	}
+}
+
+func (c *averageFn) ExtractOutput(accum averageAccum) float64 {
+	if accum.Count == 0 {
+		return 0
+	}
+	return float64(accum.Sum) / float64(accum.Count)
 }

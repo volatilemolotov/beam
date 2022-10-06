@@ -2,14 +2,13 @@
 
 It’s important to understand that transforms do not consume `PCollection`s; instead, they consider each individual element of a `PCollection` and create a new `PCollection` as output. This way, you can do different things to different elements in the same `PCollection`.
 
-Multiple transforms process the same PCollection
-You can use the same PCollection as input for multiple transforms without consuming the input or altering it.
+### Multiple transforms process the same PCollection
 
-The pipeline in figure 2 is a branching pipeline. The pipeline reads its input (first names represented as strings) from a database table and creates a PCollection of table rows. Then, the pipeline applies multiple transforms to the same `PCollection`. Transform A extracts all the names in that `PCollection` that start with the letter ‘A’, and Transform B extracts all the names in that `PCollection` that start with the letter ‘B’. Both transforms A and B have the same input `PCollection`.
+You can use the same `PCollection` as input for multiple transforms without consuming the input or altering it.
 
-![A branching pipeline. Two transforms are applied to a single PCollection of database table rows.](img/img.png)
+The pipeline reads its input (first names represented as strings) from a database table and creates a `PCollection` of table rows. Then, the pipeline applies multiple transforms to the same `PCollection`. Transform A extracts all the names in that `PCollection` that start with the letter ‘A’, and Transform B extracts all the names in that `PCollection` that start with the letter ‘B’. Both transforms A and B have the same input `PCollection`.
 
-_Figure 2: A branching pipeline. Two transforms are applied to a single PCollection of database table rows._
+You can use two transforms applied to a single `PCollection`.
 
 The following example code applies two transforms to a single input collection.
 
@@ -39,13 +38,9 @@ PCollection<String> bCollection = dbRowCollection.apply("bTrans", ParDo.of(new D
 
 Another way to branch a pipeline is to have a single transform output to multiple `PCollection`s by using tagged outputs. Transforms that produce more than one output process each element of the input once, and output to zero or more `PCollection`s.
 
-Figure 3 illustrates the same example described above, but with one transform that produces multiple outputs. Names that start with ‘A’ are added to the main output `PCollection`, and names that start with ‘B’ are added to an additional output `PCollection`.
+One transform that produces multiple outputs. Names that start with ‘A’ are added to the main output `PCollection`, and names that start with ‘B’ are added to an additional output `PCollection`.
 
-![A pipeline with a transform that outputs multiple PCollections.](img/img.png)
-
-_Figure 3: A pipeline with a transform that outputs multiple PCollections._
-
-If we compare the pipelines in figure 2 and figure 3, you can see they perform the same operation in different ways. The pipeline in figure 2 contains two transforms that process the elements in the same input `PCollection`. One transform uses the following logic:
+If we compare the pipelines of the two approaches, you will see that they perform the same operation in different ways. The first approach contains two transformations that process elements in the same input `PCollection`. The second conversion approach uses the following logic:
 
 ```
 if (starts with 'A') { outputToPCollectionA }

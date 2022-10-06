@@ -17,9 +17,6 @@
 # under the License.
 #
 
-id: combine
-name: Combine
-content:
-  - simple-function-combine
-  - combine-fn
-  - combiner-per-key
+id: co-group-by-key
+name: CoGroupByKey
+taskName: co-group-by-key

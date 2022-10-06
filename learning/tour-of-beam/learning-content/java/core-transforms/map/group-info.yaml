@@ -20,10 +20,11 @@
 id: map
 name: Map
 content:
+  - pardo-one-to-one
+  - pardo-one-to-many
   - map-elements
   - flat-map-elements
   - group-by-key
-  - pardo-one-to-one
-  - pardo-one-to-many
+  - co-group-by-key
 
 

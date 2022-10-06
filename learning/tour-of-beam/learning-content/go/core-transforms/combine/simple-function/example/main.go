@@ -23,25 +23,12 @@ import (
 	"github.com/apache/beam/sdks/v2/go/pkg/beam/x/debug"
 )
 
-
-const (
-	Player1 = "Player 1"
-	Player2 = "Player 2"
-	Player3 = "Player 3"
-)
-
 func main() {
 	ctx := context.Background()
 
 	p, s := beam.NewPipelineWithRoot()
 
-	input := beam.ParDo(s, func(_ []byte, emit func(string, int)){
-		emit(task.Player1, 15)
-		emit(task.Player2, 10)
-		emit(task.Player1, 100)
-		emit(task.Player3, 25)
-		emit(task.Player2, 75)
-	}, beam.Impulse(s))
+	input := beam.Create(s, 10, 30, 50, 70, 90)
 
 	output := applyTransform(s, input)
 
@@ -55,7 +42,7 @@ func main() {
 }
 
 func applyTransform(s beam.Scope, input beam.PCollection) beam.PCollection {
-	return beam.CombinePerKey(s, func(score1, score2 int) int {
-		return score1 + score2
+	return beam.Combine(s, func(sum, elem int) int {
+		return sum + elem
 	}, input)
 }
