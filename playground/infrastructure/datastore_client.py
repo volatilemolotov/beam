@@ -175,7 +175,8 @@ class DatastoreClient:
                 "created": now,
                 "origin": DatastoreProps.ORIGIN_PROPERTY_VALUE,
                 "numberOfFiles": 1,
-                "schVer": schema_key
+                "schVer": schema_key,
+                "complexity": f"COMPLEXITY_{example.complexity}"
             }
         )
         snippets.append(snippet_entity)

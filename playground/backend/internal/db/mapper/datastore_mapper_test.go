@@ -59,6 +59,7 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 				Files:           []*pb.SnippetFile{{Name: "MOCK_NAME", Content: "MOCK_CONTENT"}},
 				Sdk:             pb.Sdk_SDK_JAVA,
 				PipelineOptions: "MOCK_OPTIONS",
+				Complexity:      pb.Complexity_COMPLEXITY_MEDIUM,
 			},
 			expected: &entity.Snippet{
 				IDMeta: &entity.IDMeta{
@@ -71,6 +72,7 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 					PipeOpts:      "MOCK_OPTIONS",
 					Origin:        constants.UserSnippetOrigin,
 					NumberOfFiles: 1,
+					Complexity:    pb.Complexity_COMPLEXITY_MEDIUM.String(),
 				},
 				Files: []*entity.FileEntity{
 					{
@@ -91,7 +93,8 @@ func TestEntityMapper_ToSnippet(t *testing.T) {
 				result.Salt != tt.expected.Salt ||
 				result.Snippet.PipeOpts != tt.expected.Snippet.PipeOpts ||
 				result.Snippet.NumberOfFiles != 1 ||
-				result.Snippet.Origin != constants.UserSnippetOrigin {
+				result.Snippet.Origin != constants.UserSnippetOrigin ||
+				result.Snippet.Complexity != tt.expected.Snippet.Complexity {
 				t.Error("Unexpected result")
 			}
 		})
@@ -137,6 +140,7 @@ func TestEntityMapper_ToFileEntity(t *testing.T) {
 					Files:           []*pb.SnippetFile{{Name: "MOCK_NAME.scio", Content: "MOCK_CONTENT"}},
 					Sdk:             pb.Sdk_SDK_JAVA,
 					PipelineOptions: "MOCK_OPTIONS",
+					Complexity:      pb.Complexity_COMPLEXITY_MEDIUM,
 				},
 				file: &pb.SnippetFile{
 					Name:    "MOCK_NAME.scio",
