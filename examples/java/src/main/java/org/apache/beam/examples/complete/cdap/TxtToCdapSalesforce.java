@@ -20,12 +20,12 @@ package org.apache.beam.examples.complete.cdap;
 import static org.apache.beam.sdk.util.Preconditions.checkStateNotNull;
 
 import com.google.gson.Gson;
+import io.cdap.plugin.salesforce.plugin.sink.batch.CSVRecord;
 import java.util.Map;
 import org.apache.beam.examples.complete.cdap.options.CdapSalesforceSinkOptions;
 import org.apache.beam.examples.complete.cdap.transforms.FormatOutputTransform;
 import org.apache.beam.examples.complete.cdap.utils.CsvRecordCoder;
 import org.apache.beam.examples.complete.cdap.utils.PluginConfigOptionsConverter;
-import org.apache.beam.examples.complete.cdap.utils.SerializableCsvRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.PipelineResult;
 import org.apache.beam.sdk.coders.KvCoder;
@@ -134,11 +134,10 @@ public class TxtToCdapSalesforce {
     pipeline
         .apply("readFromTxt", TextIO.read().from(options.getTxtFilePath()))
         .apply(
-            MapElements.into(new TypeDescriptor<KV<NullWritable, SerializableCsvRecord>>() {})
+            MapElements.into(new TypeDescriptor<KV<NullWritable, CSVRecord>>() {})
                 .via(
                     json -> {
-                      SerializableCsvRecord csvRecord =
-                          GSON.fromJson(json, SerializableCsvRecord.class);
+                      CSVRecord csvRecord = GSON.fromJson(json, CSVRecord.class);
                       return KV.of(NullWritable.get(), csvRecord);
                     }))
         .setCoder(

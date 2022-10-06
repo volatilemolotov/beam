@@ -18,14 +18,15 @@
 package org.apache.beam.examples.complete.cdap.utils;
 
 import com.google.gson.Gson;
+import io.cdap.plugin.salesforce.plugin.sink.batch.CSVRecord;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.beam.sdk.coders.CustomCoder;
 import org.apache.beam.sdk.coders.StringUtf8Coder;
 
-/** Custom coder for {@link SerializableCsvRecord}. */
-public class CsvRecordCoder extends CustomCoder<SerializableCsvRecord> {
+/** Custom coder for {@link CSVRecord}. */
+public class CsvRecordCoder extends CustomCoder<CSVRecord> {
 
   private static final Gson GSON = new Gson();
   private static final CsvRecordCoder CODER = new CsvRecordCoder();
@@ -36,12 +37,12 @@ public class CsvRecordCoder extends CustomCoder<SerializableCsvRecord> {
   }
 
   @Override
-  public void encode(SerializableCsvRecord value, OutputStream outStream) throws IOException {
+  public void encode(CSVRecord value, OutputStream outStream) throws IOException {
     STRING_CODER.encode(GSON.toJson(value), outStream);
   }
 
   @Override
-  public SerializableCsvRecord decode(InputStream inStream) throws IOException {
-    return GSON.fromJson(STRING_CODER.decode(inStream), SerializableCsvRecord.class);
+  public CSVRecord decode(InputStream inStream) throws IOException {
+    return GSON.fromJson(STRING_CODER.decode(inStream), CSVRecord.class);
   }
 }
