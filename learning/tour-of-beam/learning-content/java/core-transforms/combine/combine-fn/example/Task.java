@@ -41,7 +41,7 @@ public class Task {
 
         PCollection<Double> output = applyTransform(numbers);
 
-        output.apply(Log.ofElements());
+        output.apply(ParDo.of(new LogOutput<>()));
 
         pipeline.run();
     }
@@ -105,6 +105,23 @@ public class Task {
             return ((double) accumulator.sum) / accumulator.count;
         }
 
+    }
+
+    static class LogOutput<T> extends DoFn<T, T> {
+        private String prefix;
+
+        LogOutput() {
+            this.prefix = "Processing element";
+        }
+
+        LogOutput(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @ProcessElement
+        public void processElement(ProcessContext c) throws Exception {
+            LOG.info(prefix + ": {}", c.element());
+        }
     }
 
 }

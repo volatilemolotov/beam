@@ -45,7 +45,7 @@ public class Task {
 
         PCollection<BigInteger> output = applyTransform(numbers);
 
-        output.apply(Log.ofElements());
+        output.apply("Log", ParDo.of(new LogOutput<>()));
 
         pipeline.run();
     }
@@ -63,4 +63,20 @@ public class Task {
 
     }
 
+    static class LogOutput<T> extends DoFn<T, T> {
+        private String prefix;
+
+        LogOutput() {
+            this.prefix = "Processing element";
+        }
+
+        LogOutput(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @ProcessElement
+        public void processElement(ProcessContext c) throws Exception {
+            LOG.info(prefix + ": {}", c.element());
+        }
+    }
 }
