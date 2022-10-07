@@ -55,7 +55,7 @@ class TourNotifier extends ChangeNotifier with PageStateMixin<void> {
           initialTreeIds: initialTreeIds,
         ),
         playgroundController = _createPlaygroundController(initialSdkId) {
-    contentTreeController.addListener(_onContentTreeControllerChanged);
+    contentTreeController.addListener(_onChanged);
     _unitContentCache.addListener(_onChanged);
   }
 
@@ -64,10 +64,6 @@ class TourNotifier extends ChangeNotifier with PageStateMixin<void> {
         sdkId: contentTreeController.sdkId,
         treeIds: contentTreeController.treeIds,
       );
-
-  void _onContentTreeControllerChanged() {
-    _onChanged();
-  }
 
   void _onChanged() {
     final currentNode = contentTreeController.currentNode;
