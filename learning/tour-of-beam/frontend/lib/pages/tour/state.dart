@@ -162,7 +162,7 @@ class TourNotifier extends ChangeNotifier with PageStateMixin<void> {
   @override
   void dispose() {
     _unitContentCache.removeListener(_onChanged);
-    contentTreeController.removeListener(_onContentTreeControllerChanged);
+    contentTreeController.removeListener(_onChanged);
     super.dispose();
   }
 }
