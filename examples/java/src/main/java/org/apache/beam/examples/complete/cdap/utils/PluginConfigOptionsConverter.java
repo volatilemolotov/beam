@@ -19,6 +19,8 @@ package org.apache.beam.examples.complete.cdap.utils;
 
 import io.cdap.plugin.common.Constants;
 import io.cdap.plugin.hubspot.common.BaseHubspotConfig;
+import io.cdap.plugin.hubspot.source.streaming.HubspotStreamingSourceConfig;
+import io.cdap.plugin.hubspot.source.streaming.PullFrequency;
 import io.cdap.plugin.salesforce.SalesforceConstants;
 import io.cdap.plugin.salesforce.plugin.sink.batch.ErrorHandling;
 import io.cdap.plugin.salesforce.plugin.sink.batch.SalesforceSinkConfig;
@@ -40,16 +42,21 @@ import org.apache.beam.vendor.guava.v26_0_jre.com.google.common.collect.Immutabl
  */
 public class PluginConfigOptionsConverter {
 
-  public static Map<String, Object> hubspotOptionsToParamsMap(CdapHubspotOptions options) {
+  public static Map<String, Object> hubspotOptionsToParamsMap(
+      CdapHubspotOptions options, boolean isStreaming) {
     String apiServerUrl = options.getApiServerUrl();
-    return ImmutableMap.<String, Object>builder()
-        .put(
-            BaseHubspotConfig.API_SERVER_URL,
-            apiServerUrl != null ? apiServerUrl : BaseHubspotConfig.DEFAULT_API_SERVER_URL)
-        .put(BaseHubspotConfig.API_KEY, options.getApiKey())
-        .put(BaseHubspotConfig.OBJECT_TYPE, options.getObjectType())
-        .put(Constants.Reference.REFERENCE_NAME, options.getReferenceName())
-        .build();
+    ImmutableMap.Builder<String, Object> builder =
+        ImmutableMap.<String, Object>builder()
+            .put(
+                BaseHubspotConfig.API_SERVER_URL,
+                apiServerUrl != null ? apiServerUrl : BaseHubspotConfig.DEFAULT_API_SERVER_URL)
+            .put(BaseHubspotConfig.API_KEY, options.getApiKey())
+            .put(BaseHubspotConfig.OBJECT_TYPE, options.getObjectType())
+            .put(Constants.Reference.REFERENCE_NAME, options.getReferenceName());
+    if (isStreaming) {
+      builder.put(HubspotStreamingSourceConfig.PULL_FREQUENCY, PullFrequency.MINUTES_15.getName());
+    }
+    return builder.build();
   }
 
   public static Map<String, Object> serviceNowOptionsToParamsMap(CdapServiceNowOptions options) {

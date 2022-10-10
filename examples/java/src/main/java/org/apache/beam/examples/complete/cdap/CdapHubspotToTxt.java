@@ -105,7 +105,8 @@ public class CdapHubspotToTxt {
    * @param options arguments to the pipeline
    */
   public static PipelineResult run(Pipeline pipeline, CdapHubspotOptions options) {
-    Map<String, Object> paramsMap = PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options);
+    Map<String, Object> paramsMap =
+        PluginConfigOptionsConverter.hubspotOptionsToParamsMap(options, false);
     LOG.info("Starting Cdap-Hubspot-to-txt pipeline with parameters: {}", paramsMap);
 
     /*
