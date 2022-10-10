@@ -24,6 +24,8 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.plugin.hubspot.common.SourceHubspotConfig;
 import io.cdap.plugin.hubspot.source.batch.HubspotBatchSource;
+import io.cdap.plugin.hubspot.source.streaming.HubspotStreamingSource;
+import io.cdap.plugin.hubspot.source.streaming.HubspotStreamingSourceConfig;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceBatchSource;
 import io.cdap.plugin.salesforce.plugin.source.batch.SalesforceSourceConfig;
 import io.cdap.plugin.servicenow.source.ServiceNowSource;
@@ -79,6 +81,29 @@ public class FormatInputTransform {
         .withPluginConfig(pluginConfig)
         .withKeyClass(NullWritable.class)
         .withValueClass(JsonElement.class);
+  }
+
+  /**
+   * Configures Cdap Hubspot Streaming Read transform.
+   *
+   * @param pluginConfigParams Cdap Hubspot plugin config parameters
+   * @return configured Read transform
+   */
+  public static CdapIO.Read<NullWritable, String> readFromCdapHubspotStreaming(
+      Map<String, Object> pluginConfigParams) {
+
+    final HubspotStreamingSourceConfig pluginConfig =
+        new ConfigWrapper<>(HubspotStreamingSourceConfig.class)
+            .withParams(pluginConfigParams)
+            .build();
+
+    checkStateNotNull(pluginConfig, "Plugin config can't be null.");
+
+    return CdapIO.<NullWritable, String>read()
+        .withCdapPluginClass(HubspotStreamingSource.class)
+        .withPluginConfig(pluginConfig)
+        .withKeyClass(NullWritable.class)
+        .withValueClass(String.class);
   }
 
   /**

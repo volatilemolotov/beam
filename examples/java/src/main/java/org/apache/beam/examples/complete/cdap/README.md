@@ -59,6 +59,24 @@ To execute this pipeline, specify the parameters in the following format:
  --txtFilePath=your-path-to-output-file
 ```
 
+## Running the CdapHubspotStreamingToTxt pipeline example
+
+Gradle 'executeCdap' task allows to run the pipeline via the following command:
+
+```bash
+gradle clean executeCdap -DmainClass=org.apache.beam.examples.complete.cdap.CdapHubspotStreamingToTxt \
+     -Dexec.args="--<argument>=<value> --<argument>=<value>"
+```
+
+To execute this pipeline, specify the parameters in the following format:
+
+```bash
+ --apikey=your-api-key \
+ --referenceName=your-reference-name \
+ --objectType=Contacts \
+ --txtFilePath=your-path-to-output-file
+```
+
 ## Running the TxtToCdapHubspot pipeline example
 
 Gradle 'executeCdap' task allows to run the pipeline via the following command:
