@@ -67,5 +67,4 @@ func (p *KafkaProducer) ProduceDatasets() {
 		fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
 			*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
 	}
-	close(deliveryChan)
 }

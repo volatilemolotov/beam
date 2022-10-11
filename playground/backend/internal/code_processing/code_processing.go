@@ -30,6 +30,7 @@ import (
 
 	pb "beam.apache.org/playground/backend/internal/api/v1"
 	"beam.apache.org/playground/backend/internal/cache"
+	"beam.apache.org/playground/backend/internal/emulators/dind"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/executors"
@@ -55,11 +56,11 @@ const (
 // - In case of run step is failed saves playground.Status_STATUS_RUN_ERROR as cache.Status and run logs as cache.RunError into cache.
 // - In case of run step is completed with no errors saves playground.Status_STATUS_FINISHED as cache.Status and run output as cache.RunOutput into cache.
 // At the end of this method deletes all created folders.
-func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycle, pipelineId uuid.UUID, appEnv *environment.ApplicationEnvs, sdkEnv *environment.BeamEnvs, pipelineOptions string) {
+func Process(ctx context.Context, cacheService cache.Cache, lc *fs_tool.LifeCycle, pipelineId uuid.UUID, appEnv *environment.ApplicationEnvs, sdkEnv *environment.BeamEnvs, pipelineOptions string, client *dind.DockerClient) {
 	pipelineLifeCycleCtx, finishCtxFunc := context.WithTimeout(ctx, appEnv.PipelineExecuteTimeout())
 	defer func(lc *fs_tool.LifeCycle) {
 		finishCtxFunc()
-		DeleteFolders(pipelineId, lc)
+		DeleteFolders(ctx, cacheService, pipelineId, lc, client)
 	}(lc)
 
 	cancelChannel := make(chan bool, 1)
@@ -496,10 +497,15 @@ func writeLogsToCache(ctx context.Context, cacheService cache.Cache, logFilePath
 }
 
 // DeleteFolders removes all prepared folders for received LifeCycle
-func DeleteFolders(pipelineId uuid.UUID, lc *fs_tool.LifeCycle) {
+func DeleteFolders(ctx context.Context, service cache.Cache, pipelineId uuid.UUID, lc *fs_tool.LifeCycle, client *dind.DockerClient) {
 	logger.Infof("%s: DeleteFolders() ...\n", pipelineId)
 	if err := lc.DeleteFolders(); err != nil {
 		logger.Error("%s: DeleteFolders(): %s\n", pipelineId, err.Error())
+	}
+	containerId, err := service.GetValue(ctx, pipelineId, cache.ContainerId)
+	client.StopAndRemoveContainer(containerId.(string))
+	if err != nil {
+		logger.Errorf(err.Error())
 	}
 	logger.Infof("%s: DeleteFolders() complete\n", pipelineId)
 	logger.Infof("%s: complete\n", pipelineId)

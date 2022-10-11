@@ -205,7 +205,7 @@ func unmarshalBySubKey(subKey cache.SubKey, value string) (interface{}, error) {
 	switch subKey {
 	case cache.Status:
 		result = new(pb.Status)
-	case cache.RunOutput, cache.RunError, cache.ValidationOutput, cache.PreparationOutput, cache.CompileOutput, cache.Logs, cache.Graph:
+	case cache.RunOutput, cache.RunError, cache.ValidationOutput, cache.PreparationOutput, cache.CompileOutput, cache.Logs, cache.Graph, cache.ContainerId:
 		result = ""
 	case cache.Canceled:
 		result = false

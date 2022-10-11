@@ -63,6 +63,8 @@ const (
 	// Graph is used to keep graph of the execution
 	Graph SubKey = "GRAPH"
 
+	ContainerId SubKey = "CONTAINER"
+
 	// ExamplesCatalog is catalog of examples available in Playground
 	ExamplesCatalog string = "EXAMPLES_CATALOG"
 

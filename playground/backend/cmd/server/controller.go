@@ -26,6 +26,7 @@ import (
 	"beam.apache.org/playground/backend/internal/components"
 	"beam.apache.org/playground/backend/internal/db"
 	"beam.apache.org/playground/backend/internal/db/mapper"
+	"beam.apache.org/playground/backend/internal/emulators/dind"
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/errors"
 	"beam.apache.org/playground/backend/internal/logger"
@@ -82,35 +83,45 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 	cacheExpirationTime := controller.env.ApplicationEnvs.CacheEnvs().KeyExpirationTime()
 	pipelineId := uuid.New()
 
+	dockerClient := dind.NewDockerClient(ctx)
+	dockerComponent := components.NewDockerComponent(dockerClient)
+
 	lc, err := life_cycle.Setup(info.Sdk, info.Code, pipelineId, controller.env.ApplicationEnvs.WorkingDir(), controller.env.ApplicationEnvs.PipelinesFolder(), controller.env.BeamSdkEnvs.PreparedModDir())
+
+	containerId := dockerComponent.StartKafkaEmulator(pipelineId)
+	if err := utils.SetToCache(ctx, controller.cacheService, pipelineId, cache.ContainerId, containerId); err != nil {
+		code_processing.DeleteFolders(ctx, controller.cacheService, pipelineId, lc, dockerClient)
+		return nil, errors.InternalError("Error during preparing", "Error during saving container id")
+	}
+
 	if err != nil {
 		logger.Errorf("RunCode(): error during setup file system: %s\n", err.Error())
 		return nil, errors.InternalError("Error during preparing", "Error during setup file system for the code processing: %s", err.Error())
 	}
 
 	if err = utils.SetToCache(ctx, controller.cacheService, pipelineId, cache.Status, pb.Status_STATUS_VALIDATING); err != nil {
-		code_processing.DeleteFolders(pipelineId, lc)
+		code_processing.DeleteFolders(ctx, controller.cacheService, pipelineId, lc, dockerClient)
 		return nil, errors.InternalError("Error during preparing", "Error during saving status of the code processing")
 	}
 	if err = utils.SetToCache(ctx, controller.cacheService, pipelineId, cache.RunOutputIndex, 0); err != nil {
-		code_processing.DeleteFolders(pipelineId, lc)
+		code_processing.DeleteFolders(ctx, controller.cacheService, pipelineId, lc, dockerClient)
 		return nil, errors.InternalError("Error during preparing", "Error during saving initial run output")
 	}
 	if err = utils.SetToCache(ctx, controller.cacheService, pipelineId, cache.LogsIndex, 0); err != nil {
-		code_processing.DeleteFolders(pipelineId, lc)
+		code_processing.DeleteFolders(ctx, controller.cacheService, pipelineId, lc, dockerClient)
 		return nil, errors.InternalError("Error during preparing", "Error during saving value for the logs output")
 	}
 	if err = utils.SetToCache(ctx, controller.cacheService, pipelineId, cache.Canceled, false); err != nil {
-		code_processing.DeleteFolders(pipelineId, lc)
+		code_processing.DeleteFolders(ctx, controller.cacheService, pipelineId, lc, dockerClient)
 		return nil, errors.InternalError("Error during preparing", "Error during saving initial cancel flag")
 	}
 	if err = controller.cacheService.SetExpTime(ctx, pipelineId, cacheExpirationTime); err != nil {
 		logger.Errorf("%s: RunCode(): cache.SetExpTime(): %s\n", pipelineId, err.Error())
-		code_processing.DeleteFolders(pipelineId, lc)
+		code_processing.DeleteFolders(ctx, controller.cacheService, pipelineId, lc, dockerClient)
 		return nil, errors.InternalError("Error during preparing", "Internal error")
 	}
 
-	go code_processing.Process(context.Background(), controller.cacheService, lc, pipelineId, &controller.env.ApplicationEnvs, &controller.env.BeamSdkEnvs, info.PipelineOptions)
+	go code_processing.Process(context.Background(), controller.cacheService, lc, pipelineId, &controller.env.ApplicationEnvs, &controller.env.BeamSdkEnvs, info.PipelineOptions, dockerClient)
 
 	pipelineInfo := pb.RunCodeResponse{PipelineUuid: pipelineId.String()}
 	return &pipelineInfo, nil
