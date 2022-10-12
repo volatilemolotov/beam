@@ -1,16 +1,16 @@
-module "setup" {
-  source = "../setup"
-}
-
 module "buckets" {
   source = "../buckets"
+}
+
+module "setup" {
+  source = "../setup"
 }
 
 resource "google_cloudfunctions_function" "cloud_function" {
   name                  = "tour-of-beam-backend-cloud-function"
   runtime               = "go116"
-  region                = var.region
   service_account_email = module.setup.service-account-email
+  region                = var.region
   ingress_settings      = "ALLOW_ALL"
   # Get the source code of the cloud function as a Zip compression
   source_archive_bucket = module.buckets.function-bucket-name
