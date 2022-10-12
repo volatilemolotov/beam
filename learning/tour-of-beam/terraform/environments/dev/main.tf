@@ -23,7 +23,7 @@ provider "google" {
 }
 
 module "setup" {
-  source             = "../../modules/setup"
+  source             = '../../modules/setup'
   project_id         = var.project_id
   service_account_id = var.service_account_id
 }
