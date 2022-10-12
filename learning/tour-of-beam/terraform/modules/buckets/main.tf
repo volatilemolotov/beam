@@ -1,13 +1,6 @@
-#Generates archive of source code
-data "archive_file" "source" {
-  type        = "zip"
-  source_dir  = "../../../backend"
-  output_path = "/tmp/backend.zip"
-}
-
 resource "google_storage_bucket" "function_bucket" {
   name          = var.name
-  location      = var.location
+  location      = var.region
   project       = var.project_id
   storage_class = var.storage_class
 }

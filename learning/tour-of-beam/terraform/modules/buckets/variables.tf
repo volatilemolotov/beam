@@ -1,11 +1,18 @@
+#Generates archive of source code
+data "archive_file" "source" {
+  type        = "zip"
+  source_dir  = "../../../backend"
+  output_path = "/tmp/backend.zip"
+}
+
 variable "name" {
   description = "Name of Bucket to Store Cloud Functions"
   default     = "tour-of-beam-cloudfunction-bucket"
 }
 
-variable "location" {
+variable "region" {
   description = "Cloud Functions Bucket Region"
-  default     = "US"
+  default     = "us-central1"
 }
 
 variable "project_id" {
