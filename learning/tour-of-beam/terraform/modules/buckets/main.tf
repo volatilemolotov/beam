@@ -1,7 +1,7 @@
 #Generates archive of source code
 data "archive_file" "source" {
   type        = "zip"
-  source_dir  = "../../backend"
+  source_dir  = "../../../backend"
   output_path = "/tmp/backend.zip"
 }
 
