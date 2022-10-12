@@ -22,22 +22,22 @@ provider "google" {
   region = var.region
 }
 
-#module "setup" {
-#  source             = "../../modules/setup/"
-#  project_id         = var.project_id
-#  service_account_id = var.service_account_id
-#}
+module "setup" {
+  source             = "../../modules/setup/"
+  project            = var.project_id
+  service_account_id = var.service_account_id
+}
 
 module "buckets" {
-  source        = "../prod"
-  project_id    = var.project_id
+  source        = "../../modules/buckets"
+  project       = var.project_id
   name          = var.function_bucket_name
   storage_class = var.function_bucket_storage_class
   location      = var.function_bucket_location
 }
 
 module "cloud-functions" {
-  source = "../dev"
-  project_id = var.project_id
-  region = var.region
+  source  = "../../modules/cloud-functions"
+  project = var.project_id
+  region  = var.region
 }
