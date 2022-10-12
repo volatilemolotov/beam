@@ -29,7 +29,7 @@ provider "google" {
 #}
 
 module "buckets" {
-  source        = "../../modules/buckets/main.tf"
+  source        = "../prod"
   project_id    = var.project_id
   name          = var.function_bucket_name
   storage_class = var.function_bucket_storage_class
@@ -37,7 +37,7 @@ module "buckets" {
 }
 
 module "cloud-functions" {
-  source = "../../modules/cloud-functions/main.tf"
+  source = "../dev"
   project_id = var.project_id
   region = var.region
 }
