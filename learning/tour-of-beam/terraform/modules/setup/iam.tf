@@ -1,6 +1,9 @@
 module "cloud-functions" {
   source = "../cloud-functions"
+  project_id = var.project_id
+  region = module.cloud-functions.cloud-function-region
 }
+
 
 resource "google_service_account" "sa_cloud_function" {
   account_id   = var.service_account_id
