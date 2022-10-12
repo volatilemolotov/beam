@@ -1,11 +1,9 @@
 module "setup" {
   source = "../setup"
-  project_id = var.project_id
 }
 
 module "buckets" {
   source = "../buckets"
-  project_id = var.project_id
 }
 
 resource "google_cloudfunctions_function" "cloud_function" {
