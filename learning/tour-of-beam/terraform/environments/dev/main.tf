@@ -23,14 +23,12 @@ provider "google" {
 }
 
 module "setup" {
-  depends_on      = [module.setup]
   source             = "../../modules/setup"
   project_id         = var.project_id
   service_account_id = var.service_account_id
 }
 
 module "buckets" {
-  depends_on    = [module.setup]
   source        = "../../modules/buckets"
   project_id    = var.project_id
   name          = var.function_bucket_name
@@ -39,7 +37,6 @@ module "buckets" {
 }
 
 module "cloud-functions" {
-  depends_on = [module.buckets, module.setup]
   source = "../../modules/cloud-functions"
   project_id = var.project_id
   service_account_email = module.setup.service-account-email
