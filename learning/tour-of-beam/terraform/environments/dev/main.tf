@@ -22,14 +22,14 @@ provider "google" {
   region = var.region
 }
 
-module "setup" {
-  source             = "././modules/setup"
-  project_id         = var.project_id
-  service_account_id = var.service_account_id
-}
+#module "setup" {
+#  source             = "../../modules/setup/"
+#  project_id         = var.project_id
+#  service_account_id = var.service_account_id
+#}
 
 module "buckets" {
-  source        = "././modules/buckets"
+  source        = "../../modules/buckets/main.tf"
   project_id    = var.project_id
   name          = var.function_bucket_name
   storage_class = var.function_bucket_storage_class
@@ -37,8 +37,7 @@ module "buckets" {
 }
 
 module "cloud-functions" {
-  source = "././modules/cloud-functions"
+  source = "../../modules/cloud-functions/main.tf"
   project_id = var.project_id
-  service_account_email = module.setup.service-account-email
   region = var.region
 }
