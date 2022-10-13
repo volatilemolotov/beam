@@ -37,7 +37,7 @@ func (dc *DockerComponent) StartKafkaEmulator(pipelineId uuid.UUID) string {
 	dc.client.PullImage(kafkaImage)
 	containerId := dc.client.StartContainer(kafkaImage, kafkaContainer, kafkaEnvs, []string{"9092:9092"})
 
-	kafkaProducer := clients.NewKafkaProducer()
+	kafkaProducer := clients.NewKafkaProducer("9092")
 	kafkaProducer.ProduceDatasets()
 	return containerId
 }

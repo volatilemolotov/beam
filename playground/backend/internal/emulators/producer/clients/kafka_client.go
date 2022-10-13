@@ -3,6 +3,7 @@ package clients
 import (
 	"encoding/json"
 	"fmt"
+	"sync"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 
@@ -13,9 +14,10 @@ type KafkaProducer struct {
 	client *kafka.Producer
 }
 
-func NewKafkaProducer() *KafkaProducer {
+func NewKafkaProducer(port string) *KafkaProducer {
+	bootstrapAddr := fmt.Sprintf("localhost:%s", port)
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": "localhost:9092",
+		"bootstrap.servers": bootstrapAddr,
 	})
 	if err != nil {
 		fmt.Printf("Failed to create producer: %s\n", err)
@@ -28,43 +30,43 @@ func (p *KafkaProducer) ProduceDatasets() {
 	users := jp.GetUsers()
 	strings := jp.GetStrings()
 
-	deliveryChan := make(chan kafka.Event, 2)
+	wg := sync.WaitGroup{}
 
-	topic := new(string)
-	*topic = "test"
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func(i int) {
+			fmt.Println("producing messages: ", i)
+			defer wg.Done()
 
-	wordsTopic := new(string)
-	*wordsTopic = "words"
+			topic := new(string)
+			*topic = fmt.Sprintf("%s%d", "test", i)
 
-	for _, user := range users.Users {
-		userBytes, _ := json.Marshal(user)
-		if err := p.client.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: topic, Partition: kafka.PartitionAny},
-			Value:          userBytes},
-			deliveryChan,
-		); err != nil {
-			fmt.Printf("Failed to produce message: %s\n", err)
-		}
+			wordsTopic := new(string)
+			*wordsTopic = fmt.Sprintf("%s%d", "words", i)
+
+			for _, user := range users.Users {
+				userBytes, _ := json.Marshal(user)
+				if err := p.client.Produce(&kafka.Message{
+					TopicPartition: kafka.TopicPartition{Topic: topic, Partition: kafka.PartitionAny},
+					Value:          userBytes},
+					nil,
+				); err != nil {
+					fmt.Printf("Failed to produce message: %s\n", err)
+				}
+			}
+
+			for _, entry := range strings.Strings {
+				entryBytes, _ := json.Marshal(entry)
+				if err := p.client.Produce(&kafka.Message{
+					TopicPartition: kafka.TopicPartition{Topic: wordsTopic, Partition: kafka.PartitionAny},
+					Value:          entryBytes},
+					nil,
+				); err != nil {
+					fmt.Printf("Failed to produce message: %s\n", err)
+				}
+			}
+		}(i)
 	}
 
-	for _, entry := range strings.Strings {
-		entryBytes, _ := json.Marshal(entry)
-		if err := p.client.Produce(&kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: wordsTopic, Partition: kafka.PartitionAny},
-			Value:          entryBytes},
-			deliveryChan,
-		); err != nil {
-			fmt.Printf("Failed to produce message: %s\n", err)
-		}
-	}
-
-	e := <-deliveryChan
-	m := e.(*kafka.Message)
-
-	if m.TopicPartition.Error != nil {
-		fmt.Printf("Delivery failed: %v\n", m.TopicPartition.Error)
-	} else {
-		fmt.Printf("Delivered message to topic %s [%d] at offset %v\n",
-			*m.TopicPartition.Topic, m.TopicPartition.Partition, m.TopicPartition.Offset)
-	}
+	wg.Wait()
 }

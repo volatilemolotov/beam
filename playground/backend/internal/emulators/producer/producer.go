@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	kafkaProducer := clients.NewKafkaProducer()
+	kafkaProducer := clients.NewKafkaProducer("9092")
 	kafkaProducer.ProduceDatasets()
 }
