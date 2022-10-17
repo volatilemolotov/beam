@@ -7,14 +7,6 @@ import (
 	"path/filepath"
 )
 
-type Users struct {
-	Users []User `json:"users"`
-}
-
-type User struct {
-	Name string `json:"name"`
-}
-
 type Strings struct {
 	Strings []Entry `json:"strings"`
 }
@@ -29,17 +21,6 @@ type JsonParser struct {
 
 func NewJsonParser() *JsonParser {
 	return &JsonParser{}
-}
-
-func (jp *JsonParser) GetUsers() *Users {
-	userJsonPath := filepath.Join("/Users/akvelon/IdeaProjects/beam/playground/backend/internal/emulators/", "datasets", "users.json")
-	file, err := ioutil.ReadFile(userJsonPath)
-	if err != nil {
-		fmt.Println(err)
-	}
-	users := Users{}
-	err = json.Unmarshal(file, &users)
-	return &users
 }
 
 func (jp *JsonParser) GetStrings() *Strings {

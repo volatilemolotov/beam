@@ -79,29 +79,6 @@ func (controller *playgroundController) RunCode(ctx context.Context, info *pb.Ru
 		return nil, errors.InvalidArgumentError("Error during preparing", "Sdk is not implemented yet: %s", info.Sdk.String())
 	}
 
-	//mock, err := kafka.NewMockCluster(1)
-	//bootstrapServers := mock.BootstrapServers()
-	//port := strings.Split(bootstrapServers, ":")[1]
-	//port := "64726"
-	//info.Code = strings.Replace(info.Code, "9092", "65393", 1)
-	//kafkaProducer := clients.NewKafkaProducer("9092")
-	//kafkaProducer.ProduceDatasets()
-
-	//c, _ := kafka.NewConsumer(&kafka.ConfigMap{
-	//	"bootstrap.servers": "127.0.0.1:49383",
-	//	"group.id":          "playground",
-	//})
-	//c.Subscribe("words0", nil)
-	//for i := 0; i < 10; i++ {
-	//	msg, err := c.ReadMessage(-1)
-	//	if err == nil {
-	//		fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-	//	} else {
-	//		fmt.Printf("Consumer error: %v (%v)\n", err, msg)
-	//	}
-	//}
-	//c.Close()
-
 	cacheExpirationTime := controller.env.ApplicationEnvs.CacheEnvs().KeyExpirationTime()
 	pipelineId := uuid.New()
 

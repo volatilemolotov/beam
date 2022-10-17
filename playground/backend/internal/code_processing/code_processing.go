@@ -503,16 +503,16 @@ func DeleteFolders(pipelineId uuid.UUID, lc *fs_tool.LifeCycle) {
 	}
 
 	//adminClient, _ := kafka.NewAdminClient(
-	//	&kafka.ConfigMap{"bootstrap.servers": "localhost:9092"},
+	//	&kafka.ConfigMap{"bootstrap.servers": "localhost:50494"},
 	//)
-	//metaData, _ := adminClient.GetMetadata(nil, true, 1000000)
+	//metaData, _ := adminClient.GetMetadata(nil, true, 1000)
 	//for _, v := range metaData.Topics {
 	//	fmt.Println(v.Topic)
 	//}
 	//
-	//adminClient.DeleteTopics(context.Background(), []string{"words", "test"})
+	//adminClient.DeleteTopics(context.Background(), []string{"words0"})
 	//
-	//metaDataAfterRemoving, _ := adminClient.GetMetadata(nil, true, 1000000)
+	//metaDataAfterRemoving, _ := adminClient.GetMetadata(nil, true, 1000)
 	//for _, v := range metaDataAfterRemoving.Topics {
 	//	fmt.Println(v.Topic)
 	//}

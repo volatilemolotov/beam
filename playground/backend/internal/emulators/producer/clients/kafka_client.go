@@ -11,54 +11,45 @@ import (
 )
 
 type KafkaProducer struct {
-	client *kafka.Producer
+	admin    *kafka.AdminClient
+	producer *kafka.Producer
 }
 
 func NewKafkaProducer(port string) *KafkaProducer {
-	bootstrapAddr := fmt.Sprintf("localhost:%s", port)
-	p, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers": bootstrapAddr,
-	})
-	if err != nil {
-		fmt.Printf("Failed to create producer: %s\n", err)
+	conf := &kafka.ConfigMap{
+		"bootstrap.servers": fmt.Sprintf("localhost:%s", port),
 	}
-	return &KafkaProducer{client: p}
+	p, err := kafka.NewProducer(conf)
+	if err != nil {
+		fmt.Printf("Failed to create producer: %s\n", err.Error())
+	}
+	a, err := kafka.NewAdminClient(conf)
+	if err != nil {
+		fmt.Printf("Failed to create admin: %s\n", err.Error())
+	}
+	return &KafkaProducer{admin: a, producer: p}
 }
 
 func (p *KafkaProducer) ProduceDatasets() {
 	jp := dataset_parsers.NewJsonParser()
-	users := jp.GetUsers()
 	strings := jp.GetStrings()
+	topicAmount := 1
 
 	wg := sync.WaitGroup{}
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < topicAmount; i++ {
 		wg.Add(1)
 		go func(i int) {
 			fmt.Println("producing messages: ", i)
 			defer wg.Done()
 
-			topic := new(string)
-			*topic = fmt.Sprintf("%s%d", "test", i)
-
 			wordsTopic := new(string)
 			*wordsTopic = fmt.Sprintf("%s%d", "words", i)
 
-			for _, user := range users.Users {
-				userBytes, _ := json.Marshal(user)
-				if err := p.client.Produce(&kafka.Message{
-					TopicPartition: kafka.TopicPartition{Topic: topic, Partition: kafka.PartitionAny},
-					Value:          userBytes},
-					nil,
-				); err != nil {
-					fmt.Printf("Failed to produce message: %s\n", err)
-				}
-			}
-
 			for _, entry := range strings.Strings {
 				entryBytes, _ := json.Marshal(entry)
-				if err := p.client.Produce(&kafka.Message{
-					TopicPartition: kafka.TopicPartition{Topic: wordsTopic, Partition: kafka.PartitionAny},
+				if err := p.producer.Produce(&kafka.Message{
+					TopicPartition: kafka.TopicPartition{Topic: wordsTopic, Partition: 0},
 					Value:          entryBytes},
 					nil,
 				); err != nil {
