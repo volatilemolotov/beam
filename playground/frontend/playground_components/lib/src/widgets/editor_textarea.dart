@@ -85,14 +85,7 @@ class _EditorTextAreaState extends State<EditorTextArea> {
         node: FocusScopeNode(canRequestFocus: widget.isEditable),
         child: CodeTheme(
           data: ext.codeTheme,
-          child: CodeField(
-            key: codeFieldKey,
-            focusNode: focusNode,
-            enabled: widget.enabled,
-            controller: widget.codeController,
-            textStyle: ext.codeRootStyle,
-            expands: true,
-          ),
+          child: TextField(maxLines: null),
         ),
       ),
     );
