@@ -39,7 +39,7 @@ dependencies:
   flutter_code_editor:
     git:
       url: https://github.com/akvelon/flutter-code-editor.git
-      ref: 43626be12f449ffe1a5b28a1c90f8fc9f592cc34
+      ref: 67adf6a4f8a3f4d429be442475adf54126857d10
   flutter_markdown: ^0.6.12
   flutter_svg: ^1.0.3
   google_fonts: ^3.0.1
