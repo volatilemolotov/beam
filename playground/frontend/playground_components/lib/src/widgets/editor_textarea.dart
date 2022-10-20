@@ -18,7 +18,7 @@
 
 // TODO(alexeyinkin): Refactor this, merge into snippet_editor.dart
 
-import 'package:code_text_field/code_text_field.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter/material.dart';
 
 import '../models/example.dart';
@@ -85,7 +85,14 @@ class _EditorTextAreaState extends State<EditorTextArea> {
         node: FocusScopeNode(canRequestFocus: widget.isEditable),
         child: CodeTheme(
           data: ext.codeTheme,
-          child: TextField(maxLines: null),
+          child: CodeField(
+            key: codeFieldKey,
+            focusNode: focusNode,
+            enabled: widget.enabled,
+            controller: widget.codeController,
+            textStyle: ext.codeRootStyle,
+            expands: true,
+          ),
         ),
       ),
     );
