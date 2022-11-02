@@ -20,6 +20,7 @@ services:
     image: redis:7.0.4-alpine
     ports:
       - "6379:6379"
+
   datastore:
     build: "./backend/containers/router/datastore"
     environment:
@@ -27,6 +28,7 @@ services:
       DATASTORE_LISTEN_ADDRESS: 0.0.0.0:8081
     ports:
       - "8081:8081"
+
   router:
     image: apache/beam_playground-backend-router
     environment:
@@ -41,6 +43,7 @@ services:
     depends_on:
       - redis
       - datastore
+
   go_runner:
     image: apache/beam_playground-backend-go
     environment:
@@ -52,6 +55,7 @@ services:
       - "8084:8084"
     depends_on:
       - redis
+
   java_runner:
     image: apache/beam_playground-backend-java
     environment:
@@ -63,6 +67,7 @@ services:
       - "8086:8086"
     depends_on:
       - redis
+
   python_runner:
     image: apache/beam_playground-backend-python
     environment:
@@ -74,6 +79,7 @@ services:
       - "8088:8088"
     depends_on:
       - redis
+
   scio_runner:
     image: apache/beam_playground-backend-scio
     environment:
@@ -85,10 +91,10 @@ services:
       - "8090:8090"
     depends_on:
       - redis
+
   frontend:
     image: apache/beam_playground-frontend
     ports:
       - "1234:8080"
     depends_on:
       - router
-
