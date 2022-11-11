@@ -43,6 +43,6 @@ images:
   - '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
 
 options:
-  logging: GCS_ONLY
+  logging: NONE
 
 timeout: 1800s
