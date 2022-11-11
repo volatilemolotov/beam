@@ -27,7 +27,7 @@ resource "google_project_iam_member" "cloud_build_roles" {
     "roles/appengine.appAdmin",
     "roles/appengine.appCreator",
     "roles/artifactregistry.admin",
-    "roles/redis.editor",
+    "roles/redis.admin",
     "roles/compute.admin",
     "roles/iam.serviceAccountCreator",
     "roles/container.admin",
