@@ -17,13 +17,13 @@
 
 steps:
   # This step builds the image from Dockerfile that will be used as Docker machine for Beam Playground deployment
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'build'
-      - '--tag=$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
-      - '-f'
-      - 'playground/infrastructure/cloudbuild/Dockerfile-base-image-worker'
-      - '.'
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args:
+#      - 'build'
+#      - '--tag=$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
+#      - '-f'
+#      - 'playground/infrastructure/cloudbuild/Dockerfile-base-image-worker'
+#      - '.'
 
   # This step uses Docker container from our image to authenticate us in GKE
   # Please set variable $_GKE_NAME in "substitutions" stage below
