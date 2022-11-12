@@ -22,10 +22,7 @@ steps:
     args:
       [
         '-c',
-        'docker',
-        'config',
-        'inspect',
-        'config.json',
+        'docker config inspect config.json',
       ]
 
   # This step uses Docker container from our image to authenticate us in GKE
