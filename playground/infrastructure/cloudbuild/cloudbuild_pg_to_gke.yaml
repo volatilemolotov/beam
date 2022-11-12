@@ -21,8 +21,10 @@ steps:
     entrypoint: "/bin/bash"
     args:
       [
-        'cat',
-        '/builder/home/.docker/config.json',
+        'docker',
+        'config',
+        'inspect',
+        'config.json',
       ]
 
   # This step uses Docker container from our image to authenticate us in GKE
