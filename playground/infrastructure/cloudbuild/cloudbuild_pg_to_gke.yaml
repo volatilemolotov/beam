@@ -16,7 +16,7 @@
 # under the License.
 
 steps:
-
+  # Docker authentication step
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
     entrypoint: "gcloud"
     args:
