@@ -39,10 +39,12 @@ substitutions:
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
 
+logsBucket: 'gs://pg-cloudbuild-logging-bucket'
+
 images:
   - '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: GCS_ONLY
 
 timeout: 1800s
