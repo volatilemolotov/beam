@@ -21,6 +21,7 @@ steps:
     entrypoint: "/bin/bash"
     args:
       [
+        '-c',
         'docker',
         'config',
         'inspect',
