@@ -26,24 +26,16 @@ resource "google_cloudbuild_trigger" "playground_infrastructure" {
 
   description = "Builds the base image and then runs cloud build config file to deploy Playground infrastructure"
 
-#  github {
-#    owner = var.github_repository_owner
-#    name  = var.github_repository_name
-#    push {
-#      branch = var.github_repository_branch
-#    }
-#  }
-
     source_to_build {
-      uri       = "https://github.com/akvelon/beam"
-      ref       = "refs/heads/cloudbuild+playground"
+      uri       = "https://github.com/${var.github_repository_owner}/${var.github_repository_name}"
+      ref       = "refs/heads/${var.github_repository_branch}"
       repo_type = "GITHUB"
     }
 
   git_file_source {
     path      = "playground/infrastructure/cloudbuild/cloudbuild_pg_infra.yaml"
-    uri       = "https://github.com/akvelon/beam"
-    revision  = "refs/heads/cloudbuild+playground"
+    uri       = "https://github.com/${var.github_repository_owner}/${var.github_repository_name}"
+    revision  = "refs/heads/${var.github_repository_branch}"
     repo_type = "GITHUB"
   }
 
@@ -57,24 +49,16 @@ resource "google_cloudbuild_trigger" "playground_to_gke" {
 
   description = "Builds the base image and then runs cloud build config file to deploy Playground to GKE"
 
-#  github {
-#    owner = var.github_repository_owner
-#    name  = var.github_repository_name
-#    push {
-#      branch = var.github_repository_branch
-#    }
-#  }
-
   source_to_build {
-    uri       = "https://github.com/akvelon/beam"
-    ref       = "refs/heads/cloudbuild+playground"
+    uri       = "https://github.com/${var.github_repository_owner}/${var.github_repository_name}"
+    ref       = "refs/heads/${var.github_repository_branch}"
     repo_type = "GITHUB"
   }
 
   git_file_source {
     path      = "playground/infrastructure/cloudbuild/cloudbuild_pg_to_gke.yaml"
-    uri       = "https://github.com/akvelon/beam"
-    revision  = "refs/heads/cloudbuild+playground"
+    uri       = "https://github.com/${var.github_repository_owner}/${var.github_repository_name}"
+    revision  = "refs/heads/${var.github_repository_branch}"
     repo_type = "GITHUB"
   }
 

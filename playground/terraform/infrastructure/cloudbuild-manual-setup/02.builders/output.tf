@@ -18,6 +18,7 @@
 output "using_triggers" {
   value = <<EOF
 
+
 To begin deploying Playground using triggers you must first execute steps described in "Prepare deployment configuration":
 https://github.com/akvelon/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#prepare-deployment-configuration
 

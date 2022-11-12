@@ -25,15 +25,16 @@ This directory organizes Infrastructure-as-Code to provision dependent resources
 - Enabled [Cloud Build API](https://cloud.google.com/apis/docs/getting-started#enabling_apis)
 - [gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
 - An existing Google Cloud Storage Bucket to save Terraform state - `state_bucket`
+- And 2nd existing GCP Bucket to save Cloud build logs 
 - DNS name for your Playground deployment instance
 - [Terraform](https://www.terraform.io/)
 - [Apache Beam GitHub](https://github.com/apache/beam) repository cloned locally
 
 ## Usage
 
-The folders are named according to the required order of execution. The steps below assume you are using a terminal and are in the root directory of this repository.
+The folders are named according to the required order of execution.
 
-### 1. Setup the Google Cloud project
+### 1. Setup the Google Cloud Build  for your GCP project
 
 The `cloudbuild-manual-setup/01.setup` provisions dependencies required to setup Cloud Build for Playground:
 - Required API services
@@ -43,7 +44,7 @@ The `cloudbuild-manual-setup/01.setup` provisions dependencies required to setup
 #### Execute the module
 
 ```console
-# Create new configuration to auth to GCP Project
+# Create new configuration to authenticate to GCP Project
 gcloud init
 
 # Acquire new user credentials to use for Application Default Credentials
@@ -52,8 +53,9 @@ gcloud auth application-default login
 # Navigate to cloudbuild-manual-setup/01.setup folder
 cd 01.setup
 
-# Setup Cloud Build SA
+# Run terraform scripts
 terraform init
+terraform plan
 terraform apply
 
 ```
@@ -79,17 +81,37 @@ Run the following commands to execute the module. Terraform will ask your permis
 ```
 # Navigate to cloudbuild-manual-setup/02.builders folder from cloudbuild-manual-setup/01.setup
 cd ../02.builders
+# Run terraform scripts
 terraform init
-terraform apply -var="github_repository_owner=$GITHUB_REPOSITORY_OWNER" /
--var="github_repository_name=$GITHUB_REPOSITORY_NAME" -var="github_repository_branch=$GITHUB_REPOSITORY_BRANCH"
+terraform plan -var="github_repository_owner=$GITHUB_REPOSITORY_OWNER" -var="github_repository_name=$GITHUB_REPOSITORY_NAME" -var="github_repository_branch=$GITHUB_REPOSITORY_BRANCH"
+terraform apply -var="github_repository_owner=$GITHUB_REPOSITORY_OWNER" -var="github_repository_name=$GITHUB_REPOSITORY_NAME" -var="github_repository_branch=$GITHUB_REPOSITORY_BRANCH"
 ```
 
-After completing these steps, GCP project will have 2 Cloud Build triggers that can be used to build and deploy Beam Playground.
+After completing these steps, 2 Cloud Build triggers will be created in your GCP project that could be used to build and deploy Beam Playground.
 
 ### Run Cloud Build Triggers
 
-**To fully deploy Playground you will have to run 2 triggers.**
+## Requirement:
 
-More details provided in Terraform script outputs
+To begin deploying Playground using Cloud Build triggers you must first execute steps described in
+[Prepare deployment configuration](https://github.com/apache/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#prepare-deployment-configuration).
 
-See [Running manual triggers](https://cloud.google.com/build/docs/manually-build-code-source-repos?hl=en#running_manual_triggers) for more information.
+#### After that, two triggers will have to be executed in sequence.
+
+## Trigger 1 - Playground-infrastructure-trigger:
+
+To run FIRST trigger,
+navigate to Cloud Build page of your GCP project and click `RUN` for **Playground-infrastructure-trigger**.
+
+Once Playground infrastructure has been deployed, please navigate to
+[Playground deployment README](https://github.com/akvelon/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#deploy-playground-infrastructure) and execute step #2:
+
+`Add following DNS A records for the discovered static IP address`
+
+## Trigger 2 - Playground-to-gke-trigger:
+
+Once Playground infrastructure deployed, you could now deploy Playground to GKE.
+To run SECOND trigger,
+navigate to Cloud Build page of your GCP project and click `RUN` for **Playground-to-gke-trigger**.
+
+Once Playground has been deployed to GKE, please navigate to [Validation](https://github.com/akvelon/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#validate-deployed-playground) to perform Playground deployment steps.

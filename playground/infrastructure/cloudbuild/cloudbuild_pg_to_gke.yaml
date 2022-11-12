@@ -45,20 +45,22 @@ steps:
 
 substitutions:
   # The name of the Google Cloud Artifact Registry
-  _ARTIFACT_REGISTRY_REPOSITORY_ID: "SET_YOUR_ARTIFACT_REPOSITORY_NAME"
+  _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
   # The name of your environment in beam/playground/terraform/environment/
-  _ENVIRONMENT_NAME: "SET_YOUR_ENVIRONMENT_NAME"
+  _ENVIRONMENT_NAME: "test"
   # The name of your DNS for Playground
-  _DNS_NAME: "SET_YOUR_DNS_NAME"
+  _DNS_NAME: "dev-playground.online"
   # Docker image tag name
-  _TAG: "SET_YOUR_TAG"
+  _TAG: "my_tag"
   # The name of your GKE cluster (from terraform.tfvars)
-  _GKE_NAME: "SET_YOUR_GKE_NAME"
+  _GKE_NAME: "playground-backend"
+
+logsBucket: 'gs://pg-cloudbuild-logging-bucket'
 
 images:
   - '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: GCS_ONLY
 
 timeout: 3600s

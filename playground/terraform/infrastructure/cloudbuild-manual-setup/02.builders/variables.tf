@@ -26,36 +26,31 @@ variable "region" {
   default     = "us-central1"
 }
 
-#variable "github_repository_name" {
-#  type        = string
-#  description = "The name of the GitHub repository. For example the repository name for https://github.com/example/foo is 'foo'."
-#}
-#
-#variable "github_repository_owner" {
-#  type        = string
-#  description = "Owner of the GitHub repository. For example the owner for https://github.com/example/foo is 'example'."
-#}
-#
-#variable "github_repository_branch" {
-#  type        = string
-#  description = "The GitHub repository branch regex to match cloud build trigger"
-#}
-#
-#variable "image_tag" {
-#  type        = string
-#  description = "The tag to apply to image builds"
-#}
+variable "github_repository_name" {
+  type        = string
+  description = "The name of the GitHub repository. For example the repository name for https://github.com/example/foo is 'foo'."
+}
+
+variable "github_repository_owner" {
+  type        = string
+  description = "Owner of the GitHub repository. For example the owner for https://github.com/example/foo is 'example'."
+}
+
+variable "github_repository_branch" {
+  type        = string
+  description = "The GitHub repository branch name to match cloud build trigger"
+}
 
 variable "infra_trigger_id" {
   type        = string
   description = "The name of the trigger that will deploy Playground infrastructure"
-  default     = "playground-infrastructure-trigger"
+  default     = "Playground-infrastructure-trigger"
 }
 
 variable "gke_trigger_id" {
   type        = string
   description = "The name of the trigger that will deploy Playground to GKE"
-  default     = "playground-to-gke-trigger"
+  default     = "Playground-to-gke-trigger"
 }
 
 variable "cloudbuild_service_account_id" {
