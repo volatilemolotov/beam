@@ -18,33 +18,8 @@
 output "using_triggers" {
   value = <<EOF
 
-
-To begin deploying Playground using triggers you must first execute steps described in "Prepare deployment configuration":
-https://github.com/akvelon/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#prepare-deployment-configuration
-
--Trigger #1:
-
-There are two triggers that run Playground infrastructure deployment first, then deployment to GKE.
-To run FIRST trigger,
-navigate to https://console.cloud.google.com/cloud-build/triggers?project=${var.project}
-and click `RUN` for ${google_cloudbuild_trigger.playground_infrastructure.name}.
-
-After trigger is succesfully triggered and Playground Infrastructure deployed:
-
-Please navigate to https://github.com/akvelon/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#deploy-playground-infrastructure
-and execute step #2:
-"Add following DNS A records for the discovered static IP address".
-
--Trigger #2:
-
-Once Playground infrastructure deployed, you could now deploy Playground to GKE.
-To run SECOND trigger,
-navigate to https://console.cloud.google.com/cloud-build/triggers?project=${var.project}
-and click `RUN` for ${google_cloudbuild_trigger.playground_to_gke.name}.
-
-Once Playground deployed to GKE:
-
-Please navigate to https://github.com/akvelon/beam/tree/Infra%2Bplayground-in-gke/playground/terraform#validate-deployed-playground to validate deployment.
+Further steps on how to run triggers described in README file.
+File located by `playground/terraform/infrastructure/cloudbuild-manual-setup/README.md`.
 
 EOF
 }
