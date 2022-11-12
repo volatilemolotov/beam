@@ -35,7 +35,7 @@ steps:
         'clusters',
         'get-credentials',
         '$_GKE_NAME',
-        '--region=$LOCATION'
+        '--region=$LOCATION-a'
       ]
 
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
