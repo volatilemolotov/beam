@@ -16,6 +16,11 @@
 # under the License.
 
 steps:
+
+  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
+    entrypoint: "/bin/bash"
+    args: [ '-c', 'docker login us-central1-docker.pkg.dev' ]
+
   # This step uses Docker container from our image to authenticate us in GKE
   # Please set variable $_GKE_NAME in "substitutions" stage below
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
@@ -32,7 +37,7 @@ steps:
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
     entrypoint: "/bin/bash"
-    args: [ '-c', 'gcloud auth configure-docker us-central1-docker.pkg.dev && ./gradlew playground:terraform:gkebackend -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
+    args: [ '-c', 'docker login us-central1-docker.pkg.dev && ./gradlew playground:terraform:gkebackend -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
 
 substitutions:
   # The name of the Google Cloud Artifact Registry
