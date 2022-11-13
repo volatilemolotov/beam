@@ -16,7 +16,7 @@
 # under the License.
 
 variable "project" {
-  type = string
+  type        = string
   description = "The ID of the Google Cloud project within which resources are provisioned"
 }
 
@@ -27,7 +27,7 @@ variable "region" {
 }
 
 variable "cloudbuild_service_account_id" {
-  type = string
+  type        = string
   description = "The ID of the cloud build service account responsible for provisioning Google Cloud resources"
-  default = "terraform-cloudbuild"
+  default     = "terraform-cloudbuild"
 }

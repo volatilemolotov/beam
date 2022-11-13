@@ -26,11 +26,11 @@ resource "google_cloudbuild_trigger" "playground_infrastructure" {
 
   description = "Builds the base image and then runs cloud build config file to deploy Playground infrastructure"
 
-    source_to_build {
-      uri       = "https://github.com/${var.github_repository_owner}/${var.github_repository_name}"
-      ref       = "refs/heads/${var.github_repository_branch}"
-      repo_type = "GITHUB"
-    }
+  source_to_build {
+    uri       = "https://github.com/${var.github_repository_owner}/${var.github_repository_name}"
+    ref       = "refs/heads/${var.github_repository_branch}"
+    repo_type = "GITHUB"
+  }
 
   git_file_source {
     path      = "playground/infrastructure/cloudbuild/cloudbuild_pg_infra.yaml"
