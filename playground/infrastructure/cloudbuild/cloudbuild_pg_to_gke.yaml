@@ -32,7 +32,7 @@ steps:
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
     entrypoint: "/bin/bash"
-    args: [ '-c', 'docker login us-central1-docker.pkg.dev && ./gradlew playground:terraform:gkebackend -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
+    args: [ '-c', './gradlew playground:terraform:gkebackend -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
 
 substitutions:
   # The name of the Google Cloud Artifact Registry
