@@ -16,11 +16,6 @@
 # under the License.
 
 steps:
-
-  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
-    entrypoint: "/bin/bash"
-    args: [ '-c', 'docker login us-central1-docker.pkg.dev' ]
-
   # This step uses Docker container from our image to authenticate us in GKE
   # Please set variable $_GKE_NAME in "substitutions" stage below
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
