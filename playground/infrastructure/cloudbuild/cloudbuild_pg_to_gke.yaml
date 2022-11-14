@@ -51,7 +51,7 @@ substitutions:
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
   # Docker image tag name
-  _TAG: "us-central1-docker.pkg.dev/sandbox-playground-001/my-tag"
+  _TAG: "beta"
   # The name of your GKE cluster (from terraform.tfvars)
   _GKE_NAME: "playground-backend"
 
