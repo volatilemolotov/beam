@@ -26,7 +26,7 @@ steps:
         'clusters',
         'get-credentials',
         '$_GKE_NAME',
-        '--region=$LOCATION-a'
+        '--region=us-central1-a'
       ]
 
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
@@ -46,7 +46,7 @@ substitutions:
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
   # Docker image tag name
-  _TAG: "test-tag"
+  _TAG: "new-tag"
   # The name of your GKE cluster (from terraform.tfvars)
   _GKE_NAME: "playground-backend"
 
