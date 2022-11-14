@@ -20,13 +20,13 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
-      - '--tag=us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+      - '--tag=us-west1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/new-builder:worker'
       - '-f'
       - 'playground/infrastructure/cloudbuild/Dockerfile-base-image-worker'
       - '.'
 
   # This step uses Docker container from image in previous step to run gradle task for Playground Infrastructure deployment
-  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+  - name: 'us-west1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/new-builder:worker'
     entrypoint: "/bin/bash"
   # Please set variables $_ENVIRONMENT_NAME and $_DNS_NAME in "substitutions" stage below
     args: ['-c', './gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
@@ -35,14 +35,14 @@ substitutions:
   # The name of the Google Cloud Artifact Registry
   _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
   # The name of your environment in beam/playground/terraform/environment/
-  _ENVIRONMENT_NAME: "test"
+  _ENVIRONMENT_NAME: "staging"
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
 
 logsBucket: 'gs://pg-cloudbuild-logging-bucket'
 
 images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+  - 'us-west1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/new-builder:worker'
 
 options:
   logging: GCS_ONLY
