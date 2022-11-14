@@ -26,8 +26,8 @@ RUN apt-get -y install build-essential unzip
 # Install Docker
 RUN apt-get -y install apt-transport-https ca-certificates software-properties-common
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable edge test"
-RUN apt-get -y install docker-ce
+RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+RUN apt-get -y install docker-ce docker-ce-cli
 # See: https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script
 #RUN curl -fsSL https://get.docker.com -o get-docker.sh
 #RUN sh ./get-docker.sh >/dev/null
