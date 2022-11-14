@@ -30,8 +30,13 @@ steps:
       ]
 
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
-    entrypoint: "/bin/bash"
-    args: [ '-c', 'docker images -a' ]
+    entrypoint: "gcloud"
+    args:
+      [
+        'auth',
+        'configure-docker',
+        'us-central1-docker.pkg.dev'
+      ]
 
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
