@@ -29,6 +29,10 @@ steps:
         '--region=$LOCATION-a'
       ]
 
+  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
+    entrypoint: "/bin/bash"
+    args: [ '-c', 'docker images -a' ]
+
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
     entrypoint: "/bin/bash"
