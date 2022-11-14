@@ -20,14 +20,15 @@ FROM gcr.io/google.com/cloudsdktool/google-cloud-cli
 ARG GO_VERSION=1.18
 ENV PATH="${PATH}:/usr/local/go/bin"
 
+RUN cat /etc/os-release
 RUN apt-get update >/dev/null
 RUN apt-get -y install build-essential unzip
 
 # Install Docker
 RUN apt-get -y install apt-transport-https ca-certificates software-properties-common
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/trusted.gpg.d/docker-archive-keyring.gpg
 RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
-RUN apt-get -y install docker-ce
+RUN apt-get update >/dev/null && apt-get -y install docker-ce
 # See: https://docs.docker.com/engine/install/ubuntu/#install-using-the-convenience-script
 #RUN curl -fsSL https://get.docker.com -o get-docker.sh
 #RUN sh ./get-docker.sh >/dev/null
