@@ -42,7 +42,7 @@ substitutions:
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
   # Docker image tag name
-  _TAG: "test-tag"
+  _TAG: "test"
   # The name of your GKE cluster (from terraform.tfvars)
   _GKE_NAME: "playground-backend"
 
