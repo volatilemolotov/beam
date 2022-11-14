@@ -18,7 +18,7 @@
 steps:
   # This step uses Docker container from our image to authenticate us in GKE
   # Please set variable $_GKE_NAME in "substitutions" stage below
-  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
+  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "gcloud"
     args:
       [
@@ -29,12 +29,12 @@ steps:
         '--region=$LOCATION-a'
       ]
 
-  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
+  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "/bin/bash"
     args: [ '-c', 'docker images -a' ]
 
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
-  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
+  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "/bin/bash"
     args: [ '-c', './gradlew playground:terraform:gkebackend -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
 
@@ -51,9 +51,6 @@ substitutions:
   _GKE_NAME: "playground-backend"
 
 logsBucket: 'gs://pg-cloudbuild-logging-bucket'
-
-images:
-  - '$LOCATION-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/builder:worker'
 
 options:
   logging: GCS_ONLY
