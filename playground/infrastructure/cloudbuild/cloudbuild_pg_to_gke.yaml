@@ -32,7 +32,7 @@ steps:
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "/bin/bash"
-    args: [ '-c', './gradlew playground:terraform:prepareConfig -Pdns-name="$_DNS_NAME" && ./gradlew playground:terraform:gkebackend -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME" && ls playground/frontend/lib' ]
+    args: [ '-c', './gradlew playground:terraform:prepareConfig -Pdns-name="$_DNS_NAME" && ls playground/frontend/lib && ./gradlew playground:terraform:gkebackend -Pdocker-repository-root="$_DOCKER_REPOSITORY_ROOT" -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME" && ls playground/frontend/lib' ]
 
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
