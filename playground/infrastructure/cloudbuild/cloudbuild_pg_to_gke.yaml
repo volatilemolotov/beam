@@ -32,9 +32,15 @@ steps:
   # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "/bin/bash"
-    args: [ '-c', './gradlew playground:terraform:gkebackend -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-001/playground-repository" -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
+    args: [ '-c', 'ls playground/frontend/lib']
+
+  # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
+  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+    entrypoint: "/bin/bash"
+    args: [ '-c', './gradlew playground:terraform:gkebackend -Pdocker-repository-root="$_DOCKER_REPOSITORY_ROOT" -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
 
 substitutions:
+  $_DOCKER_REPOSITORY_ROOT: "us-central1-docker.pkg.dev/sandbox-playground-001/playground-repository"
   # The name of the Google Cloud Artifact Registry
   _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
   # The name of your environment in beam/playground/terraform/environment/
