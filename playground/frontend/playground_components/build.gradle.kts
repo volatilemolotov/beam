@@ -150,6 +150,21 @@ tasks.register("ensureSymbolsDirectoryExists") {
   }
 }
 
+tasks.register("extractBeamSymbolsGo") {
+  doLast {
+    exec {
+      workingDir("tools/extract_symbols_go")
+      executable("go")
+      args(
+        "run",
+        "extract_symbols_go.go",
+        "../../../../../sdks/go/pkg/beam",
+      )
+      standardOutput = FileOutputStream("playground/frontend/playground_components/assets/symbols/go.g.yaml")
+    }
+  }
+}
+
 tasks.register("extractBeamSymbolsPython") {
   doLast {
     exec {
