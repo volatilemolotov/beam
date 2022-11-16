@@ -22,9 +22,10 @@ steps:
     args:
       [
         '-c', './gradlew playground:terraform:prepareConfig -Pdns-name="${_DNS_NAME}" && 
-        ./gradlew playground:terraform:gkebackend -Pdocker-repository-root="${_DOCKER_REPOSITORY_ROOT}" \ 
+        ./gradlew playground:terraform:gkebackend -Pdocker-repository-root="${_DOCKER_REPOSITORY_ROOT}" 
           -Pproject_environment="${_ENVIRONMENT_NAME}" -Pdocker-tag="${_TAG}" -Pdns-name="${_DNS_NAME}"'
       ]
+
 
 # Substitutions can be changed in GCP Cloud Build Triggers UI
 substitutions:
