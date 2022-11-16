@@ -16,39 +16,35 @@
 # under the License.
 
 steps:
-  # This step uses Docker container from our image to authenticate us in GKE
-  # Please set variable $_GKE_NAME in "substitutions" stage below
-  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
-    entrypoint: "gcloud"
-    args:
-      [
-        'container',
-        'clusters',
-        'get-credentials',
-        '$_GKE_NAME',
-        '--region=us-central1-a'
-      ]
-
-  # This step uses Docker container from image in previous step to run gradle task for Playground to GKE deployment
-  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+  # This stage uses pre-built Docker container to run gradle task for Playground pre-config and deployment to GKE
+  - name: '${LOCATION}-docker.pkg.dev/${PROJECT_ID}/${_ARTIFACT_REGISTRY_REPO}/builder:worker'
     entrypoint: "/bin/bash"
-    args: [ '-c', './gradlew playground:terraform:prepareConfig -Pdns-name="$_DNS_NAME" && ./gradlew playground:terraform:gkebackend -Pdocker-repository-root="$_DOCKER_REPOSITORY_ROOT" -Pproject_environment="$_ENVIRONMENT_NAME" -Pdocker-tag="$_TAG" -Pdns-name="$_DNS_NAME"' ]
+    args:
+      - '-c'
+      - |
+        ./gradlew playground:terraform:prepareConfig -Pdns-name="${_DNS_NAME}" && 
+        ./gradlew playground:terraform:gkebackend -Pdocker-repository-root="${_DOCKER_REPOSITORY_ROOT}" \
+        -Pproject_environment="{$_ENVIRONMENT_NAME}" -Pdocker-tag="${_TAG}" -Pdns-name="${_DNS_NAME}"' 
 
+# Substitutions can be changed in GCP Cloud Build Triggers UI
 substitutions:
-  _DOCKER_REPOSITORY_ROOT: "us-central1-docker.pkg.dev/sandbox-playground-001/playground-repository"
-  # The name of the Google Cloud Artifact Registry
-  _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
+  # The name of your Google Cloud Artifact Registry repository
+  _ARTIFACT_REGISTRY_REPO: "playground-repository"
   # The name of your environment in beam/playground/terraform/environment/
   _ENVIRONMENT_NAME: "test"
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
-  # Docker image tag name
-  _TAG: "test"
+  # The name of your Docker tag
+  _TAG: "tag-playground"
   # The name of your GKE cluster (from terraform.tfvars)
-  _GKE_NAME: "playground-backend"
+  _GKE_NAME: "playground-cluster"
+  # The name of the GCP logs bucket
+  _LOGS_BUCKET_NAME: "pg-cloudbuild-logging-bucket"
 
-logsBucket: 'gs://pg-cloudbuild-logging-bucket'
+# The name of your GCP logs bucket
+logsBucket: 'gs://${_LOGS_BUCKET_NAME}'
 
+# This option enables writing logs to GCS bucket
 options:
   logging: GCS_ONLY
 
