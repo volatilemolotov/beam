@@ -16,20 +16,21 @@
  * limitations under the License.
  */
 
-import 'package:easy_localization_ext/easy_localization_ext.dart';
+import 'package:highlight/languages/go.dart';
+import 'package:highlight/languages/python.dart';
 
-import 'locator.dart';
+import '../../../assets/assets.gen.dart';
+import '../../../playground_components.dart';
+import 'yaml.dart';
 
-class PlaygroundComponents {
-  static const packageName = 'playground_components';
+final symbolLoadersByMode = {
+  go: YamlSymbolsLoader(
+    path: Assets.symbols.goG,
+    package: PlaygroundComponents.packageName,
+  ),
 
-  // TODO(alexeyinkin): Make const when this is fixed: https://github.com/aissat/easy_localization_loader/issues/39
-  static final translationLoader = YamlPackageAssetLoader(
-    packageName,
-    path: 'assets/translations',
-  );
-
-  static Future<void> ensureInitialized() async {
-    await initializeServiceLocator();
-  }
-}
+  python: YamlSymbolsLoader(
+    path: Assets.symbols.pythonG,
+    package: PlaygroundComponents.packageName,
+  ),
+};
