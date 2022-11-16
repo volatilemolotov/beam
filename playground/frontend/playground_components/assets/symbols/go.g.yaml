@@ -20,9 +20,7 @@
   - AsCombineFn
   - AsDoFn
   - Bind
-  - Bind
   - BoolToBounded
-  - Bounded
   - Bounded
   - BucketExists
   - BuildTempWorkerBinary
@@ -50,16 +48,12 @@
   - ConvertFn
   - Copy
   - Count
-  - Count
   - CountElms
-  - Create
-  - Create
   - Create
   - Create2
   - CreateBucket
   - CreateDisposition
   - CreateEnvironment
-  - CreateList
   - CreateList
   - CreateList2
   - CreateWithEndpoint
@@ -73,7 +67,6 @@
   - DecodeBool
   - DecodeByte
   - DecodeBytes
-  - DecodeCoder
   - DecodeCoder
   - DecodeCoderRef
   - DecodeCoderRefs
@@ -186,7 +179,6 @@
   - EnableCaptureHook
   - EnableHeapCaptureHook
   - EnableHook
-  - EnableHook
   - EnableProfCaptureHook
   - EnableTraceCaptureHook
   - Encode
@@ -223,20 +215,9 @@
   - EqualsList
   - Error
   - Errorf
-  - Errorf
   - Errorln
   - Evaluate
   - Exclude
-  - Execute
-  - Execute
-  - Execute
-  - Execute
-  - Execute
-  - Execute
-  - Execute
-  - Execute
-  - Execute
-  - Execute
   - Execute
   - ExecuteBundles
   - ExecuteEnv
@@ -247,7 +228,6 @@
   - Expand
   - ExpandedComponents
   - ExpandedTransform
-  - ExpansionAddr
   - ExpansionAddr
   - ExpansionAddrRead
   - ExpansionAddrWrite
@@ -263,7 +243,6 @@
   - FetchSize
   - File
   - Flatten
-  - FreeDiskSpace
   - FreeDiskSpace
   - FromDuration
   - FromMetricUpdates
@@ -368,13 +347,10 @@
   - InboundTagToNode
   - Include
   - Info
-  - Info
   - Infof
   - Infoln
   - Init
-  - Init
   - Initialize
-  - Initialized
   - Initialized
   - Input
   - Int64Counter
@@ -384,7 +360,6 @@
   - Invoke
   - InvokeWithoutEventTime
   - IsBound
-  - IsCoGBK
   - IsCoGBK
   - IsComplex
   - IsComposite
@@ -396,13 +371,11 @@
   - IsEnabled
   - IsEqual
   - IsEqualList
-  - IsEqualList
   - IsFieldNil
   - IsFloat
   - IsInputRegistered
   - IsInteger
   - IsIter
-  - IsKV
   - IsKV
   - IsLifecycleMethod
   - IsList
@@ -418,7 +391,6 @@
   - IsStructurallyAssignable
   - IsUniversal
   - IsW
-  - IsW
   - IsWorkerCompatibleBinary
   - Iter1
   - Iter2
@@ -432,7 +404,6 @@
   - LoadFunction
   - LookupCustomCoder
   - LookupType
-  - Main
   - Main
   - MainCalled
   - MainRet
@@ -502,12 +473,10 @@
   - MakeWindowDecoder
   - MakeWindowEncoder
   - Marshal
-  - Marshal
   - MarshalCoders
   - MarshalTo
   - MarshalWindowingStrategy
   - Materialize
-  - Max
   - Max
   - MaxNumRecords
   - MaxPerKey
@@ -520,7 +489,6 @@
   - MergeGauges
   - MergeMsecs
   - MergePCols
-  - Min
   - Min
   - MinPerKey
   - MultiFinishBundle
@@ -541,14 +509,6 @@
   - NamedOutboundLinks
   - Never
   - New
-  - New
-  - New
-  - New
-  - New
-  - New
-  - New
-  - New
-  - New
   - NewArtifactRetrievalServiceClient
   - NewArtifactStagingServiceClient
   - NewBeamFnControlClient
@@ -560,9 +520,6 @@
   - NewBool
   - NewBytes
   - NewClient
-  - NewClient
-  - NewCoGBK
-  - NewCoGBK
   - NewCoGBK
   - NewCoder
   - NewCoderMarshaller
@@ -571,10 +528,8 @@
   - NewCombineFn
   - NewConfig
   - NewCounter
-  - NewCounter
   - NewCrossLanguage
   - NewCustomCoder
-  - NewDistribution
   - NewDistribution
   - NewDoFn
   - NewDouble
@@ -590,7 +545,6 @@
   - NewFloat
   - NewFn
   - NewGauge
-  - NewGauge
   - NewGlobalWindow
   - NewGlobalWindows
   - NewGrowableTracker
@@ -598,7 +552,6 @@
   - NewImpulse
   - NewIntervalWindow
   - NewJobServiceClient
-  - NewKV
   - NewKV
   - NewLegacyArtifactRetrievalServiceClient
   - NewLegacyArtifactStagingServiceClient
@@ -633,7 +586,6 @@
   - NewSlidingWindows
   - NewStagingServer
   - NewString
-  - NewString
   - NewT
   - NewTaggedExternal
   - NewTestStreamServiceClient
@@ -644,13 +596,11 @@
   - NewVarIntZ
   - NewVarUintZ
   - NewW
-  - NewW
   - NewWindowInto
   - NewWrappedTracker
   - NoFiringPane
   - NodeTypes
   - NonEmpty
-  - Normalize
   - Normalize
   - Now
   - NullableDecoder
@@ -682,7 +632,6 @@
   - Partition
   - Performant
   - PhysicalMemorySize
-  - PhysicalMemorySize
   - Prepare
   - Print
   - PrintJob
@@ -692,24 +641,10 @@
   - ProtoToOptions
   - Publish
   - Query
-  - Query
   - QueryAutomatedExpansionService
   - QueryExpansionService
   - QueryPythonExpansionService
   - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - Read
-  - ReadAll
   - ReadAll
   - ReadAllSdf
   - ReadClasspaths
@@ -738,19 +673,14 @@
   - RegisterBeamFnWorkerStatusServer
   - RegisterCaptureHook
   - RegisterCoder
-  - RegisterCoder
-  - RegisterDoFn
   - RegisterDoFn
   - RegisterEmitter
   - RegisterExpansionServiceServer
   - RegisterFunc
   - RegisterFunction
-  - RegisterFunction
   - RegisterHandler
   - RegisterHeapCaptureHook
   - RegisterHook
-  - RegisterHook
-  - RegisterInit
   - RegisterInit
   - RegisterInput
   - RegisterJobServiceServer
@@ -768,8 +698,6 @@
   - RegisterStructWrapper
   - RegisterTestStreamServiceServer
   - RegisterTraceCaptureHook
-  - RegisterType
-  - RegisterType
   - RegisterType
   - Registered
   - RemoveFakeImpulses
@@ -791,13 +719,10 @@
   - RowDecoderForStruct
   - RowEncoderForStruct
   - Run
-  - Run
-  - Run
   - RunAndValidate
   - RunInitHooks
   - RunRequestHooks
   - RunResponseHooks
-  - RunWithMetrics
   - RunWithMetrics
   - SampleForHeapProfile
   - SampleInterval
@@ -810,7 +735,6 @@
   - SetLogger
   - SetPTransformID
   - SetProcessMemoryCeiling
-  - SetProcessMemoryCeiling
   - SetTopLevelMsg
   - SetTopLevelMsgf
   - SetUpPythonEnvironment
@@ -821,12 +745,10 @@
   - SkipK
   - SkipPtr
   - SkipW
-  - SkipW
   - Smallest
   - SmallestPerKey
   - Source
   - SourceSingle
-  - Stage
   - Stage
   - StageDir
   - StageFile
@@ -840,9 +762,7 @@
   - SubParams
   - SubReturns
   - Submit
-  - Submit
   - Substitute
-  - Sum
   - Sum
   - SumPerKey
   - SwapKV
@@ -895,7 +815,6 @@
   - ToLogicalType
   - ToType
   - TopologicalSort
-  - Transform
   - Transform
   - Translate
   - Trigger
@@ -957,7 +876,6 @@
   - ValueOf
   - VerifyNamedOutputs
   - WaitForCompletion
-  - WaitForCompletion
   - Warn
   - Warnf
   - Warnln
@@ -973,17 +891,6 @@
   - WrapWindowed
   - Wrapf
   - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
-  - Write
   - WriteBatch
   - WriteClasspaths
   - WriteConnectionProperties
@@ -996,7 +903,6 @@
   - WriteUnsafe
   - WriteWithBatchSize
   - WriteWorkerID
-  properties: []
 AccumulationMode:
   methods:
   - Descriptor
@@ -1004,7 +910,6 @@ AccumulationMode:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 AccumulationMode_Enum:
   methods:
   - Descriptor
@@ -1013,27 +918,22 @@ AccumulationMode_Enum:
   - Number
   - String
   - Type
-  properties: []
 AfterAllTrigger:
   methods:
   - String
   - SubTriggers
-  properties: []
 AfterAnyTrigger:
   methods:
   - String
   - SubTriggers
-  properties: []
 AfterCountTrigger:
   methods:
   - ElementCount
   - String
-  properties: []
 AfterEachTrigger:
   methods:
   - String
   - Subtriggers
-  properties: []
 AfterEndOfWindowTrigger:
   methods:
   - Early
@@ -1041,18 +941,15 @@ AfterEndOfWindowTrigger:
   - Late
   - LateFiring
   - String
-  properties: []
 AfterProcessingTimeTrigger:
   methods:
   - AlignedTo
   - PlusDelay
   - String
   - TimestampTransforms
-  properties: []
 AfterSynchronizedProcessingTimeTrigger:
   methods:
   - String
-  properties: []
 AlignToTransform:
   methods:
   - String
@@ -1061,7 +958,6 @@ AlignToTransform:
 AlwaysTrigger:
   methods:
   - String
-  properties: []
 Annotation:
   methods:
   - Descriptor
@@ -1171,11 +1067,9 @@ ArtifactRequestWrapper:
   properties:
   - Request
 ArtifactRequestWrapper_GetArtifact:
-  methods: []
   properties:
   - GetArtifact
 ArtifactRequestWrapper_ResolveArtifact:
-  methods: []
   properties:
   - ResolveArtifact
 ArtifactResponseWrapper:
@@ -1195,49 +1089,39 @@ ArtifactResponseWrapper:
   - Response
   - StagingToken
 ArtifactResponseWrapper_GetArtifactResponse:
-  methods: []
   properties:
   - GetArtifactResponse
 ArtifactResponseWrapper_ResolveArtifactResponse:
-  methods: []
   properties:
   - ResolveArtifactResponse
 ArtifactRetrievalService_GetArtifactClient:
   methods:
   - Recv
-  properties: []
 ArtifactRetrievalService_GetArtifactServer:
   methods:
   - Send
-  properties: []
 ArtifactRetrievalServiceClient:
   methods:
   - GetArtifact
   - ResolveArtifacts
-  properties: []
 ArtifactRetrievalServiceServer:
   methods:
   - GetArtifact
   - ResolveArtifacts
-  properties: []
 ArtifactStagingService_ReverseArtifactRetrievalServiceClient:
   methods:
   - Recv
   - Send
-  properties: []
 ArtifactStagingService_ReverseArtifactRetrievalServiceServer:
   methods:
   - Recv
   - Send
-  properties: []
 ArtifactStagingServiceClient:
   methods:
   - ReverseArtifactRetrievalService
-  properties: []
 ArtifactStagingServiceServer:
   methods:
   - ReverseArtifactRetrievalService
-  properties: []
 ArtifactStagingToRolePayload:
   methods:
   - Descriptor
@@ -1268,7 +1152,6 @@ AtomicType:
   - Number
   - String
   - Type
-  properties: []
 AtomicTypeValue:
   methods:
   - Descriptor
@@ -1289,39 +1172,30 @@ AtomicTypeValue:
   properties:
   - Value
 AtomicTypeValue_Boolean:
-  methods: []
   properties:
   - Boolean
 AtomicTypeValue_Byte:
-  methods: []
   properties:
   - Byte
 AtomicTypeValue_Bytes:
-  methods: []
   properties:
   - Bytes
 AtomicTypeValue_Double:
-  methods: []
   properties:
   - Double
 AtomicTypeValue_Float:
-  methods: []
   properties:
   - Float
 AtomicTypeValue_Int16:
-  methods: []
   properties:
   - Int16
 AtomicTypeValue_Int32:
-  methods: []
   properties:
   - Int32
 AtomicTypeValue_Int64:
-  methods: []
   properties:
   - Int64
 AtomicTypeValue_String_:
-  methods: []
   properties:
   - String_
 AuthenticationSpec:
@@ -1337,7 +1211,14 @@ AuthenticationSpec:
   - Payload
   - Urn
 Bag:
-  methods: []
+  methods:
+  - Add
+  - Clear
+  - CoderType
+  - KeyCoderType
+  - Read
+  - StateKey
+  - StateType
   properties:
   - Key
 BagStateSpec:
@@ -1357,7 +1238,6 @@ BeamConstants:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 BeamConstants_Constants:
   methods:
   - Descriptor
@@ -1366,115 +1246,90 @@ BeamConstants_Constants:
   - Number
   - String
   - Type
-  properties: []
 BeamFnControl_ControlClient:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnControl_ControlServer:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnControlClient:
   methods:
   - Control
   - GetProcessBundleDescriptor
-  properties: []
 BeamFnControlServer:
   methods:
   - Control
   - GetProcessBundleDescriptor
-  properties: []
 BeamFnData_DataClient:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnData_DataServer:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnDataClient:
   methods:
   - Data
-  properties: []
 BeamFnDataServer:
   methods:
   - Data
-  properties: []
 BeamFnExternalWorkerPoolClient:
   methods:
   - StartWorker
   - StopWorker
-  properties: []
 BeamFnExternalWorkerPoolServer:
   methods:
   - StartWorker
   - StopWorker
-  properties: []
 BeamFnLogging_LoggingClient:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnLogging_LoggingServer:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnLoggingClient:
   methods:
   - Logging
-  properties: []
 BeamFnLoggingServer:
   methods:
   - Logging
-  properties: []
 BeamFnState_StateClient:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnState_StateServer:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnStateClient:
   methods:
   - State
-  properties: []
 BeamFnStateServer:
   methods:
   - State
-  properties: []
 BeamFnWorkerStatus_WorkerStatusClient:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnWorkerStatus_WorkerStatusServer:
   methods:
   - Recv
   - Send
-  properties: []
 BeamFnWorkerStatusClient:
   methods:
   - WorkerStatus
-  properties: []
 BeamFnWorkerStatusServer:
   methods:
   - WorkerStatus
-  properties: []
 BoundableRTracker:
   methods:
   - IsBounded
-  properties: []
 BoundedQuery:
-  methods: []
   properties:
   - End
   - Start
@@ -1513,13 +1368,10 @@ BundleApplication:
 BundleFinalization:
   methods:
   - RegisterCallback
-  properties: []
 BundleState:
   methods:
   - String
-  properties: []
 CacheMetrics:
-  methods: []
   properties:
   - Hits
 CancelJobRequest:
@@ -1545,7 +1397,6 @@ CancelJobResponse:
 Class:
   methods:
   - String
-  properties: []
 ClosingBehavior:
   methods:
   - Descriptor
@@ -1553,7 +1404,6 @@ ClosingBehavior:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 ClosingBehavior_Enum:
   methods:
   - Descriptor
@@ -1562,7 +1412,6 @@ ClosingBehavior_Enum:
   - Number
   - String
   - Type
-  properties: []
 CoGBK:
   methods:
   - Down
@@ -1587,8 +1436,6 @@ Coder:
   - ProtoReflect
   - Reset
   - String
-  - String
-  - String
   - Type
   properties:
   - ComponentCoderIds
@@ -1608,7 +1455,6 @@ CoderMarshaller:
   properties:
   - Namespace
 CoderRef:
-  methods: []
   properties:
   - Components
   - IsPairLike
@@ -1621,7 +1467,6 @@ CoderUnmarshaller:
   - Coder
   - Coders
   - WindowCoder
-  properties: []
 Combine:
   methods:
   - Down
@@ -1648,7 +1493,6 @@ CombineFn:
   - Name
   - SetupFn
   - TeardownFn
-  properties: []
 CombinePayload:
   methods:
   - Descriptor
@@ -1662,13 +1506,20 @@ CombinePayload:
   - AccumulatorCoderId
   - CombineFn
 Combining:
-  methods: []
+  methods:
+  - Add
+  - Clear
+  - CoderType
+  - GetCombineFn
+  - KeyCoderType
+  - Read
+  - StateKey
+  - StateType
   properties:
   - Key
 CombiningPipelineState:
   methods:
   - GetCombineFn
-  properties: []
 CombiningStateSpec:
   methods:
   - Descriptor
@@ -1711,7 +1562,6 @@ CommitManifestResponse_Constants:
   - Number
   - String
   - Type
-  properties: []
 Components:
   methods:
   - Descriptor
@@ -1738,28 +1588,21 @@ Config:
   - AdvanceProcessingTimeToInfinity
   - AdvanceWatermark
   - AdvanceWatermarkToInfinity
-  properties: []
 ContentStructure:
   methods:
   - String
-  properties: []
 ConvertToAccumulators:
   methods:
   - ProcessElement
   - String
-  properties: []
 Copier:
   methods:
   - Copy
-  properties: []
 Counter:
   methods:
   - Dec
-  - Dec
-  - Inc
   - Inc
   - String
-  properties: []
 CounterResult:
   methods:
   - Name
@@ -1781,28 +1624,20 @@ CustomCoder:
   - ProtoReflect
   - Reset
   - String
-  - String
   properties:
   - Dec
-  - Dec
-  - Enc
   - Enc
   - ID
   - Name
-  - Name
-  - Type
   - Type
 DataChannel:
   methods:
   - OpenRead
   - OpenWrite
-  properties: []
 DataChannelManager:
   methods:
   - Open
-  properties: []
 DataContext:
-  methods: []
   properties:
   - Data
   - State
@@ -1810,7 +1645,6 @@ DataManager:
   methods:
   - OpenRead
   - OpenWrite
-  properties: []
 DataSink:
   methods:
   - Down
@@ -1848,11 +1682,9 @@ DataSource:
 Decoder:
   methods:
   - Decode
-  properties: []
 DefaultTrigger:
   methods:
   - String
-  properties: []
 DeferredArtifactPayload:
   methods:
   - Descriptor
@@ -1889,7 +1721,6 @@ DescribePipelineOptionsRequest:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 DescribePipelineOptionsResponse:
   methods:
   - Descriptor
@@ -1927,8 +1758,6 @@ Distribution:
   methods:
   - String
   - Update
-  - Update
-  properties: []
 DistributionResult:
   methods:
   - Name
@@ -1939,7 +1768,6 @@ DistributionResult:
   - Attempted
   - Key
 DistributionValue:
-  methods: []
   properties:
   - Count
 DoFn:
@@ -1953,7 +1781,6 @@ DoFn:
   - SetupFn
   - StartBundleFn
   - TeardownFn
-  properties: []
 DockerPayload:
   methods:
   - Descriptor
@@ -1977,28 +1804,20 @@ DynFn:
   - String
   properties:
   - Data
-  - Data
   - Gen
-  - Gen
-  - Name
   - Name
   - T
   - Type
 ElementDecoder:
   methods:
   - Decode
-  - Decode
   - DecodeTo
-  properties: []
 ElementEncoder:
   methods:
   - Encode
-  - Encode
-  properties: []
 ElementProcessor:
   methods:
   - ProcessElement
-  properties: []
 Elements:
   methods:
   - Descriptor
@@ -2056,7 +1875,6 @@ EmbeddedFilePayload:
   properties:
   - Data
 Emitter:
-  methods: []
   properties:
   - Key
   - Name
@@ -2082,7 +1900,6 @@ EncodedType:
 Encoder:
   methods:
   - Encode
-  properties: []
 Entry:
   methods:
   - Descriptor
@@ -2104,27 +1921,21 @@ Entry:
   - Msg
   - Timestamp
 Entry_Elems:
-  methods: []
   properties:
   - Elems
 Entry_Footer:
-  methods: []
   properties:
   - Footer
 Entry_Header:
-  methods: []
   properties:
   - Header
 Entry_InstReq:
-  methods: []
   properties:
   - InstReq
 Entry_InstResp:
-  methods: []
   properties:
   - InstResp
 Entry_LogEntries:
-  methods: []
   properties:
   - LogEntries
 EntryHeader:
@@ -2169,7 +1980,6 @@ Eval:
   - Printf
   - RequiresRegistrations
   - UsesDefaultReflectionShims
-  properties: []
 EventsRequest:
   methods:
   - Descriptor
@@ -2273,11 +2083,9 @@ ExecutableStagePayload_WireCoderSetting:
   - Target
   - Urn
 ExecutableStagePayload_WireCoderSetting_InputOrOutputId:
-  methods: []
   properties:
   - InputOrOutputId
 ExecutableStagePayload_WireCoderSetting_Timer:
-  methods: []
   properties:
   - Timer
 ExecutionState:
@@ -2301,7 +2109,6 @@ Expand:
   - UID
   - ValueDecoders
 ExpandedTransform:
-  methods: []
   properties:
   - Components
   - Requirements
@@ -2313,7 +2120,6 @@ ExpansionMethods:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 ExpansionMethods_Enum:
   methods:
   - Descriptor
@@ -2322,9 +2128,7 @@ ExpansionMethods_Enum:
   - Number
   - String
   - Type
-  properties: []
 ExpansionPayload:
-  methods: []
   properties:
   - Dialect
   - Query
@@ -2363,18 +2167,15 @@ ExpansionResponse:
 ExpansionServiceClient:
   methods:
   - Expand
-  properties: []
 ExpansionServiceRunner:
   methods:
   - Endpoint
   - StartService
   - StopService
   - String
-  properties: []
 ExpansionServiceServer:
   methods:
   - Expand
-  properties: []
 ExternalConfigurationPayload:
   methods:
   - Descriptor
@@ -2415,7 +2216,6 @@ ExtractOutput:
   methods:
   - ProcessElement
   - String
-  properties: []
 Extractor:
   methods:
   - Bytes
@@ -2474,27 +2274,21 @@ FieldType:
   - Nullable
   - TypeInfo
 FieldType_ArrayType:
-  methods: []
   properties:
   - ArrayType
 FieldType_AtomicType:
-  methods: []
   properties:
   - AtomicType
 FieldType_IterableType:
-  methods: []
   properties:
   - IterableType
 FieldType_LogicalType:
-  methods: []
   properties:
   - LogicalType
 FieldType_MapType:
-  methods: []
   properties:
   - MapType
 FieldType_RowType:
-  methods: []
   properties:
   - RowType
 FieldValue:
@@ -2514,27 +2308,21 @@ FieldValue:
   properties:
   - FieldValue
 FieldValue_ArrayValue:
-  methods: []
   properties:
   - ArrayValue
 FieldValue_AtomicValue:
-  methods: []
   properties:
   - AtomicValue
 FieldValue_IterableValue:
-  methods: []
   properties:
   - IterableValue
 FieldValue_LogicalTypeValue:
-  methods: []
   properties:
   - LogicalTypeValue
 FieldValue_MapValue:
-  methods: []
   properties:
   - MapValue
 FieldValue_RowValue:
-  methods: []
   properties:
   - RowValue
 FinalizeBundleRequest:
@@ -2554,7 +2342,6 @@ FinalizeBundleResponse:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 FixedKey:
   methods:
   - Down
@@ -2599,7 +2386,6 @@ FixedWindowsPayload_Enum:
   - Number
   - String
   - Type
-  properties: []
 Flatten:
   methods:
   - Down
@@ -2640,16 +2426,12 @@ Fn:
   - Returns
   - StateProvider
   - String
-  - String
-  - String
   - Type
   - WatermarkEstimator
   - Window
   properties:
   - DynFn
   - Dynfn
-  - Fn
-  - Fn
   - Fn
   - Gap
   - Kind
@@ -2661,14 +2443,12 @@ Fn:
   - Size
   - Type
 FnParam:
-  methods: []
   properties:
   - Kind
   - T
 FnParamKind:
   methods:
   - String
-  properties: []
 Footer:
   methods:
   - Descriptor
@@ -2676,7 +2456,6 @@ Footer:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 FullType:
   methods:
   - Class
@@ -2713,183 +2492,138 @@ Func:
 Func0x0:
   methods:
   - Call0x0
-  properties: []
 Func0x1:
   methods:
   - Call0x1
-  properties: []
 Func0x2:
   methods:
   - Call0x2
-  properties: []
 Func0x3:
   methods:
   - Call0x3
-  properties: []
 Func0x4:
   methods:
   - Call0x4
-  properties: []
 Func1x0:
   methods:
   - Call1x0
-  properties: []
 Func1x1:
   methods:
   - Call1x1
-  properties: []
 Func1x2:
   methods:
   - Call1x2
-  properties: []
 Func1x3:
   methods:
   - Call1x3
-  properties: []
 Func1x4:
   methods:
   - Call1x4
-  properties: []
 Func2x0:
   methods:
   - Call2x0
-  properties: []
 Func2x1:
   methods:
   - Call2x1
-  properties: []
 Func2x2:
   methods:
   - Call2x2
-  properties: []
 Func2x3:
   methods:
   - Call2x3
-  properties: []
 Func2x4:
   methods:
   - Call2x4
-  properties: []
 Func3x0:
   methods:
   - Call3x0
-  properties: []
 Func3x1:
   methods:
   - Call3x1
-  properties: []
 Func3x2:
   methods:
   - Call3x2
-  properties: []
 Func3x3:
   methods:
   - Call3x3
-  properties: []
 Func3x4:
   methods:
   - Call3x4
-  properties: []
 Func4x0:
   methods:
   - Call4x0
-  properties: []
 Func4x1:
   methods:
   - Call4x1
-  properties: []
 Func4x2:
   methods:
   - Call4x2
-  properties: []
 Func4x3:
   methods:
   - Call4x3
-  properties: []
 Func4x4:
   methods:
   - Call4x4
-  properties: []
 Func5x0:
   methods:
   - Call5x0
-  properties: []
 Func5x1:
   methods:
   - Call5x1
-  properties: []
 Func5x2:
   methods:
   - Call5x2
-  properties: []
 Func5x3:
   methods:
   - Call5x3
-  properties: []
 Func5x4:
   methods:
   - Call5x4
-  properties: []
 Func6x0:
   methods:
   - Call6x0
-  properties: []
 Func6x1:
   methods:
   - Call6x1
-  properties: []
 Func6x2:
   methods:
   - Call6x2
-  properties: []
 Func6x3:
   methods:
   - Call6x3
-  properties: []
 Func6x4:
   methods:
   - Call6x4
-  properties: []
 Func7x0:
   methods:
   - Call7x0
-  properties: []
 Func7x1:
   methods:
   - Call7x1
-  properties: []
 Func7x2:
   methods:
   - Call7x2
-  properties: []
 Func7x3:
   methods:
   - Call7x3
-  properties: []
 Func7x4:
   methods:
   - Call7x4
-  properties: []
 Func8x0:
   methods:
   - Call8x0
-  properties: []
 Func8x1:
   methods:
   - Call8x1
-  properties: []
 Func8x2:
   methods:
   - Call8x2
-  properties: []
 Func8x3:
   methods:
   - Call8x3
-  properties: []
 Func8x4:
   methods:
   - Call8x4
-  properties: []
 FunctionSpec:
   methods:
   - Descriptor
@@ -2905,9 +2639,7 @@ FunctionSpec:
 Gauge:
   methods:
   - Set
-  - Set
   - String
-  properties: []
 GaugeResult:
   methods:
   - Name
@@ -2918,14 +2650,12 @@ GaugeResult:
   - Attempted
   - Key
 GaugeValue:
-  methods: []
   properties:
   - Timestamp
   - Value
 GenID:
   methods:
   - New
-  properties: []
 GetArtifactRequest:
   methods:
   - Descriptor
@@ -3003,7 +2733,6 @@ GetJobsRequest:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 GetJobsResponse:
   methods:
   - Descriptor
@@ -3051,7 +2780,6 @@ GetProvisionInfoRequest:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 GetProvisionInfoResponse:
   methods:
   - Descriptor
@@ -3067,7 +2795,6 @@ GlobalWindow:
   - Equals
   - MaxTimestamp
   - String
-  properties: []
 GlobalWindowsPayload:
   methods:
   - Descriptor
@@ -3075,7 +2802,6 @@ GlobalWindowsPayload:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 GlobalWindowsPayload_Enum:
   methods:
   - Descriptor
@@ -3084,7 +2810,6 @@ GlobalWindowsPayload_Enum:
   - Number
   - String
   - Type
-  properties: []
 Graph:
   methods:
   - Build
@@ -3093,7 +2818,6 @@ Graph:
   - NewScope
   - Root
   - String
-  properties: []
 GroupIntoBatchesPayload:
   methods:
   - Descriptor
@@ -3115,12 +2839,10 @@ GrowableTracker:
   - IsBounded
   - Start
   - TrySplit
-  properties: []
 GuardedError:
   methods:
   - Error
   - TrySetError
-  properties: []
 HandlerParams:
   methods:
   - CoderMarshaller
@@ -3136,7 +2858,6 @@ HarnessMonitoringInfosRequest:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 HarnessMonitoringInfosResponse:
   methods:
   - Descriptor
@@ -3162,7 +2883,6 @@ Header:
   - SdkVersion
   - Version
 Hook:
-  methods: []
   properties:
   - Dialer
   - Init
@@ -3191,25 +2911,15 @@ Inbound:
 Inject:
   methods:
   - Down
-  - Down
-  - FinishBundle
   - FinishBundle
   - ID
-  - ID
-  - ProcessElement
   - ProcessElement
   - StartBundle
-  - StartBundle
   - String
-  - String
-  - Up
   - Up
   properties:
   - "N"
-  - "N"
   - Out
-  - Out
-  - UID
   - UID
   - ValueEncoder
 InjectPayload:
@@ -3223,7 +2933,6 @@ InjectPayload:
   properties:
   - "N"
 Input:
-  methods: []
   properties:
   - Key
   - Name
@@ -3248,31 +2957,24 @@ InstructionRequest:
   - InstructionId
   - Request
 InstructionRequest_FinalizeBundle:
-  methods: []
   properties:
   - FinalizeBundle
 InstructionRequest_HarnessMonitoringInfos:
-  methods: []
   properties:
   - HarnessMonitoringInfos
 InstructionRequest_MonitoringInfos:
-  methods: []
   properties:
   - MonitoringInfos
 InstructionRequest_ProcessBundle:
-  methods: []
   properties:
   - ProcessBundle
 InstructionRequest_ProcessBundleProgress:
-  methods: []
   properties:
   - ProcessBundleProgress
 InstructionRequest_ProcessBundleSplit:
-  methods: []
   properties:
   - ProcessBundleSplit
 InstructionRequest_Register:
-  methods: []
   properties:
   - Register
 InstructionResponse:
@@ -3297,31 +2999,24 @@ InstructionResponse:
   - InstructionId
   - Response
 InstructionResponse_FinalizeBundle:
-  methods: []
   properties:
   - FinalizeBundle
 InstructionResponse_HarnessMonitoringInfos:
-  methods: []
   properties:
   - HarnessMonitoringInfos
 InstructionResponse_MonitoringInfos:
-  methods: []
   properties:
   - MonitoringInfos
 InstructionResponse_ProcessBundle:
-  methods: []
   properties:
   - ProcessBundle
 InstructionResponse_ProcessBundleProgress:
-  methods: []
   properties:
   - ProcessBundleProgress
 InstructionResponse_ProcessBundleSplit:
-  methods: []
   properties:
   - ProcessBundleSplit
 InstructionResponse_Register:
-  methods: []
   properties:
   - Register
 Interface:
@@ -3330,7 +3025,6 @@ Interface:
   - OpenRead
   - OpenWrite
   - Size
-  properties: []
 IntervalWindow:
   methods:
   - Equals
@@ -3345,7 +3039,6 @@ IsBounded:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 IsBounded_Enum:
   methods:
   - Descriptor
@@ -3354,7 +3047,6 @@ IsBounded_Enum:
   - Number
   - String
   - Type
-  properties: []
 IterableType:
   methods:
   - Descriptor
@@ -3433,7 +3125,6 @@ JobMessage_MessageImportance:
   - Number
   - String
   - Type
-  properties: []
 JobMessagesRequest:
   methods:
   - Descriptor
@@ -3457,15 +3148,12 @@ JobMessagesResponse:
   properties:
   - Response
 JobMessagesResponse_MessageResponse:
-  methods: []
   properties:
   - MessageResponse
 JobMessagesResponse_StateResponse:
-  methods: []
   properties:
   - StateResponse
 JobOptions:
-  methods: []
   properties:
   - Algorithm
   - ArtifactURLs
@@ -3475,13 +3163,11 @@ JobOptions:
   - DiskType
   - EnableHotKeyLogging
   - Experiments
-  - Experiments
   - FlexRSGoal
   - KmsKey
   - Labels
   - MachineType
   - MaxNumWorkers
-  - Name
   - Name
   - Network
   - NoUsePublicIPs
@@ -3499,7 +3185,6 @@ JobOptions:
   - TransformNameMapping
   - Update
   - Worker
-  - Worker
   - WorkerHarnessThreads
   - WorkerJar
   - WorkerRegion
@@ -3508,19 +3193,15 @@ JobOptions:
 JobService_GetMessageStreamClient:
   methods:
   - Recv
-  properties: []
 JobService_GetMessageStreamServer:
   methods:
   - Send
-  properties: []
 JobService_GetStateStreamClient:
   methods:
   - Recv
-  properties: []
 JobService_GetStateStreamServer:
   methods:
   - Send
-  properties: []
 JobServiceClient:
   methods:
   - Cancel
@@ -3533,7 +3214,6 @@ JobServiceClient:
   - GetStateStream
   - Prepare
   - Run
-  properties: []
 JobServiceServer:
   methods:
   - Cancel
@@ -3546,7 +3226,6 @@ JobServiceServer:
   - GetStateStream
   - Prepare
   - Run
-  properties: []
 JobState:
   methods:
   - Descriptor
@@ -3554,7 +3233,6 @@ JobState:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 JobState_Enum:
   methods:
   - Descriptor
@@ -3563,7 +3241,6 @@ JobState_Enum:
   - Number
   - String
   - Type
-  properties: []
 JobStateEvent:
   methods:
   - Descriptor
@@ -3576,11 +3253,8 @@ JobStateEvent:
   properties:
   - State
   - Timestamp
-KV:
-  methods: []
-  properties: []
+KV: {}
 KeyedFile:
-  methods: []
   properties:
   - Key
 Kind:
@@ -3591,7 +3265,6 @@ Kind:
   - Number
   - String
   - Type
-  properties: []
 LabelledPayload:
   methods:
   - Descriptor
@@ -3613,19 +3286,15 @@ LabelledPayload:
   - Namespace
   - Value
 LabelledPayload_BoolValue:
-  methods: []
   properties:
   - BoolValue
 LabelledPayload_DoubleValue:
-  methods: []
   properties:
   - DoubleValue
 LabelledPayload_IntValue:
-  methods: []
   properties:
   - IntValue
 LabelledPayload_StringValue:
-  methods: []
   properties:
   - StringValue
 Labels:
@@ -3635,45 +3304,36 @@ Labels:
   - Namespace
   - PCollection
   - Transform
-  properties: []
 LegacyArtifactRetrievalService_GetArtifactClient:
   methods:
   - Recv
-  properties: []
 LegacyArtifactRetrievalService_GetArtifactServer:
   methods:
   - Send
-  properties: []
 LegacyArtifactRetrievalServiceClient:
   methods:
   - GetArtifact
   - GetManifest
-  properties: []
 LegacyArtifactRetrievalServiceServer:
   methods:
   - GetArtifact
   - GetManifest
-  properties: []
 LegacyArtifactStagingService_PutArtifactClient:
   methods:
   - CloseAndRecv
   - Send
-  properties: []
 LegacyArtifactStagingService_PutArtifactServer:
   methods:
   - Recv
   - SendAndClose
-  properties: []
 LegacyArtifactStagingServiceClient:
   methods:
   - CommitManifest
   - PutArtifact
-  properties: []
 LegacyArtifactStagingServiceServer:
   methods:
   - CommitManifest
   - PutArtifact
-  properties: []
 LegacyGetArtifactRequest:
   methods:
   - Descriptor
@@ -3716,7 +3376,6 @@ LogControl:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 LogEntry:
   methods:
   - Descriptor
@@ -3758,7 +3417,6 @@ LogEntry_Severity:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 LogEntry_Severity_Enum:
   methods:
   - Descriptor
@@ -3767,11 +3425,9 @@ LogEntry_Severity_Enum:
   - Number
   - String
   - Type
-  properties: []
 Logger:
   methods:
   - Log
-  properties: []
 LogicalType:
   methods:
   - ArgumentType
@@ -3812,7 +3468,6 @@ LogicalTypes:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 LogicalTypes_Enum:
   methods:
   - Descriptor
@@ -3821,16 +3476,13 @@ LogicalTypes_Enum:
   - Number
   - String
   - Type
-  properties: []
 Loopback:
   methods:
   - EnvironmentConfig
   - StartWorker
   - Stop
   - StopWorker
-  properties: []
 MainInput:
-  methods: []
   properties:
   - Key
   - RTracker
@@ -3852,13 +3504,21 @@ ManualWatermarkEstimator:
   properties:
   - State
 Map:
-  methods: []
+  methods:
+  - Clear
+  - CoderType
+  - Get
+  - KeyCoderType
+  - Keys
+  - Put
+  - Remove
+  - StateKey
+  - StateType
   properties:
   - Key
 MapLoader:
   methods:
   - LoadMap
-  properties: []
 MapStateSpec:
   methods:
   - Descriptor
@@ -3922,7 +3582,6 @@ MergeAccumulators:
   - ProcessElement
   - String
   - Up
-  properties: []
 MergeStatus:
   methods:
   - Descriptor
@@ -3930,7 +3589,6 @@ MergeStatus:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 MergeStatus_Enum:
   methods:
   - Descriptor
@@ -3939,7 +3597,6 @@ MergeStatus_Enum:
   - Number
   - String
   - Type
-  properties: []
 MessageWithComponents:
   methods:
   - Descriptor
@@ -3963,43 +3620,33 @@ MessageWithComponents:
   - Components
   - Root
 MessageWithComponents_Coder:
-  methods: []
   properties:
   - Coder
 MessageWithComponents_CombinePayload:
-  methods: []
   properties:
   - CombinePayload
 MessageWithComponents_FunctionSpec:
-  methods: []
   properties:
   - FunctionSpec
 MessageWithComponents_ParDoPayload:
-  methods: []
   properties:
   - ParDoPayload
 MessageWithComponents_Pcollection:
-  methods: []
   properties:
   - Pcollection
 MessageWithComponents_Ptransform:
-  methods: []
   properties:
   - Ptransform
 MessageWithComponents_ReadPayload:
-  methods: []
   properties:
   - ReadPayload
 MessageWithComponents_SideInput:
-  methods: []
   properties:
   - SideInput
 MessageWithComponents_WindowIntoPayload:
-  methods: []
   properties:
   - WindowIntoPayload
 MessageWithComponents_WindowingStrategy:
-  methods: []
   properties:
   - WindowingStrategy
 MetricResults:
@@ -4040,7 +3687,6 @@ MonitoringInfo_MonitoringInfoLabels:
   - Number
   - String
   - Type
-  properties: []
 MonitoringInfoLabelProps:
   methods:
   - Descriptor
@@ -4074,7 +3720,6 @@ MonitoringInfoSpecs:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 MonitoringInfoSpecs_Enum:
   methods:
   - Descriptor
@@ -4083,7 +3728,6 @@ MonitoringInfoSpecs_Enum:
   - Number
   - String
   - Type
-  properties: []
 MonitoringInfoTypeUrns:
   methods:
   - Descriptor
@@ -4091,7 +3735,6 @@ MonitoringInfoTypeUrns:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 MonitoringInfoTypeUrns_Enum:
   methods:
   - Descriptor
@@ -4100,7 +3743,6 @@ MonitoringInfoTypeUrns_Enum:
   - Number
   - String
   - Type
-  properties: []
 MonitoringInfosMetadataRequest:
   methods:
   - Descriptor
@@ -4131,7 +3773,6 @@ MsecResult:
   - Attempted
   - Key
 MsecValue:
-  methods: []
   properties:
   - Start
 MultiEdge:
@@ -4149,7 +3790,6 @@ MultiEdge:
   - Reset
   - Scope
   - String
-  - String
   properties:
   - AccumCoder
   - CombineFn
@@ -4166,7 +3806,6 @@ MultiEdge:
   - RestrictionCoder
   - StateCoders
   - Value
-  - WindowFn
   - WindowFn
 MultiEdge_Inbound:
   methods:
@@ -4188,7 +3827,6 @@ MultiEdge_Inbound_InputKind:
   - Number
   - String
   - Type
-  properties: []
 MultiEdge_Outbound:
   methods:
   - Descriptor
@@ -4220,19 +3858,16 @@ Mutation:
   - Ops
   - RowKey
 NamedEdge:
-  methods: []
   properties:
   - Edge
   - Name
 NamedScope:
-  methods: []
   properties:
   - Name
   - Scope
 NeverTrigger:
   methods:
   - String
-  properties: []
 Node:
   methods:
   - Bounded
@@ -4242,9 +3877,7 @@ Node:
   - WindowingStrategy
   properties:
   - Coder
-Nullable:
-  methods: []
-  properties: []
+Nullable: {}
 OnTimeBehavior:
   methods:
   - Descriptor
@@ -4252,7 +3885,6 @@ OnTimeBehavior:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 OnTimeBehavior_Enum:
   methods:
   - Descriptor
@@ -4261,9 +3893,7 @@ OnTimeBehavior_Enum:
   - Number
   - String
   - Type
-  properties: []
 Operation:
-  methods: []
   properties:
   - Column
   - Family
@@ -4296,7 +3926,6 @@ Options:
   properties:
   - Environment
 Opts:
-  methods: []
   properties:
   - InternalSharding
   - K
@@ -4306,7 +3935,6 @@ OrFinallyTrigger:
   - Finally
   - Main
   - String
-  properties: []
 OrderedListStateSpec:
   methods:
   - Descriptor
@@ -4330,7 +3958,6 @@ OutputTime:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 OutputTime_Enum:
   methods:
   - Descriptor
@@ -4339,7 +3966,6 @@ OutputTime_Enum:
   - Number
   - String
   - Type
-  properties: []
 PCol:
   methods:
   - ID
@@ -4360,7 +3986,6 @@ PColResult:
   - Attempted
   - Key
 PColValue:
-  methods: []
   properties:
   - ElementCount
   - SampledByteSize
@@ -4384,8 +4009,6 @@ PCollection:
   - SetCoder
   - StartBundle
   - String
-  - String
-  - String
   - Type
   - Up
   properties:
@@ -4400,7 +4023,6 @@ PCollection:
   - UniqueName
   - WindowingStrategyId
 PCollectionSnapshot:
-  methods: []
   properties:
   - ElementCount
   - ID
@@ -4432,7 +4054,6 @@ PTransform:
 PTransformState:
   methods:
   - Set
-  properties: []
 PairWithRestriction:
   methods:
   - Down
@@ -4447,7 +4068,6 @@ PairWithRestriction:
   - Out
   - UID
 PaneInfo:
-  methods: []
   properties:
   - Index
   - IsFirst
@@ -4498,7 +4118,6 @@ ParDoPayload:
   - StateSpecs
   - TimerFamilySpecs
 Payload:
-  methods: []
   properties:
   - Config
   - Data
@@ -4519,7 +4138,6 @@ Pipeline:
   - ProtoReflect
   - Reset
   - Root
-  - String
   - String
   properties:
   - Components
@@ -4551,7 +4169,6 @@ PipelineOptionType:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 PipelineOptionType_Enum:
   methods:
   - Descriptor
@@ -4560,19 +4177,16 @@ PipelineOptionType_Enum:
   - Number
   - String
   - Type
-  properties: []
 PipelineResult:
   methods:
   - JobID
   - Metrics
-  properties: []
 PipelineState:
   methods:
   - CoderType
   - KeyCoderType
   - StateKey
   - StateType
-  properties: []
 Plan:
   methods:
   - Checkpoint
@@ -4585,14 +4199,11 @@ Plan:
   - SourcePTransformID
   - Split
   - String
-  properties: []
 PlanSnapshot:
-  methods: []
   properties:
   - PCols
   - Source
 Port:
-  methods: []
   properties:
   - URL
 PrepareJobRequest:
@@ -4710,7 +4321,6 @@ ProcessBundleRequest_CacheToken_SideInput:
   - SideInputId
   - TransformId
 ProcessBundleRequest_CacheToken_SideInput_:
-  methods: []
   properties:
   - SideInput
 ProcessBundleRequest_CacheToken_UserState:
@@ -4720,9 +4330,7 @@ ProcessBundleRequest_CacheToken_UserState:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 ProcessBundleRequest_CacheToken_UserState_:
-  methods: []
   properties:
   - UserState
 ProcessBundleResponse:
@@ -4801,7 +4409,6 @@ ProcessContinuation:
   methods:
   - ResumeDelay
   - ShouldResume
-  properties: []
 ProcessPayload:
   methods:
   - Descriptor
@@ -4839,7 +4446,6 @@ ProcessSizedElementsAndRestrictions:
   - SU
   - TfId
 ProgressReportSnapshot:
-  methods: []
   properties:
   - Count
   - ID
@@ -4860,7 +4466,6 @@ Provider:
   - WriteBagState
   - WriteMapState
   - WriteValueState
-  properties: []
 ProvisionInfo:
   methods:
   - Descriptor
@@ -4892,11 +4497,9 @@ ProvisionInfo:
 ProvisionServiceClient:
   methods:
   - GetProvisionInfo
-  properties: []
 ProvisionServiceServer:
   methods:
   - GetProvisionInfo
-  properties: []
 ProxyManifest:
   methods:
   - Descriptor
@@ -4984,11 +4587,9 @@ PutArtifactRequest:
   properties:
   - Content
 PutArtifactRequest_Data:
-  methods: []
   properties:
   - Data
 PutArtifactRequest_Metadata:
-  methods: []
   properties:
   - Metadata
 PutArtifactResponse:
@@ -4998,7 +4599,6 @@ PutArtifactResponse:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 PyPIPayload:
   methods:
   - Descriptor
@@ -5019,7 +4619,6 @@ QualifiedTableName:
   - Project
   - Table
 QueryOptions:
-  methods: []
   properties:
   - UseStandardSQL
 QueryResults:
@@ -5029,7 +4628,6 @@ QueryResults:
   - Gauges
   - Msecs
   - PCols
-  properties: []
 RTracker:
   methods:
   - GetError
@@ -5038,17 +4636,13 @@ RTracker:
   - IsDone
   - TryClaim
   - TrySplit
-  properties: []
 RangeEndEstimator:
   methods:
   - Estimate
-  properties: []
 RawOptions:
-  methods: []
   properties:
   - Options
 RawOptionsWrapper:
-  methods: []
   properties:
   - AppName
   - Experiments
@@ -5059,7 +4653,6 @@ RawOptionsWrapper:
 ReStream:
   methods:
   - Open
-  properties: []
 ReadModifyWriteStateSpec:
   methods:
   - Descriptor
@@ -5071,7 +4664,6 @@ ReadModifyWriteStateSpec:
   properties:
   - CoderId
 ReadOptions:
-  methods: []
   properties:
   - IDAttribute
   - Subscription
@@ -5106,7 +4698,6 @@ RegisterResponse:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 Registry:
   methods:
   - FromType
@@ -5115,7 +4706,6 @@ Registry:
   - RegisterType
   - Registered
   - ToType
-  properties: []
 RemoteGrpcPort:
   methods:
   - Descriptor
@@ -5131,16 +4721,13 @@ RemoteGrpcPort:
 Remover:
   methods:
   - Remove
-  properties: []
 Renamer:
   methods:
   - Rename
-  properties: []
 RepeatTrigger:
   methods:
   - String
   - SubTrigger
-  properties: []
 ReshuffleInput:
   methods:
   - Down
@@ -5205,7 +4792,6 @@ ResolveArtifactsResponse:
   properties:
   - Replacements
 ResolveConfig:
-  methods: []
   properties:
   - JoinFn
   - SdkPath
@@ -5220,18 +4806,14 @@ Results:
   methods:
   - AllMetrics
   - Query
-  properties: []
 RetrievalServer:
   methods:
   - GetArtifact
   - GetManifest
-  properties: []
 ReturnKind:
   methods:
   - String
-  properties: []
 ReturnParam:
-  methods: []
   properties:
   - Kind
   - T
@@ -5239,21 +4821,17 @@ ReusableEmitter:
   methods:
   - Init
   - Value
-  properties: []
 ReusableInput:
   methods:
   - Init
   - Reset
   - Value
-  properties: []
 ReusableTimestampObservingWatermarkEmitter:
   methods:
   - AttachEstimator
-  properties: []
 Root:
   methods:
   - Process
-  properties: []
 Row:
   methods:
   - Descriptor
@@ -5311,7 +4889,6 @@ RunJobResponse:
 SCombine:
   methods:
   - MergeAccumulators
-  properties: []
 Schema:
   methods:
   - Descriptor
@@ -5339,19 +4916,16 @@ SchemaProvider:
   - BuildDecoder
   - BuildEncoder
   - FromLogicalType
-  properties: []
 Scope:
   methods:
   - ID
   - IsValid
   - Scope
   - String
-  - String
   properties:
   - Label
   - Parent
 ScopeTree:
-  methods: []
   properties:
   - Children
   - Edges
@@ -5361,7 +4935,6 @@ ScopedDataManager:
   - Close
   - OpenRead
   - OpenWrite
-  properties: []
 ScopedStateReader:
   methods:
   - Close
@@ -5377,7 +4950,6 @@ ScopedStateReader:
   - OpenMultimapUserStateAppender
   - OpenMultimapUserStateClearer
   - OpenMultimapUserStateReader
-  properties: []
 SdfFallback:
   methods:
   - AttachFinalizer
@@ -5391,7 +4963,6 @@ SdfFallback:
   properties:
   - PDo
 SearchQuery:
-  methods: []
   properties:
   - Identifier
   - Parameters
@@ -5414,9 +4985,17 @@ SessionWindowsPayload_Enum:
   - Number
   - String
   - Type
-  properties: []
 Set:
-  methods: []
+  methods:
+  - Add
+  - Clear
+  - CoderType
+  - Contains
+  - KeyCoderType
+  - Keys
+  - Remove
+  - StateKey
+  - StateType
   properties:
   - Key
 SetStateSpec:
@@ -5433,7 +5012,6 @@ SideCache:
   methods:
   - QueryCache
   - SetCache
-  properties: []
 SideInput:
   methods:
   - Descriptor
@@ -5453,7 +5031,6 @@ SideInputAdapter:
   methods:
   - NewIterable
   - NewKeyedIterable
-  properties: []
 SideInputCache:
   methods:
   - CacheMetrics
@@ -5462,7 +5039,6 @@ SideInputCache:
   - QueryCache
   - SetCache
   - SetValidTokens
-  properties: []
 Signature:
   methods:
   - String
@@ -5476,11 +5052,9 @@ SingleResult:
   - Name
   - Namespace
   - Transform
-  properties: []
 SliceLoader:
   methods:
   - LoadSlice
-  properties: []
 SlidingWindowsPayload:
   methods:
   - Descriptor
@@ -5503,9 +5077,7 @@ SlidingWindowsPayload_Enum:
   - Number
   - String
   - Type
-  properties: []
 SourceConfig:
-  methods: []
   properties:
   - HotKeyFraction
   - InitialSplits
@@ -5523,7 +5095,6 @@ SourceConfigBuilder:
   - NumElements
   - NumHotKeys
   - ValueSize
-  properties: []
 SplitAndSizeRestrictions:
   methods:
   - Down
@@ -5538,13 +5109,11 @@ SplitAndSizeRestrictions:
   - Out
   - UID
 SplitPoints:
-  methods: []
   properties:
   - BufSize
   - Frac
   - Splits
 SplitResult:
-  methods: []
   properties:
   - InId
   - OW
@@ -5570,7 +5139,6 @@ SplittableDoFn:
   - WatermarkEstimatorStateFn
   - WatermarkEstimatorStateT
   - WatermarkEstimatorT
-  properties: []
 SplittableUnit:
   methods:
   - Checkpoint
@@ -5579,12 +5147,10 @@ SplittableUnit:
   - GetProgress
   - GetTransformId
   - Split
-  properties: []
 StagingServer:
   methods:
   - CommitManifest
   - PutArtifact
-  properties: []
 Standard:
   methods:
   - Log
@@ -5597,7 +5163,6 @@ StandardArtifacts:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardArtifacts_Roles:
   methods:
   - Descriptor
@@ -5606,7 +5171,6 @@ StandardArtifacts_Roles:
   - Number
   - String
   - Type
-  properties: []
 StandardArtifacts_Types:
   methods:
   - Descriptor
@@ -5615,7 +5179,6 @@ StandardArtifacts_Types:
   - Number
   - String
   - Type
-  properties: []
 StandardCoders:
   methods:
   - Descriptor
@@ -5623,7 +5186,6 @@ StandardCoders:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardCoders_Enum:
   methods:
   - Descriptor
@@ -5632,7 +5194,6 @@ StandardCoders_Enum:
   - Number
   - String
   - Type
-  properties: []
 StandardDisplayData:
   methods:
   - Descriptor
@@ -5640,7 +5201,6 @@ StandardDisplayData:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardDisplayData_DisplayData:
   methods:
   - Descriptor
@@ -5649,7 +5209,6 @@ StandardDisplayData_DisplayData:
   - Number
   - String
   - Type
-  properties: []
 StandardEnvironments:
   methods:
   - Descriptor
@@ -5657,7 +5216,6 @@ StandardEnvironments:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardEnvironments_Environments:
   methods:
   - Descriptor
@@ -5666,7 +5224,6 @@ StandardEnvironments_Environments:
   - Number
   - String
   - Type
-  properties: []
 StandardPTransforms:
   methods:
   - Descriptor
@@ -5674,7 +5231,6 @@ StandardPTransforms:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardPTransforms_CombineComponents:
   methods:
   - Descriptor
@@ -5683,7 +5239,6 @@ StandardPTransforms_CombineComponents:
   - Number
   - String
   - Type
-  properties: []
 StandardPTransforms_Composites:
   methods:
   - Descriptor
@@ -5692,7 +5247,6 @@ StandardPTransforms_Composites:
   - Number
   - String
   - Type
-  properties: []
 StandardPTransforms_DeprecatedPrimitives:
   methods:
   - Descriptor
@@ -5701,7 +5255,6 @@ StandardPTransforms_DeprecatedPrimitives:
   - Number
   - String
   - Type
-  properties: []
 StandardPTransforms_GroupIntoBatchesComponents:
   methods:
   - Descriptor
@@ -5710,7 +5263,6 @@ StandardPTransforms_GroupIntoBatchesComponents:
   - Number
   - String
   - Type
-  properties: []
 StandardPTransforms_Primitives:
   methods:
   - Descriptor
@@ -5719,7 +5271,6 @@ StandardPTransforms_Primitives:
   - Number
   - String
   - Type
-  properties: []
 StandardPTransforms_SplittableParDoComponents:
   methods:
   - Descriptor
@@ -5728,7 +5279,6 @@ StandardPTransforms_SplittableParDoComponents:
   - Number
   - String
   - Type
-  properties: []
 StandardProtocols:
   methods:
   - Descriptor
@@ -5736,7 +5286,6 @@ StandardProtocols:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardProtocols_Enum:
   methods:
   - Descriptor
@@ -5745,7 +5294,6 @@ StandardProtocols_Enum:
   - Number
   - String
   - Type
-  properties: []
 StandardRequirements:
   methods:
   - Descriptor
@@ -5753,7 +5301,6 @@ StandardRequirements:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardRequirements_Enum:
   methods:
   - Descriptor
@@ -5762,7 +5309,6 @@ StandardRequirements_Enum:
   - Number
   - String
   - Type
-  properties: []
 StandardResourceHints:
   methods:
   - Descriptor
@@ -5770,7 +5316,6 @@ StandardResourceHints:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardResourceHints_Enum:
   methods:
   - Descriptor
@@ -5779,7 +5324,6 @@ StandardResourceHints_Enum:
   - Number
   - String
   - Type
-  properties: []
 StandardRunnerProtocols:
   methods:
   - Descriptor
@@ -5787,7 +5331,6 @@ StandardRunnerProtocols:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardRunnerProtocols_Enum:
   methods:
   - Descriptor
@@ -5796,7 +5339,6 @@ StandardRunnerProtocols_Enum:
   - Number
   - String
   - Type
-  properties: []
 StandardSideInputTypes:
   methods:
   - Descriptor
@@ -5804,7 +5346,6 @@ StandardSideInputTypes:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardSideInputTypes_Enum:
   methods:
   - Descriptor
@@ -5813,7 +5354,6 @@ StandardSideInputTypes_Enum:
   - Number
   - String
   - Type
-  properties: []
 StandardUserStateTypes:
   methods:
   - Descriptor
@@ -5821,7 +5361,6 @@ StandardUserStateTypes:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StandardUserStateTypes_Enum:
   methods:
   - Descriptor
@@ -5830,7 +5369,6 @@ StandardUserStateTypes_Enum:
   - Number
   - String
   - Type
-  properties: []
 StartWorkerRequest:
   methods:
   - Descriptor
@@ -5878,7 +5416,6 @@ StateAppendResponse:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StateChannel:
   methods:
   - Send
@@ -5887,7 +5424,6 @@ StateChannel:
 StateChannelManager:
   methods:
   - Open
-  properties: []
 StateClearRequest:
   methods:
   - Descriptor
@@ -5895,7 +5431,6 @@ StateClearRequest:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StateClearResponse:
   methods:
   - Descriptor
@@ -5903,7 +5438,6 @@ StateClearResponse:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 StateGetRequest:
   methods:
   - Descriptor
@@ -5960,7 +5494,6 @@ StateKey_BagUserState:
   - UserStateId
   - Window
 StateKey_BagUserState_:
-  methods: []
   properties:
   - BagUserState
 StateKey_IterableSideInput:
@@ -5978,7 +5511,6 @@ StateKey_IterableSideInput:
   - TransformId
   - Window
 StateKey_IterableSideInput_:
-  methods: []
   properties:
   - IterableSideInput
 StateKey_MultimapKeysSideInput:
@@ -5996,7 +5528,6 @@ StateKey_MultimapKeysSideInput:
   - TransformId
   - Window
 StateKey_MultimapKeysSideInput_:
-  methods: []
   properties:
   - MultimapKeysSideInput
 StateKey_MultimapKeysUserState:
@@ -6016,7 +5547,6 @@ StateKey_MultimapKeysUserState:
   - UserStateId
   - Window
 StateKey_MultimapKeysUserState_:
-  methods: []
   properties:
   - MultimapKeysUserState
 StateKey_MultimapSideInput:
@@ -6036,7 +5566,6 @@ StateKey_MultimapSideInput:
   - TransformId
   - Window
 StateKey_MultimapSideInput_:
-  methods: []
   properties:
   - MultimapSideInput
 StateKey_MultimapUserState:
@@ -6058,7 +5587,6 @@ StateKey_MultimapUserState:
   - UserStateId
   - Window
 StateKey_MultimapUserState_:
-  methods: []
   properties:
   - MultimapUserState
 StateKey_Runner:
@@ -6072,7 +5600,6 @@ StateKey_Runner:
   properties:
   - Key
 StateKey_Runner_:
-  methods: []
   properties:
   - Runner
 StateReader:
@@ -6089,7 +5616,6 @@ StateReader:
   - OpenMultimapUserStateAppender
   - OpenMultimapUserStateClearer
   - OpenMultimapUserStateReader
-  properties: []
 StateRequest:
   methods:
   - Descriptor
@@ -6110,15 +5636,12 @@ StateRequest:
   - Request
   - StateKey
 StateRequest_Append:
-  methods: []
   properties:
   - Append
 StateRequest_Clear:
-  methods: []
   properties:
   - Clear
 StateRequest_Get:
-  methods: []
   properties:
   - Get
 StateResponse:
@@ -6139,22 +5662,18 @@ StateResponse:
   - Id
   - Response
 StateResponse_Append:
-  methods: []
   properties:
   - Append
 StateResponse_Clear:
-  methods: []
   properties:
   - Clear
 StateResponse_Get:
-  methods: []
   properties:
   - Get
 StateSampler:
   methods:
   - Sample
   - SetLogInterval
-  properties: []
 StateSpec:
   methods:
   - Descriptor
@@ -6174,35 +5693,27 @@ StateSpec:
   - Protocol
   - Spec
 StateSpec_BagSpec:
-  methods: []
   properties:
   - BagSpec
 StateSpec_CombiningSpec:
-  methods: []
   properties:
   - CombiningSpec
 StateSpec_MapSpec:
-  methods: []
   properties:
   - MapSpec
 StateSpec_OrderedListSpec:
-  methods: []
   properties:
   - OrderedListSpec
 StateSpec_ReadModifyWriteSpec:
-  methods: []
   properties:
   - ReadModifyWriteSpec
 StateSpec_SetSpec:
-  methods: []
   properties:
   - SetSpec
 Status:
   methods:
   - String
-  properties: []
 StepConfig:
-  methods: []
   properties:
   - FilterRatio
   - InitialSplits
@@ -6215,9 +5726,7 @@ StepConfigBuilder:
   - InitialSplits
   - OutputPerInput
   - Splittable
-  properties: []
 StepKey:
-  methods: []
   properties:
   - Step
 StopWorkerRequest:
@@ -6244,11 +5753,9 @@ Store:
   methods:
   - BundleState
   - StateRegistry
-  properties: []
 Stream:
   methods:
   - Read
-  properties: []
 StreamID:
   methods:
   - String
@@ -6258,12 +5765,10 @@ StreamID:
 SymbolResolver:
   methods:
   - Sym2Addr
-  properties: []
 SymbolTable:
   methods:
   - Addr2Sym
   - Sym2Addr
-  properties: []
 T:
   methods:
   - Errorf
@@ -6271,7 +5776,6 @@ T:
   - Failed
   - Helper
   - Run
-  properties: []
 TestStreamPayload:
   methods:
   - Descriptor
@@ -6334,15 +5838,12 @@ TestStreamPayload_Event_AdvanceWatermark:
   - NewWatermark
   - Tag
 TestStreamPayload_Event_ElementEvent:
-  methods: []
   properties:
   - ElementEvent
 TestStreamPayload_Event_ProcessingTimeEvent:
-  methods: []
   properties:
   - ProcessingTimeEvent
 TestStreamPayload_Event_WatermarkEvent:
-  methods: []
   properties:
   - WatermarkEvent
 TestStreamPayload_TimestampedElement:
@@ -6360,19 +5861,15 @@ TestStreamPayload_TimestampedElement:
 TestStreamService_EventsClient:
   methods:
   - Recv
-  properties: []
 TestStreamService_EventsServer:
   methods:
   - Send
-  properties: []
 TestStreamServiceClient:
   methods:
   - Events
-  properties: []
 TestStreamServiceServer:
   methods:
   - Events
-  properties: []
 Time:
   methods:
   - Add
@@ -6380,7 +5877,6 @@ Time:
   - String
   - Subtract
   - ToTime
-  properties: []
 TimeDomain:
   methods:
   - Descriptor
@@ -6388,7 +5884,6 @@ TimeDomain:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 TimeDomain_Enum:
   methods:
   - Descriptor
@@ -6397,7 +5892,6 @@ TimeDomain_Enum:
   - Number
   - String
   - Type
-  properties: []
 TimerFamilySpec:
   methods:
   - Descriptor
@@ -6411,7 +5905,6 @@ TimerFamilySpec:
   - TimeDomain
   - TimerFamilyCoderId
 TimerMap:
-  methods: []
   properties:
   - Clear
   - FireTimestamp
@@ -6419,7 +5912,6 @@ TimerMap:
   - Pane
   - Windows
 Timers:
-  methods: []
   properties:
   - Clear
   - FireTimestamp
@@ -6430,7 +5922,6 @@ Timers:
 TimestampObservingEstimator:
   methods:
   - ObserveTimestamp
-  properties: []
 TimestampObservingWatermarkEstimator:
   methods:
   - CurrentWatermark
@@ -6462,7 +5953,6 @@ TimestampTransform_AlignTo:
   - Offset
   - Period
 TimestampTransform_AlignTo_:
-  methods: []
   properties:
   - AlignTo
 TimestampTransform_Delay:
@@ -6476,11 +5966,9 @@ TimestampTransform_Delay:
   properties:
   - DelayMillis
 TimestampTransform_Delay_:
-  methods: []
   properties:
   - Delay
 Top:
-  methods: []
   properties:
   - Emitters
   - FileName
@@ -6499,9 +5987,7 @@ Tracker:
   - IsDone
   - TryClaim
   - TrySplit
-  properties: []
 Transaction:
-  methods: []
   properties:
   - Key
   - MapKey
@@ -6556,7 +6042,6 @@ Trigger_AfterAll:
   properties:
   - Subtriggers
 Trigger_AfterAll_:
-  methods: []
   properties:
   - AfterAll
 Trigger_AfterAny:
@@ -6570,7 +6055,6 @@ Trigger_AfterAny:
   properties:
   - Subtriggers
 Trigger_AfterAny_:
-  methods: []
   properties:
   - AfterAny
 Trigger_AfterEach:
@@ -6584,7 +6068,6 @@ Trigger_AfterEach:
   properties:
   - Subtriggers
 Trigger_AfterEach_:
-  methods: []
   properties:
   - AfterEach
 Trigger_AfterEndOfWindow:
@@ -6600,7 +6083,6 @@ Trigger_AfterEndOfWindow:
   - EarlyFirings
   - LateFirings
 Trigger_AfterEndOfWindow_:
-  methods: []
   properties:
   - AfterEndOfWindow
 Trigger_AfterProcessingTime:
@@ -6614,7 +6096,6 @@ Trigger_AfterProcessingTime:
   properties:
   - TimestampTransforms
 Trigger_AfterProcessingTime_:
-  methods: []
   properties:
   - AfterProcessingTime
 Trigger_AfterSynchronizedProcessingTime:
@@ -6624,9 +6105,7 @@ Trigger_AfterSynchronizedProcessingTime:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 Trigger_AfterSynchronizedProcessingTime_:
-  methods: []
   properties:
   - AfterSynchronizedProcessingTime
 Trigger_Always:
@@ -6636,9 +6115,7 @@ Trigger_Always:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 Trigger_Always_:
-  methods: []
   properties:
   - Always
 Trigger_Default:
@@ -6648,9 +6125,7 @@ Trigger_Default:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 Trigger_Default_:
-  methods: []
   properties:
   - Default
 Trigger_ElementCount:
@@ -6664,7 +6139,6 @@ Trigger_ElementCount:
   properties:
   - ElementCount
 Trigger_ElementCount_:
-  methods: []
   properties:
   - ElementCount
 Trigger_Never:
@@ -6674,9 +6148,7 @@ Trigger_Never:
   - ProtoReflect
   - Reset
   - String
-  properties: []
 Trigger_Never_:
-  methods: []
   properties:
   - Never
 Trigger_OrFinally:
@@ -6692,7 +6164,6 @@ Trigger_OrFinally:
   - Finally
   - Main
 Trigger_OrFinally_:
-  methods: []
   properties:
   - OrFinally
 Trigger_Repeat:
@@ -6706,7 +6177,6 @@ Trigger_Repeat:
   properties:
   - Subtrigger
 Trigger_Repeat_:
-  methods: []
   properties:
   - Repeat
 TruncateSizedRestriction:
@@ -6756,7 +6226,6 @@ Type_ChanDir:
   - Number
   - String
   - Type
-  properties: []
 Type_Kind:
   methods:
   - Descriptor
@@ -6765,7 +6234,6 @@ Type_Kind:
   - Number
   - String
   - Type
-  properties: []
 Type_Special:
   methods:
   - Descriptor
@@ -6774,7 +6242,6 @@ Type_Special:
   - Number
   - String
   - Type
-  properties: []
 Type_StructField:
   methods:
   - Descriptor
@@ -6798,7 +6265,6 @@ Type_StructField:
   - Tag
   - Type
 TypeDefinition:
-  methods: []
   properties:
   - T
   - Var
@@ -6807,48 +6273,37 @@ TypeMismatchError:
   - Error
   properties:
   - Got
-U:
-  methods: []
-  properties: []
+U: {}
 UnimplementedArtifactRetrievalServiceServer:
   methods:
   - GetArtifact
   - ResolveArtifacts
-  properties: []
 UnimplementedArtifactStagingServiceServer:
   methods:
   - ReverseArtifactRetrievalService
-  properties: []
 UnimplementedBeamFnControlServer:
   methods:
   - Control
   - GetProcessBundleDescriptor
-  properties: []
 UnimplementedBeamFnDataServer:
   methods:
   - Data
-  properties: []
 UnimplementedBeamFnExternalWorkerPoolServer:
   methods:
   - StartWorker
   - StopWorker
-  properties: []
 UnimplementedBeamFnLoggingServer:
   methods:
   - Logging
-  properties: []
 UnimplementedBeamFnStateServer:
   methods:
   - State
-  properties: []
 UnimplementedBeamFnWorkerStatusServer:
   methods:
   - WorkerStatus
-  properties: []
 UnimplementedExpansionServiceServer:
   methods:
   - Expand
-  properties: []
 UnimplementedJobServiceServer:
   methods:
   - Cancel
@@ -6861,25 +6316,20 @@ UnimplementedJobServiceServer:
   - GetStateStream
   - Prepare
   - Run
-  properties: []
 UnimplementedLegacyArtifactRetrievalServiceServer:
   methods:
   - GetArtifact
   - GetManifest
-  properties: []
 UnimplementedLegacyArtifactStagingServiceServer:
   methods:
   - CommitManifest
   - PutArtifact
-  properties: []
 UnimplementedProvisionServiceServer:
   methods:
   - GetProvisionInfo
-  properties: []
 UnimplementedTestStreamServiceServer:
   methods:
   - Events
-  properties: []
 Unit:
   methods:
   - Down
@@ -6887,49 +6337,20 @@ Unit:
   - ID
   - StartBundle
   - Up
-  properties: []
-UnsafeArtifactRetrievalServiceServer:
-  methods: []
-  properties: []
-UnsafeArtifactStagingServiceServer:
-  methods: []
-  properties: []
-UnsafeBeamFnControlServer:
-  methods: []
-  properties: []
-UnsafeBeamFnDataServer:
-  methods: []
-  properties: []
-UnsafeBeamFnExternalWorkerPoolServer:
-  methods: []
-  properties: []
-UnsafeBeamFnLoggingServer:
-  methods: []
-  properties: []
-UnsafeBeamFnStateServer:
-  methods: []
-  properties: []
-UnsafeBeamFnWorkerStatusServer:
-  methods: []
-  properties: []
-UnsafeExpansionServiceServer:
-  methods: []
-  properties: []
-UnsafeJobServiceServer:
-  methods: []
-  properties: []
-UnsafeLegacyArtifactRetrievalServiceServer:
-  methods: []
-  properties: []
-UnsafeLegacyArtifactStagingServiceServer:
-  methods: []
-  properties: []
-UnsafeProvisionServiceServer:
-  methods: []
-  properties: []
-UnsafeTestStreamServiceServer:
-  methods: []
-  properties: []
+UnsafeArtifactRetrievalServiceServer: {}
+UnsafeArtifactStagingServiceServer: {}
+UnsafeBeamFnControlServer: {}
+UnsafeBeamFnDataServer: {}
+UnsafeBeamFnExternalWorkerPoolServer: {}
+UnsafeBeamFnLoggingServer: {}
+UnsafeBeamFnStateServer: {}
+UnsafeBeamFnWorkerStatusServer: {}
+UnsafeExpansionServiceServer: {}
+UnsafeJobServiceServer: {}
+UnsafeLegacyArtifactRetrievalServiceServer: {}
+UnsafeLegacyArtifactStagingServiceServer: {}
+UnsafeProvisionServiceServer: {}
+UnsafeTestStreamServiceServer: {}
 UserFn:
   methods:
   - Descriptor
@@ -6945,30 +6366,29 @@ UserFn:
 UserStateAdapter:
   methods:
   - NewStateProvider
-  properties: []
-V:
-  methods: []
-  properties: []
+V: {}
 Value:
-  methods: []
+  methods:
+  - Clear
+  - CoderType
+  - KeyCoderType
+  - Read
+  - StateKey
+  - StateType
+  - Write
   properties:
   - Key
-W:
-  methods: []
-  properties: []
+W: {}
 WallTimeWatermarkEstimator:
   methods:
   - CurrentWatermark
-  properties: []
 WatermarkEstimator:
   methods:
   - CurrentWatermark
-  properties: []
 Window:
   methods:
   - Equals
   - MaxTimestamp
-  properties: []
 WindowCoder:
   methods:
   - Equals
@@ -6980,12 +6400,10 @@ WindowDecoder:
   methods:
   - Decode
   - DecodeSingle
-  properties: []
 WindowEncoder:
   methods:
   - Encode
   - EncodeSingle
-  properties: []
 WindowFn:
   methods:
   - Descriptor
@@ -7015,9 +6433,7 @@ WindowInto:
   - Fn
   - Out
   - UID
-WindowIntoOption:
-  methods: []
-  properties: []
+WindowIntoOption: {}
 WindowIntoPayload:
   methods:
   - Descriptor
@@ -7031,10 +6447,7 @@ WindowIntoPayload:
 WindowMapper:
   methods:
   - MapWindow
-  properties: []
-WindowedValue:
-  methods: []
-  properties: []
+WindowedValue: {}
 WindowingStrategy:
   methods:
   - Descriptor
@@ -7054,11 +6467,8 @@ WindowingStrategy:
   - ProtoReflect
   - Reset
   - String
-  - String
   properties:
   - AccumulationMode
-  - AccumulationMode
-  - AllowedLateness
   - AllowedLateness
   - AssignsToOneWindow
   - ClosingBehavior
@@ -7067,7 +6477,6 @@ WindowingStrategy:
   - MergeStatus
   - OnTimeBehavior
   - OutputTime
-  - Trigger
   - Trigger
   - WindowCoderId
   - WindowFn
@@ -7096,14 +6505,12 @@ WorkerStatusResponse:
   - Id
   - StatusInfo
 Wrap:
-  methods: []
   properties:
   - Methods
   - Name
 WrappedTracker:
   methods:
   - IsBounded
-  properties: []
 WriteFilesPayload:
   methods:
   - Descriptor
@@ -7125,14 +6532,6 @@ WriteFilesPayload:
 Writer:
   methods:
   - SaveData
-  properties: []
-X:
-  methods: []
-  properties: []
-"Y":
-  methods: []
-  properties: []
-Z:
-  methods: []
-  properties: []
-
+X: {}
+"Y": {}
+Z: {}

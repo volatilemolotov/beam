@@ -20,6 +20,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -30,13 +31,16 @@ import (
 )
 
 type ClassSymbols struct {
-	Methods    []string
-	Properties []string
+	Methods    []string `yaml:",omitempty"`
+	Properties []string `yaml:",omitempty"`
 }
 
 func (cs *ClassSymbols) sort() {
 	sort.Strings(cs.Methods)
+	cs.Methods = removeDuplicates(cs.Methods)
+
 	sort.Strings(cs.Properties)
+	cs.Properties = removeDuplicates(cs.Properties)
 }
 
 func main() {
@@ -54,18 +58,18 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println(string(yamlData))
+	fmt.Print(string(yamlData))
 }
 
 func getDirSymbolsRecursive(dir string) map[string]*ClassSymbols {
 	classesMap := make(map[string]*ClassSymbols)
 
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
 
-		if info.IsDir() || !shouldIncludeFile(path) {
+		if d.IsDir() || !shouldIncludeFile(path) {
 			return nil
 		}
 
@@ -90,23 +94,22 @@ func shouldIncludeFile(path string) bool {
 
 func addFileSymbols(classesMap map[string]*ClassSymbols, filename string) {
 	fileSet := token.NewFileSet()
-	file, err := parser.ParseFile(fileSet, filename, nil, parser.AllErrors)
+	file, err := parser.ParseFile(fileSet, filename, nil, parser.SkipObjectResolution)
 	if err != nil {
 		panic(err)
 	}
 
 	ast.Inspect(file, func(node ast.Node) bool {
-		if typeSpec, ok := node.(*ast.TypeSpec); ok {
-			visitTypeSpec(classesMap, typeSpec)
-			return false
-		}
+	    switch node := node.(type) {
+	        case *ast.TypeSpec:
+	            visitTypeSpec(classesMap, node)
+            case *ast.FuncDecl:
+                visitFuncDecl(classesMap, node)
+            default:
+                return true // Go recursive
+	    }
 
-		if funcDecl, ok := node.(*ast.FuncDecl); ok {
-			visitFuncDecl(classesMap, funcDecl)
-			return false
-		}
-
-		return true
+	    return false // No recursion
 	})
 }
 
@@ -141,7 +144,7 @@ func visitStructType(classesMap map[string]*ClassSymbols, typeSpec *ast.TypeSpec
 			continue
 		}
 
-		(*classSymbols).Properties = append(classSymbols.Properties, name)
+		classSymbols.Properties = append(classSymbols.Properties, name)
 	}
 }
 
@@ -159,48 +162,55 @@ func visitInterfaceType(classesMap map[string]*ClassSymbols, typeSpec *ast.TypeS
 			continue
 		}
 
-		(*classSymbols).Methods = append(classSymbols.Methods, name)
+		classSymbols.Methods = append(classSymbols.Methods, name)
 	}
 }
 
 func visitFuncDecl(classesMap map[string]*ClassSymbols, funcDecl *ast.FuncDecl) {
-	classNames := getReceiverClassNames(funcDecl)
-	for _, className := range classNames {
-		if !shouldIncludeSymbol(className) {
-			continue
-		}
+	className := getReceiverClassName(funcDecl)
+    if !shouldIncludeSymbol(className) {
+        return
+    }
 
-		name := funcDecl.Name.Name
-		if !shouldIncludeSymbol(name) {
-			continue
-		}
+    name := funcDecl.Name.Name
+    if !shouldIncludeSymbol(name) {
+        return
+    }
 
-		classSymbols := getOrCreateClassSymbols(classesMap, className)
-		(*classSymbols).Methods = append(classSymbols.Methods, name)
-	}
+    classSymbols := getOrCreateClassSymbols(classesMap, className)
+    classSymbols.Methods = append(classSymbols.Methods, name)
 }
 
-func getReceiverClassNames(funcDecl *ast.FuncDecl) []string {
+func getReceiverClassName(funcDecl *ast.FuncDecl) string {
 	if funcDecl.Recv == nil {
-		return []string{""}
+		return ""
 	}
 
-	result := []string{}
-	for _, field := range (*funcDecl.Recv).List {
-		if ident, ok := field.Type.(*ast.Ident); ok {
-			result = append(result, ident.Name)
-			continue
-		}
+    return getExpressionClassName(funcDecl.Recv.List[0].Type)
+}
 
-		if starExpr, ok := field.Type.(*ast.StarExpr); ok {
-			if ident, ok := starExpr.X.(*ast.Ident); ok {
-				result = append(result, ident.Name)
-				continue
-			}
-		}
-	}
+// Extracts the class name from nodes like Foo, *Foo, Foo[type] etc.
+func getExpressionClassName(expr ast.Expr) string {
+    switch expr := expr.(type) {
+        case *ast.Ident:
+            // Foo
+            return expr.Name
+        case *ast.IndexExpr:
+            // Foo[param]
+            if ident, ok := expr.X.(*ast.Ident); ok {
+                return ident.Name
+            }
+        case *ast.IndexListExpr:
+            // Foo[param1, param2]
+            if ident, ok := expr.X.(*ast.Ident); ok {
+                return ident.Name
+            }
+        case *ast.StarExpr:
+            // *Foo, *Foo[param], *Foo[param1, param2]
+            return getExpressionClassName(expr.X)
+    }
 
-	return result
+    panic(nil)
 }
 
 func getOrCreateClassSymbols(classesMap map[string]*ClassSymbols, name string) *ClassSymbols {
@@ -209,10 +219,7 @@ func getOrCreateClassSymbols(classesMap map[string]*ClassSymbols, name string) *
 		return existing
 	}
 
-	created := ClassSymbols{
-		Methods:    nil,
-		Properties: nil,
-	}
+	created := ClassSymbols{}
 
 	classesMap[name] = &created
 	return &created
@@ -229,7 +236,22 @@ func shouldIncludeSymbol(symbol string) bool {
 
 func sortClassSymbolsMap(classesMap map[string]*ClassSymbols) {
 	// Only sort ClassSymbols objects because the map itself is sorted when serialized.
+	// https://github.com/go-yaml/yaml/issues/30#issuecomment-56232269
 	for _, v := range classesMap {
 		v.sort()
 	}
+}
+
+func removeDuplicates(arr []string) []string {
+    existing := make(map[string]bool)
+    result := []string{}
+
+    for _, item := range arr {
+        if _, exists := existing[item]; !exists {
+            existing[item] = true
+            result = append(result, item)
+        }
+    }
+
+    return result
 }

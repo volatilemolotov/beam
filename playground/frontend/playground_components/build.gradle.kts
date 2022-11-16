@@ -135,6 +135,7 @@ tasks.register("generateCode") {
 
 tasks.register("extractBeamSymbols") {
   dependsOn("ensureSymbolsDirectoryExists")
+  dependsOn("extractBeamSymbolsGo")
   dependsOn("extractBeamSymbolsPython")
 
   group = "build"
