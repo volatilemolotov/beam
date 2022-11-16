@@ -21,8 +21,8 @@ steps:
     entrypoint: "/bin/bash"
     args:
       [
-        '-c', './gradlew playground:terraform:prepareConfig -Pdns-name="${_DNS_NAME}"',
-          './gradlew playground:terraform:gkebackend -Pdocker-repository-root="${_DOCKER_REPOSITORY_ROOT}" \ 
+        '-c', './gradlew playground:terraform:prepareConfig -Pdns-name="${_DNS_NAME}" && 
+        ./gradlew playground:terraform:gkebackend -Pdocker-repository-root="${_DOCKER_REPOSITORY_ROOT}" \ 
           -Pproject_environment="{$_ENVIRONMENT_NAME}" -Pdocker-tag="${_TAG}" -Pdns-name="${_DNS_NAME}"'
       ]
 
