@@ -37,7 +37,7 @@ substitutions:
   # The name of your Docker tag
   _TAG: "tag-playground"
   # The name of your GKE cluster (from terraform.tfvars)
-  _GKE_NAME: "playground-cluster"
+  _GKE_NAME: "playground-backend"
   # The name of the GCP logs bucket
   _LOGS_BUCKET_NAME: "pg-cloudbuild-logging-bucket"
 
