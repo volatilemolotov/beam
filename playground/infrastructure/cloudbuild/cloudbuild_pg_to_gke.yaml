@@ -41,6 +41,8 @@ substitutions:
   _GKE_NAME: "playground-backend"
   # The name of the GCP logs bucket
   _LOGS_BUCKET_NAME: "pg-cloudbuild-logging-bucket"
+  # The name of docker repository root
+  _DOCKER_REPOSITORY_ROOT: "us-central1-docker.pkg.dev/sandbox-playground-001/playground-repository"
 
 # The name of your GCP logs bucket
 logsBucket: 'gs://${_LOGS_BUCKET_NAME}'
