@@ -49,6 +49,6 @@ images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
 
 options:
-  logging: LOGGING
+  logging: CLOUD_LOGGING_ONLY
 
 timeout: 1800s
