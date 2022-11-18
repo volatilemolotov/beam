@@ -44,6 +44,21 @@ The `cloudbuild-manual-setup/01.setup` provisions dependencies required to setup
 #### Execute the module
 
 ```console
+project_id                    = "project_id_name"                # Your Project ID
+region                        = "us-central1"               # Your GCP region name where resources will be provisioned
+location                      = "us-central1-b"             # Select the deployment location from available in the specified region
+cloudbuild_service_account_id = "playground-cloudbuild-sa"  # The name of Cloud Build service account
+github_repository_name        = "beam"                      # The name of the GitHub repo to be connected with Cloud Build. Example: In https://github.com/example/foo is 'foo'
+github_repository_owner       = "repo_owner_name"           # Owner of the GitHub repo to be connected with Cloud Build. Example: In https://github.com/example/foo is 'example'.
+github_repository_branch      = "branch_name"               # The name of the GitHub repo branch to be connected with Cloud Build
+
+network_name                  = "network_name"              # GCP VPC Network Name for Playground deployment
+gke_name                      = "playground-backend"        # Playground GKE Cluster name
+state_bucket                  = "bucket_name"               # GCS bucket name for Beam Playground temp files
+```
+
+
+```console
 # Create new configuration to authenticate to GCP Project
 gcloud init
 
