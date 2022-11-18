@@ -41,17 +41,14 @@ substitutions:
   # The name of the Google Cloud Artifact Registry
   _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
   # The name of your environment in beam/playground/terraform/environment/
-  _ENVIRONMENT_NAME: "test"
+  _ENVIRONMENT_NAME: "test-${LOCATION}"
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
-#  _LOGS_BUCKET_NAME: ""
-#
-#logsBucket: 'gs://${_LOGS_BUCKET_NAME}'
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
 
-#options:
-#  logging: GCS_ONLY
+options:
+  logging: LOGGING
 
 timeout: 1800s
