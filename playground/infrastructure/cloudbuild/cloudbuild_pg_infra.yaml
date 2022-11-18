@@ -44,14 +44,14 @@ substitutions:
   _ENVIRONMENT_NAME: "test"
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
-  _LOGS_BUCKET_NAME: ""
-
-logsBucket: 'gs://${_LOGS_BUCKET_NAME}'
+#  _LOGS_BUCKET_NAME: ""
+#
+#logsBucket: 'gs://${_LOGS_BUCKET_NAME}'
 
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
 
-options:
-  logging: GCS_ONLY
+#options:
+#  logging: GCS_ONLY
 
 timeout: 1800s
