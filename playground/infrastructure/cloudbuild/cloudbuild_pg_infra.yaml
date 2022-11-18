@@ -41,7 +41,7 @@ substitutions:
   # The name of the Google Cloud Artifact Registry
   _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
   # The name of your environment in beam/playground/terraform/environment/
-  _ENVIRONMENT_NAME: "test-${LOCATION}"
+  _ENVIRONMENT_NAME: 'test-$LOCATION'
   # The name of your DNS for Playground
   _DNS_NAME: "dev-playground.online"
 
