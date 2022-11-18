@@ -29,13 +29,13 @@ steps:
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "/bin/bash"
     # Please set variables $_ENVIRONMENT_NAME and $_DNS_NAME in "substitutions" stage below
-    args: ['-c', 'pwd && ls -la && ls -la playground/terraform/environment/test']
+    args: ['-c', 'mkdir playground/terraform/environment/uat && touch playground/terraform/environment/uat/terraform.tfvars']
 
   # This step uses Docker container from image in previous step to run gradle task for Playground Infrastructure deployment
   - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
     entrypoint: "/bin/bash"
   # Please set variables $_ENVIRONMENT_NAME and $_DNS_NAME in "substitutions" stage below
-    args: ['-c', './gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
+    args: ['-c', 'ls -la playground/terraform/environment/uat && ./gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
 
 substitutions:
   # The name of the Google Cloud Artifact Registry
