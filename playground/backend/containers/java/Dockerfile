@@ -44,7 +44,8 @@ ARG HAMCREST_VERSION=1.3
 ARG JUNIT_VERSION=4.13.2
 ARG GRPC_VERSION=1_48_1
 ARG BEAM_VENDOR_GRPC_VERSION=0.1
-#ENV BEAM_VERSION=${BEAM_VERSION_ARG}
+ARG KAFKA_CLIENTS_VERSION=2.3.1
+ARG SPRING_VERSION=5.3.18
 ENV SERVER_IP=0.0.0.0
 ENV SERVER_PORT=8080
 ENV APP_WORK_DIR=/opt/playground/backend/
@@ -77,6 +78,21 @@ RUN wget https://repo1.maven.org/maven2/junit/junit/$JUNIT_VERSION/junit-$JUNIT_
 # Install Beam Vendor gRPC
 RUN wget https://repo1.maven.org/maven2/org/apache/beam/beam-vendor-grpc-$GRPC_VERSION/$BEAM_VENDOR_GRPC_VERSION/beam-vendor-grpc-$GRPC_VERSION-$BEAM_VENDOR_GRPC_VERSION.jar &&\
     mv beam-vendor-grpc-$GRPC_VERSION-$BEAM_VENDOR_GRPC_VERSION.jar /opt/apache/beam/jars/beam-vendor-grpc.jar
+# Install Kafka IO
+RUN wget https://repo1.maven.org/maven2/org/apache/beam/beam-sdks-java-io-kafka/$BEAM_VERSION/beam-sdks-java-io-kafka-$BEAM_VERSION.jar &&\
+    mv beam-sdks-java-io-kafka-$BEAM_VERSION.jar /opt/apache/beam/jars/beam-sdks-java-io-kafka.jar
+# Install Apache Kafka Clients
+RUN wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/$KAFKA_CLIENTS_VERSION/kafka-clients-$KAFKA_CLIENTS_VERSION.jar &&\
+    mv kafka-clients-$KAFKA_CLIENTS_VERSION.jar /opt/apache/beam/jars/kafka-clients.jar
+# Install Spring Expression
+RUN wget https://repo1.maven.org/maven2/org/springframework/spring-expression/$SPRING_VERSION/spring-expression-$SPRING_VERSION.jar &&\
+    mv spring-expression-$SPRING_VERSION.jar /opt/apache/beam/jars/spring-expression.jar
+# Install Spring Core
+RUN wget https://repo1.maven.org/maven2/org/springframework/spring-core/$SPRING_VERSION/spring-core-$SPRING_VERSION.jar &&\
+    mv spring-core-$SPRING_VERSION.jar /opt/apache/beam/jars/spring-core.jar
+# Install Spring JCL
+RUN wget https://repo1.maven.org/maven2/org/springframework/spring-jcl/$SPRING_VERSION/spring-jcl-$SPRING_VERSION.jar &&\
+    mv spring-jcl-$SPRING_VERSION.jar /opt/apache/beam/jars/spring-jcl.jar
 # Install Java Katas Utils
 COPY katas /go/src/katas
 RUN cd /go/src/katas &&\
