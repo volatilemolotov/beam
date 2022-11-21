@@ -16,50 +16,40 @@
 # under the License.
 
 steps:
-  # This step builds the image from Dockerfile that will be used as Docker machine for Beam Playground deployment
+  # This stage builds the image from Dockerfile that will be used as environment to run Beam Playground deployment
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
-      - '--tag=us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+      - '--tag=$LOCATION-docker.pkg.dev/$PROJECT_ID/playground-repository/builder:playground'
       - '-f'
-      - 'playground/infrastructure/cloudbuild/Dockerfile-base-image-worker'
+      - 'playground/infrastructure/cloudbuild/Dockerfile'
       - '.'
 
-  # This step uses Docker container from image in previous step to run gradle task for Playground Infrastructure deployment
-  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+  # This stage uses Docker container from image built in step above to run gradle task for Playground Infrastructure deployment
+  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/playground-repository/builder:playground'
     entrypoint: "/bin/bash"
-    # Please set variables $_ENVIRONMENT_NAME and $_DNS_NAME in "substitutions" stage below
     args:
-    - "-c"
-    - |
-      mkdir playground/terraform/environment/$_ENVIRONMENT_NAME
-      sed -n '47,57p' playground/terraform/infrastructure/cloudbuild-manual-setup/README.md > playground/terraform/environment/$_ENVIRONMENT_NAME/terraform.tfvars
-      sed 's/project_id_name/$PROJECT_ID/g; s/us-central1/$LOCATION/g; s/us-central1-b/$LOCATION-a/g; s/repo_owner_name/$_REPO_OWNER_NAME/g; \
-      s/branch_name/$BRANCH_NAME/g; s/network_name/$_NETWORK_NAME/g; s/playground-backend/$_GKE_NAME/g; s/bucket_name/$_TF_STATE_BUCKET/g;' \
-      playground/terraform/environment/$_ENVIRONMENT_NAME/terraform.tfvars
+      - '-c'
+      - |
+        mkdir playground/terraform/environment/$_ENVIRONMENT_NAME
+        printf '%s\n' 'project_id = $PROJECT_ID' \
+        'network_name = $_NETWORK_NAME' \
+        'gke_name = $_GKE_NAME' \
+        'region = $LOCATION' \
+        'location = $LOCATION-a' \
+        'state_bucket = $_STATE_BUCKET' \
+        > playground/terraform/environment/$_ENVIRONMENT_NAME/terraform.tfvars
 
-  # This step uses Docker container from image in previous step to run gradle task for Playground Infrastructure deployment
-  - name: 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+# This stage uses Docker container from image built in step above to run gradle task for Playground Infrastructure deployment
+  - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/playground-repository/builder:playground'
     entrypoint: "/bin/bash"
-  # Please set variables $_ENVIRONMENT_NAME and $_DNS_NAME in "substitutions" stage below
-    args: ['-c', 'cat playground/terraform/environment/uat/terraform.tfvars && ./gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
+    args: ['-c', './gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
 
-substitutions:
-  # The name of the Google Cloud Artifact Registry
-  _ARTIFACT_REGISTRY_REPOSITORY_ID: "playground-repository"
-  # The name of your environment in beam/playground/terraform/environment/
-  _ENVIRONMENT_NAME: 'test'
-  # The name of your DNS for Playground
-  _DNS_NAME: "dev-playground.online"
-  _REPO_OWNER_NAME: ""
-  # The name of your GKE cluster (from terraform.tfvars)
-  _GKE_NAME: "playground-backend"
-  _TF_STATE_BUCKET: ""
-  _NETWORK_NAME: ""
-
+# Pushing built image to GCP Artifact Registry repository
 images:
-  - 'us-central1-docker.pkg.dev/$PROJECT_ID/$_ARTIFACT_REGISTRY_REPOSITORY_ID/playground-builder:worker'
+  - '$LOCATION-docker.pkg.dev/$PROJECT_ID/playground-repository/builder:playground'
 
+# This option enables writing logs to Cloud Logging
 options:
   logging: CLOUD_LOGGING_ONLY
 

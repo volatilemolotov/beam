@@ -16,6 +16,5 @@
 # under the License.
 
 provider "google" {
-  project = var.project
-  region  = var.region
+  project = var.project_id
 }
