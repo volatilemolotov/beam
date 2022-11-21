@@ -43,7 +43,7 @@ steps:
 # This stage uses Docker container from image built in step above to run gradle task for Playground Infrastructure deployment
   - name: '$LOCATION-docker.pkg.dev/$PROJECT_ID/playground-repository/builder:playground'
     entrypoint: "/bin/bash"
-    args: ['-c', './gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
+    args: ['-c', 'cat playground/terraform/environment/$_ENVIRONMENT_NAME/terraform.tfvars && ./gradlew playground:terraform:InitInfrastructure -Pproject_environment="$_ENVIRONMENT_NAME" -Pdns-name="$_DNS_NAME"']
 
 # Pushing built image to GCP Artifact Registry repository
 images:
