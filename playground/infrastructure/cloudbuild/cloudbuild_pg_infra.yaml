@@ -33,12 +33,12 @@ steps:
       - |
         rm -rf mkdir playground/terraform/environment/$_ENVIRONMENT_NAME
         mkdir playground/terraform/environment/$_ENVIRONMENT_NAME
-        printf '%s\n' 'project_id = $PROJECT_ID' \
-        'network_name = $_NETWORK_NAME' \
-        'gke_name = $_GKE_NAME' \
-        'region = $LOCATION' \
-        'location = $LOCATION-a' \
-        'state_bucket = $_STATE_BUCKET' \
+        printf '%s\n' 'project_id = "$PROJECT_ID"' \
+        'network_name = "$_NETWORK_NAME"' \
+        'gke_name = "$_GKE_NAME"' \
+        'region = "$LOCATION"' \
+        'location = "$LOCATION-a"' \
+        'state_bucket = "$_STATE_BUCKET"' \
         > playground/terraform/environment/$_ENVIRONMENT_NAME/terraform.tfvars
 
 # This stage uses Docker container from image built in step above to run gradle task for Playground Infrastructure deployment
