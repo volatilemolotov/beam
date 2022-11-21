@@ -40,7 +40,7 @@ steps:
         'location = "$LOCATION-a"' \
         'state_bucket = "$_STATE_BUCKET"' \
         > playground/terraform/environment/$_ENVIRONMENT_NAME/terraform.tfvars
-        printf "bucket = "bucket_name" \
+        printf 'bucket = "$_STATE_BUCKET"'\
         > playground/terraform/environment/$_ENVIRONMENT_NAME/state.tfbackend 
 
 # This stage uses Docker container from image built in step above to run gradle task for Playground Infrastructure deployment
