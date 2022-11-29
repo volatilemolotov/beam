@@ -21,11 +21,11 @@ resource "google_container_cluster" "playground-gke" {
   name               = var.name
   project            = var.project_id
   location           = var.location
-  initial_node_count = var.node_count
+  initial_node_count = 2
   network            = var.network
   subnetwork         = var.subnetwork
   node_config {
-    machine_type    = var.machine_type
+    machine_type    = "n2-standard-2"
     service_account = var.service_account_email
 
     oauth_scopes = [

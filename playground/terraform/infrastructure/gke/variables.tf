@@ -28,7 +28,7 @@ variable "machine_type" {
 
 variable "node_count" {
   description = "Node pool size"
-  default     = 1
+  default     = 2
 }
 
 variable "service_account_email" {
