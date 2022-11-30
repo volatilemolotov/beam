@@ -50,9 +50,9 @@ variable "gke_name" {
   default = "playground-backend"
 }
 
-variable "gke_region" {
-    description = "Location of GKE cluster"
-}
+# variable "region" {
+#    description = "Location of GKE cluster"
+# }
 
 variable "service_account" {
   description = "Service account id"
