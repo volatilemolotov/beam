@@ -20,7 +20,7 @@
 resource "google_container_cluster" "playground-gke" {
   name               = var.name
   project            = var.project_id
-  location           = var.location
+  location           = var.region
   #initial_node_count = var.node_count
   network            = var.network
   subnetwork         = var.subnetwork

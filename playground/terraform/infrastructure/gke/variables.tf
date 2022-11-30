@@ -40,7 +40,7 @@ variable "name" {
   default     = "playground-backend"
 }
 
-variable "location" {
+variable "region" {
   description = "Location of GKE cluster"
 }
 
