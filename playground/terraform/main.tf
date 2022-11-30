@@ -24,7 +24,7 @@ module "infrastructure" {
   region                        = var.region
   network_region                = var.region
   redis_region                  = var.region
-  location                      = var.location
+ # location                      = var.location
   #Artifact Registry
   repository_id                 = var.repository_id
   repository_location           = var.region
@@ -40,7 +40,7 @@ module "infrastructure" {
   gke_machine_type              = var.gke_machine_type
   gke_node_count                = var.gke_node_count
   gke_name                      = var.gke_name
-  gke_region                    = var.region
+  # gke_region                    = var.region
   service_account               = var.service_account
 }
 
