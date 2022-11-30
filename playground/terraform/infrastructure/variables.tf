@@ -148,6 +148,3 @@ variable "gke_name" {
   default     = "playground-examples"
 }
 
-variable "region" {
-  description = "Location of GKE cluster"
-}
