@@ -64,7 +64,7 @@ module "gke" {
   machine_type      = var.gke_machine_type
   node_count        = var.gke_node_count
   name              = var.gke_name
-  region          = var.region
+  region            = var.region
   subnetwork        = module.network.playground_subnetwork_id
   network           = module.network.playground_network_id
 }
