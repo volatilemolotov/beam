@@ -25,18 +25,18 @@ resource "google_container_cluster" "playground-gke" {
   network            = var.network
   subnetwork         = var.subnetwork
   enable_autopilot = true
-  #node_config {
+  node_config {
   #  machine_type    = var.machine_type
-  #  service_account = var.service_account_email
+    service_account = var.service_account_email
 
-  #  oauth_scopes = [
-  #    "https://www.googleapis.com/auth/cloud-platform"
-  #  ]
-  #  labels = {
-  #    component = "beam-playground"
-  #  }
-  #  tags = ["beam-playground"]
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+    labels = {
+      component = "beam-playground"
+    }
+    tags = ["beam-playground"]
 
-  #}
+  }
 
 }
