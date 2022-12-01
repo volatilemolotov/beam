@@ -42,16 +42,6 @@ spec:
            value: {{ .Values.redis_ip }}
          - name: NUM_PARALLEL_JOBS
            value: "5"
-       readinessProbe:
-         tcpSocket:
-           port: 8080
-         initialDelaySeconds: 5
-         periodSeconds: 10
-       livenessProbe:
-         tcpSocket:
-           port: 8080
-         initialDelaySeconds: 15
-         periodSeconds: 20
        resources:
          requests:
            memory: "50Mi"
