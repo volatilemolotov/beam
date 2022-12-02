@@ -18,6 +18,7 @@
 Testing...... more Testing
 
 HELLO COMMIT MESSAGE TEST...
+More tests...
 
 FROM gcr.io/google.com/cloudsdktool/google-cloud-cli
 
