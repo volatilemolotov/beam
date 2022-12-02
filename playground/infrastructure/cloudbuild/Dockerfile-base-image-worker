@@ -17,6 +17,8 @@
 
 Testing...... more Testing
 
+HELLO COMMIT MESSAGE TEST
+
 FROM gcr.io/google.com/cloudsdktool/google-cloud-cli
 
 ARG GO_VERSION=1.18
