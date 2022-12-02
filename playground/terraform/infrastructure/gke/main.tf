@@ -30,7 +30,8 @@ resource "google_container_cluster" "playground-gke" {
     service_account = var.service_account_email
 
     oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/datastore"
     ]
     labels = {
       component = "beam-playground"
