@@ -41,6 +41,7 @@ export PATH=$PATH:gradle-${GRADLE_VERSION}/bin
 curl -OL https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz > /dev/null
 tar -C /usr/local -xvf go$GO_VERSION.linux-amd64.tar.gz > /dev/null
 export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/usr/local/go/bin >> ~/.profile
 source ~/.profile
 
 # Install Docker
