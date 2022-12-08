@@ -125,7 +125,7 @@ then
 
       set -ex
       opts=" -Pdocker-tag=$DOCKERTAG"
-      if [[ -n "${SDK_TAG}" ]]
+      if [[ -n "$SDK_TAG" ]]
       then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
       fi
