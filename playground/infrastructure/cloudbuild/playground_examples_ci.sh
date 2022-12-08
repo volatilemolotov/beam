@@ -125,10 +125,10 @@ then
 
       set -ex
       opts=" -Pdocker-tag=$DOCKERTAG"
-      if [[ -n "$SDK_TAG" ]]
-      then
-            opts="${opts} -Psdk-tag=${SDK_TAG}"
-      fi
+    #   if [[ -n "$SDK_TAG" ]]
+    #   then
+    #         opts="${opts} -Psdk-tag=${SDK_TAG}"
+    #   fi
       for sdk in java
       do
         if [[ "$sdk" == "java" ]]
