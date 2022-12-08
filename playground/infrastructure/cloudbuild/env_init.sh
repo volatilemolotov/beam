@@ -22,7 +22,7 @@ apt-get install -y build-essential unzip apt-transport-https ca-certificates cur
 
 # Install Docker
 curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian focal stable" > /dev/null
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /dev/null
 apt update > /dev/null && apt install -y docker-ce > /dev/null
 
 #Install Helm
