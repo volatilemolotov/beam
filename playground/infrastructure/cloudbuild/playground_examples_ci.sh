@@ -56,7 +56,7 @@ SUBDIRS="././learning/katas ././examples ././sdks" \
 GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
 BEAM_ROOT_DIR="../../" \
 SDK_CONFIG="../../playground/sdks.yaml" \
-BEAM_EXAMPLE_CATEGORIES="../../playground/categories.yaml" \
+BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 SERVER_ADDRESS=localhost:8080 \
 BEAM_VERSION=2.43.0 \
@@ -146,9 +146,10 @@ then
       NAME=$(docker run -d --rm -p 8080:8080 -e PROTOCOL_TYPE=TCP "$IMAGE_TAG")
       echo "NAME=$NAME" && NAME=$NAME
 
+      cd playground/infrastructure
       for sdk in "${sdks[@]}"
       do
-          python3 playground/infrastructure/ci_cd.py \
+          python3 ci_cd.py \
           --step $STEP \
           --sdk SDK_"${sdk^^}" \
           --origin "${ORIGIN}" \
