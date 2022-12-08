@@ -129,7 +129,7 @@ then
       then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
       fi
-      for sdk in "${sdks[@]}"
+      for sdk in python java
       do
         if [[ "$sdk" == "java" ]]
         then
