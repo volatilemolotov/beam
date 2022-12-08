@@ -59,8 +59,8 @@ SDK_CONFIG="../../playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 SERVER_ADDRESS=localhost:8080 \
-BEAM_VERSION=2.43.0 \
-sdks=("python" "java" "go") \
+BEAM_VERSION=2.42.0 \
+sdks=("java" "python" "go") \
 allowlist=("playground/backend" \
 "playground/infrastructure")
 
@@ -129,14 +129,13 @@ then
       then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
       fi
-      for sdk in python java
+      for sdk in "${sdks[@]}"
       do
         if [[ "$sdk" == "java" ]]
         then
             # Java uses a fixed BEAM_VERSION
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
-
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
       done
 
@@ -147,7 +146,7 @@ then
       echo "NAME=$NAME" && NAME=$NAME
 
       cd playground/infrastructure
-      for sdk in python java
+      for sdk in "${sdks[@]}"
       do
           python3 ci_cd.py \
           --step ${STEP} \

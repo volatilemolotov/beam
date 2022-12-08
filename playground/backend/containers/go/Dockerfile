@@ -21,15 +21,14 @@ FROM $BASE_IMAGE
 ARG SDK_TAG
 ARG SDK_TAG_LOCAL
 
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
+
 # Setup Go Environment
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" &&\
     chmod -R 777 "$GOPATH/bin"
-
-
-RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1 &&\
-    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 
 # Setup Go SDK dependencies
 COPY beam /opt/playground/beam
