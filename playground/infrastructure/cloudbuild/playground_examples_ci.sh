@@ -137,9 +137,8 @@ then
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
+        IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
       done
-
-      echo "IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}" && IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
 
       set -uex
       NAME=$(docker run -d --network=cloudbuild -p 8080:8080 --name runner_container -e PROTOCOL_TYPE=TCP "$IMAGE_TAG")
