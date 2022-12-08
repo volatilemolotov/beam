@@ -142,7 +142,7 @@ then
       echo "IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}" && IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
 
       set -uex
-      NAME=$(docker run -d -p 8080:8080 --name runner_container -e PROTOCOL_TYPE=TCP "$IMAGE_TAG")
+      NAME=$(docker run -d --network cloudbuild -p 8080:8080 --name runner_container -e PROTOCOL_TYPE=TCP "$IMAGE_TAG")
       sleep 20s
       NAME=$NAME
       docker ps -a
