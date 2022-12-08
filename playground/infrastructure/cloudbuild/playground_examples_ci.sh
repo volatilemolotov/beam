@@ -56,7 +56,7 @@ SUBDIRS="././learning/katas ././examples ././sdks" \
 GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
 BEAM_ROOT_DIR="../../" \
 SDK_CONFIG="../../playground/sdks.yaml" \
-BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
+BEAM_EXAMPLE_CATEGORIES="../../playground/categories.yaml" \
 BEAM_CONCURRENCY=4 \
 SERVER_ADDRESS=localhost:8080 \
 BEAM_VERSION=2.43.0 \
@@ -137,7 +137,7 @@ then
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
 
-      ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
+        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
       done
 
       echo "IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}" && IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
