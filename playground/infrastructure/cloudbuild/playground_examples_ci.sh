@@ -60,7 +60,7 @@ BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 SERVER_ADDRESS=localhost:8080 \
 BEAM_VERSION=2.42.0 \
-sdks=("java" "python" "go") \
+sdks=("java") \
 allowlist=("playground/backend" \
 "playground/infrastructure")
 
@@ -129,7 +129,7 @@ then
       then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
       fi
-      for sdk in java python
+      for sdk in java
       do
         if [[ "$sdk" == "java" ]]
         then
