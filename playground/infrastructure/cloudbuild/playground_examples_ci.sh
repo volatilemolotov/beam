@@ -129,7 +129,7 @@ then
       then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
       fi
-      for sdk in "${sdks[@]}"
+      for sdk in java python
       do
         if [[ "$sdk" == "java" ]]
         then
@@ -148,7 +148,7 @@ then
       docker logs runner_container
 
       cd playground/infrastructure
-      for sdk in "${sdks[@]}"
+      for sdk in java python
       do
           python3 ci_cd.py \
           --step ${STEP} \
