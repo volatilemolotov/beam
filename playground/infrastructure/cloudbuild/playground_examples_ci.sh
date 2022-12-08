@@ -58,7 +58,7 @@ BEAM_ROOT_DIR="../../" \
 SDK_CONFIG="../../playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
-SERVER_ADDRESS=localhost:8080 \
+SERVER_ADDRESS=0.0.0.0:8080 \
 BEAM_VERSION=2.42.0 \
 sdks=("java" "python" "go") \
 allowlist=("playground/backend" \
@@ -129,7 +129,7 @@ then
       then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
       fi
-      for sdk in "${sdks[@]}"
+      for sdk in java python
       do
         if [[ "$sdk" == "java" ]]
         then
