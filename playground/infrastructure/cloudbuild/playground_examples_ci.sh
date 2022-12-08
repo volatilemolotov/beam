@@ -147,13 +147,13 @@ then
       echo "NAME=$NAME" && NAME=$NAME
 
       cd playground/infrastructure
-      for sdk in "${sdks[@]}"
+      for sdk in python java
       do
           python3 ci_cd.py \
-          --step $STEP \
+          --step ${STEP} \
           --sdk SDK_"${sdk^^}" \
-          --origin "${ORIGIN}" \
-          --subdirs "${SUBDIRS}"
+          --origin ${ORIGIN} \
+          --subdirs ${SUBDIRS}
       done
 else
       echo "Example has NOT been changed"
