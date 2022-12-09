@@ -31,8 +31,8 @@ steps:
 
   - name: 'docker'
     entrypoint: '/bin/sh'
-    args: ['IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)',
-          'run', '-d', '-p', '8080:8080/tcp', '$IMAGE_TAG']
+    args: ['_IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)',
+          'run', '-d', '-p', '8080:8080/tcp', '${_IMAGE_TAG}']
 
   - name: 'ubuntu'
     entrypoint: 'bash'
