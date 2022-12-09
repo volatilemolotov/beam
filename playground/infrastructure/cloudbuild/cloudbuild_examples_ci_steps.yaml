@@ -47,43 +47,13 @@ steps:
 #    waitFor:
 #      - "Second step"
 #
-  - name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-          apt-get update > /dev/null
-          export DEBIAN_FRONTEND=noninteractive
-          apt-get install -y software-properties-common > /dev/null
-          add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
-          apt install -y python3.8 python3-pip > /dev/null
-          
-          cd playground/infrastructure
-          pip install -r requirements.txt > /dev/null
-          
-          export \
-          ORIGIN=PG_EXAMPLES \
-          STEP=CI \
-          SUBDIRS="././learning/katas ././examples ././sdks" \
-          GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
-          BEAM_ROOT_DIR="../../" \
-          SDK_CONFIG="../../playground/sdks.yaml" \
-          BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
-          BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=step_0:8080 \
-          BEAM_VERSION=2.43.0 \
-          sdks=("java") \
-          allowlist=("playground/backend" \
-          "playground/infrastructure")
-          
-          for sdk in "${sdks[@]}"
-          do
-            python3 ci_cd.py \
-            --step ${STEP} \
-            --sdk SDK_"${sdk^^}" \
-            --origin ${ORIGIN} \
-            --subdirs ${SUBDIRS}
-          done
+#  - name: 'ubuntu'
+#    entrypoint: 'bash'
+#    args:
+#      - '-c'
+#      - |
+#        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
+#        ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
 
 options:
   machineType: 'E2_HIGHCPU_32'
