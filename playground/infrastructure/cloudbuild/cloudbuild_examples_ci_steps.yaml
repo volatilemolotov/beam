@@ -32,8 +32,6 @@ steps:
     volumes:
       - name: 'myvolume'
         path: '/persistent_volume'
-    options:
-      machineType: 'E2_HIGHCPU_8'
 
   - id: "Second step"
     name: 'docker'
@@ -44,8 +42,6 @@ steps:
     volumes:
       - name: 'myvolume'
         path: '/persistent_volume'
-    options:
-      machineType: 'E2_HIGHCPU_8'
 
   - name: 'ubuntu'
     entrypoint: 'bash'
@@ -53,10 +49,9 @@ steps:
       - '-c'
       - | 
         ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
-    options:
-      machineType: 'E2_HIGHCPU_8'
 
 options:
+  machineType: 'E2_HIGHCPU_32'
   logging: CLOUD_LOGGING_ONLY
 
 timeout: 7200s
