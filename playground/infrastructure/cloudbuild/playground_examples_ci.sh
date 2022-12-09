@@ -137,7 +137,7 @@ then
         fi
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-        IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
+        IMAGE_TAG=beam_playground-backend-${sdk}:${DOCKERTAG}
         echo $IMAGE_TAG > /workspace/image_var.txt
         echo "DONE"
       done
