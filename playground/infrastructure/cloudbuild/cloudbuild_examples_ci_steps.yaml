@@ -41,6 +41,7 @@ steps:
     args:
       - '-c'
       - | 
+        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
         ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
 
 options:
