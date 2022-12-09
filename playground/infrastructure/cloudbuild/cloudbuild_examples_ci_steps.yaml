@@ -32,7 +32,7 @@ steps:
 
   - id: "Second step"
     name: 'docker'
-    args: ['run', '-d', '-p', '8080:8080/tcp', '--ip=192.168.10.20', '--name', 'runner_container',
+    args: ['run', '-d', '-p', '8080:8080/tcp', '--name', 'runner_container',
            'us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-java:${COMMIT_SHA}']
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
