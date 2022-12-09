@@ -29,20 +29,11 @@ steps:
       - 'BASE_BRANCH=${_BASE_BRANCH}'
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
-    volumes:
-      - name: 'myvolume'
-        path: '/persistent_volume'
 
   - id: "Second step"
     name: 'docker'
-    entrypoint: '/bin/sh'
-    args: ['pwd',
-           'ls -la',
-           '_IMAGE_TAG=$(cat /persistent_volume/image_tag_variable.txt)',
+    args: ['_IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)',
            'run', '-d', '-p', '8080:8080/tcp', '${_IMAGE_TAG}']
-    volumes:
-      - name: 'myvolume'
-        path: '/persistent_volume'
 
   - name: 'ubuntu'
     entrypoint: 'bash'
