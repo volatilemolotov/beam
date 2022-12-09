@@ -47,8 +47,6 @@ steps:
       - "-c"
       - |
           docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
-    waitFor:
-      - "Second step"
 
   - name: 'ubuntu'
     entrypoint: 'bash'
@@ -88,8 +86,6 @@ steps:
           --origin ${origin} \
           --subdirs ${subdirs}
           done
-    waitFor:
-      - "Second step"
 
 options:
   machineType: 'E2_HIGHCPU_8'
