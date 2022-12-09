@@ -137,9 +137,8 @@ then
         fi
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
         IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
+        echo $IMAGE_TAG > /workspace/image_tag_variable.txt
       done
-
-      echo $IMAGE_TAG > /workspace/image_tag_variable.txt
 
 #      set -uex
 #      NAME=$(docker run -d --network=cloudbuild -p 127.0.0.1:8080:8080/tcp --name runner_container "$IMAGE_TAG")
