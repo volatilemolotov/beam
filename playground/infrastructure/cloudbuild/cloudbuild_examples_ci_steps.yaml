@@ -68,6 +68,9 @@ steps:
           pip install -r requirements.txt > /dev/null
           cat /workspace/public_ip.txt
           public_ip=$(cat /workspace/public_ip.txt)
+        
+          ping -c 3 ${public_ip}
+          ping -c 5 ${public_ip}:8080
           
           export \
           origin=PG_EXAMPLES \
@@ -78,7 +81,7 @@ steps:
           SDK_CONFIG="../../playground/sdks.yaml" \
           BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
           BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=step_1:8080 \
+          SERVER_ADDRESS=${public_ip}:8080 \
           BEAM_VERSION=2.43.0 \
           sdks=("java") \
           allowlist=("playground/backend" "playground/infrastructure")
