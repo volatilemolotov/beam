@@ -40,6 +40,7 @@ steps:
           docker run -p 8080:8080/tcp --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
+    waitFor: ["First step"]
 
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: "bash"
