@@ -47,6 +47,7 @@ steps:
     args:
       - "-c"
       - |
+          sleep 30
           docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
     waitFor: ["First step"]
 
@@ -55,6 +56,7 @@ steps:
     args:
       - '-c'
       - |
+          sleep 30
           apt-get update > /dev/null
           export DEBIAN_FRONTEND=noninteractive
           apt-get install -y software-properties-common > /dev/null
