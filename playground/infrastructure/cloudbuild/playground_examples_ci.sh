@@ -57,7 +57,7 @@ BEAM_ROOT_DIR="../../" \
 SDK_CONFIG="../../playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
-SERVER_ADDRESS=step_0:8080 \
+SERVER_ADDRESS=localhost:8080 \
 BEAM_VERSION=2.43.0 \
 sdks=("java") \
 allowlist=("playground/backend" \
@@ -136,23 +136,29 @@ then
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
-#        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
+        echo "DONE"
       done
 
-      set -uex
-      NAME=$(docker run -d --network=cloudbuild -p 8080:8080/tcp --name runner_container "$IMAGE_TAG")
-      NAME=$NAME
+#      set -uex
+#      NAME=$(docker run -d --network=cloudbuild -p 127.0.0.1:8080:8080/tcp --name runner_container "$IMAGE_TAG")
+#      NAME=$NAME
+#      docker ps -a
+#      docker logs runner_container
+#      netstat -tulpn | grep LISTEN
+#      docker container inspect runner_container
+#      docker network inspect cloudbuild
 
-      cd playground/infrastructure
-      for sdk in "${sdks[@]}"
-      do
-          python3 ci_cd.py \
-          --step ${STEP} \
-          --sdk SDK_"${sdk^^}" \
-          --origin ${ORIGIN} \
-          --subdirs ${SUBDIRS}
-      done
+#      cd playground/infrastructure
+#      for sdk in "${sdks[@]}"
+#      do
+#          python3 ci_cd.py \
+#          --step ${STEP} \
+#          --sdk SDK_"${sdk^^}" \
+#          --origin ${ORIGIN} \
+#          --subdirs ${SUBDIRS}
+#      done
 else
       echo "Example has NOT been changed"
 fi
