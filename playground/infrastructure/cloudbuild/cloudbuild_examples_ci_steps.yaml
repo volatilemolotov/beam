@@ -60,7 +60,7 @@ steps:
           sleep 30
           apt-get update > /dev/null
           export DEBIAN_FRONTEND=noninteractive
-          apt-get install -y software-properties-common iputils-ping > /dev/null
+          apt-get install -y software-properties-common iputils-ping nmap > /dev/null
           add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
           apt install -y python3.8 python3-pip > /dev/null
           
@@ -70,7 +70,7 @@ steps:
           public_ip=$(cat /workspace/public_ip.txt)
         
           ping -c 3 ${public_ip}
-          ping -c 5 ${public_ip}:8080
+          nmap -p 8080 ${public_ip}
           
           export \
           origin=PG_EXAMPLES \
@@ -97,7 +97,7 @@ steps:
     waitFor: ["First step"]
 
 options:
-  machineType: 'E2_HIGHCPU_8'
+  machineType: 'E2_HIGHCPU_32'
   logging: CLOUD_LOGGING_ONLY
 
 timeout: 7200s
