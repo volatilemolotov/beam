@@ -2,7 +2,7 @@
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
 # regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
+# to you under the Apache License, Version 2.0 (the)
 # "License"); you may not use this file except in compliance
 # with the License.  You may obtain a copy of the License at
 #
@@ -31,11 +31,24 @@ steps:
       - 'TAG_NAME=${TAG_NAME}'
 
   - id: "Second step"
-    name: 'docker'
-    args: ['run', '-d', '-p', '8080:8080/tcp', '--name', 'runner_container',
-           'us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-java:${COMMIT_SHA}']
+    name: 'gcr.io/cloud-builders/docker'
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+         _image_tag=$(cat /workspace/image_var.txt)
+         docker run -p 8080:8080/tcp --name runner_container $_image_tag
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+         docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container < /workspace/public_ip.txt
+    waitFor:
+      - "Second step"
 
   - name: 'ubuntu'
     entrypoint: 'bash'
@@ -51,6 +64,8 @@ steps:
         cd playground/infrastructure
         pip install -r requirements.txt > /dev/null
         
+        _public_ip=$(cat /workspace/public_ip.txt)
+        
         export \
         origin=PG_EXAMPLES \
         step=CI \
@@ -60,7 +75,7 @@ steps:
         SDK_CONFIG="../../playground/sdks.yaml" \
         BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
         BEAM_CONCURRENCY=4 \
-        SERVER_ADDRESS=step_1:8080 \
+        SERVER_ADDRESS=$_public_ip:8080 \
         BEAM_VERSION=2.43.0 \
         sdks=("java") \
         allowlist=("playground/backend" "playground/infrastructure")
