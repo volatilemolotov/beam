@@ -38,6 +38,36 @@ steps:
       - |
           image_tag=$(cat /workspace/image_var.txt)
           docker run -p 8080:8080/tcp --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag
+          apk update && apk upgrade --available 
+          apk add --update python3
+          apk add py3-pip
+        
+          public_ip=$(cat /workspace/public_ip.txt)
+          cd playground/infrastructure
+          pip install -r requirements.txt > /dev/null
+                  
+          export \
+          origin=PG_EXAMPLES \
+          step=CI \
+          subdirs="././learning/katas ././examples ././sdks" \
+          GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
+          BEAM_ROOT_DIR="../../" \
+          SDK_CONFIG="../../playground/sdks.yaml" \
+          BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
+          BEAM_CONCURRENCY=4 \
+          SERVER_ADDRESS=localhost:8080 \
+          BEAM_VERSION=2.43.0 \
+          sdks=("java") \
+          allowlist=("playground/backend" "playground/infrastructure")
+          
+          for sdk in "${sdks[@]}"
+          do
+          python3 ci_cd.py \
+          --step ${step} \
+          --sdk SDK_"${sdk^^}" \
+          --origin ${origin} \
+          --subdirs ${subdirs}
+          done
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
 
