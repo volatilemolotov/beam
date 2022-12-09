@@ -36,9 +36,12 @@ steps:
     args:
       - "-c"
       - |
-         gcloud auth configure-docker us-central1-docker.pkg.dev
-         image_tag=$(cat /workspace/image_var.txt)
-         docker run -p 8080:8080/tcp --name runner_container $image_tag
+          apk add --update curl bash
+          curl -sSL https://sdk.cloud.google.com | bash
+          export PATH=$PATH:/root/google-cloud-sdk/bin
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+          image_tag=$(cat /workspace/image_var.txt)
+          docker run -p 8080:8080/tcp --name runner_container $image_tag
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
 
@@ -47,7 +50,7 @@ steps:
     args:
       - "-c"
       - |
-         docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container < /workspace/public_ip.txt
+          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container < /workspace/public_ip.txt
     waitFor:
       - "Second step"
 
@@ -56,39 +59,39 @@ steps:
     args:
       - '-c'
       - |
-        apt-get update > /dev/null
-        export DEBIAN_FRONTEND=noninteractive
-        apt-get install -y software-properties-common > /dev/null
-        add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
-        apt install -y python3.8 python3-pip > /dev/null
-        
-        cd playground/infrastructure
-        pip install -r requirements.txt > /dev/null
-        
-        public_ip=$(cat /workspace/public_ip.txt)
-        
-        export \
-        origin=PG_EXAMPLES \
-        step=CI \
-        subdirs="././learning/katas ././examples ././sdks" \
-        GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
-        BEAM_ROOT_DIR="../../" \
-        SDK_CONFIG="../../playground/sdks.yaml" \
-        BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
-        BEAM_CONCURRENCY=4 \
-        SERVER_ADDRESS=$public_ip:8080 \
-        BEAM_VERSION=2.43.0 \
-        sdks=("java") \
-        allowlist=("playground/backend" "playground/infrastructure")
-        
-        for sdk in "${sdks[@]}"
-        do
-        python3 ci_cd.py \
-        --step ${step} \
-        --sdk SDK_"${sdk^^}" \
-        --origin ${origin} \
-        --subdirs ${subdirs}
-        done
+          apt-get update > /dev/null
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get install -y software-properties-common > /dev/null
+          add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
+          apt install -y python3.8 python3-pip > /dev/null
+          
+          cd playground/infrastructure
+          pip install -r requirements.txt > /dev/null
+          
+          public_ip=$(cat /workspace/public_ip.txt)
+          
+          export \
+          origin=PG_EXAMPLES \
+          step=CI \
+          subdirs="././learning/katas ././examples ././sdks" \
+          GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
+          BEAM_ROOT_DIR="../../" \
+          SDK_CONFIG="../../playground/sdks.yaml" \
+          BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
+          BEAM_CONCURRENCY=4 \
+          SERVER_ADDRESS=$public_ip:8080 \
+          BEAM_VERSION=2.43.0 \
+          sdks=("java") \
+          allowlist=("playground/backend" "playground/infrastructure")
+          
+          for sdk in "${sdks[@]}"
+          do
+          python3 ci_cd.py \
+          --step ${step} \
+          --sdk SDK_"${sdk^^}" \
+          --origin ${origin} \
+          --subdirs ${subdirs}
+          done
     waitFor:
       - "Second step"
 
