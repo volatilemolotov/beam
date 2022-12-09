@@ -32,8 +32,9 @@ steps:
 
   - id: "Second step"
     name: 'docker'
-    args: ['_IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)',
-           'run', '-d', '-p', '8080:8080/tcp', '${_IMAGE_TAG}']
+    args: ['run', '-d', '-p', '8080:8080/tcp', 'us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-java:${COMMIT_SHA}']
+    env:
+      - 'COMMIT_SHA=${COMMIT_SHA}'
 
   - name: 'ubuntu'
     entrypoint: 'bash'
@@ -43,6 +44,7 @@ steps:
         ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
 
 options:
+  machineType: 'E2_HIGHCPU_16'
   logging: CLOUD_LOGGING_ONLY
 
 timeout: 7200s
