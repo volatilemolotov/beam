@@ -135,11 +135,11 @@ then
             # Java uses a fixed BEAM_VERSION
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
-        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
+        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
         echo $IMAGE_TAG > /workspace/image_tag_variable.txt
-        pwd
-        ls -la
+        ls -la /workspace
+        cat /workspace/image_tag_variable.txt
       done
 
 #      set -uex
