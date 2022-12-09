@@ -140,7 +140,7 @@ then
       done
 
       set -uex
-      NAME=$(docker run -d --network=cloudbuild -p 0.0.0.0:8080 --name runner_container -e PROTOCOL_TYPE=TCP "$IMAGE_TAG")
+      NAME=$(docker run -d --network=cloudbuild -p 127.0.0.1:8080:8080/tcp --name runner_container "$IMAGE_TAG")
       NAME=$NAME
       docker ps -a
       docker logs runner_container
