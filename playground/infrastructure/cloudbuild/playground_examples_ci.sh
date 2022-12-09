@@ -21,7 +21,7 @@ export GO_VERSION=1.18
 #Install python java8 and dependencies
 apt-get update > /dev/null
 export DEBIAN_FRONTEND=noninteractive
-apt-get install -y apt-transport-https ca-certificates software-properties-common curl unzip > /dev/null
+apt-get install -y apt-transport-https ca-certificates software-properties-common curl unzip apt-utils > /dev/null
 apt install net-tools
 add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
 apt install -y python3.8 python3.8-distutils python3-pip > /dev/null
@@ -58,7 +58,7 @@ SDK_CONFIG="../../playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 SERVER_ADDRESS=localhost:8080 \
-BEAM_VERSION=2.42.0 \
+BEAM_VERSION=2.43.0 \
 sdks=("java") \
 allowlist=("playground/backend" \
 "playground/infrastructure")
@@ -139,24 +139,26 @@ then
         IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
       done
 
-      set -uex
-      NAME=$(docker run -d --network=cloudbuild -p 127.0.0.1:8080:8080/tcp --name runner_container "$IMAGE_TAG")
-      NAME=$NAME
-      docker ps -a
-      docker logs runner_container
-      netstat -tulpn | grep LISTEN
-      docker container inspect runner_container
-      docker network inspect cloudbuild
+      echo $IMAGE_TAG > /workspace/image_tag_variable.txt
 
-      cd playground/infrastructure
-      for sdk in "${sdks[@]}"
-      do
-          python3 ci_cd.py \
-          --step ${STEP} \
-          --sdk SDK_"${sdk^^}" \
-          --origin ${ORIGIN} \
-          --subdirs ${SUBDIRS}
-      done
+#      set -uex
+#      NAME=$(docker run -d --network=cloudbuild -p 127.0.0.1:8080:8080/tcp --name runner_container "$IMAGE_TAG")
+#      NAME=$NAME
+#      docker ps -a
+#      docker logs runner_container
+#      netstat -tulpn | grep LISTEN
+#      docker container inspect runner_container
+#      docker network inspect cloudbuild
+
+#      cd playground/infrastructure
+#      for sdk in "${sdks[@]}"
+#      do
+#          python3 ci_cd.py \
+#          --step ${STEP} \
+#          --sdk SDK_"${sdk^^}" \
+#          --origin ${ORIGIN} \
+#          --subdirs ${SUBDIRS}
+#      done
 else
       echo "Example has NOT been changed"
 fi

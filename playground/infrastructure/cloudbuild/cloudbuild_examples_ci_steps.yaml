@@ -29,6 +29,21 @@ steps:
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
 
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: '/bin/bash'
+    args:
+      - c
+      - |
+        IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)
+        docker run -d -p 8080:8080/tcp $IMAGE_TAG
+
+  - name: 'ubuntu'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - | 
+        ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
+
 options:
   logging: CLOUD_LOGGING_ONLY
 
