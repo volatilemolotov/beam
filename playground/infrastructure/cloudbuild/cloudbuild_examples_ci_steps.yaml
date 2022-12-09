@@ -36,8 +36,8 @@ steps:
     args:
       - "-c"
       - |
-         _image_tag=$(cat /workspace/image_var.txt)
-         docker run -p 8080:8080/tcp --name runner_container $_image_tag
+         image_tag=$(cat /workspace/image_var.txt)
+         docker run -p 8080:8080/tcp --name runner_container $image_tag
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
 
@@ -64,7 +64,7 @@ steps:
         cd playground/infrastructure
         pip install -r requirements.txt > /dev/null
         
-        _public_ip=$(cat /workspace/public_ip.txt)
+        public_ip=$(cat /workspace/public_ip.txt)
         
         export \
         origin=PG_EXAMPLES \
@@ -75,7 +75,7 @@ steps:
         SDK_CONFIG="../../playground/sdks.yaml" \
         BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
         BEAM_CONCURRENCY=4 \
-        SERVER_ADDRESS=$_public_ip:8080 \
+        SERVER_ADDRESS=$public_ip:8080 \
         BEAM_VERSION=2.43.0 \
         sdks=("java") \
         allowlist=("playground/backend" "playground/infrastructure")
