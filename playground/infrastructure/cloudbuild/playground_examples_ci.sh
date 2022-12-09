@@ -22,6 +22,7 @@ export GO_VERSION=1.18
 apt-get update > /dev/null
 export DEBIAN_FRONTEND=noninteractive
 apt-get install -y apt-transport-https ca-certificates software-properties-common curl unzip > /dev/null
+apt install net-tools
 add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
 apt install -y python3.8 python3.8-distutils python3-pip > /dev/null
 apt install --reinstall python3.8-distutils > /dev/null
