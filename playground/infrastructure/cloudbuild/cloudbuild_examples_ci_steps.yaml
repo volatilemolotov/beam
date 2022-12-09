@@ -46,7 +46,7 @@ steps:
     args:
       - "-c"
       - |
-          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container < /workspace/public_ip.txt
+          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
     waitFor:
       - "Second step"
 
