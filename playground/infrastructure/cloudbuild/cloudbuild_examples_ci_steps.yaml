@@ -30,11 +30,11 @@ steps:
       - 'TAG_NAME=${TAG_NAME}'
 
   - name: 'docker'
-    entrypoint: 'bash'
+    entrypoint: '/bin/sh'
     args:
       - '-c'
       - |
-        pwd && IMAGE_TAG=$(cat /workspace/image_tag_variable.txt) \
+        IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)
         docker run -d -p 8080:8080/tcp $IMAGE_TAG
 
   - name: 'ubuntu'
