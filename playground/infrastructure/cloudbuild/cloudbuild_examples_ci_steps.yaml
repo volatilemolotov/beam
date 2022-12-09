@@ -44,7 +44,7 @@ steps:
         ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
 
 options:
-  machineType: 'E2_HIGHCPU_16'
+  machineType: 'E2_HIGHCPU_32'
   logging: CLOUD_LOGGING_ONLY
 
 timeout: 7200s
