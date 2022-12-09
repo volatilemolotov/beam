@@ -38,7 +38,6 @@ steps:
       - |
           apk add --update curl bash
           curl -sSL https://sdk.cloud.google.com | bash
-          export PATH=$PATH:/root/google-cloud-sdk/bin
           gcloud auth configure-docker us-central1-docker.pkg.dev
           image_tag=$(cat /workspace/image_var.txt)
           docker run -p 8080:8080/tcp --name runner_container $image_tag
