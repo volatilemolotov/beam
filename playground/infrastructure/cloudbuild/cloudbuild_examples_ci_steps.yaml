@@ -30,30 +30,30 @@ steps:
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
 
-  - id: "Second step"
-    name: 'docker'
-    args: ['run', '-d', '-p', '8080:8080/tcp', '--name', 'runner_container',
-           'us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-java:${COMMIT_SHA}']
-    env:
-      - 'COMMIT_SHA=${COMMIT_SHA}'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'inspect', 'runner_container']
-    waitFor:
-      - "Second step"
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'inspect', '-f', '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'runner_container']
-    waitFor:
-      - "Second step"
-
-  - name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - | 
-        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
-        ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
+#  - id: "Second step"
+#    name: 'docker'
+#    args: ['run', '-d', '-p', '8080:8080/tcp', '--name', 'runner_container',
+#           'us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-java:${COMMIT_SHA}']
+#    env:
+#      - 'COMMIT_SHA=${COMMIT_SHA}'
+#
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args: [ 'inspect', 'runner_container']
+#    waitFor:
+#      - "Second step"
+#
+#  - name: 'gcr.io/cloud-builders/docker'
+#    args: [ 'inspect', '-f', '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}', 'runner_container']
+#    waitFor:
+#      - "Second step"
+#
+#  - name: 'ubuntu'
+#    entrypoint: 'bash'
+#    args:
+#      - '-c'
+#      - |
+#        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
+#        ./playground/infrastructure/cloudbuild/playground_examples_ci_2.sh
 
 options:
   machineType: 'E2_HIGHCPU_32'
