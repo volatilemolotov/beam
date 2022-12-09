@@ -34,7 +34,7 @@ steps:
     args:
       - '-c'
       - |
-        IMAGE_TAG=$(cat /workspace/image_tag_variable.txt) \
+        pwd && IMAGE_TAG=$(cat /workspace/image_tag_variable.txt) \
         docker run -d -p 8080:8080/tcp $IMAGE_TAG
 
   - name: 'ubuntu'
