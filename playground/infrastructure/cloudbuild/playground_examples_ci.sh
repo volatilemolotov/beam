@@ -41,8 +41,6 @@ export PATH=$PATH:gradle-${GRADLE_VERSION}/bin
 curl -OL https://golang.org/dl/go$GO_VERSION.linux-amd64.tar.gz > /dev/null
 tar -C /usr/local -xvf go$GO_VERSION.linux-amd64.tar.gz > /dev/null
 export PATH=$PATH:/usr/local/go/bin
-export PATH=$PATH:/usr/local/go/bin >> ~/.profile
-source ~/.profile
 
 # Install Docker
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -146,6 +144,7 @@ then
       NAME=$NAME
       docker ps -a
       docker logs runner_container
+      netstat -tulpn | grep LISTEN
 
       cd playground/infrastructure
       for sdk in "${sdks[@]}"
