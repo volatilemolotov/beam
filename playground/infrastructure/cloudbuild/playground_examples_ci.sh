@@ -138,6 +138,8 @@ then
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
         IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
         echo $IMAGE_TAG > /persistent_volume/image_tag_variable.txt
+        pwd
+        ls -la
       done
 
 #      set -uex
