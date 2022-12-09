@@ -140,11 +140,14 @@ then
 
       set -uex
       NAME=$(docker run -d --network=cloudbuild -p 8080:8080 --name runner_container -e PROTOCOL_TYPE=TCP "$IMAGE_TAG")
-      sleep 20s
       NAME=$NAME
+      docker network connect cloudbuild runner_container
       docker ps -a
       docker logs runner_container
       netstat -tulpn | grep LISTEN
+      docker network inspect cloudbuild
+      docker exec runner_container ls
+
 
       cd playground/infrastructure
       for sdk in "${sdks[@]}"
