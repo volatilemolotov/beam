@@ -29,10 +29,10 @@ steps:
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
 
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: 'docker'
     entrypoint: '/bin/bash'
     args:
-      - c
+      - '-c'
       - |
         IMAGE_TAG=$(cat /workspace/image_tag_variable.txt)
         docker run -d -p 8080:8080/tcp $IMAGE_TAG
