@@ -30,19 +30,19 @@ steps:
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
 
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}', '--port', '8080', '--region', 'us-central1', '--allow-unauthenticated']
-
-
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: "First second step"
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1
-          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1 > /workspace/cloud_run_host.txt
+#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#    entrypoint: gcloud
+#    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}', '--port', '8080', '--region', 'us-central1', '--allow-unauthenticated']
+#
+#
+#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#    id: "First second step"
+#    entrypoint: "bash"
+#    args:
+#      - "-c"
+#      - |
+#          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1
+#          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1 > /workspace/cloud_run_host.txt
 
   - id: "Second step"
     name: 'gcr.io/cloud-builders/docker'
@@ -71,7 +71,7 @@ steps:
           SDK_CONFIG="../../playground/sdks.yaml" \
           BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
           BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=localhost:8080 \
+          SERVER_ADDRESS=http://0.0.0.0:8080 \
           BEAM_VERSION=2.43.0 \
           sdks=("java") \
           allowlist=("playground/backend" "playground/infrastructure")
