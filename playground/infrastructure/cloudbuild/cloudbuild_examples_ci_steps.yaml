@@ -41,8 +41,8 @@ steps:
     args:
       - "-c"
       - |
-          gcloud run services describe javarunner-container --format 'value(status.url)'
-          gcloud run services describe javarunner-container --format 'value(status.url)' > /workspace/cloud_run_host.txt'
+          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1
+          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1 > /workspace/cloud_run_host.txt
 
   - id: "Second step"
     name: 'gcr.io/cloud-builders/docker'
