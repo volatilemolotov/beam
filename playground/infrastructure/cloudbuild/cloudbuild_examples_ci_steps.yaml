@@ -16,55 +16,55 @@
 # under the License.
 
 steps:
-  - id: "First step"
-    name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci.sh \
-        && ./playground/infrastructure/cloudbuild/playground_examples_ci.sh
-    env:
-      - 'BRANCH_NAME=${BRANCH_NAME}'
-      - 'BASE_BRANCH=${_BASE_BRANCH}'
-      - 'COMMIT_SHA=${COMMIT_SHA}'
-      - 'TAG_NAME=${TAG_NAME}'
+#  - id: "First step"
+#    name: 'ubuntu'
+#    entrypoint: 'bash'
+#    args:
+#      - '-c'
+#      - |
+#        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci.sh \
+#        && ./playground/infrastructure/cloudbuild/playground_examples_ci.sh
+#    env:
+#      - 'BRANCH_NAME=${BRANCH_NAME}'
+#      - 'BASE_BRANCH=${_BASE_BRANCH}'
+#      - 'COMMIT_SHA=${COMMIT_SHA}'
+#      - 'TAG_NAME=${TAG_NAME}'
 
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}', '--port', '8080', '--region', 'us-central1', '--allow-unauthenticated']
+#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#    entrypoint: gcloud
+#    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}', '--port', '8080', '--region', 'us-central1', '--allow-unauthenticated']
+#
+#
+#  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+#    id: "First second step"
+#    entrypoint: "bash"
+#    args:
+#      - "-c"
+#      - |
+#          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1
+#          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1 > /workspace/cloud_run_host.txt
 
-
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    id: "First second step"
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1
-          gcloud run services describe javarunner-container --format 'value(status.url)' --region=us-central1 > /workspace/cloud_run_host.txt
-
-  - id: "Second step"
-    name: 'gcr.io/cloud-builders/docker'
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-          image_tag=$(cat /workspace/image_var.txt)
-          docker run -p 8080:8080/tcp --network=cloudbuild --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag
-    env:
-      - 'COMMIT_SHA=${COMMIT_SHA}'
-    waitFor: ["First step"]
-
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-          sleep 30
-          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container
-          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
-    waitFor: ["First step"]
+#  - id: "Second step"
+#    name: 'gcr.io/cloud-builders/docker'
+#    entrypoint: "bash"
+#    args:
+#      - "-c"
+#      - |
+#          image_tag=$(cat /workspace/image_var.txt)
+#          docker run -p 8080:8080/tcp --network=cloudbuild --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag
+#    env:
+#      - 'COMMIT_SHA=${COMMIT_SHA}'
+#    waitFor: ["First step"]
+#
+#  - name: 'gcr.io/cloud-builders/docker'
+#    entrypoint: "bash"
+#    args:
+#      - "-c"
+#      - |
+#          sleep 30
+#          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container
+#          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
+#    waitFor: ["First step"]
 
   - name: 'ubuntu'
     entrypoint: 'bash'
@@ -84,7 +84,7 @@ steps:
           public_ip=$(cat /workspace/public_ip.txt)
         
           cat /workspace/cloud_run_host.txt
-          cloudrun_host=$(cat /workspace/cloud_run_host.txt')
+          cloudrun_host=$(cat /workspace/cloud_run_host.txt)
         
           ping -c 3 ${public_ip}
           nmap -p 8080 ${public_ip}
@@ -118,7 +118,6 @@ steps:
           --origin ${origin} \
           --subdirs ${subdirs}
           done
-    waitFor: ["First second step"]
 
 options:
   machineType: 'E2_HIGHCPU_8'
