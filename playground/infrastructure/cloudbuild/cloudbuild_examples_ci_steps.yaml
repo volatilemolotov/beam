@@ -71,6 +71,8 @@ steps:
         
           ping -c 3 ${public_ip}
           nmap -p 8080 ${public_ip}
+          curl http://${public_ip}
+          curl http://${public_ip}:8080
           
           export \
           origin=PG_EXAMPLES \
