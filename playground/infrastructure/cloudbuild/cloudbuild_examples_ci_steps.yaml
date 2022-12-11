@@ -74,7 +74,7 @@ steps:
           sleep 30
           apt-get update > /dev/null
           export DEBIAN_FRONTEND=noninteractive
-          apt-get install -y software-properties-common iputils-ping nmap > /dev/null
+          apt-get install -y software-properties-common iputils-ping nmap curl > /dev/null
           add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
           apt install -y python3.8 python3-pip > /dev/null
           
@@ -105,7 +105,7 @@ steps:
           SDK_CONFIG="../../playground/sdks.yaml" \
           BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
           BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=https://javarunner-container-7kb7fhav3a-uc.a.run.app:8080 \
+          SERVER_ADDRESS=https://javarunner-container-7kb7fhav3a-uc.a.run.app \
           BEAM_VERSION=2.43.0 \
           sdks=("java") \
           allowlist=("playground/backend" "playground/infrastructure")
