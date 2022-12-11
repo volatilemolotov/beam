@@ -32,7 +32,12 @@ steps:
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}', '--port', '8080', '--region', 'us-central1']
+    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}', '--port', '8080', '--region', 'us-central1', '--allow-unauthenticated']
+
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [ 'run', 'services', 'describe', 'javarunner-container', '--format', 'value(status.url)']
 
   - id: "Second step"
     name: 'gcr.io/cloud-builders/docker'
