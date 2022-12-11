@@ -32,7 +32,7 @@ steps:
 
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     entrypoint: gcloud
-    args: [ 'run', 'deploy', 'runner_container_java', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}' ]
+    args: [ 'run', 'deploy', 'javarunner-container', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}' ]
 
   - id: "Second step"
     name: 'gcr.io/cloud-builders/docker'
