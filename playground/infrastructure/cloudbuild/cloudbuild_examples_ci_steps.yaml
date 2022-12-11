@@ -30,6 +30,10 @@ steps:
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
 
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args: [ 'run', 'deploy', 'runner_container_java', '--image', 'us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/beam_playground-backend-java:${COMMIT_SHA}' ]
+
   - id: "Second step"
     name: 'gcr.io/cloud-builders/docker'
     entrypoint: "bash"
@@ -99,7 +103,7 @@ steps:
     waitFor: ["First step"]
 
 options:
-  machineType: 'E2_HIGHCPU_32'
+  machineType: 'E2_HIGHCPU_8'
   logging: CLOUD_LOGGING_ONLY
 
 timeout: 7200s
