@@ -16,19 +16,19 @@
 # under the License.
 
 steps:
-  - id: "First step"
-    name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci.sh \
-        && ./playground/infrastructure/cloudbuild/playground_examples_ci.sh
-    env:
-      - 'BRANCH_NAME=${BRANCH_NAME}'
-      - 'BASE_BRANCH=${_BASE_BRANCH}'
-      - 'COMMIT_SHA=${COMMIT_SHA}'
-      - 'TAG_NAME=${TAG_NAME}'
+#  - id: "First step"
+#    name: 'ubuntu'
+#    entrypoint: 'bash'
+#    args:
+#      - '-c'
+#      - |
+#        chmod +x playground/infrastructure/cloudbuild/playground_examples_ci.sh \
+#        && ./playground/infrastructure/cloudbuild/playground_examples_ci.sh
+#    env:
+#      - 'BRANCH_NAME=${BRANCH_NAME}'
+#      - 'BASE_BRANCH=${_BASE_BRANCH}'
+#      - 'COMMIT_SHA=${COMMIT_SHA}'
+#      - 'TAG_NAME=${TAG_NAME}'
 
 #  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
 #    entrypoint: gcloud
@@ -86,71 +86,70 @@ steps:
           done
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'
-    waitFor: ["First step"]
+#    waitFor: ["First step"]
 
-  - name: 'gcr.io/cloud-builders/docker'
-    entrypoint: "bash"
-    args:
-      - "-c"
-      - |
-          sleep 30
-          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container
-          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
-    waitFor: ["First step"]
-
-  - name: 'ubuntu'
-    entrypoint: 'bash'
-    args:
-      - '-c'
-      - |
-          sleep 30
-          apt-get update > /dev/null
-          export DEBIAN_FRONTEND=noninteractive
-          apt-get install -y software-properties-common iputils-ping nmap > /dev/null
-          add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
-          apt install -y python3.8 python3-pip > /dev/null
-          
-          cd playground/infrastructure
-          pip install -r requirements.txt > /dev/null
-          cat /workspace/public_ip.txt
-          public_ip=$(cat /workspace/public_ip.txt)
-        
-          cat /workspace/cloud_run_host.txt
-          cloudrun_host=$(cat /workspace/cloud_run_host.txt)
-        
-          ping -c 3 ${public_ip}
-          nmap -p 8080 ${public_ip}
-          curl http://${public_ip}
-          curl http://${public_ip}:8080
-        
-          curl http://${cloudrun_host}
-          curl http://${cloudrun_host}:8080
-          curl https://${cloudrun_host}
-          curl https://${cloudrun_host}:8080
-          
-          export \
-          origin=PG_EXAMPLES \
-          step=CI \
-          subdirs="././learning/katas ././examples ././sdks" \
-          GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
-          BEAM_ROOT_DIR="../../" \
-          SDK_CONFIG="../../playground/sdks.yaml" \
-          BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
-          BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=http://${public_ip}:8080 \
-          BEAM_VERSION=2.43.0 \
-          sdks=("java") \
-          allowlist=("playground/backend" "playground/infrastructure")
-          
-          for sdk in "${sdks[@]}"
-          do
-          python3 ci_cd.py \
-          --step ${step} \
-          --sdk SDK_"${sdk^^}" \
-          --origin ${origin} \
-          --subdirs ${subdirs}
-          done
-    waitFor: ["First second step"]
+#  - name: 'gcr.io/cloud-builders/docker'
+#    entrypoint: "bash"
+#    args:
+#      - "-c"
+#      - |
+#          sleep 30
+#          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container
+#          docker inspect -f {{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}} runner_container > /workspace/public_ip.txt
+#    waitFor: ["First step"]
+#
+#  - name: 'ubuntu'
+#    entrypoint: 'bash'
+#    args:
+#      - '-c'
+#      - |
+#          sleep 30
+#          apt-get update > /dev/null
+#          export DEBIAN_FRONTEND=noninteractive
+#          apt-get install -y software-properties-common iputils-ping nmap > /dev/null
+#          add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
+#          apt install -y python3.8 python3-pip > /dev/null
+#
+#          cd playground/infrastructure
+#          pip install -r requirements.txt > /dev/null
+#          cat /workspace/public_ip.txt
+#          public_ip=$(cat /workspace/public_ip.txt)
+#
+#          cat /workspace/cloud_run_host.txt
+#          cloudrun_host=$(cat /workspace/cloud_run_host.txt)
+#
+#          ping -c 3 ${public_ip}
+#          nmap -p 8080 ${public_ip}
+#          curl http://${public_ip}
+#          curl http://${public_ip}:8080
+#
+#          curl http://${cloudrun_host}
+#          curl http://${cloudrun_host}:8080
+#          curl https://${cloudrun_host}
+#          curl https://${cloudrun_host}:8080
+#
+#          export \
+#          origin=PG_EXAMPLES \
+#          step=CI \
+#          subdirs="././learning/katas ././examples ././sdks" \
+#          GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
+#          BEAM_ROOT_DIR="../../" \
+#          SDK_CONFIG="../../playground/sdks.yaml" \
+#          BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
+#          BEAM_CONCURRENCY=4 \
+#          SERVER_ADDRESS=http://${public_ip}:8080 \
+#          BEAM_VERSION=2.43.0 \
+#          sdks=("java") \
+#          allowlist=("playground/backend" "playground/infrastructure")
+#
+#          for sdk in "${sdks[@]}"
+#          do
+#          python3 ci_cd.py \
+#          --step ${step} \
+#          --sdk SDK_"${sdk^^}" \
+#          --origin ${origin} \
+#          --subdirs ${subdirs}
+#          done
 
 options:
   machineType: 'E2_HIGHCPU_8'
