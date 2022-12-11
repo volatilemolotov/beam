@@ -39,7 +39,7 @@ steps:
     id: "First second step"
     entrypoint: "bash"
     args:
-      - "c"
+      - "-c"
       - |
           gcloud run services describe javarunner-container --format 'value(status.url)'
           gcloud run services describe javarunner-container --format 'value(status.url)' > /workspace/cloud_run_host.txt'
