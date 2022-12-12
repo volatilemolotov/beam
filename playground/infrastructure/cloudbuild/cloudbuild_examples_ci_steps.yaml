@@ -37,11 +37,13 @@ steps:
       - "-c"
       - |
           image_tag=$(cat /workspace/image_var.txt)
-          docker run -d -p 8080:8080 --network=cloudbuild --name runner_container -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
-          sleep 15
-          docker ps -a
-          
+          for image_tags in "${image_tag[@]}"
+          do
+              docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
           sleep 20
+          docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- > /workspace/runner_container_names.txt
+          runner_names=$(cat /workspace/runner_container_names.txt)
+        
           apt-get update > /dev/null
           export DEBIAN_FRONTEND=noninteractive
           apt-get install -y software-properties-common net-tools curl > /dev/null
@@ -62,16 +64,20 @@ steps:
           BEAM_CONCURRENCY=4 \
           SERVER_ADDRESS=runner_container:8080 \
           BEAM_VERSION=2.43.0 \
-          sdks=("java") \
+          sdks=("java" "python" "go") \
           allowlist=("playground/backend" "playground/infrastructure")
     
           for sdk in "${sdks[@]}"
           do
-          python3 ci_cd.py \
-          --step ${step} \
-          --sdk SDK_"${sdk^^}" \
-          --origin ${origin} \
-          --subdirs ${subdirs}
+            for runner_name in "${runner_names[@]}"
+            do
+                export SERVER_ADDRESS=${runner_name}:8080
+                python3 ci_cd.py \
+                --step ${step} \
+                --sdk SDK_"${sdk^^}" \
+                --origin ${origin} \
+                --subdirs ${subdirs}
+            done
           done
     env:
       - 'COMMIT_SHA=${COMMIT_SHA}'

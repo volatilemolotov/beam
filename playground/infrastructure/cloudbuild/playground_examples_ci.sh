@@ -57,11 +57,9 @@ BEAM_ROOT_DIR="../../" \
 SDK_CONFIG="../../playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
-# SERVER_ADDRESS=localhost:8080 \
 BEAM_VERSION=2.43.0 \
-sdks=("go") \
-allowlist=("playground/backend" \
-"playground/infrastructure")
+sdks=("java" "python" "go") \
+allowlist=("playground/backend" "playground/infrastructure")
 
 echo "Environment variables exported"
 git branch
@@ -139,7 +137,7 @@ then
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         IMAGE_TAG=beam_playground-backend-${sdk}:${DOCKERTAG}
         echo $IMAGE_TAG > /workspace/image_var.txt
-        echo "DONE"
+        cat /workspace/image_var.txt
       done
 
 #      set -uex
