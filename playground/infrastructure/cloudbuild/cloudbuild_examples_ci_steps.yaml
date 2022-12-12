@@ -76,7 +76,7 @@ steps:
           SDK_CONFIG="../../playground/sdks.yaml" \
           BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
           BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=runner_container:9095 \
+          SERVER_ADDRESS=runner_container:8080 \
           BEAM_VERSION=2.43.0 \
           sdks=("java") \
           allowlist=("playground/backend" "playground/infrastructure")
