@@ -58,14 +58,15 @@ steps:
           sleep 20
           apt-get update > /dev/null
           export DEBIAN_FRONTEND=noninteractive
-          apt-get install -y software-properties-common net-tools > /dev/null
+          apt-get install -y software-properties-common net-tools curl > /dev/null
           add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
           apt install -y python3.8 python3-pip > /dev/null
-    
+      
           cd playground/infrastructure
           pip install -r requirements.txt > /dev/null
           
           netstat -anp
+          curl runner_container:8080
     
           export \
           origin=PG_EXAMPLES \
