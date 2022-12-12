@@ -51,7 +51,7 @@ steps:
       - "-c"
       - |
           image_tag=$(cat /workspace/image_var.txt)
-          docker run --privileged -d -p 8080:8080 --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
+          docker run --privileged -d --expose=8080 -p 8080:8080 --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
           sleep 15
           docker ps -a
           docker inspect runner_container
