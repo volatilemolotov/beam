@@ -59,7 +59,7 @@ BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 # SERVER_ADDRESS=localhost:8080 \
 BEAM_VERSION=2.43.0 \
-sdks=("java") \
+sdks=("go") \
 allowlist=("playground/backend" \
 "playground/infrastructure")
 
