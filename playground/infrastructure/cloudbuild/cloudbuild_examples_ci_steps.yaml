@@ -51,7 +51,7 @@ steps:
       - "-c"
       - |
           image_tag=$(cat /workspace/image_var.txt)
-          docker run --privileged -d --expose=8080 -p 8080:8080 --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
+          docker run --privileged -d -p 127.0.0.1:9090:9090 --name runner_container us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
           docker run -d -p 9091:9091 nginx
           sleep 15
           docker ps -a
@@ -79,7 +79,7 @@ steps:
           SDK_CONFIG="../../playground/sdks.yaml" \
           BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
           BEAM_CONCURRENCY=4 \
-          SERVER_ADDRESS=localhost:9091 \
+          SERVER_ADDRESS=http://localhost:9090 \
           BEAM_VERSION=2.43.0 \
           sdks=("java") \
           allowlist=("playground/backend" "playground/infrastructure")
