@@ -129,7 +129,7 @@ then
         docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker ps -a
 
-        EXPORT SERVER_ADDRESS=container-${sdk}
+        EXPORT SERVER_ADDRESS=container-${sdk}:8080
         python3 playground/infrastructure/ci_cd.py \
         --step ${STEP} \
         --sdk SDK_"${sdk^^}" \
