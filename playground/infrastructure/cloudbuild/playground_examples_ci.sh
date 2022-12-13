@@ -58,7 +58,6 @@ SDK_CONFIG="playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="playground/categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
-SERVER_ADDRESS=runner_container:8080 \
 sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure" "playground/backend")
 
@@ -127,9 +126,10 @@ then
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
 
-        docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name runner_container us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker ps -a
 
+        EXPORT SERVER_ADDRESS=container-${sdk}
         python3 playground/infrastructure/ci_cd.py \
         --step ${STEP} \
         --sdk SDK_"${sdk^^}" \
