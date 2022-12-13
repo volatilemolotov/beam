@@ -79,20 +79,17 @@ diff=$(git diff --name-only $base_ref $COMMIT_SHA | tr '\n' ' ')
 set +e -ux
 for sdk in "${sdks[@]}"
 do
-    for allowpath in "${allowlist[@]}"
-    do
-        python3 playground/infrastructure/checker.py \
-        --verbose \
-        --sdk SDK_"${sdk^^}" \
-        --allowlist "${allowpath}" \
-        --paths "${diff}"
-        if [[ $? -eq 0 ]]
-        then
-            example_has_changed=True
-        else
-            example_has_changed=False
-        fi
-    done
+      python3 playground/infrastructure/checker.py \
+      --verbose \
+      --sdk SDK_"${sdk^^}" \
+      --allowlist "${allowlist}" \
+      --paths "${diff}"
+      if [[ $? -eq 0 ]]
+      then
+          example_has_changed=True
+      else
+          example_has_changed=False
+      fi
 done
 
 
