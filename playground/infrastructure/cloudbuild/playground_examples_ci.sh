@@ -59,7 +59,7 @@ BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
 sdks=("java" "python" "go") \
-allowlist="playground/infrastructure playground/backend"
+allowlist=("playground/infrastructure" "playground/backend")
 
 echo "Environment variables exported"
 
