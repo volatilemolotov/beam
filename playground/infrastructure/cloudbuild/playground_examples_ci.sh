@@ -62,12 +62,10 @@ sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure/cloudbuild/playground_examples_ci.sh")
 
 echo "Environment variables exported"
-git branch -a
-git show-ref
 
 # Get Difference
 # define the base ref
-base_ref=${BRANCH_NAME}
+base_ref=remotes/origin/cloudbuild+playground+examples+cd
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
 then
   base_ref=refs/heads/master
