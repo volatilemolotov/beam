@@ -36,8 +36,7 @@ COPY setup_sdk.sh /
 
 ENV BEAM_SRC /opt/playground/beam
 ENV PREPARED_MOD_DIR /opt/playground/prepared_folder
-RUN chmod +x /script.sh
-RUN ./setup_sdk.sh /opt/playground/prepared_folder
+RUN /setup_sdk.sh /opt/playground/prepared_folder
 
 # Prepare Application
 COPY src /go/src/playground/backend
