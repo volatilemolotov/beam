@@ -130,8 +130,7 @@ then
         docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name runner_container us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker ps -a
 
-        cd playground/infrastructure
-        python3 ci_cd.py \
+        python3 playground/infrastructure/ci_cd.py \
         --step ${STEP} \
         --sdk SDK_"${sdk^^}" \
         --origin ${ORIGIN} \
