@@ -126,7 +126,7 @@ then
       ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
       docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
 
-      docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+      docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name runner_container us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
       docker ps -a
       docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
 
@@ -134,7 +134,7 @@ then
       cd playground/infrastructure
       for container_name in $(cat /workspace/container_names.txt)
       do
-          export SERVER_ADDRESS=${container_name}:8080
+          export SERVER_ADDRESS=runner_container:8080
           python3 ci_cd.py \
           --step ${STEP} \
           --sdk SDK_"${sdk^^}" \
