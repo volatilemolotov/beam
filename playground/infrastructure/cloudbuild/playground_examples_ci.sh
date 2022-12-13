@@ -123,8 +123,9 @@ then
           opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
       fi
 
-      ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
-      IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
+      ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
+      docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+      IMAGE_TAG=beam_playground-backend-${sdk}:${DOCKERTAG}
 
       NAME=$(docker run -d --network=cloudbuild -p 8080:8080 -e PROTOCOL_TYPE=TCP "${IMAGE_TAG}")
       NAME=$NAME
