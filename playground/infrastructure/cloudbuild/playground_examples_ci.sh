@@ -65,7 +65,7 @@ echo "Environment variables exported"
 
 # Get Difference
 # define the base ref
-base_ref=remotes/origin/cloudbuild+playground+examples+cd
+base_ref=origin/cloudbuild+playground+examples+cd
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
 then
   base_ref=refs/heads/master
