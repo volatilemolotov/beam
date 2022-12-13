@@ -58,6 +58,7 @@ SDK_CONFIG="../../playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
+SERVER_ADDRESS=runner_container:8080 \
 sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure" "playground/backend")
 
@@ -103,44 +104,38 @@ then
     fi
     for sdk in "${sdks[@]}"
     do
-      if [[ "$sdk" == "python" ]]
-      then
-          # builds apache/beam_python3.7_sdk:$DOCKERTAG image
-          ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
-          # and set SDK_TAG to DOCKERTAG so that the next step would find it
-          SDK_TAG=${DOCKERTAG}
-      fi
+        if [[ "$sdk" == "python" ]]
+        then
+            # builds apache/beam_python3.7_sdk:$DOCKERTAG image
+            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
+            # and set SDK_TAG to DOCKERTAG so that the next step would find it
+            SDK_TAG=${DOCKERTAG}
+        fi
 
-      opts=" -Pdocker-tag=${DOCKERTAG}"
-      if [[ -n "$SDK_TAG" ]]
-      then
-          opts="${opts} -Psdk-tag=${SDK_TAG}"
-      fi
+        opts=" -Pdocker-tag=${DOCKERTAG}"
+        if [[ -n "$SDK_TAG" ]]
+        then
+            opts="${opts} -Psdk-tag=${SDK_TAG}"
+        fi
 
-      if [[ "$sdk" == "java" ]]
-      then
-          # Java uses a fixed BEAM_VERSION
-          opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
-      fi
+        if [[ "$sdk" == "java" ]]
+        then
+            # Java uses a fixed BEAM_VERSION
+            opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
+        fi
 
-      ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
-      docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
+        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
 
-      docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name runner_container us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-      docker ps -a
-      docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
+        docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name runner_container us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        docker ps -a
 
-      cat /workspace/container_names.txt
-      cd playground/infrastructure
-      for container_name in $(cat /workspace/container_names.txt)
-      do
-          export SERVER_ADDRESS=runner_container:8080
-          python3 ci_cd.py \
-          --step ${STEP} \
-          --sdk SDK_"${sdk^^}" \
-          --origin ${ORIGIN} \
-          --subdirs ${SUBDIRS}
-      done
+        cd playground/infrastructure
+        python3 ci_cd.py \
+        --step ${STEP} \
+        --sdk SDK_"${sdk^^}" \
+        --origin ${ORIGIN} \
+        --subdirs ${SUBDIRS}
     done
 else
       echo "Example has NOT been changed"
