@@ -130,13 +130,18 @@ then
       NAME=$(docker run -d --network=cloudbuild -p 8080:8080 -e PROTOCOL_TYPE=TCP "${IMAGE_TAG}")
       NAME=$NAME
       docker ps -a
+      docker inspect --format='{{.Name}}' $(sudo docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
 
       cd playground/infrastructure
-      python3 ci_cd.py \
-      --step ${STEP} \
-      --sdk SDK_"${sdk^^}" \
-      --origin ${ORIGIN} \
-      --subdirs ${SUBDIRS}
+      for container_name in $(cat /workspace/container_names.txt)
+      do
+          export SERVER_ADDRESS=${container_name}:8080
+          python3 ci_cd.py \
+          --step ${STEP} \
+          --sdk SDK_"${sdk^^}" \
+          --origin ${ORIGIN} \
+          --subdirs ${SUBDIRS}
+      done
     done
 else
       echo "Example has NOT been changed"
