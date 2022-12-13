@@ -62,7 +62,7 @@ sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure/cloudbuild/playground_examples_ci.sh")
 
 echo "Environment variables exported"
-git branch -a | grep cloudbuild
+git branch -a
 git show-ref
 
 # Get Difference
