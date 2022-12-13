@@ -68,12 +68,12 @@ git show-ref
 # Get Difference
 set -xeu
 # define the base ref
-base_ref=refs/heads/master
+base_ref=refs/heads/${BRANCH_NAME}
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
 then
   base_ref=refs/heads/master
 fi
-diff=$(git diff --name-only $base_ref | tr '\n' ' ')
+diff=$(git diff --name-only $base_ref $COMMIT_SHA | tr '\n' ' ')
 
 # Check if there are Examples
 set +e -ux
@@ -103,9 +103,10 @@ then
       if [[ -z ${TAG_NAME} ]]
       then
             DOCKERTAG=${COMMIT_SHA} && echo "DOCKERTAG=${COMMIT_SHA}"
-      elif [[ -z ${COMMIT_SHA} ]]
+      if [[ -z ${COMMIT_SHA} ]]
       then
             DOCKERTAG=${TAG_NAME} && echo "DOCKERTAG=${TAG_NAME}"
+      fi
       fi
 
       set -uex
@@ -114,18 +115,18 @@ then
         if [[ "$sdk" == "python" ]]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
-            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag="$DOCKERTAG"
+            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             echo "SDK_TAG=${DOCKERTAG}" && SDK_TAG=${DOCKERTAG}
         fi
       done
 
       set -ex
-      opts=" -Pdocker-tag=$DOCKERTAG"
-    #   if [[ -n "$SDK_TAG" ]]
-    #   then
-    #         opts="${opts} -Psdk-tag=${SDK_TAG}"
-    #   fi
+      opts=" -Pdocker-tag=${DOCKERTAG}"
+       if [[ -n "$SDK_TAG" ]]
+       then
+             opts="${opts} -Psdk-tag=${SDK_TAG}"
+       fi
       for sdk in "${sdks[@]}"
       do
         if [[ "$sdk" == "java" ]]
