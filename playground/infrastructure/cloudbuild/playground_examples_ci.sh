@@ -68,7 +68,7 @@ git show-ref
 # Get Difference
 set -xeu
 # define the base ref
-base_ref=refs/heads/${BRANCH_NAME}
+base_ref=refs/heads/master
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
 then
   base_ref=refs/heads/master
@@ -95,7 +95,6 @@ done
 
 if [[ ${example_has_changed} == True ]]
 then
-      rm ~/.m2/settings.xml
 
       if [[ -z ${TAG_NAME} ]]
       then
