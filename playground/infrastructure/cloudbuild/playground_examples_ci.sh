@@ -130,6 +130,7 @@ then
       docker ps -a
       docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
 
+      cat /workspace/container_names.txt
       cd playground/infrastructure
       for container_name in $(cat /workspace/container_names.txt)
       do
