@@ -39,7 +39,7 @@ steps:
           image_tag=$(cat /workspace/image_var.txt)
           for image_tags in "${image_tag[@]}"
           do
-              docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tag 
+              docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository/$image_tags
           sleep 20
           docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- > /workspace/runner_container_names.txt
           runner_names=$(cat /workspace/runner_container_names.txt)

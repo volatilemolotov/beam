@@ -59,9 +59,7 @@ BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
 sdks=("java" "python" "go") \
-allowlist=("playground/infrastructure/cloudbuild/cloudbuild_examples_ci_steps.yaml" \
-"playground/infrastructure/cloudbuild/playground_examples_ci.sh" \
-"playground/backend" "playground/infrastructure")
+allowlist=("playground/backend/**" "playground/infrastructure/**")
 
 echo "Environment variables exported"
 git branch
@@ -88,14 +86,14 @@ do
       --sdk SDK_"${sdk^^}" \
       --allowlist "${allowlists}" \
       --paths "${diff}"
+  done
+done
 if [[ $? -eq 0 ]]
   then
       example_has_changed=True
   else
       example_has_changed=False
 fi
-  done
-done
 
 
 if [[ ${example_has_changed} == True ]]
@@ -138,7 +136,7 @@ then
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         IMAGE_TAG=beam_playground-backend-${sdk}:${DOCKERTAG}
-        echo $IMAGE_TAG > /workspace/image_var.txt
+        echo $IMAGE_TAG >> /workspace/image_var.txt
         cat /workspace/image_var.txt
       done
 
