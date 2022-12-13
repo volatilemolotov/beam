@@ -81,7 +81,7 @@ diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 set +e -ux
 for sdk in "${sdks[@]}"
 do
-  for allowlists in "${allowlist}"
+  for allowlists in "${allowlist[@]}"
   do
       python3 playground/infrastructure/checker.py \
       --verbose \
