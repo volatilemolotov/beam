@@ -94,6 +94,7 @@ if [[ $? -eq 0 ]]
   else
       example_has_changed=False
 fi
+  done
 done
 
 
