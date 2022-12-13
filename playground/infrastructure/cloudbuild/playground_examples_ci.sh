@@ -59,7 +59,9 @@ BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
 sdks=("java" "python" "go") \
-allowlist=("playground/backend" "playground/infrastructure")
+allowlist=("playground/infrastructure/cloudbuild/cloudbuild_examples_ci_steps.yaml" \
+"playground/infrastructure/cloudbuild/playground_examples_ci.sh" \
+"playground/backend" "playground/infrastructure")
 
 echo "Environment variables exported"
 git branch
@@ -84,12 +86,12 @@ do
       --sdk SDK_"${sdk^^}" \
       --allowlist "${allowlist}" \
       --paths "${diff}"
-      if [[ $? -eq 0 ]]
-      then
-          example_has_changed=True
-      else
-          example_has_changed=False
-      fi
+if [[ $? -eq 0 ]]
+  then
+      example_has_changed=True
+  else
+      example_has_changed=False
+fi
 done
 
 
