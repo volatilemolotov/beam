@@ -62,8 +62,7 @@ sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure" "playground/backend")
 
 echo "Environment variables exported"
-pwd
-ls -la
+ls -la playground
 
 # Get Difference
 # define the base ref
@@ -74,11 +73,11 @@ then
 fi
 diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 
-
+cd playground/infrastructure
 # Check if there are Examples
 for sdk in "${sdks[@]}"
 do
-      python3 playground/infrastructure/checker.py \
+      python3 checker.py \
       --verbose \
       --sdk SDK_"${sdk^^}" \
       --allowlist "${allowlist}" \
