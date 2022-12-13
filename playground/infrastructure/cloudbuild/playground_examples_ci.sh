@@ -72,6 +72,7 @@ then
 fi
 diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 
+ls -la
 # Check if there are Examples
 cd playground/infrastructure
 for sdk in "${sdks[@]}"
@@ -89,7 +90,7 @@ if [[ $? -eq 0 ]]
 fi
 done
 
-cd -
+cd ../..
 
 if [[ ${example_has_changed} == True ]]
 then
@@ -128,7 +129,7 @@ then
       NAME=$(docker run -d --network=cloudbuild -p 8080:8080 -e PROTOCOL_TYPE=TCP "${IMAGE_TAG}")
       NAME=$NAME
       docker ps -a
-      docker inspect --format='{{.Name}}' $(sudo docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
+      docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
 
       cd playground/infrastructure
       for container_name in $(cat /workspace/container_names.txt)
