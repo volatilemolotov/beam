@@ -51,11 +51,11 @@ apt update > /dev/null && apt install -y docker-ce > /dev/null
 export \
 ORIGIN=PG_EXAMPLES \
 STEP=CI \
-SUBDIRS="././learning/katas ././examples ././sdks" \
+SUBDIRS="./learning/katas ./examples ./sdks" \
 GOOGLE_CLOUD_PROJECT=$PROJECT_ID \
-BEAM_ROOT_DIR="../../" \
-SDK_CONFIG="../../playground/sdks.yaml" \
-BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
+BEAM_ROOT_DIR="." \
+SDK_CONFIG="playground/sdks.yaml" \
+BEAM_EXAMPLE_CATEGORIES="playground/categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
 SERVER_ADDRESS=runner_container:8080 \
