@@ -127,7 +127,7 @@ then
       docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
       IMAGE_TAG=beam_playground-backend-${sdk}:${DOCKERTAG}
 
-      NAME=$(docker run -d --network=cloudbuild -p 8080:8080 -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/$PROJECT_ID/playground-repository:${IMAGE_TAG})
+      NAME=$(docker run -d --network=cloudbuild -p 8080:8080 -e PROTOCOL_TYPE=TCP us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository:${IMAGE_TAG})
       NAME=$NAME
       docker ps -a
       docker inspect --format='{{.Name}}' $(docker ps -aq --no-trunc) | cut -c2- >> /workspace/container_names.txt
