@@ -65,10 +65,10 @@ echo "Environment variables exported"
 
 # Get Difference
 # define the base ref
-base_ref=origin/cloudbuild+playground+examples+cd
+base_ref=master
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
 then
-  base_ref=refs/heads/master
+  base_ref=master
 fi
 diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 
