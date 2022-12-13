@@ -135,6 +135,9 @@ then
         --sdk SDK_"${sdk^^}" \
         --origin ${ORIGIN} \
         --subdirs ${SUBDIRS}
+
+        docker stop container-${sdk}
+        docker rm container-${sdk}
     done
 else
       echo "Example has NOT been changed"
