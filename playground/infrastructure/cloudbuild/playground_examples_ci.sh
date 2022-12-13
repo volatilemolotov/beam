@@ -67,7 +67,7 @@ git show-ref
 
 # Get Difference
 # define the base ref
-base_ref=refs/heads/master
+base_ref=${BRANCH_NAME}
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
 then
   base_ref=refs/heads/master
