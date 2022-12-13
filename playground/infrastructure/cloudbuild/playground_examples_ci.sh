@@ -59,14 +59,13 @@ BEAM_EXAMPLE_CATEGORIES="../categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
 sdks=("java" "python" "go") \
-allowlist=("playground/backend/**" "playground/infrastructure/**")
+allowlist=("playground/backend playground/infrastructure")
 
 echo "Environment variables exported"
 git branch
 git show-ref
 
 # Get Difference
-set -xeu
 # define the base ref
 base_ref=refs/heads/master
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "master" ]]
@@ -76,88 +75,69 @@ fi
 diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 
 # Check if there are Examples
-set +e -ux
+cd playground/infrastructure
 for sdk in "${sdks[@]}"
 do
-  for allowlists in "${allowlist[@]}"
-  do
-      python3 playground/infrastructure/checker.py \
+      python3 checker.py \
       --verbose \
       --sdk SDK_"${sdk^^}" \
-      --allowlist "${allowlists}" \
+      --allowlist "${allowlist}" \
       --paths "${diff}"
-  done
-done
 if [[ $? -eq 0 ]]
   then
       example_has_changed=True
   else
       example_has_changed=False
 fi
+done
 
+cd -
 
 if [[ ${example_has_changed} == True ]]
 then
-
-      if [[ -z ${TAG_NAME} ]]
+    if [[ -z ${TAG_NAME} ]]
+    then
+        DOCKERTAG=${COMMIT_SHA}
+    elif [[ -z ${COMMIT_SHA} ]]
+    then
+        DOCKERTAG=${TAG_NAME}
+    fi
+    for sdk in "${sdks[@]}"
+    do
+      if [[ "$sdk" == "python" ]]
       then
-            DOCKERTAG=${COMMIT_SHA} && echo "DOCKERTAG=${COMMIT_SHA}"
-      if [[ -z ${COMMIT_SHA} ]]
-      then
-            DOCKERTAG=${TAG_NAME} && echo "DOCKERTAG=${TAG_NAME}"
-      fi
+          # builds apache/beam_python3.7_sdk:$DOCKERTAG image
+          ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
+          # and set SDK_TAG to DOCKERTAG so that the next step would find it
+          SDK_TAG=${DOCKERTAG}
       fi
 
-      set -uex
-      for sdk in "${sdks[@]}"
-      do
-        if [[ "$sdk" == "python" ]]
-        then
-            # builds apache/beam_python3.7_sdk:$DOCKERTAG image
-            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
-            # and set SDK_TAG to DOCKERTAG so that the next step would find it
-            echo "SDK_TAG=${DOCKERTAG}" && SDK_TAG=${DOCKERTAG}
-        fi
-      done
-
-      set -ex
       opts=" -Pdocker-tag=${DOCKERTAG}"
-       if [[ -n "$SDK_TAG" ]]
-       then
-             opts="${opts} -Psdk-tag=${SDK_TAG}"
-       fi
-      for sdk in "${sdks[@]}"
-      do
-        if [[ "$sdk" == "java" ]]
-        then
-            # Java uses a fixed BEAM_VERSION
-            opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
-        fi
-        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
-        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-        IMAGE_TAG=beam_playground-backend-${sdk}:${DOCKERTAG}
-        echo $IMAGE_TAG >> /workspace/image_var.txt
-        cat /workspace/image_var.txt
-      done
+      if [[ -n "$SDK_TAG" ]]
+      then
+          opts="${opts} -Psdk-tag=${SDK_TAG}"
+      fi
 
-#      set -uex
-#      NAME=$(docker run -d --network=cloudbuild -p 127.0.0.1:8080:8080/tcp --name runner_container "$IMAGE_TAG")
-#      NAME=$NAME
-#      docker ps -a
-#      docker logs runner_container
-#      netstat -tulpn | grep LISTEN
-#      docker container inspect runner_container
-#      docker network inspect cloudbuild
+      if [[ "$sdk" == "java" ]]
+      then
+          # Java uses a fixed BEAM_VERSION
+          opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
+      fi
 
-#      cd playground/infrastructure
-#      for sdk in "${sdks[@]}"
-#      do
-#          python3 ci_cd.py \
-#          --step ${STEP} \
-#          --sdk SDK_"${sdk^^}" \
-#          --origin ${ORIGIN} \
-#          --subdirs ${SUBDIRS}
-#      done
+      ./gradlew -i playground:backend:containers:${sdk}:docker ${opts}
+      IMAGE_TAG=apache/beam_playground-backend-${sdk}:${DOCKERTAG}
+
+      NAME=$(docker run -d --network=cloudbuild -p 8080:8080 -e PROTOCOL_TYPE=TCP "${IMAGE_TAG}")
+      NAME=$NAME
+      docker ps -a
+
+      cd playground/infrastructure
+      python3 ci_cd.py \
+      --step ${STEP} \
+      --sdk SDK_"${sdk^^}" \
+      --origin ${ORIGIN} \
+      --subdirs ${SUBDIRS}
+    done
 else
       echo "Example has NOT been changed"
 fi
