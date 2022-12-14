@@ -98,6 +98,7 @@ then
     then
         DOCKERTAG=${TAG_NAME}
     fi
+    echo $DOCKERTAG
     for sdk in "${sdks[@]}"
     do
         if [[ "$sdk" == "python" ]]
@@ -105,7 +106,8 @@ then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
-            SDK_TAG=${DOCKERTAG}
+            SDK_TAG=$DOCKERTAG
+            echo $SDK_TAG
         fi
 
         opts=" -Pdocker-tag=${DOCKERTAG}"
