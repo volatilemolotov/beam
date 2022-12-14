@@ -94,14 +94,13 @@ if [[ ${example_has_changed} == True ]]
 then
     if [[ -z ${TAG_NAME} ]]
     then
-        export DOCKERTAG=${COMMIT_SHA}
+        DOCKERTAG=${COMMIT_SHA}
     elif [[ -z ${COMMIT_SHA} ]]
     then
-        export DOCKERTAG=${TAG_NAME}
+        DOCKERTAG=${TAG_NAME}
     fi
     for sdk in "${sdks[@]}"
     do
-        set +e -ux
         if [ "$sdk" == "python" ]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
@@ -110,7 +109,7 @@ then
             set SDK_TAG=${DOCKERTAG}
         fi
 
-        set -ex
+        echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
         if [ -n "$SDK_TAG" ]; then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
@@ -121,7 +120,7 @@ then
             # Java uses a fixed BEAM_VERSION
             export opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
-
+        echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
