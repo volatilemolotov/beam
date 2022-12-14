@@ -116,7 +116,14 @@ then
             # Java uses a fixed BEAM_VERSION
             export opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
+
+        if [ "$sdk" == "go" ]
+        then
+          unset SDK_TAG
+        fi
+
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
+
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker ps -a
