@@ -94,12 +94,11 @@ if [[ ${example_has_changed} == True ]]
 then
     if [[ -z ${TAG_NAME} ]]
     then
-        DOCKERTAG=${COMMIT_SHA}
+        export DOCKERTAG=${COMMIT_SHA}
     elif [[ -z ${COMMIT_SHA} ]]
     then
-        DOCKERTAG=${TAG_NAME}
+        export DOCKERTAG=${TAG_NAME}
     fi
-    echo $DOCKERTAG
     for sdk in "${sdks[@]}"
     do
         set -uex
@@ -108,7 +107,7 @@ then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
-            SDK_TAG=$DOCKERTAG
+            export SDK_TAG=$DOCKERTAG
         fi
 
         set -ex
