@@ -26,7 +26,7 @@ PIPELINES_MODULE="executable_files"
 
 # Project convention for local versions 2.44.0.dev is incorrect in Go
 # Replace this with 2.44.0-dev
-SDK_TAG=2.45.0-dev
+SDK_TAG=${SDK_TAG/%.dev/-dev}
 SDK_TAG_LOCAL=${SDK_TAG_LOCAL/%.dev/-dev}
 
 mkdir -p $PREPARED_MOD_DIR
