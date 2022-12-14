@@ -66,6 +66,7 @@ ls -la playground
 
 # Get Difference
 # define the base ref
+set -xeu
 base_ref=refs/heads/master
 if [[ -z "$base_ref" ]] || [[ "$base_ref" == "refs/heads/master" ]]
 then
@@ -73,11 +74,10 @@ then
 fi
 diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 
-cd playground/infrastructure
 # Check if there are Examples
 for sdk in "${sdks[@]}"
 do
-      python3 checker.py \
+      python3 playground/infrastructure/checker.py \
       --verbose \
       --sdk SDK_"${sdk^^}" \
       --allowlist "${allowlist}" \
@@ -89,8 +89,6 @@ if [[ $? -eq 0 ]]
       example_has_changed=False
 fi
 done
-
-cd ../..
 
 if [[ ${example_has_changed} == True ]]
 then
@@ -111,6 +109,7 @@ then
             SDK_TAG=${DOCKERTAG}
         fi
 
+        echo $SDK_TAG   
         opts=" -Pdocker-tag=${DOCKERTAG}"
         if [[ -n "$SDK_TAG" ]]
         then
