@@ -110,6 +110,8 @@ then
             echo "SDK_TAG = ${SDK_TAG}"
         fi
 
+        echo "DOCKERTAG = ${DOCKERTAG}"
+        echo "SDK_TAG = ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
         if [[ -z "$SDK_TAG" ]]
         then
