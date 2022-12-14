@@ -103,7 +103,10 @@ then
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             echo "SDK_TAG=${DOCKERTAG}"
+        else
+          unset SDK_TAG
         fi
+
 
         echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
@@ -115,11 +118,6 @@ then
         then
             # Java uses a fixed BEAM_VERSION
             export opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
-        fi
-
-        if [ "$sdk" == "go" ]
-        then
-          unset SDK_TAG
         fi
 
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
