@@ -18,7 +18,7 @@
 #Dokerfile to set up the Beam Go SDK
 ARG BASE_IMAGE
 FROM $BASE_IMAGE
-ARG SDK_TAG
+ARG SDK_TAG=2.43.0
 ARG SDK_TAG_LOCAL
 
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0

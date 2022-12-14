@@ -138,6 +138,7 @@ then
 
         docker stop container-${sdk}
         docker rm container-${sdk}
+        sleep 10
         docker ps -a
     done
 else
