@@ -106,7 +106,6 @@ then
             unset SDK_TAG
         fi
 
-
         echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
         if [ -n "$SDK_TAG" ]; then
