@@ -111,12 +111,9 @@ then
         fi
 
         set -ex
-        echo "DOCKERTAG For ${sdk} = ${DOCKERTAG}"
-        echo "SDK_TAG For ${sdk} = ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
-        if [ -n "$SDK_TAG" ]
-        then
-            opts="$opts -Psdk-tag=${SDK_TAG}"
+        if [ -n "$SDK_TAG" ]; then
+            opts="${opts} -Psdk-tag=${SDK_TAG}"
         fi
 
         if [ "$sdk" == "java" ]
@@ -127,8 +124,6 @@ then
 
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-        echo "opts For ${sdk} = ${opts}"
-        echo "BEAM_VERSION For ${sdk} = ${BEAM_VERSION}"
         docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker ps -a
         sleep 15
