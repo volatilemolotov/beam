@@ -58,7 +58,7 @@ SDK_CONFIG="playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="playground/categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
-sdks=("java" "go" "python") \
+sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure" "playground/backend")
 
 echo "Environment variables exported"
@@ -67,7 +67,7 @@ ls -la playground
 # Get Difference
 # define the base ref
 base_ref=refs/heads/master
-if [[ -z "$base_ref" ]] || [[ "$base_ref" == "refs/heads/master" ]]
+if [ -z "$base_ref" ] || [ "$base_ref" == "refs/heads/master" ]
 then
   base_ref=refs/heads/master
 fi
@@ -81,7 +81,7 @@ do
       --sdk SDK_"${sdk^^}" \
       --allowlist "${allowlist}" \
       --paths "${diff}"
-if [[ $? -eq 0 ]]
+if [ $? -eq 0 ]
   then
       example_has_changed=True
   else
@@ -101,27 +101,26 @@ then
     echo $DOCKERTAG
     for sdk in "${sdks[@]}"
     do
-        if [[ "$sdk" == "python" ]]
+        if [ "$sdk" == "python" ]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             SDK_TAG=$DOCKERTAG
-            echo "SDK_TAG = ${SDK_TAG}"
         fi
 
         echo "DOCKERTAG For ${sdk} = ${DOCKERTAG}"
         echo "SDK_TAG For ${sdk} = ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
-        if [[ -z "$SDK_TAG" ]]
+        if [ -n "$SDK_TAG" ]
         then
-            opts="${opts} -Psdk-tag=${SDK_TAG}"
+            opts="$opts -Psdk-tag=${SDK_TAG}"
         fi
 
-        if [[ "$sdk" == "java" ]]
+        if [ "$sdk" == "java" ]
         then
             # Java uses a fixed BEAM_VERSION
-            opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
+            export opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
 
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
