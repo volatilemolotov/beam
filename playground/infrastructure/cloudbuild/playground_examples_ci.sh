@@ -58,7 +58,7 @@ SDK_CONFIG="playground/sdks.yaml" \
 BEAM_EXAMPLE_CATEGORIES="playground/categories.yaml" \
 BEAM_CONCURRENCY=4 \
 BEAM_VERSION=2.43.0 \
-sdks=("java" "python" "go") \
+sdks=("java" "go" "python") \
 allowlist=("playground/infrastructure" "playground/backend")
 
 echo "Environment variables exported"
@@ -104,14 +104,14 @@ then
         if [[ "$sdk" == "python" ]]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
-#            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
+            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             SDK_TAG=$DOCKERTAG
             echo "SDK_TAG = ${SDK_TAG}"
         fi
 
-        echo "DOCKERTAG = ${DOCKERTAG}"
-        echo "SDK_TAG = ${SDK_TAG}"
+        echo "DOCKERTAG For ${sdk} = ${DOCKERTAG}"
+        echo "SDK_TAG For ${sdk} = ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
         if [[ -z "$SDK_TAG" ]]
         then
@@ -124,24 +124,24 @@ then
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
 
-#        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
-#        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-        echo "opts = ${opts}"
-        echo "BEAM_VERSION = ${BEAM_VERSION}"
-#        #docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-#        docker ps -a
-#        sleep 15
-#        export SERVER_ADDRESS=container-${sdk}:8080
-#        python3 playground/infrastructure/ci_cd.py \
-#        --step ${STEP} \
-#        --sdk SDK_"${sdk^^}" \
-#        --origin ${ORIGIN} \
-#        --subdirs ${SUBDIRS}
-#
-#        docker stop container-${sdk}
-#        docker rm container-${sdk}
-#        sleep 10
-#        docker ps -a
+        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
+        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        echo "opts For ${sdk} = ${opts}"
+        echo "BEAM_VERSION For ${sdk} = ${BEAM_VERSION}"
+        docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        docker ps -a
+        sleep 15
+        export SERVER_ADDRESS=container-${sdk}:8080
+        python3 playground/infrastructure/ci_cd.py \
+        --step ${STEP} \
+        --sdk SDK_"${sdk^^}" \
+        --origin ${ORIGIN} \
+        --subdirs ${SUBDIRS}
+
+        docker stop container-${sdk}
+        docker rm container-${sdk}
+        sleep 10
+        docker ps -a
     done
 else
       echo "Example has NOT been changed"
