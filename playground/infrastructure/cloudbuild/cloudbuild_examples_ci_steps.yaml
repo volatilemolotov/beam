@@ -29,6 +29,7 @@ steps:
       - 'BASE_BRANCH=${_BASE_BRANCH}'
       - 'COMMIT_SHA=${COMMIT_SHA}'
       - 'TAG_NAME=${TAG_NAME}'
+      - 'PROJECT_ID=${PROJECT_ID}'
 
 logsBucket: 'gs://mytfstate-bucket-1'
 options:

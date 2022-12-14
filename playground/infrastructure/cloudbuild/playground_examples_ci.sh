@@ -22,7 +22,6 @@ export GO_VERSION=1.18
 apt-get update > /dev/null
 export DEBIAN_FRONTEND=noninteractive
 apt-get install -y apt-transport-https ca-certificates software-properties-common curl unzip apt-utils > /dev/null
-apt install net-tools
 add-apt-repository -y ppa:deadsnakes/ppa > /dev/null && apt update > /dev/null
 apt install -y python3.8 python3.8-distutils python3-pip > /dev/null
 apt install --reinstall python3.8-distutils > /dev/null
@@ -30,7 +29,7 @@ pip install --upgrade google-api-python-client > /dev/null
 python3.8 -m pip install pip --upgrade > /dev/null
 ln -s /usr/bin/python3.8 /usr/bin/python > /dev/null
 apt install python3.8-venv > /dev/null
-pip install -r playground/infrastructure/requirements.txt
+pip install -r playground/infrastructure/requirements.txt > /dev/null
 
 # Install jdk and gradle
 apt-get install openjdk-8-jdk -y > /dev/null
@@ -104,7 +103,7 @@ then
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             echo "SDK_TAG=${DOCKERTAG}"
         else
-          unset SDK_TAG
+            unset SDK_TAG
         fi
 
 
