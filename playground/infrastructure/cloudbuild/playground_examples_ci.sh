@@ -104,12 +104,12 @@ then
         if [[ "$sdk" == "python" ]]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
-            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
+            #./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             SDK_TAG=${DOCKERTAG}
         fi
 
-        echo $SDK_TAG   
+        echo "SDK_TAG = ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
         if [[ -n "$SDK_TAG" ]]
         then
@@ -122,23 +122,24 @@ then
             opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
 
-        ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
-        docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
-
-        docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        #./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
+        #docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
+        echo "opts = ${opts}"
+        echo "BEAM_VERSION = ${BEAM_VERSION}"
+        #docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker ps -a
         sleep 15
-        export SERVER_ADDRESS=container-${sdk}:8080
-        python3 playground/infrastructure/ci_cd.py \
-        --step ${STEP} \
-        --sdk SDK_"${sdk^^}" \
-        --origin ${ORIGIN} \
-        --subdirs ${SUBDIRS}
-
-        docker stop container-${sdk}
-        docker rm container-${sdk}
-        sleep 10
-        docker ps -a
+#        export SERVER_ADDRESS=container-${sdk}:8080
+#        python3 playground/infrastructure/ci_cd.py \
+#        --step ${STEP} \
+#        --sdk SDK_"${sdk^^}" \
+#        --origin ${ORIGIN} \
+#        --subdirs ${SUBDIRS}
+#
+#        docker stop container-${sdk}
+#        docker rm container-${sdk}
+#        sleep 10
+#        docker ps -a
     done
 else
       echo "Example has NOT been changed"
