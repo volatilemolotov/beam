@@ -101,13 +101,13 @@ then
     fi
     for sdk in "${sdks[@]}"
     do
-        set -uex
+        set +e -ux
         if [ "$sdk" == "python" ]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
-            export SDK_TAG=$DOCKERTAG
+            set SDK_TAG=${DOCKERTAG}
         fi
 
         set -ex
