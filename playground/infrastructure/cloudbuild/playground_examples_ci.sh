@@ -76,6 +76,7 @@ diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 # Check if there are Examples
 for sdk in "${sdks[@]}"
 do
+      set +e -ux
       python3 playground/infrastructure/checker.py \
       --verbose \
       --sdk SDK_"${sdk^^}" \
@@ -101,6 +102,7 @@ then
     echo $DOCKERTAG
     for sdk in "${sdks[@]}"
     do
+        set -uex
         if [ "$sdk" == "python" ]
         then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
@@ -109,6 +111,7 @@ then
             SDK_TAG=$DOCKERTAG
         fi
 
+        set -ex
         echo "DOCKERTAG For ${sdk} = ${DOCKERTAG}"
         echo "SDK_TAG For ${sdk} = ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
