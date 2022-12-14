@@ -61,9 +61,6 @@ BEAM_VERSION=2.43.0 \
 sdks=("java" "python" "go") \
 allowlist=("playground/infrastructure" "playground/backend")
 
-echo "Environment variables exported"
-ls -la playground
-
 # Get Difference
 # define the base ref
 base_ref=refs/heads/master
@@ -76,7 +73,6 @@ diff=$(git diff --name-only $base_ref | tr '\n' ' ')
 # Check if there are Examples
 for sdk in "${sdks[@]}"
 do
-      set +e -ux
       python3 playground/infrastructure/checker.py \
       --verbose \
       --sdk SDK_"${sdk^^}" \
@@ -106,7 +102,7 @@ then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
-            set SDK_TAG=${DOCKERTAG}
+            export SDK_TAG=${DOCKERTAG}
         fi
 
         echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
