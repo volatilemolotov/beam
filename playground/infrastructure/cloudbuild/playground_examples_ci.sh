@@ -102,12 +102,12 @@ then
             # builds apache/beam_python3.7_sdk:$DOCKERTAG image
             ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
-            SDK_TAG=${DOCKERTAG}
+            echo "SDK_TAG=${DOCKERTAG}"
         fi
 
         echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
         opts=" -Pdocker-tag=${DOCKERTAG}"
-        if [ -z "$SDK_TAG" ]; then
+        if [ -n "$SDK_TAG" ]; then
             opts="${opts} -Psdk-tag=${SDK_TAG}"
         fi
 
@@ -116,7 +116,6 @@ then
             # Java uses a fixed BEAM_VERSION
             export opts="$opts -Pbase-image=apache/beam_java8_sdk:${BEAM_VERSION}"
         fi
-        echo "SDK_TAG for ${sdk} - ${SDK_TAG}"
         ./gradlew -i playground:backend:containers:${sdk}:docker ${opts} -Pdocker-repository-root="us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository"
         docker push us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
         docker run -d -p 8080:8080 --network=cloudbuild -e PROTOCOL_TYPE=TCP --name container-${sdk} us-central1-docker.pkg.dev/sandbox-playground-008/playground-repository/beam_playground-backend-${sdk}:${DOCKERTAG}
