@@ -107,7 +107,7 @@ then
 #            ./gradlew -i :sdks:python:container:py37:docker -Pdocker-tag=$DOCKERTAG
             # and set SDK_TAG to DOCKERTAG so that the next step would find it
             SDK_TAG=$DOCKERTAG
-            echo $SDK_TAG
+            echo "SDK_TAG = ${SDK_TAG}"
         fi
 
         opts=" -Pdocker-tag=${DOCKERTAG}"
