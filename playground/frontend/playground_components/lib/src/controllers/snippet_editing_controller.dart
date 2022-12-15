@@ -104,13 +104,13 @@ class SnippetEditingController extends ChangeNotifier {
   }
 
   void _toStartOfContextLineIfAny() {
-    final contextLine = selectedExample?.contextLine;
+    final contextLine1Based = selectedExample?.contextLine;
 
-    if (contextLine == null) {
+    if (contextLine1Based == null) {
       return;
     }
 
-    _toStartOfFullLine(max(contextLine - 1, 0));
+    _toStartOfFullLine(max(contextLine1Based - 1, 0));
   }
 
   void _toStartOfFullLine(int line) {
