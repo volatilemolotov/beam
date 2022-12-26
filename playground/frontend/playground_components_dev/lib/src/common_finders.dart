@@ -16,14 +16,37 @@
  * limitations under the License.
  */
 
-export 'src/code/java.dart';
-export 'src/code/python.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:playground_components/playground_components.dart';
 
-export 'src/common_finders.dart';
-export 'src/example_names.dart';
-export 'src/example_outputs.dart';
-export 'src/example_paths.dart';
-export 'src/examples.dart';
-export 'src/expect.dart';
-export 'src/string.dart';
-export 'src/widget_tester.dart';
+extension CommonFindersExtension on CommonFinders {
+  Finder codeField() {
+    return byType(CodeField);
+  }
+
+  Finder graphTab() {
+    return widgetWithText(OutputTab, 'Graph');
+  }
+
+  Finder outputArea() {
+    return byType(OutputArea);
+  }
+
+  Finder outputSelectableText() {
+    final outputArea = find.outputArea();
+    return find.descendant(
+      of: outputArea,
+      matching: find.byType(SelectableText),
+    );
+  }
+
+  Finder resultTab() {
+    return widgetWithText(OutputTab, 'Result');
+  }
+
+  Finder runOrCancelButton() {
+    return byType(RunOrCancelButton);
+  }
+}

@@ -16,14 +16,26 @@
  * limitations under the License.
  */
 
-export 'src/code/java.dart';
-export 'src/code/python.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:playground/modules/examples/example_selector.dart';
+import 'package:playground/modules/sdk/components/sdk_selector.dart';
+import 'package:playground/modules/sdk/components/sdk_selector_row.dart';
 
-export 'src/common_finders.dart';
-export 'src/example_names.dart';
-export 'src/example_outputs.dart';
-export 'src/example_paths.dart';
-export 'src/examples.dart';
-export 'src/expect.dart';
-export 'src/string.dart';
-export 'src/widget_tester.dart';
+extension CommonFindersExtension on CommonFinders {
+  Finder exampleItemInDropdown(String name) {
+    return widgetWithText(GestureDetector, name);
+  }
+
+  Finder exampleSelector() {
+    return byType(ExampleSelector);
+  }
+
+  Finder sdkItemInDropdown(String name) {
+    return widgetWithText(SdkSelectorRow, name);
+  }
+
+  Finder sdkSelector() {
+    return byType(SDKSelector);
+  }
+}

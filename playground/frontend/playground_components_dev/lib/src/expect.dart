@@ -16,14 +16,21 @@
  * limitations under the License.
  */
 
-export 'src/code/java.dart';
-export 'src/code/python.dart';
+import 'package:flutter_test/flutter_test.dart';
 
-export 'src/common_finders.dart';
-export 'src/example_names.dart';
-export 'src/example_outputs.dart';
-export 'src/example_paths.dart';
-export 'src/examples.dart';
-export 'src/expect.dart';
-export 'src/string.dart';
-export 'src/widget_tester.dart';
+import 'widget_tester.dart';
+
+void expectOutput(String text, WidgetTester wt) {
+  final actualText = wt.findOutputText();
+  expect(actualText, text);
+}
+
+void expectOutputContains(String text, WidgetTester wt) {
+  final actualText = wt.findOutputText();
+  expect(actualText, contains(text));
+}
+
+void expectOutputEndsWith(String text, WidgetTester wt) {
+  final actualText = wt.findOutputText();
+  expect(actualText, endsWith(text));
+}
