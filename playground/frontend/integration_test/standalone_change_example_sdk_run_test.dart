@@ -20,6 +20,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:highlight/languages/java.dart';
 import 'package:highlight/languages/python.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:playground_components/playground_components.dart';
 import 'package:playground_components_dev/playground_components_dev.dart';
 
 import 'common/common.dart';
@@ -105,7 +106,7 @@ public class MyClass {
     await wt.tap(find.sdkSelector());
     await wt.pumpAndSettle();
 
-    await wt.tap(find.sdkItemInDropdown('Python'));
+    await wt.tap(find.sdkItemInDropdown(Sdk.python));
     await wt.pumpAndSettle();
 
     expect(

@@ -21,6 +21,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:playground/modules/examples/example_selector.dart';
 import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/modules/sdk/components/sdk_selector_row.dart';
+import 'package:playground_components/playground_components.dart';
 
 extension CommonFindersExtension on CommonFinders {
   Finder exampleItemInDropdown(String name) {
@@ -31,8 +32,8 @@ extension CommonFindersExtension on CommonFinders {
     return byType(ExampleSelector);
   }
 
-  Finder sdkItemInDropdown(String name) {
-    return widgetWithText(SdkSelectorRow, name);
+  Finder sdkItemInDropdown(Sdk sdk) {
+    return widgetWithText(SdkSelectorRow, sdk.title);
   }
 
   Finder sdkSelector() {
