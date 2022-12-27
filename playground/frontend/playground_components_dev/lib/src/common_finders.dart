@@ -27,6 +27,7 @@ extension CommonFindersExtension on CommonFinders {
   }
 
   Finder graphTab() {
+    // TODO(alexeyinkin): Use keys when output tabs get to use enum, https://github.com/apache/beam/issues/22663
     return widgetWithText(OutputTab, 'Graph');
   }
 
@@ -43,6 +44,7 @@ extension CommonFindersExtension on CommonFinders {
   }
 
   Finder resultTab() {
+    // TODO(alexeyinkin): Use keys when output tabs get to use enum, https://github.com/apache/beam/issues/22663
     return widgetWithText(OutputTab, 'Result');
   }
 
