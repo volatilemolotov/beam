@@ -18,26 +18,24 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:playground/modules/examples/example_selector.dart';
-import 'package:playground/modules/sdk/components/sdk_selector.dart';
-import 'package:playground/modules/sdk/components/sdk_selector_row.dart';
-import 'package:playground_components/playground_components.dart';
-import 'package:playground_components_dev/playground_components_dev.dart';
 
-extension CommonFindersExtension on CommonFinders {
-  Finder exampleItemInDropdown(String name) {
-    return widgetWithText(GestureDetector, name);
+extension FinderExtension on Finder {
+  // TODO(alexeyinkin): Push to Flutter or wait for them to make their own, https://github.com/flutter/flutter/issues/117675
+  Finder and(Finder another) {
+    return _AndFinder(this, another);
   }
+}
 
-  Finder exampleSelector() {
-    return byType(ExampleSelector);
-  }
+class _AndFinder extends ChainedFinder {
+  _AndFinder(super.parent, this.another);
 
-  Finder sdkItemInDropdown(Sdk sdk) {
-    return find.byType(SdkSelectorRow).and(find.byKey(ValueKey(sdk)));
-  }
+  final Finder another;
 
-  Finder sdkSelector() {
-    return byType(SDKSelector);
+  @override
+  String get description => '${parent.description} AND ${another.description}';
+
+  @override
+  Iterable<Element> filter(Iterable<Element> parentCandidates) {
+    return another.apply(parentCandidates);
   }
 }
