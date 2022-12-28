@@ -2,7 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
 
-import 'common.dart';
+import 'common/common.dart';
+import 'common/common_finders.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

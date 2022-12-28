@@ -3,7 +3,8 @@ import 'package:integration_test/integration_test.dart';
 import 'package:playground/pages/standalone_playground/widgets/feedback/feedback_dropdown_content.dart';
 import 'package:playground/pages/standalone_playground/widgets/feedback/playground_feedback.dart';
 
-import 'common.dart';
+import 'common/common.dart';
+import 'common/common_finders.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

@@ -1,8 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:playground_components/src/widgets/split_view.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
-import 'common.dart';
+import 'common/common.dart';
+import 'common/common_finders.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,7 @@ void main() {
     await wt.pumpAndSettle();
 
     final newPosition = wt.getCenter(find.dragHandle());
-    expectSimilar(newPosition.dy, dragHandlePosition.dy + height * (maxRatio - defaultRatio));
+    expectSimilar(newPosition.dy,
+        dragHandlePosition.dy + height * (maxRatio - defaultRatio));
   });
 }

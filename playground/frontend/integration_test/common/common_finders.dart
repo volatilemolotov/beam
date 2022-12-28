@@ -16,25 +16,20 @@
  * limitations under the License.
  */
 
-import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:playground/main.dart' as app;
 import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
 import 'package:playground/modules/examples/components/description_popover/description_popover_button.dart';
 import 'package:playground/modules/examples/example_selector.dart';
-import 'package:playground/modules/shortcuts/components/shortcuts_modal.dart';
-import 'package:playground/pages/standalone_playground/widgets/editor_textarea_wrapper.dart';
-import 'package:playground/pages/standalone_playground/widgets/feedback/feedback_dropdown_content.dart';
+import 'package:playground/modules/sdk/components/sdk_selector.dart';
 import 'package:playground/pages/standalone_playground/widgets/more_actions.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:playground_components/src/widgets/drag_handle.dart';
-
-Future<void> init(WidgetTester wt) async {
-  app.main();
-  await wt.pumpAndSettle();
-}
+import 'package:playground/modules/sdk/components/sdk_selector_row.dart';
+import 'package:playground/modules/shortcuts/components/shortcuts_modal.dart';
+import 'package:playground/pages/standalone_playground/widgets/editor_textarea_wrapper.dart';
+import 'package:playground/pages/standalone_playground/widgets/feedback/feedback_dropdown_content.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
 extension CommonFindersExtension on CommonFinders {
   Finder codeTextAreaWrapper() {
@@ -69,24 +64,15 @@ extension CommonFindersExtension on CommonFinders {
     return byType(MoreActions);
   }
 
-  Finder outputWidget() {
-    return byType(OutputWidget);
+  Finder sdkItemInDropdown(Sdk sdk) {
+    return find.byType(SdkSelectorRow).and(find.byKey(ValueKey(sdk)));
+  }
+
+  Finder sdkSelector() {
+    return byType(SDKSelector);
   }
 
   Finder shortcutsModal() {
     return byType(ShortcutsModal);
   }
-
-  Finder splitView() {
-    return byType(SplitView);
-  }
-
-  Finder toggleThemeButton() {
-    return byType(ToggleThemeButton);
-  }
-}
-
-void expectSimilar(double a, double b) {
-  final percent = max(a, b) * 0.01;
-  expect(a, closeTo(b, percent));
 }

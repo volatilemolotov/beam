@@ -2,7 +2,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'common.dart';
+import 'common/common.dart';
+import 'common/common_finders.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

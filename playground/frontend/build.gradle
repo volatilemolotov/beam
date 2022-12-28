@@ -190,10 +190,11 @@ tasks.register("integrationTest") {
   dependsOn("integrationTest_standalone_example_description")
   dependsOn("integrationTest_standalone_resize_output")
   dependsOn("integrationTest_standalone_enjoy_playground")
+  dependsOn("integrationTest_standalone_change_example_sdk_run")
 }
 
-tasks.register("integrationTest_standalone_change_example") {
-  runIntegrationTest("standalone_change_example", "/")
+tasks.register("integrationTest_standalone_change_example_sdk_run") {
+  runIntegrationTest("standalone_change_example_sdk_run", "/")
 }
 
 tasks.register("integrationTest_standalone_toggle_dark_mode") {
