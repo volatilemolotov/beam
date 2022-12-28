@@ -38,6 +38,7 @@ class OutputPlacements extends StatelessWidget {
             children: OutputPlacement.values
                 .map(
                   (placement) => Semantics(
+                    key: ValueKey(placement),
                     label:
                         '${AppLocalizations.of(context)!.outputPlacementSemantic}'
                         ' ${placement.name(context)}',

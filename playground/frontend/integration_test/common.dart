@@ -16,10 +16,20 @@
  * limitations under the License.
  */
 
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playground/main.dart' as app;
+import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
+import 'package:playground/modules/examples/components/description_popover/description_popover_button.dart';
 import 'package:playground/modules/examples/example_selector.dart';
+import 'package:playground/modules/shortcuts/components/shortcuts_modal.dart';
+import 'package:playground/pages/standalone_playground/widgets/editor_textarea_wrapper.dart';
+import 'package:playground/pages/standalone_playground/widgets/feedback/feedback_dropdown_content.dart';
+import 'package:playground/pages/standalone_playground/widgets/more_actions.dart';
+import 'package:playground_components/playground_components.dart';
+import 'package:playground_components/src/widgets/drag_handle.dart';
 
 Future<void> init(WidgetTester wt) async {
   app.main();
@@ -27,11 +37,56 @@ Future<void> init(WidgetTester wt) async {
 }
 
 extension CommonFindersExtension on CommonFinders {
-  Finder exampleSelector() {
-    return byType(ExampleSelector);
+  Finder codeTextAreaWrapper() {
+    return byType(CodeTextAreaWrapper);
+  }
+
+  Finder descriptionPopoverButton() {
+    return byType(DescriptionPopoverButton);
+  }
+
+  Finder descriptionPopover() {
+    return byType(DescriptionPopover);
+  }
+
+  Finder dragHandle() {
+    return byType(DragHandle);
   }
 
   Finder exampleItemInDropdown(String name) {
     return widgetWithText(GestureDetector, name);
   }
+
+  Finder exampleSelector() {
+    return byType(ExampleSelector);
+  }
+
+  Finder feedbackDropdownContent() {
+    return byType(FeedbackDropdownContent);
+  }
+
+  Finder moreActions() {
+    return byType(MoreActions);
+  }
+
+  Finder outputWidget() {
+    return byType(OutputWidget);
+  }
+
+  Finder shortcutsModal() {
+    return byType(ShortcutsModal);
+  }
+
+  Finder splitView() {
+    return byType(SplitView);
+  }
+
+  Finder toggleThemeButton() {
+    return byType(ToggleThemeButton);
+  }
+}
+
+void expectSimilar(double a, double b) {
+  final percent = max(a, b) * 0.01;
+  expect(a, closeTo(b, percent));
 }
