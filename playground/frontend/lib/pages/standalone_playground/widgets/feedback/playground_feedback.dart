@@ -28,8 +28,8 @@ import 'feedback_dropdown_icon_button.dart';
 
 /// A status bar item for feedback.
 class PlaygroundFeedback extends StatelessWidget {
-  static const enjoyingKey = Key('enjoying');
-  static const notEnjoyingKey = Key('notEnjoying');
+  static const thumbUpKey = Key('thumbUp');
+  static const thumbDownKey = Key('thumbDown');
 
   const PlaygroundFeedback({Key? key}) : super(key: key);
 
@@ -45,7 +45,7 @@ class PlaygroundFeedback extends StatelessWidget {
           style: const TextStyle(fontWeight: kBoldWeight),
         ),
         FeedbackDropdownIconButton(
-          key: enjoyingKey,
+          key: thumbUpKey,
           label: appLocale.enjoying,
           iconAsset: kThumbUpIconAsset,
           filledIconAsset: kThumbUpIconAssetFilled,
@@ -53,7 +53,7 @@ class PlaygroundFeedback extends StatelessWidget {
           isSelected: isEnjoying != null && isEnjoying,
         ),
         FeedbackDropdownIconButton(
-          key: notEnjoyingKey,
+          key: thumbDownKey,
           label: appLocale.notEnjoying,
           iconAsset: kThumbDownIconAsset,
           filledIconAsset: kThumbDownIconAssetFilled,

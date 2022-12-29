@@ -22,6 +22,7 @@ import 'package:playground/modules/examples/components/description_popover/descr
 import 'package:playground/modules/examples/components/description_popover/description_popover_button.dart';
 import 'package:playground/modules/examples/example_selector.dart';
 import 'package:playground/modules/sdk/components/sdk_selector.dart';
+import 'package:playground/pages/standalone_playground/widgets/feedback/playground_feedback.dart';
 import 'package:playground/pages/standalone_playground/widgets/more_actions.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:playground_components/src/widgets/drag_handle.dart';
@@ -56,8 +57,28 @@ extension CommonFindersExtension on CommonFinders {
     return byType(ExampleSelector);
   }
 
+  Finder feedbackDropdownCancelButton() {
+    return find.byKey(FeedbackDropdownContent.cancelButtonKey);
+  }
+
   Finder feedbackDropdownContent() {
     return byType(FeedbackDropdownContent);
+  }
+
+  Finder feedbackDropdownSendButton() {
+    return find.byKey(FeedbackDropdownContent.sendButtonKey);
+  }
+
+  Finder feedbackDropdownTextField() {
+    return find.byKey(FeedbackDropdownContent.textFieldKey);
+  }
+
+  Finder feedbackThumbDown() {
+    return find.byKey(PlaygroundFeedback.thumbDownKey);
+  }
+
+  Finder feedbackThumbUp() {
+    return find.byKey(PlaygroundFeedback.thumbUpKey);
   }
 
   Finder moreActions() {

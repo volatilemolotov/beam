@@ -16,24 +16,23 @@
  * limitations under the License.
  */
 
-import 'dart:math';
+import 'package:equatable/equatable.dart';
 
-import 'package:flutter_test/flutter_test.dart';
-import 'package:playground/main.dart' as app;
+class AnalyticsEvent with EquatableMixin {
+  final String category;
+  final String action;
+  final String? label;
+  final int? value;
+  final Map<String, String>? parameters;
 
-Future<void> init(WidgetTester wt) async {
-  app.main();
-  await wt.pumpAndSettle();
-}
-
-void expectContains(Finder external, Finder internal) {
-  expect(
-    find.descendant(of: external, matching: internal),
-    findsOneWidget,
-  );
-}
-
-void expectSimilar(double a, double b) {
-  final percent = max(a, b) * 0.01;
-  expect(a, closeTo(b, percent));
+  AnalyticsEvent({
+    required this.category,
+    required this.action, 
+    this.label,
+    this.value,
+    this.parameters,
+  });
+  
+  @override
+  List<Object?> get props => [category, action, label, value, parameters];
 }
