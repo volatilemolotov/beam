@@ -27,12 +27,12 @@ class AnalyticsEvent with EquatableMixin {
 
   AnalyticsEvent({
     required this.category,
-    required this.action, 
+    required this.action,
     this.label,
     this.value,
     this.parameters,
   });
-  
+
   @override
   List<Object?> get props => [category, action, label, value, parameters];
 }

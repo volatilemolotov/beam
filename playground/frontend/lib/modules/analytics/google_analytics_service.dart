@@ -26,7 +26,7 @@ import 'analytics_event.dart';
 
 class GoogleAnalyticsService implements AnalyticsService {
   final _analytics = AnalyticsHtml(kAnalyticsUA, 'beam', '1.0');
-  
+
   @override
   AnalyticsEvent? lastSentEvent;
 
