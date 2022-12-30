@@ -27,7 +27,7 @@ import '../common/common_finders.dart';
 
 Future<void> checkResizeOutput(WidgetTester wt) async {
   final dragHandleStartPosition = wt.getCenter(find.dragHandle());
-  Future<void> returnDragHandleToStartPosition() async {
+  Future<void> resetSplitViewRatio() async {
     final currentPosition = wt.getCenter(find.dragHandle());
     final offset = dragHandleStartPosition - currentPosition;
     await wt.drag(find.dragHandle(), offset);
@@ -35,19 +35,19 @@ Future<void> checkResizeOutput(WidgetTester wt) async {
   }
 
   await _checkDragVertically(wt);
-  await returnDragHandleToStartPosition();
+  await resetSplitViewRatio();
 
   await _checkExcessivelyDragVertically(wt);
-  await returnDragHandleToStartPosition();
+  await resetSplitViewRatio();
 
   await wt.tap(find.byKey(const ValueKey(OutputPlacement.left)));
   await wt.pumpAndSettle();
 
   await _checkDragHorizontally(wt);
-  await returnDragHandleToStartPosition();
+  await resetSplitViewRatio();
 
   await _checkExcessivelyDragHorizontally(wt);
-  await returnDragHandleToStartPosition();
+  await resetSplitViewRatio();
 }
 
 Future<void> _checkDragVertically(WidgetTester wt) async {
