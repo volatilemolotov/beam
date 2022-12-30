@@ -191,24 +191,8 @@ tasks.register("integrationTest_standalone_change_example_sdk_run") {
   runIntegrationTest("standalone_change_example_sdk_run", "/")
 }
 
-tasks.register("integrationTest_standalone_enjoy_playground") {
-  runIntegrationTest("standalone_enjoy_playground", "/")
-}
-
-tasks.register("integrationTest_standalone_example_description") {
-  runIntegrationTest("standalone_example_description", "/")
-}
-
 tasks.register("integrationTest_standalone_miscellaneous_ui") {
   runIntegrationTest("standalone_miscellaneous_ui", "/")
-}
-
-tasks.register("integrationTest_standalone_shortcuts_window") {
-  runIntegrationTest("standalone_shortcuts_window", "/")
-}
-
-tasks.register("integrationTest_standalone_toggle_dark_mode") {
-  runIntegrationTest("standalone_toggle_dark_mode", "/")
 }
 
 void runIntegrationTest(String path, String url) {

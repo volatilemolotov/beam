@@ -16,30 +16,32 @@
  * limitations under the License.
  */
 
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
-import 'common/common.dart';
-import 'miscellaneous_ui/description_test.dart';
-import 'miscellaneous_ui/enjoy_playground_test.dart';
-import 'miscellaneous_ui/output_placement_test.dart';
-import 'miscellaneous_ui/resize_output_test.dart';
-import 'miscellaneous_ui/shortcuts_modal_test.dart';
-import 'miscellaneous_ui/toggle_brightness_mode_test.dart';
+import '../common/common.dart';
+import '../common/common_finders.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  testWidgets(
-    'Check UI, not connected with running examples',
-    (WidgetTester wt) async {
-      await init(wt);
+Future<void> checkDescription(WidgetTester wt) async {
+  await wt.tap(find.descriptionPopoverButton());
+  await wt.pumpAndSettle();
 
-      await checkEnjoyPlayground(wt);
-      await checkDescription(wt);
-      await checkOutputPlacement(wt);
-      await checkResizeOutput(wt);
-      await checkShortcutsModal(wt);
-      await checkToggleBrightnessMode(wt);
-    },
+  expect(find.descriptionPopover(), findsOneWidget);
+
+  final example = wt.findPlaygroundController().selectedExample!;
+
+  expectHasDescendant(find.descriptionPopover(), find.text(example.name));
+  expectHasDescendant(
+    find.descriptionPopover(),
+    find.text(example.description),
   );
+
+  // //TODO Check contains github and colab links,
+  // //when https://github.com/apache/beam/pull/24820 will be merged
+
+  await wt.sendKeyEvent(LogicalKeyboardKey.escape);
+  await wt.pumpAndSettle();
+
+  expect(find.descriptionPopover(), findsNothing);
 }

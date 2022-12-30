@@ -16,30 +16,26 @@
  * limitations under the License.
  */
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
-import 'common/common.dart';
-import 'miscellaneous_ui/description_test.dart';
-import 'miscellaneous_ui/enjoy_playground_test.dart';
-import 'miscellaneous_ui/output_placement_test.dart';
-import 'miscellaneous_ui/resize_output_test.dart';
-import 'miscellaneous_ui/shortcuts_modal_test.dart';
-import 'miscellaneous_ui/toggle_brightness_mode_test.dart';
+Future<void> checkToggleBrightnessMode(WidgetTester wt) async {
+  Brightness getBrightness() {
+    return Theme.of(wt.element(find.toggleThemeButton())).brightness;
+  }
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  testWidgets(
-    'Check UI, not connected with running examples',
-    (WidgetTester wt) async {
-      await init(wt);
+  Future<void> toggleTheme() async {
+    await wt.tap(find.toggleThemeButton());
+    await wt.pumpAndSettle();
+  }
 
-      await checkEnjoyPlayground(wt);
-      await checkDescription(wt);
-      await checkOutputPlacement(wt);
-      await checkResizeOutput(wt);
-      await checkShortcutsModal(wt);
-      await checkToggleBrightnessMode(wt);
-    },
-  );
+  final startBrightness = getBrightness();
+  final invertedBrightness =
+      startBrightness == Brightness.light ? Brightness.dark : Brightness.light;
+
+  await toggleTheme();
+  expect(getBrightness(), invertedBrightness);
+  await toggleTheme();
+  expect(getBrightness(), startBrightness);
 }

@@ -19,20 +19,26 @@
 import 'package:equatable/equatable.dart';
 
 class AnalyticsEvent with EquatableMixin {
-  final String category;
   final String action;
+  final String category;
   final String? label;
-  final int? value;
   final Map<String, String>? parameters;
+  final int? value;
 
   AnalyticsEvent({
-    required this.category,
     required this.action,
+    required this.category,
     this.label,
-    this.value,
     this.parameters,
+    this.value,
   });
 
   @override
-  List<Object?> get props => [category, action, label, value, parameters];
+  List<Object?> get props => [
+        action,
+        category,
+        label,
+        parameters,
+        value,
+      ];
 }

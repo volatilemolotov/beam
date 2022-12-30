@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-import 'dart:math';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playground/main.dart' as app;
 
@@ -26,14 +24,16 @@ Future<void> init(WidgetTester wt) async {
   await wt.pumpAndSettle();
 }
 
-void expectContains(Finder external, Finder internal) {
+void expectHasDescendant(Finder ancestor, Finder descendant) {
   expect(
-    find.descendant(of: external, matching: internal),
+    find.descendant(of: ancestor, matching: descendant),
     findsOneWidget,
   );
 }
 
 void expectSimilar(double a, double b) {
-  final percent = max(a, b) * 0.01;
-  expect(a, closeTo(b, percent));
+  Matcher closeToFraction(num value, double fraction) =>
+      closeTo(value, value * fraction);
+  Matcher onePerCentTolerance(num value) => closeToFraction(value, 0.01);
+  expect(a, onePerCentTolerance(b));
 }

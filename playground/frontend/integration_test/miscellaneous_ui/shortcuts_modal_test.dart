@@ -16,30 +16,33 @@
  * limitations under the License.
  */
 
+import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:integration_test/integration_test.dart';
 
-import 'common/common.dart';
-import 'miscellaneous_ui/description_test.dart';
-import 'miscellaneous_ui/enjoy_playground_test.dart';
-import 'miscellaneous_ui/output_placement_test.dart';
-import 'miscellaneous_ui/resize_output_test.dart';
-import 'miscellaneous_ui/shortcuts_modal_test.dart';
-import 'miscellaneous_ui/toggle_brightness_mode_test.dart';
+import '../common/common_finders.dart';
 
-void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  testWidgets(
-    'Check UI, not connected with running examples',
-    (WidgetTester wt) async {
-      await init(wt);
+Future<void> checkShortcutsModal(WidgetTester wt) async {
+  expect(find.shortcutsModal(), findsNothing);
 
-      await checkEnjoyPlayground(wt);
-      await checkDescription(wt);
-      await checkOutputPlacement(wt);
-      await checkResizeOutput(wt);
-      await checkShortcutsModal(wt);
-      await checkToggleBrightnessMode(wt);
-    },
-  );
+  AppLocalizations appLocale =
+      AppLocalizations.of(wt.element(find.moreActions()))!;
+
+  await wt.tap(find.moreActions());
+  await wt.pumpAndSettle();
+
+  expect(find.text(appLocale.shortcuts), findsOneWidget);
+
+  await wt.tap(find.text(appLocale.shortcuts));
+  await wt.pumpAndSettle();
+
+  expect(find.shortcutsModal(), findsOneWidget);
+
+  await wt.tap(find.text(appLocale.close));
+  await wt.pumpAndSettle();
+
+  expect(find.shortcutsModal(), findsNothing);
+
+  await wt.sendKeyEvent(LogicalKeyboardKey.escape);
+  await wt.pumpAndSettle();
 }
