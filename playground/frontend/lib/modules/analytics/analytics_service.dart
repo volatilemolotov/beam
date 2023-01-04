@@ -22,7 +22,7 @@ import 'package:playground_components/playground_components.dart';
 import 'package:provider/provider.dart';
 
 abstract class AnalyticsService {
-  AnalyticsEvent? lastSentEvent;
+  AnalyticsEvent? get lastSentEvent;
 
   static AnalyticsService get(BuildContext context) {
     return Provider.of<AnalyticsService>(context, listen: false);
