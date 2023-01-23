@@ -38,4 +38,3 @@ task("lintProto") {
     }
   }
 }
-# Tests
