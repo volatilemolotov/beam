@@ -16,11 +16,18 @@
  * limitations under the License.
  */
 
+import 'package:playground_components/playground_components.dart';
+
 import '../example_descriptor.dart';
 
 const goExample = ExampleDescriptor(
+  //
   '',
   dbPath: '',
+  path:
+      '/playground/frontend/playground_components_dev/lib/src/examples/go/content/example.go',
+  sdk: Sdk.go,
+
   croppedVisibleText: '''
 
 func Folded() {
@@ -57,6 +64,4 @@ func Unfolded2() {
 }
 
 ''',
-  path:
-      '/playground/frontend/playground_components_dev/lib/src/examples/go/content/example.go',
 );

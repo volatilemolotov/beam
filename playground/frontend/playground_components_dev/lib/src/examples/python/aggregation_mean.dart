@@ -16,11 +16,16 @@
  * limitations under the License.
  */
 
+import 'package:playground_components/playground_components.dart';
+
 import '../example_descriptor.dart';
 
 const pythonAggregationMean = ExampleDescriptor(
+  //
   'AggregationMean',
   dbPath: 'SDK_PYTHON/PRECOMPILED_OBJECT_TYPE_KATA/AggregationMean',
-  outputContains: '16 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]',
   path: '/learning/katas/python/Common Transforms/Aggregation/Mean/task.py',
+  sdk: Sdk.python,
+
+  outputContains: ['16 [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]'],
 );
