@@ -40,8 +40,8 @@ class ExampleDescriptor {
     required this.path,
     required this.sdk,
     this.contextLine1Based,
-    this.croppedVisibleText,
-    this.fullVisibleText,
+    this.croppedFoldedVisibleText,
+    this.foldedVisibleText,
     this.outputContains,
     this.outputTail,
     this.repositoryAndRef = _defaultRepositoryAndRef,
@@ -63,11 +63,11 @@ class ExampleDescriptor {
 
   final Sdk sdk;
 
-  /// Visible text when using `visibleSectionNames`.
-  final String? croppedVisibleText;
+  /// Visible text when using `visibleSectionNames` and `foldOutsideSections()`.
+  final String? croppedFoldedVisibleText;
 
-  /// Visible text without using `visibleSectionNames`.
-  final String? fullVisibleText;
+  /// Visible text when using `foldOutsideSections()`.
+  final String? foldedVisibleText;
 
   final List<String>? outputContains;
   final String? outputTail;

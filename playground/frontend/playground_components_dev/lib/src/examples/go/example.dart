@@ -28,7 +28,7 @@ const goExample = ExampleDescriptor(
       '/playground/frontend/playground_components_dev/lib/src/examples/go/content/example.go',
   sdk: Sdk.go,
 
-  croppedVisibleText: '''
+  croppedFoldedVisibleText: '''
 
 func Folded() {
 
@@ -43,7 +43,7 @@ func Unfolded2() {
 }
 
 ''',
-  fullVisibleText: '''
+  foldedVisibleText: '''
 /*
 
 package main

@@ -119,14 +119,14 @@ Future<void> _testContentExampleLoader(WidgetTester wt) async {
       '$path?sdk=go&files=${Uri.encodeComponent(files)}&$_fullViewOptions',
     );
     expectSdk(Sdk.go, wt);
-    expectVisibleText(goExample.fullVisibleText, wt);
+    expectVisibleText(goExample.foldedVisibleText, wt);
     await _expectEditableAndReadOnly(wt);
 
     await wt.navigateAndSettle(
       '$path?sdk=go&files=${Uri.encodeComponent(files)}&$_croppedViewOptions',
     );
     expectSdk(Sdk.go, wt);
-    expectVisibleText(goExample.croppedVisibleText, wt);
+    expectVisibleText(goExample.croppedFoldedVisibleText, wt);
     _expectReadOnly(wt);
   }
 }
@@ -145,14 +145,14 @@ Future<void> _testHttpExampleLoader(WidgetTester wt) async {
       '$path?sdk=go&url=${goExample.url}&$_fullViewOptions',
     );
     expectSdk(Sdk.go, wt);
-    expectVisibleText(goExample.fullVisibleText, wt);
+    expectVisibleText(goExample.foldedVisibleText, wt);
     await _expectEditableAndReadOnly(wt);
 
     await wt.navigateAndSettle(
       '$path?sdk=go&url=${goExample.url}&$_croppedViewOptions',
     );
     expectSdk(Sdk.go, wt);
-    expectVisibleText(goExample.croppedVisibleText, wt);
+    expectVisibleText(goExample.croppedFoldedVisibleText, wt);
     _expectReadOnly(wt);
   }
 }
@@ -188,21 +188,21 @@ Future<void> _testUserSharedExampleLoader(WidgetTester wt) async {
       '$path?sdk=go&shared=$snippetId&$_fullViewOptions',
     );
     expectSdk(Sdk.go, wt);
-    expectVisibleText('${goExample.fullVisibleText}$tail', wt);
+    expectVisibleText('${goExample.foldedVisibleText}$tail', wt);
     await _expectEditableAndReadOnly(wt);
 
     await wt.navigateAndSettle(
       '$path?sdk=go&url=${goExample.url}&$_croppedViewOptions',
     );
     expectSdk(Sdk.go, wt);
-    expectVisibleText(goExample.croppedVisibleText, wt);
+    expectVisibleText(goExample.croppedFoldedVisibleText, wt);
     _expectReadOnly(wt);
   }
 }
 
 Future<void> _testMultipleExamples(WidgetTester wt) async {
   final javaVisibleText = await javaAggregationMax.getVisibleText();
-  final goVisibleText = goExample.fullVisibleText;
+  final goVisibleText = goExample.foldedVisibleText;
 
   final examplesList = [
     {
