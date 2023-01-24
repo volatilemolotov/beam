@@ -29,5 +29,5 @@ const javaMinimalWordCount = ExampleDescriptor(
       '/examples/java/src/main/java/org/apache/beam/examples/MinimalWordCount.java',
   sdk: Sdk.java,
 
-  outputContains: ['Finalizing 4 file results'],
+  outputContains: ['Finalizing for destination'],
 );

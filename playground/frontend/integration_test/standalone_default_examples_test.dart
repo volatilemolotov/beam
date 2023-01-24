@@ -41,11 +41,7 @@ void main() {
 
       await _expectExample(example, wt);
       await _runCached(example, wt);
-
-      // TODO: Fix Java runner.
-      if (example.sdk.id != 'java') {
-        await _runReal(example, wt);
-      }
+      await _runReal(example, wt);
     }
   });
 }
