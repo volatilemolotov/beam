@@ -20,41 +20,62 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:playground/src/assets/assets.gen.dart';
+import 'package:playground_components/playground_components.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+const datasetsFolderPath =
+    'https://github.com/apache/beam/blob/master/playground/backend/datasets/';
 
 class LinkButton extends StatelessWidget {
   final String iconPath;
   final String text;
-  final String url;
+  final Iterable<String> urls;
+  final Color? Function(BuildContext context)? iconColorBuilder;
 
-  const LinkButton({
+  const LinkButton._({
     required this.iconPath,
     required this.text,
-    required this.url,
+    required this.urls,
+    this.iconColorBuilder,
   });
 
   factory LinkButton.colab(String url) {
-    return LinkButton(
+    return LinkButton._(
       iconPath: Assets.colab,
       text: 'intents.playground.openGoogleColab'.tr(),
-      url: url,
+      urls: [url],
     );
   }
 
   factory LinkButton.github(String url) {
-    return LinkButton(
+    return LinkButton._(
       iconPath: Assets.github,
       text: 'intents.playground.viewOnGithub'.tr(),
-      url: url,
+      urls: [url],
+    );
+  }
+
+  factory LinkButton.dataset(List<Dataset> datasets) {
+    return LinkButton._(
+      iconColorBuilder: (context) =>
+          Theme.of(context).extension<BeamThemeExtension>()?.iconColor,
+      iconPath: Assets.streaming,
+      text: 'intents.playground.showDatasets'.tr(),
+      urls: datasets.map((d) => '$datasetsFolderPath${d.datasetPath}'),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return TextButton.icon(
-      icon: SvgPicture.asset(iconPath),
+      icon: SvgPicture.asset(
+        iconPath,
+        color: iconColorBuilder != null ? iconColorBuilder!(context) : null,
+      ),
       onPressed: () {
-        launchUrl(Uri.parse(url));
+        for (final url in urls) {
+          launchUrl(Uri.parse(url));
+        }
       },
       label: Text(text),
     );

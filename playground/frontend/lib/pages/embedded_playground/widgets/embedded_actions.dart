@@ -46,8 +46,9 @@ class EmbeddedActions extends StatelessWidget {
         Consumer<PlaygroundController>(
           builder: (_, controller, __) {
             final selectedExample = controller.selectedExample;
-            final hasGithubLink = selectedExample?.urlVcs != null;
-            final hasColabLink = selectedExample?.urlNotebook != null;
+            final hasColabLink = selectedExample?.urlNotebook?.isNotEmpty ?? false;
+            final hasDatasets = selectedExample?.datasets.isNotEmpty ?? false;
+            final hasGithubLink = selectedExample?.urlVcs?.isNotEmpty ?? false;
 
             return Row(
               children: [
@@ -58,6 +59,10 @@ class EmbeddedActions extends StatelessWidget {
                 if (hasColabLink)
                   _ButtonPadding(
                     child: LinkButton.colab(selectedExample?.urlNotebook ?? ''),
+                  ),
+                if (hasDatasets)
+                  _ButtonPadding(
+                    child: LinkButton.dataset(selectedExample!.datasets),
                   ),
                 const SizedBox(width: kXxlSpacing),
                 _ButtonPadding(
