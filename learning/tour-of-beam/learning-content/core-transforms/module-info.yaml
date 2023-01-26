@@ -21,14 +21,9 @@ sdk:
   - Java
   - Python
   - Go
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-concepts/group-info.yaml
-id: concepts
-name: Beam Concepts
-========
 id: core-transforms
 name: Core Transforms
 complexity: MEDIUM
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/module-info.yaml
 content:
   - map
   - additional-outputs
