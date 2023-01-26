@@ -14,7 +14,6 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-<<<<<<<< HEAD:playground/terraform/infrastructure/cloudbuild-manual-setup/01.setup/variables.tf
 
 variable "project_id" {
   type        = string
@@ -26,17 +25,4 @@ variable "cloudbuild_service_account_id" {
   description = "The ID of the cloud build service account responsible for provisioning Google Cloud resources"
   default     = "playground-cloudbuild-sa"
 }
-========
-#
 
-sdk:
-  - Java
-  - Python
-  - Go
-id: combine
-name: Combine
-content:
-  - simple-function
-  - combine-fn
-  - combine-per-key
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/combine/group-info.yaml

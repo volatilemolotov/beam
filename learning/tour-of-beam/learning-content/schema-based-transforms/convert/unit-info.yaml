@@ -19,16 +19,8 @@
 
 sdk:
   - Java
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/core-transforms/composite/unit-info.yaml
-  - Python
-  - Go
-id: min
-name: Min example
-complexity: BASIC
-taskName: Min
-========
 id: convert
 name: Convert
 taskName: convert
 complexity: ADVANCED
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/convert/unit-info.yaml
+

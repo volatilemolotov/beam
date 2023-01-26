@@ -19,16 +19,10 @@
 
 sdk:
   - Java
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/common-transforms/aggregation/sum/unit-info.yaml
   - Python
   - Go
 id: sum
 name: Sum example
 complexity: BASIC
 taskName: Sum
-========
-id: group
-name: Group
-taskName: group
-complexity: ADVANCED
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/group/unit-info.yaml
+

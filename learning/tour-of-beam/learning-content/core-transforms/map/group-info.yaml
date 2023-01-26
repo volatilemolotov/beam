@@ -15,19 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-<<<<<<<< HEAD:playground/terraform/infrastructure/cloudbuild-manual-setup/01.setup/terraform.tf
-terraform {
-  backend "gcs" {
-    prefix = "01.setup"
-  }
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 4.0.0"
-    }
-  }
-}
-========
 sdk:
   - Java
   - Python
@@ -41,4 +28,4 @@ content:
   - flat-map-elements
   - group-by-key
   - co-group-by-key
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/map/group-info.yaml
+

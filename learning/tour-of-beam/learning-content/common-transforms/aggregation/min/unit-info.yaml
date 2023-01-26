@@ -19,16 +19,10 @@
 
 sdk:
   - Java
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/common-transforms/aggregation/min/unit-info.yaml
   - Python
   - Go
 id: min
 name: Min example
 complexity: BASIC
 taskName: Min
-========
-id: rename
-name: Rename
-taskName: rename
-complexity: ADVANCED
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/rename/unit-info.yaml
+

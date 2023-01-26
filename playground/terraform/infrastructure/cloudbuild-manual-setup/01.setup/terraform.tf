@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-<<<<<<<< HEAD:playground/terraform/infrastructure/cloudbuild-manual-setup/01.setup/terraform.tf
 terraform {
   backend "gcs" {
     prefix = "01.setup"
@@ -27,18 +26,4 @@ terraform {
     }
   }
 }
-========
-sdk:
-  - Java
-  - Python
-  - Go
-id: map
-name: Map
-content:
-  - pardo-one-to-one
-  - pardo-one-to-many
-  - map-elements
-  - flat-map-elements
-  - group-by-key
-  - co-group-by-key
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/map/group-info.yaml
+

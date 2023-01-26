@@ -16,7 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-concepts/pipeline-concepts/creating-pipeline/unit-info.yaml
 
 sdk:
   - Java
@@ -26,11 +25,4 @@ id: creating-pipeline
 name: Creating pipelines
 complexity: BASIC
 taskName: creating-pipeline
-========
-sdk:
-  - Java
-  - Python
-id: map-elements
-name: Map elements
-taskName: map-elements
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/map/map-elements/unit-info.yaml
+

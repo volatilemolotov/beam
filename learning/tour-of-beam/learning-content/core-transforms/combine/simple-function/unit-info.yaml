@@ -21,14 +21,7 @@ sdk:
   - Java
   - Python
   - Go
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-concepts/creating-collections/reading-from-csv/unit-info.yaml
-id: from-csv
-name: Creating PCollections from csv files
-complexity: BASIC
-taskName: CSV
-========
 id: min
 name: Min example
 complexity: BASIC
 taskName: Min
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/combine/simple-function/unit-info.yaml

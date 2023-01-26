@@ -17,7 +17,6 @@
 # under the License.
 #
 
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-terms/unit-info.yaml
 sdk:
   - Java
   - Python
@@ -25,8 +24,4 @@ sdk:
 id: terms
 name: List of Beam Terms
 complexity: BASIC
-========
-id: group-by-key
-name: GroupByKey
-taskName: group-by-key
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/map/group-by-key/unit-info.yaml
+

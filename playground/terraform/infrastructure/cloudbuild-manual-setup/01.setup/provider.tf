@@ -15,18 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-<<<<<<<< HEAD:playground/terraform/infrastructure/cloudbuild-manual-setup/01.setup/provider.tf
 provider "google" {
   project = var.project_id
 }
-========
-sdk:
-  - Java
-id: schema-concepts
-name: Schema Concepts
-content:
-- creating-schema
-- logical-type
 
-
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/schema-concept/group-info.yaml

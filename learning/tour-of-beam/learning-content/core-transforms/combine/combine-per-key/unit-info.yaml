@@ -21,14 +21,7 @@ sdk:
   - Java
   - Python
   - Go
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/common-transforms/aggregation/max/unit-info.yaml
-id: max
-name: Max example
-complexity: BASIC
-taskName: Max
-========
 id: min
 name: Min example
 complexity: BASIC
 taskName: Min
->>>>>>>> tob-core-transforms-module:learning/tour-of-beam/learning-content/core-transforms/combine/combine-per-key/unit-info.yaml

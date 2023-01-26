@@ -16,16 +16,6 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-concepts/creating-collections/reading-from-text/unit-info.yaml
-sdk:
-  - Java
-  - Python
-  - Go
-id: from-text
-name: Creating PCollections from text files
-complexity: BASIC
-taskName: TextIO
-========
 
 sdk:
   - Java
@@ -33,4 +23,4 @@ id: select
 name: Select
 taskName: select
 complexity: ADVANCED
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/select/unit-info.yaml
+

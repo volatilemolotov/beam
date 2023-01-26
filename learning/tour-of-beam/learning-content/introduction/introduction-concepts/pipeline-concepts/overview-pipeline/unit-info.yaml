@@ -19,15 +19,9 @@
 
 sdk:
   - Java
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-concepts/pipeline-concepts/overview-pipeline/unit-info.yaml
   - Python
   - Go
 id: overview-pipeline
 name: Pipeline overview
 complexity: BASIC
-========
-id: coder
-name: Coder
-taskName: coder
-complexity: ADVANCED
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/coder/unit-info.yaml
+

@@ -19,15 +19,8 @@
 
 sdk:
   - Java
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/introduction/introduction-concepts/runner-concepts/unit-info.yaml
-  - Python
-  - Go
-id: runner-concepts
-name: Runners
-complexity: BASIC
-========
 id: join
 name: Join
 taskName: join
 complexity: ADVANCED
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/join/unit-info.yaml
+

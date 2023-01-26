@@ -19,18 +19,6 @@
 
 sdk:
   - Java
-<<<<<<<< HEAD:learning/tour-of-beam/learning-content/common-transforms/aggregation/group-info.yaml
-  - Python
-  - Go
-id: aggregation
-name: Aggregations
-content:
-- count
-- sum
-- mean
-- min
-- max
-========
 id: schema-based-transforms
 name: Schema-based transforms
 complexity: MEDIUM
@@ -45,5 +33,3 @@ content:
   - rename
   - coder
 
-
->>>>>>>> origin/tob-schema-based-transforms:learning/tour-of-beam/learning-content/schema-based-transforms/module-info.yaml
