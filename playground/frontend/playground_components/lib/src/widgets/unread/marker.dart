@@ -19,41 +19,18 @@
 import 'package:flutter/material.dart';
 
 import '../../constants/sizes.dart';
-import '../unread/marker.dart';
 
-const _horizontalPadding = BeamSizes.size8;
-
-class OutputTab extends StatelessWidget {
-  const OutputTab({
-    required this.isUnread,
-    required this.title,
-    this.trailing,
-  });
-
-  final bool isUnread;
-  final String title;
-  final Widget? trailing;
+class UnreadMarkerWidget extends StatelessWidget {
+  const UnreadMarkerWidget();
 
   @override
   Widget build(BuildContext context) {
-    return Tab(
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: BeamSizes.size8,
-        children: [
-          const SizedBox(width: _horizontalPadding),
-          Text(title),
-          if (trailing != null) trailing!,
-          SizedBox(
-            width: _horizontalPadding,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: isUnread
-                  ? const UnreadMarkerWidget()
-                  : const Opacity(opacity: 0, child: UnreadMarkerWidget()),
-            ),
-          ),
-        ],
+    return Container(
+      width: BeamIconSizes.xs,
+      height: BeamIconSizes.xs,
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColor,
+        shape: BoxShape.circle,
       ),
     );
   }

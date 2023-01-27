@@ -16,44 +16,42 @@
  * limitations under the License.
  */
 
+import 'dart:async';
+
+import 'package:aligned_dialog/aligned_dialog.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/sizes.dart';
-import '../unread/marker.dart';
+import '../../controllers/playground_controller.dart';
+import 'result_filter_popover.dart';
 
-const _horizontalPadding = BeamSizes.size8;
-
-class OutputTab extends StatelessWidget {
-  const OutputTab({
-    required this.isUnread,
-    required this.title,
-    this.trailing,
+class ResultFilterButton extends StatelessWidget {
+  const ResultFilterButton({
+    required this.playgroundController,
   });
 
-  final bool isUnread;
-  final String title;
-  final Widget? trailing;
+  final PlaygroundController playgroundController;
 
   @override
   Widget build(BuildContext context) {
-    return Tab(
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: BeamSizes.size8,
-        children: [
-          const SizedBox(width: _horizontalPadding),
-          Text(title),
-          if (trailing != null) trailing!,
-          SizedBox(
-            width: _horizontalPadding,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              child: isUnread
-                  ? const UnreadMarkerWidget()
-                  : const Opacity(opacity: 0, child: UnreadMarkerWidget()),
+    return GestureDetector(
+      onTap: () {
+        unawaited(
+          showAlignedDialog(
+            context: context,
+            builder: (dialogContext) => ResultFilterPopover(
+              playgroundController: playgroundController,
             ),
+            followerAnchor: Alignment.topLeft,
+            targetAnchor: Alignment.topLeft,
+            barrierColor: Colors.transparent,
           ),
-        ],
+        );
+      },
+      child: Icon(
+        Icons.filter_alt_outlined,
+        size: BeamIconSizes.small,
+        color: Theme.of(context).primaryColor,
       ),
     );
   }

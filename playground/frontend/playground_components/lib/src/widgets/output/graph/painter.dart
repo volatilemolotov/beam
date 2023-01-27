@@ -18,35 +18,21 @@
 
 import 'package:flutter/material.dart';
 
-import '../../enums/result_filter.dart';
-import '../bubble.dart';
+import 'graph_builder/canvas_drawer.dart';
+import 'graph_builder/painters/graph_painter.dart';
 
-class ResultFilterBubble extends StatelessWidget {
-  final ResultFilterEnum groupValue;
-  final ValueChanged<ResultFilterEnum> onChanged;
-  final String title;
-  final ResultFilterEnum value;
+class GraphCustomPainter extends CustomPainter {
+  final GraphPainter graph;
 
-  const ResultFilterBubble({
-    super.key,
-    required this.groupValue,
-    required this.onChanged,
-    required this.title,
-    required this.value,
-  });
+  GraphCustomPainter({required this.graph});
 
   @override
-  Widget build(BuildContext context) {
-    final isSelected = value == groupValue;
+  void paint(Canvas canvas, Size size) {
+    graph.paint(CanvasDrawer(canvas));
+  }
 
-    return BubbleWidget(
-      isSelected: isSelected,
-      onTap: () {
-        if (!isSelected) {
-          onChanged(value);
-        }
-      },
-      title: title,
-    );
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }

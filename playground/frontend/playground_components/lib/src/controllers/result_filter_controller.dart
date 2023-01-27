@@ -18,35 +18,13 @@
 
 import 'package:flutter/material.dart';
 
-import '../../enums/result_filter.dart';
-import '../bubble.dart';
+import '../enums/result_filter.dart';
 
-class ResultFilterBubble extends StatelessWidget {
-  final ResultFilterEnum groupValue;
-  final ValueChanged<ResultFilterEnum> onChanged;
-  final String title;
-  final ResultFilterEnum value;
+class ResultFilterController extends ChangeNotifier {
+  ResultFilterEnum value = ResultFilterEnum.all;
 
-  const ResultFilterBubble({
-    super.key,
-    required this.groupValue,
-    required this.onChanged,
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isSelected = value == groupValue;
-
-    return BubbleWidget(
-      isSelected: isSelected,
-      onTap: () {
-        if (!isSelected) {
-          onChanged(value);
-        }
-      },
-      title: title,
-    );
+  void setValue(ResultFilterEnum newValue) {
+    value = newValue;
+    notifyListeners();
   }
 }

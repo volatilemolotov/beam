@@ -21,14 +21,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../playground_components.dart';
+import '../enums/unread_entry.dart';
 import '../repositories/models/run_code_request.dart';
 import '../repositories/models/run_code_result.dart';
 import 'snippet_editing_controller.dart';
+import 'unread_controller.dart';
 
 class CodeRunner extends ChangeNotifier {
   final CodeRepository? _codeRepository;
   final ValueGetter<SnippetEditingController> _snippetEditingControllerGetter;
   SnippetEditingController? snippetEditingController;
+  final unreadController = UnreadController();
 
   CodeRunner({
     required ValueGetter<SnippetEditingController>
@@ -44,13 +47,19 @@ class CodeRunner extends ChangeNotifier {
 
   String? get pipelineOptions =>
       _snippetEditingControllerGetter().pipelineOptions;
+
   RunCodeResult? get result => _result;
+
   DateTime? get runStartDate => _runStartDate;
+
   DateTime? get runStopDate => _runStopDate;
+
   bool get isCodeRunning => !(_result?.isFinished ?? true);
 
   String get resultLog => _result?.log ?? '';
+
   String get resultOutput => _result?.output ?? '';
+
   String get resultLogOutput => resultLog + resultOutput;
 
   bool get isExampleChanged {
@@ -58,7 +67,7 @@ class CodeRunner extends ChangeNotifier {
   }
 
   void clearResult() {
-    _result = null;
+    _setResult(null);
     notifyListeners();
   }
 
@@ -67,13 +76,17 @@ class CodeRunner extends ChangeNotifier {
     _runStopDate = null;
     notifyListeners();
     snippetEditingController = _snippetEditingControllerGetter();
+    final sdk = snippetEditingController!.sdk;
 
     final parsedPipelineOptions =
         parsePipelineOptions(snippetEditingController!.pipelineOptions);
     if (parsedPipelineOptions == null) {
-      _result = const RunCodeResult(
-        status: RunCodeStatus.compileError,
-        errorMessage: kPipelineOptionsParseError,
+      _setResult(
+        RunCodeResult(
+          sdk: sdk,
+          status: RunCodeStatus.compileError,
+          errorMessage: kPipelineOptionsParseError,
+        ),
       );
       _runStopDate = DateTime.now();
       notifyListeners();
@@ -91,7 +104,7 @@ class CodeRunner extends ChangeNotifier {
         pipelineOptions: parsedPipelineOptions,
       );
       _runSubscription = _codeRepository?.runCode(request).listen((event) {
-        _result = event;
+        _setResult(event);
         notifyListeners();
 
         if (event.isFinished) {
@@ -114,14 +127,24 @@ class CodeRunner extends ChangeNotifier {
     if (_result == null) {
       return;
     }
-    _result = RunCodeResult(
-      status: _result!.status,
-      output: _result!.output,
+
+    _setResult(
+      RunCodeResult(
+        sdk: _result!.sdk,
+        status: _result!.status,
+        output: _result!.output,
+      ),
     );
+
     notifyListeners();
   }
 
   Future<void> cancelRun() async {
+    final sdk = _result?.sdk;
+    if (sdk == null) {
+      return;
+    }
+
     snippetEditingController = null;
     await _runSubscription?.cancel();
     final pipelineUuid = _result?.pipelineUuid ?? '';
@@ -130,11 +153,14 @@ class CodeRunner extends ChangeNotifier {
       await _codeRepository?.cancelExecution(pipelineUuid);
     }
 
-    _result = RunCodeResult(
-      status: RunCodeStatus.finished,
-      output: _result?.output,
-      log: (_result?.log ?? '') + kExecutionCancelledText,
-      graph: _result?.graph,
+    _setResult(
+      RunCodeResult(
+        sdk: sdk,
+        status: RunCodeStatus.finished,
+        output: _result?.output,
+        log: (_result?.log ?? '') + kExecutionCancelledText,
+        graph: _result?.graph,
+      ),
     );
 
     _runStopDate = DateTime.now();
@@ -142,24 +168,48 @@ class CodeRunner extends ChangeNotifier {
   }
 
   Future<void> _showPrecompiledResult() async {
-    _result = const RunCodeResult(
-      status: RunCodeStatus.preparation,
-    );
     final selectedExample = snippetEditingController!.example!;
+
+    _setResult(
+      RunCodeResult(
+        sdk: selectedExample.sdk,
+        status: RunCodeStatus.preparation,
+      ),
+    );
 
     notifyListeners();
     // add a little delay to improve user experience
     await Future.delayed(kPrecompiledDelay);
 
     final String logs = selectedExample.logs ?? '';
-    _result = RunCodeResult(
-      status: RunCodeStatus.finished,
-      output: selectedExample.outputs,
-      log: kCachedResultsLog + logs,
-      graph: selectedExample.graph,
+    _setResult(
+      RunCodeResult(
+        sdk: selectedExample.sdk,
+        status: RunCodeStatus.finished,
+        output: selectedExample.outputs,
+        log: kCachedResultsLog + logs,
+        graph: selectedExample.graph,
+      ),
     );
 
     _runStopDate = DateTime.now();
     notifyListeners();
+  }
+
+  void _setResult(RunCodeResult? newValue) {
+    _result = newValue;
+
+    if (newValue == null) {
+      unreadController.clear();
+    } else {
+      unreadController.setValue(
+        UnreadEntryEnum.result,
+        (newValue.output ?? '') + (newValue.log ?? ''),
+      );
+      unreadController.setValue(
+        UnreadEntryEnum.graph,
+        newValue.graph ?? '',
+      );
+    }
   }
 }

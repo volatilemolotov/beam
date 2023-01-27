@@ -39,7 +39,7 @@ import '../services/symbols/loaders/map.dart';
 import '../services/symbols/symbols_notifier.dart';
 import 'code_runner.dart';
 import 'example_loaders/examples_loader.dart';
-import 'output_filter_type_controller.dart';
+import 'result_filter_controller.dart';
 import 'snippet_editing_controller.dart';
 
 const kTitleLength = 25;
@@ -56,8 +56,7 @@ const kCachedResultsLog =
 class PlaygroundController with ChangeNotifier {
   final ExampleCache exampleCache;
   final ExamplesLoader examplesLoader;
-  final OutputFilterTypeController outputTypeController =
-      OutputFilterTypeController();
+  final resultFilterController = ResultFilterController();
 
   late final CodeRunner codeRunner;
 

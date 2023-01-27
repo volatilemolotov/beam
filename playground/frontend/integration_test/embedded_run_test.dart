@@ -16,18 +16,27 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
 import 'package:playground_components_dev/playground_components_dev.dart';
 
-Future<void> checkToggleBrightnessMode(WidgetTester wt) async {
-  final startBrightness = wt.getBrightness();
-  final invertedBrightness =
-      startBrightness == Brightness.light ? Brightness.dark : Brightness.light;
+import 'common/common.dart';
+import 'miscellaneous_ui/toggle_brightness_mode_test.dart';
 
-  await wt.toggleTheme();
-  expect(wt.getBrightness(), invertedBrightness);
+const _url = '/embedded?path=SDK_JAVA%2FPRECOMPILED_OBJECT_TYPE_EXAMPLE%2FMinimalWordCount&sdk=java';
 
-  await wt.toggleTheme();
-  expect(wt.getBrightness(), startBrightness);
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('Embedded run', (WidgetTester wt) async {
+    await init(wt);
+
+    await _openJavaMinimalWordCount(wt);
+    await wt.runExpectCached(javaMinimalWordCount);
+    await wt.modifyRunExpectReal(javaMinimalWordCount);
+    await checkToggleBrightnessMode(wt);
+  });
+}
+
+Future<void> _openJavaMinimalWordCount(WidgetTester wt) async {
+  await wt.navigateAndSettle(_url);
 }

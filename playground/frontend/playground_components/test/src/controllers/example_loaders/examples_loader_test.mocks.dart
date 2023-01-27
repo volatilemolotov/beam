@@ -11,10 +11,10 @@ import 'package:playground_components/src/cache/example_cache.dart' as _i2;
 import 'package:playground_components/src/controllers/code_runner.dart' as _i5;
 import 'package:playground_components/src/controllers/example_loaders/examples_loader.dart'
     as _i3;
-import 'package:playground_components/src/controllers/output_filter_type_controller.dart'
-    as _i4;
 import 'package:playground_components/src/controllers/playground_controller.dart'
     as _i12;
+import 'package:playground_components/src/controllers/result_filter_controller.dart'
+    as _i4;
 import 'package:playground_components/src/controllers/snippet_editing_controller.dart'
     as _i7;
 import 'package:playground_components/src/models/category_with_examples.dart'
@@ -48,8 +48,8 @@ class _FakeExampleCache_0 extends _i1.Fake implements _i2.ExampleCache {}
 
 class _FakeExamplesLoader_1 extends _i1.Fake implements _i3.ExamplesLoader {}
 
-class _FakeOutputFilterTypeController_2 extends _i1.Fake
-    implements _i4.OutputFilterTypeController {}
+class _FakeResultFilterController_2 extends _i1.Fake
+    implements _i4.ResultFilterController {}
 
 class _FakeCodeRunner_3 extends _i1.Fake implements _i5.CodeRunner {}
 
@@ -88,11 +88,10 @@ class MockPlaygroundController extends _i1.Mock
         returnValue: _FakeExamplesLoader_1(),
       ) as _i3.ExamplesLoader);
   @override
-  _i4.OutputFilterTypeController get outputTypeController =>
-      (super.noSuchMethod(
-        Invocation.getter(#outputTypeController),
-        returnValue: _FakeOutputFilterTypeController_2(),
-      ) as _i4.OutputFilterTypeController);
+  _i4.ResultFilterController get resultFilterController => (super.noSuchMethod(
+        Invocation.getter(#resultFilterController),
+        returnValue: _FakeResultFilterController_2(),
+      ) as _i4.ResultFilterController);
   @override
   _i5.CodeRunner get codeRunner => (super.noSuchMethod(
         Invocation.getter(#codeRunner),

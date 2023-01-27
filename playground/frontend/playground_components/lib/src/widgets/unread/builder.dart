@@ -16,37 +16,31 @@
  * limitations under the License.
  */
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-import '../../enums/result_filter.dart';
-import '../bubble.dart';
+import '../../controllers/unread_controller.dart';
 
-class ResultFilterBubble extends StatelessWidget {
-  final ResultFilterEnum groupValue;
-  final ValueChanged<ResultFilterEnum> onChanged;
-  final String title;
-  final ResultFilterEnum value;
-
-  const ResultFilterBubble({
+/// Calls [builder] when [controller] changes and passes the unread status
+/// of [unreadKey].
+class UnreadBuilder extends StatelessWidget {
+  const UnreadBuilder({
     super.key,
-    required this.groupValue,
-    required this.onChanged,
-    required this.title,
-    required this.value,
+    required this.builder,
+    required this.controller,
+    required this.unreadKey,
   });
+
+  final Widget Function(BuildContext context, bool isUnread) builder;
+  final UnreadController controller;
+  final Object unreadKey;
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = value == groupValue;
-
-    return BubbleWidget(
-      isSelected: isSelected,
-      onTap: () {
-        if (!isSelected) {
-          onChanged(value);
-        }
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return builder(context, controller.isUnread(unreadKey));
       },
-      title: title,
     );
   }
 }

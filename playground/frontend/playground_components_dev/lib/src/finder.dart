@@ -24,6 +24,10 @@ extension FinderExtension on Finder {
   Finder and(Finder another) {
     return _AndFinder(this, another);
   }
+
+  Finder or(Finder another) {
+    return _OrFinder(this, another);
+  }
 }
 
 class _AndFinder extends ChainedFinder {
@@ -37,5 +41,21 @@ class _AndFinder extends ChainedFinder {
   @override
   Iterable<Element> filter(Iterable<Element> parentCandidates) {
     return another.apply(parentCandidates);
+  }
+}
+
+class _OrFinder extends ChainedFinder {
+  _OrFinder(super.parent, this.another);
+
+  final Finder another;
+
+  @override
+  String get description => '(${parent.description} OR ${another.description})';
+
+  @override
+  Iterable<Element> filter(Iterable<Element> parentCandidates) {
+    final result = parentCandidates.toSet();
+    result.addAll(another.evaluate());
+    return result;
   }
 }

@@ -32,6 +32,7 @@ dependencies:
   get_it: ^7.2.0
   highlight: ^0.7.0
   http: ^0.13.5
+  keyed_collection_widgets: ^0.4.3
   playground_components: { path: ../playground_components }
   provider: ^6.0.3
   total_lints: ^2.18.0
