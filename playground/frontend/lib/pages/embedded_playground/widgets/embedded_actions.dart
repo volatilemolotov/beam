@@ -23,7 +23,7 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:playground/components/link_button.dart';
+import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:provider/provider.dart';
 
@@ -45,25 +45,13 @@ class EmbeddedActions extends StatelessWidget {
       children: [
         Consumer<PlaygroundController>(
           builder: (_, controller, __) {
-            final selectedExample = controller.selectedExample;
-            final hasColabLink = selectedExample?.urlNotebook?.isNotEmpty ?? false;
-            final hasDatasets = selectedExample?.datasets.isNotEmpty ?? false;
-            final hasGithubLink = selectedExample?.urlVcs?.isNotEmpty ?? false;
-
             return Row(
               children: [
-                if (hasGithubLink)
-                  _ButtonPadding(
-                    child: LinkButton.github(selectedExample?.urlVcs ?? ''),
+                ...buildExampleActions(controller.selectedExample).map(
+                  (w) => _ButtonPadding(
+                    child: w,
                   ),
-                if (hasColabLink)
-                  _ButtonPadding(
-                    child: LinkButton.colab(selectedExample?.urlNotebook ?? ''),
-                  ),
-                if (hasDatasets)
-                  _ButtonPadding(
-                    child: LinkButton.dataset(selectedExample!.datasets),
-                  ),
+                ),
                 const SizedBox(width: kXxlSpacing),
                 _ButtonPadding(
                   child: SizedBox(
