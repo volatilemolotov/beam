@@ -54,8 +54,6 @@ class _OrFinder extends ChainedFinder {
 
   @override
   Iterable<Element> filter(Iterable<Element> parentCandidates) {
-    final result = parentCandidates.toSet();
-    result.addAll(another.evaluate());
-    return result;
+    return {...parentCandidates, ...another.evaluate()};
   }
 }

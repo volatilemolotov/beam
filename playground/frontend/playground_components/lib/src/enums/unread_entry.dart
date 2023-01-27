@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+/// Keys to track the unread status for.
 enum UnreadEntryEnum {
   result,
   graph,

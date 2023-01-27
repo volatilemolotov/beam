@@ -83,9 +83,9 @@ class CodeRunner extends ChangeNotifier {
     if (parsedPipelineOptions == null) {
       _setResult(
         RunCodeResult(
+          errorMessage: kPipelineOptionsParseError,
           sdk: sdk,
           status: RunCodeStatus.compileError,
-          errorMessage: kPipelineOptionsParseError,
         ),
       );
       _runStopDate = DateTime.now();
@@ -130,9 +130,9 @@ class CodeRunner extends ChangeNotifier {
 
     _setResult(
       RunCodeResult(
+        output: _result!.output,
         sdk: _result!.sdk,
         status: _result!.status,
-        output: _result!.output,
       ),
     );
 
@@ -155,11 +155,11 @@ class CodeRunner extends ChangeNotifier {
 
     _setResult(
       RunCodeResult(
+        graph: _result?.graph,
+        log: (_result?.log ?? '') + kExecutionCancelledText,
+        output: _result?.output,
         sdk: sdk,
         status: RunCodeStatus.finished,
-        output: _result?.output,
-        log: (_result?.log ?? '') + kExecutionCancelledText,
-        graph: _result?.graph,
       ),
     );
 
@@ -184,11 +184,11 @@ class CodeRunner extends ChangeNotifier {
     final String logs = selectedExample.logs ?? '';
     _setResult(
       RunCodeResult(
+        graph: selectedExample.graph,
+        log: kCachedResultsLog + logs,
+        output: selectedExample.outputs,
         sdk: selectedExample.sdk,
         status: RunCodeStatus.finished,
-        output: selectedExample.outputs,
-        log: kCachedResultsLog + logs,
-        graph: selectedExample.graph,
       ),
     );
 
