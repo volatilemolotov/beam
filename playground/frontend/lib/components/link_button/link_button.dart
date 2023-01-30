@@ -21,18 +21,18 @@ import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkButton extends StatelessWidget {
+  final Color? color;
   final String iconPath;
+  final bool showText;
   final String text;
   final String url;
-  final Color? color;
-  final bool showText;
 
   const LinkButton({
     required this.iconPath,
     required this.text,
     required this.url,
-    this.showText = true,
     this.color,
+    this.showText = true,
   });
 
   @override

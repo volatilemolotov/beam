@@ -24,8 +24,9 @@ import '../../src/assets/assets.gen.dart';
 import 'link_button.dart';
 
 class ColabButton extends StatelessWidget {
-  final String url;
   final bool showText;
+  final String url;
+
   const ColabButton({
     required this.url,
     this.showText = true,

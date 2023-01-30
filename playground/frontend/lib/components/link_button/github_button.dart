@@ -23,8 +23,9 @@ import '../../src/assets/assets.gen.dart';
 import 'link_button.dart';
 
 class GithubButton extends StatelessWidget {
-  final String url;
   final bool showText;
+  final String url;
+  
   const GithubButton({
     required this.url,
     this.showText = true,
