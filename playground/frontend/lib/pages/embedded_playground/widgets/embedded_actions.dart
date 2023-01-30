@@ -23,11 +23,11 @@ import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:provider/provider.dart';
 
 import '../../../constants/sizes.dart';
+import '../../../modules/examples/components/example_actions.dart';
 import '../../../modules/messages/models/set_content_message.dart';
 import '../../../src/assets/assets.gen.dart';
 import '../../../utils/javascript_post_message.dart';
@@ -47,7 +47,10 @@ class EmbeddedActions extends StatelessWidget {
           builder: (_, controller, __) {
             return Row(
               children: [
-                ...buildExampleActions(controller.selectedExample).map(
+                ...buildExampleActions(
+                  controller.selectedExample,
+                  showButtonsText: false,
+                ).map(
                   (w) => _ButtonPadding(
                     child: w,
                   ),

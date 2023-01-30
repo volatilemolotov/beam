@@ -17,13 +17,11 @@
  */
 
 import 'package:flutter/material.dart';
-import 'package:playground/components/link_button/colab_button.dart';
-import 'package:playground/components/link_button/github_button.dart';
 import 'package:playground/constants/font_weight.dart';
 import 'package:playground/constants/sizes.dart';
 import 'package:playground_components/playground_components.dart';
 
-import '../../../../components/link_button/dataset_button.dart';
+import '../example_actions.dart';
 
 const kDescriptionWidth = 300.0;
 
@@ -64,21 +62,4 @@ class DescriptionPopover extends StatelessWidget {
       );
 
   Widget get description => Text(example.description);
-}
-
-List<Widget> buildExampleActions(ExampleBase? example) {
-  if (example == null) {
-    return [];
-  }
-
-  final hasColabLink = example.urlNotebook?.isNotEmpty ?? false;
-  final hasDatasets = example.datasets.isNotEmpty;
-  final hasGithubLink = example.urlVcs?.isNotEmpty ?? false;
-
-  return [
-    if (hasGithubLink) GithubButton(url: example.urlVcs ?? ''),
-    if (hasColabLink) ColabButton(url: example.urlNotebook ?? ''),
-    if (hasDatasets)
-      DatasetButton(fileName: example.datasets.first.datasetPath),
-  ];
 }

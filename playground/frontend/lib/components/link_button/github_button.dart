@@ -17,14 +17,18 @@
  */
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../../src/assets/assets.gen.dart';
 import 'link_button.dart';
 
 class GithubButton extends StatelessWidget {
   final String url;
-  const GithubButton({required this.url});
+  final bool showText;
+  const GithubButton({
+    required this.url,
+    this.showText = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +36,7 @@ class GithubButton extends StatelessWidget {
       iconPath: Assets.github,
       text: 'intents.playground.viewOnGithub'.tr(),
       url: url,
+      showText: showText,
     );
   }
 }

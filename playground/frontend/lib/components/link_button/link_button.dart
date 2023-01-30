@@ -25,25 +25,39 @@ class LinkButton extends StatelessWidget {
   final String text;
   final String url;
   final Color? color;
+  final bool showText;
 
   const LinkButton({
     required this.iconPath,
     required this.text,
     required this.url,
+    this.showText = true,
     this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextButton.icon(
-      icon: SvgPicture.asset(
-        iconPath,
-        color: color,
-      ),
-      onPressed: () {
-        launchUrl(Uri.parse(url));
-      },
-      label: Text(text),
+    final icon = SvgPicture.asset(
+      iconPath,
+      color: color,
     );
+    void onTap() => launchUrl(Uri.parse(url));
+    
+    if (showText) {
+      return TextButton.icon(
+        icon: icon,
+        onPressed: onTap,
+        label: Text(text),
+      );
+    } else {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: const BorderRadius.all(Radius.circular(8)),
+        child: Padding(
+          padding: const EdgeInsets.all(2.0),
+          child: icon,
+        ),
+      );
+    }
   }
 }

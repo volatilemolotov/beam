@@ -23,7 +23,7 @@ import 'package:playground_components/playground_components.dart';
 import '../../src/assets/assets.gen.dart';
 import 'link_button.dart';
 
-const datasetsFolderPath =
+const _datasetsFolderPath =
     'https://github.com/apache/beam/blob/master/playground/backend/datasets/';
 
 class DatasetButton extends StatelessWidget {
@@ -35,8 +35,10 @@ class DatasetButton extends StatelessWidget {
     return LinkButton(
       color: Theme.of(context).extension<BeamThemeExtension>()?.iconColor,
       iconPath: Assets.streaming,
-      text: 'intents.playground.showDatasets'.tr() + fileName,
-      url: '$datasetsFolderPath$fileName',
+      text: 'intents.playground.showDatasets'.tr(
+        namedArgs: {'fileName': fileName},
+      ),
+      url: '$_datasetsFolderPath$fileName',
     );
   }
 }
