@@ -45,7 +45,7 @@ class DescriptionPopover extends StatelessWidget {
               const SizedBox(height: kMdSpacing),
               description,
               const SizedBox(height: kMdSpacing),
-              ...buildExampleActions(example),
+              ...buildExampleActions(example, showButtonsText: true),
             ],
           ),
         ),

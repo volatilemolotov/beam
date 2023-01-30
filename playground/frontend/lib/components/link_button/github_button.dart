@@ -25,10 +25,10 @@ import 'link_button.dart';
 class GithubButton extends StatelessWidget {
   final bool showText;
   final String url;
-  
+
   const GithubButton({
     required this.url,
-    this.showText = true,
+    required this.showText,
   });
 
   @override

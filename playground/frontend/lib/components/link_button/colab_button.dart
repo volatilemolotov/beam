@@ -29,7 +29,7 @@ class ColabButton extends StatelessWidget {
 
   const ColabButton({
     required this.url,
-    this.showText = true,
+    required this.showText,
   });
 
   @override

@@ -25,7 +25,7 @@ import '../../../components/link_button/github_button.dart';
 
 List<Widget> buildExampleActions(
   ExampleBase? example, {
-  bool showButtonsText = true,
+  required bool showButtonsText,
 }) {
   if (example == null) {
     return [];
