@@ -27,10 +27,12 @@ import 'package:playground_components/src/models/example_loading_descriptors/exa
     as _i9;
 import 'package:playground_components/src/models/example_loading_descriptors/user_shared_example_loading_descriptor.dart'
     as _i8;
+import 'package:playground_components/src/models/example_view_options.dart'
+    as _i19;
 import 'package:playground_components/src/models/loading_status.dart' as _i18;
 import 'package:playground_components/src/models/sdk.dart' as _i13;
 import 'package:playground_components/src/models/shortcut.dart' as _i6;
-import 'package:playground_components/src/models/snippet_file.dart' as _i19;
+import 'package:playground_components/src/models/snippet_file.dart' as _i20;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -400,17 +402,21 @@ class MockExampleCache extends _i1.Mock implements _i2.ExampleCache {
         returnValue: Future<_i10.ExampleBase>.value(_FakeExampleBase_8()),
       ) as _i14.Future<_i10.ExampleBase>);
   @override
-  _i14.Future<_i11.Example> loadSharedExample(String? id) =>
+  _i14.Future<_i11.Example> loadSharedExample(
+    String? id, {
+    _i19.ExampleViewOptions? viewOptions,
+  }) =>
       (super.noSuchMethod(
         Invocation.method(
           #loadSharedExample,
           [id],
+          {#viewOptions: viewOptions},
         ),
         returnValue: Future<_i11.Example>.value(_FakeExample_9()),
       ) as _i14.Future<_i11.Example>);
   @override
   _i14.Future<String> saveSnippet({
-    List<_i19.SnippetFile>? files,
+    List<_i20.SnippetFile>? files,
     _i13.Sdk? sdk,
     String? pipelineOptions,
   }) =>
