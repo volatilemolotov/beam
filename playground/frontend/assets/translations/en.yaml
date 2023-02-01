@@ -20,4 +20,7 @@ intents:
     clearOutput: 'Clear Output'
     newExample: 'New Example'
     showSuggestions: 'Show Suggestions'
+    openGoogleColab: 'Open in Google Colab'
+    showDatasets: 'Dataset: {fileName}'
+    viewOnGithub: 'View on GitHub'
     usesEmulatedData: 'This examples uses emulated data'
