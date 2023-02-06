@@ -273,13 +273,12 @@ tasks.register("readState") {
 
 tasks.register("pushBack") {
     group = "deploy"
-    val modulePath = project(":playground").projectDir.absolutePath
     dependsOn(":playground:backend:containers:go:dockerTagsPush")
     dependsOn(":playground:backend:containers:java:dockerTagsPush")
     dependsOn(":playground:backend:containers:python:dockerTagsPush")
     dependsOn(":playground:backend:containers:scio:dockerTagsPush")
     dependsOn(":playground:backend:containers:router:dockerTagsPush")
-    dependsOn("$modulePath/infrastructure/proxy:dockerTagsPush")
+    dependsOn(":playground:infrastructure:proxy:dockerTagsPush")
 }
 
 tasks.register("pushFront") {
