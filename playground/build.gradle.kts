@@ -46,6 +46,8 @@ task("dockerComposeLocalUp") {
     dependsOn(":playground:backend:containers:python:docker")
     dependsOn(":playground:backend:containers:scio:docker")
     dependsOn(":playground:frontend:docker")
+    dependsOn(":playground:infrastructure:proxy:docker")
+    
 
     group = "build"
     description = "Start Playground backend and frontend locally"
