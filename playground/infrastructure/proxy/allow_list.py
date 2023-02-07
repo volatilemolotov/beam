@@ -20,6 +20,7 @@ ALLOWED_LIST = [
     "127.0.0.1",
     "logging.googleapis.com",
     "datastore.googleapis.com",
+    "bigquery.googleapis.com",
     "oauth2.googleapis.com",
     "storage.googleapis.com",
     "repo1.maven.org"
