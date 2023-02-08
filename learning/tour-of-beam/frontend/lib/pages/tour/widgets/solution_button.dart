@@ -19,6 +19,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:playground_components/playground_components.dart';
 
 import '../../../assets/assets.gen.dart';
 import '../state.dart';
@@ -42,7 +43,20 @@ class SolutionButton extends StatelessWidget {
                 : null,
           ),
         ),
-        onPressed: tourNotifier.toggleShowingSolution,
+        onPressed: () {
+          // TODO(nausharipov): resolve the conflict with save user code
+          showDialog(
+            context: context,
+            builder: (context) => BeamAlertDialog(
+              continueLabel: 'pages.tour.showSolution'.tr(),
+              title: 'pages.tour.solveYourself'.tr(),
+              onContinue: () {
+                tourNotifier.toggleShowingSolution();
+                Navigator.pop(context);
+              },
+            ),
+          );
+        },
         icon: SvgPicture.asset(Assets.svg.solution),
         label: const Text('ui.solution').tr(),
       ),
