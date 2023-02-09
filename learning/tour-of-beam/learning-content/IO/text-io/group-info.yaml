@@ -21,11 +21,9 @@ sdk:
   - Java
   - Python
   - Go
+complexity: MEDIUM
+id: textIO
+name: TextIO
 content:
-  - introduction
-  - common-transforms
-  - core-transforms
-  - schema-based-transforms
-  - windowing
-  - triggers
-  - io
+- text-io-local
+- text-io-gcs
