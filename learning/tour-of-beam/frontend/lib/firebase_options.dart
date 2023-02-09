@@ -53,11 +53,12 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBtAreurqJ5D4IK6cNisZh5dnDRKljbJAw',
-    authDomain: 'astest-369409.firebaseapp.com',
-    projectId: 'astest-369409',
-    storageBucket: 'astest-369409.appspot.com',
-    messagingSenderId: '534850967604',
-    appId: '1:534850967604:web:55c6af8da7940df1ddd261',
+  apiKey: "AIzaSyCKVQyItQWYnnK0xGdGYdA36X68Aiqwmjs",
+  authDomain: "careful-synapse-375718.firebaseapp.com",
+  projectId: "careful-synapse-375718",
+  storageBucket: "careful-synapse-375718.appspot.com",
+  messagingSenderId: "577014861619",
+  appId: "1:577014861619:web:82e14b0cd18367300f3846",
+  measurementId: "G-915G6Z0T0Y"
   );
 }
