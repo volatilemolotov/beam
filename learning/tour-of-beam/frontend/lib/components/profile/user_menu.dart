@@ -89,13 +89,18 @@ class _Info extends StatelessWidget {
   }
 }
 
-class _Buttons extends StatelessWidget {
+class _Buttons extends StatefulWidget {
   final VoidCallback closeOverlayCallback;
 
   const _Buttons({
     required this.closeOverlayCallback,
   });
 
+  @override
+  State<_Buttons> createState() => _ButtonsState();
+}
+
+class _ButtonsState extends State<_Buttons> {
   @override
   Widget build(BuildContext context) {
     final authNotifier = GetIt.instance.get<AuthNotifier>();
@@ -118,30 +123,27 @@ class _Buttons extends StatelessWidget {
         _IconLabel(
           onTap: () async {
             await authNotifier.logOut();
-            closeOverlayCallback();
+            widget.closeOverlayCallback();
           },
           iconPath: Assets.svg.profileLogout,
           label: 'ui.signOut'.tr(),
         ),
         const BeamDivider(),
         _IconLabel(
-          onTap: () {
-            closeOverlayCallback();
-            showDialog(
+          onTap: () async {
+            widget.closeOverlayCallback();
+            final confirmed = await ConfirmDialog.show(
               context: context,
-              builder: (context) => BeamAlertDialog(
-                text: 'dialogs.deleteAccountWarning'.tr(),
-                continueLabel: 'ui.deleteMyAccount'.tr(),
-                title: 'ui.deleteTobAccount'.tr(),
-                onContinue: () {
-                  authNotifier.deleteAccount().then(
-                    (_) {
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
+              confirmButtonText: 'ui.deleteMyAccount'.tr(),
+              subtitle: 'dialogs.deleteAccountWarning'.tr(),
+              title: 'ui.deleteTobAccount'.tr(),
             );
+            if (confirmed && mounted) {
+              await BeamOverlays.showProgressOverlay(
+                this.context,
+                authNotifier.deleteAccount(),
+              );
+            }
           },
           iconPath: Assets.svg.profileDelete,
           label: 'ui.deleteMyAccount'.tr(),

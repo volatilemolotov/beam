@@ -18,24 +18,29 @@
 
 import 'package:flutter/material.dart';
 
-import '../../controllers/public_notifier.dart';
-import 'widget.dart';
+import '../../../playground_components.dart';
 
-void showOverlay({
-  required BuildContext context,
-  required PublicNotifier closeNotifier,
-  required Positioned positioned,
-  bool barrierDismissible = true,
-}) {
-  final overlay = OverlayEntry(
-    builder: (context) {
-      return BeamOverlay(
-        close: closeNotifier.notifyPublic,
-        isDismissible: barrierDismissible,
-        child: positioned,
-      );
-    },
-  );
-  closeNotifier.addListener(overlay.remove);
-  Overlay.of(context)?.insert(overlay);
+/// Groups common overlays.
+class BeamOverlays {
+  /// Shows an overlay until future completes.
+  static Future<void> showProgressOverlay(
+    BuildContext context,
+    Future future,
+  ) async {
+    final closeNotifier = PublicNotifier();
+    showOverlay(
+      context: context,
+      closeNotifier: closeNotifier,
+      barrierDismissible: false,
+      positioned: Positioned.fill(
+        child: Container(
+          alignment: Alignment.center,
+          color: Theme.of(context).dialogBackgroundColor.withOpacity(0.2),
+          child: const CircularProgressIndicator(),
+        ),
+      ),
+    );
+    await future;
+    closeNotifier.notifyPublic();
+  }
 }

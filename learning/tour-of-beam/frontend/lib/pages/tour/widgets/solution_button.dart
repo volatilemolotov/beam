@@ -43,22 +43,24 @@ class SolutionButton extends StatelessWidget {
                 : null,
           ),
         ),
-        onPressed: () {
+        onPressed: () async {
           // TODO(nausharipov): resolve the conflict with save user code
-          showDialog(
-            context: context,
-            builder: (context) => BeamAlertDialog(
-              continueLabel: 'pages.tour.showSolution'.tr(),
-              title: 'pages.tour.solveYourself'.tr(),
-              onContinue: () {
-                tourNotifier.toggleShowingSolution();
-                Navigator.pop(context);
-              },
-            ),
-          );
+          if (tourNotifier.isShowingSolution) {
+            tourNotifier.toggleShowingSolution();
+          } else {
+            final confirmed = await ConfirmDialog.show(
+              context: context,
+              confirmButtonText: 'pages.tour.showSolution'.tr(),
+              subtitle: 'pages.tour.solveYourself'.tr(),
+              title: 'pages.tour.solution'.tr(),
+            );
+            if (confirmed) {
+              tourNotifier.toggleShowingSolution();
+            }
+          }
         },
         icon: SvgPicture.asset(Assets.svg.solution),
-        label: const Text('ui.solution').tr(),
+        label: const Text('pages.tour.solution').tr(),
       ),
     );
   }
