@@ -18,7 +18,7 @@ package validators
 import (
 	"beam.apache.org/playground/backend/internal/fs_tool"
 	"beam.apache.org/playground/backend/internal/logger"
-	"io/ioutil"
+	"os"
 	"strings"
 )
 
@@ -28,32 +28,32 @@ const (
 	javaKatasPattern    = "org.apache.beam.learning.katas"
 )
 
-// GetJavaValidators return validators methods that should be applied to Java code
-// The last validator should check that the code is unit tests or not
-func GetJavaValidators(filePath string) *[]Validator {
-	validatorArgs := make([]interface{}, 2)
-	validatorArgs[0] = filePath
-	validatorArgs[1] = javaExtension
-	pathCheckerValidator := Validator{
-		Validator: fs_tool.CheckPathIsValid,
-		Args:      validatorArgs,
-		Name:      "Valid path",
-	}
-	unitTestValidator := Validator{
-		Validator: checkIsUnitTestJava,
-		Args:      validatorArgs,
-		Name:      UnitTestValidatorName,
-	}
-	katasValidator := Validator{
-		Validator: checkIsKataJava,
-		Args:      validatorArgs,
-		Name:      KatasValidatorName,
-	}
-	validators := []Validator{pathCheckerValidator, unitTestValidator, katasValidator}
-	return &validators
+type javaValidator struct {
+	filepath string
 }
 
-//checkIsUnitTestJava checks if the pipeline is a UnitTest
+func GetJavaValidator(filepath string) Validator {
+	return javaValidator{filepath: filepath}
+}
+
+func (v javaValidator) Validate() (map[string]bool, error) {
+	var result = make(map[string]bool)
+	var err error
+
+	if result["Valid path"], err = fs_tool.CheckPathIsValid(v.filepath, javaExtension); err != nil {
+		return result, err
+	}
+	if result[UnitTestValidatorName], err = checkIsUnitTestJava(v.filepath, javaExtension); err != nil {
+		return result, err
+	}
+	if result[KatasValidatorName], err = checkIsKataJava(v.filepath, javaExtension); err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+// checkIsUnitTestJava checks if the pipeline is a UnitTest
 func checkIsUnitTestJava(args ...interface{}) (bool, error) {
 	ok, err := checkPipelineType(append(args, javaUnitTestPattern)...)
 	if err != nil {
@@ -62,7 +62,7 @@ func checkIsUnitTestJava(args ...interface{}) (bool, error) {
 	return ok, nil
 }
 
-//checkIsKataJava checks if the pipeline is a kata
+// checkIsKataJava checks if the pipeline is a kata
 func checkIsKataJava(args ...interface{}) (bool, error) {
 	ok, err := checkPipelineType(append(args, javaKatasPattern)...)
 	if err != nil {
@@ -74,7 +74,7 @@ func checkIsKataJava(args ...interface{}) (bool, error) {
 func checkPipelineType(args ...interface{}) (bool, error) {
 	filePath := args[0].(string)
 	pattern := args[2].(string)
-	code, err := ioutil.ReadFile(filePath)
+	code, err := os.ReadFile(filePath)
 	if err != nil {
 		logger.Errorf("Validation: Error during open file: %s, err: %s\n", filePath, err.Error())
 		return false, err
