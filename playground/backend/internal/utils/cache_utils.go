@@ -24,8 +24,8 @@ import (
 
 // SetToCache puts value to cache by key and subKey.
 // If error occurs during the function - logs and returns error.
-func SetToCache(ctx context.Context, cacheService cache.Cache, key uuid.UUID, subKey cache.SubKey, value interface{}) error {
-	err := cacheService.SetValue(ctx, key, subKey, value)
+func SetToCache(cacheService cache.Cache, key uuid.UUID, subKey cache.SubKey, value interface{}) error {
+	err := cacheService.SetValue(context.Background(), key, subKey, value)
 	if err != nil {
 		logger.Errorf("%s: cache.SetValue: %s\n", key, err.Error())
 		// TODO send email to fix error with writing to cache
