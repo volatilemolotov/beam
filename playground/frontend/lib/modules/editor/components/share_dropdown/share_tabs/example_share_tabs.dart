@@ -61,7 +61,7 @@ class ExampleShareTabs extends StatelessWidget {
           children: [
             Text(appLocale.linkReady),
             LinkTextField(
-              text: standaloneUri.toString(),
+              text: Uri.decodeFull(standaloneUri.toString()),
             ),
           ],
         ),
