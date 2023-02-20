@@ -81,8 +81,14 @@ class SnippetEditingController extends ChangeNotifier {
     _isChanged = false;
     releaseExampleLoading();
 
+    final selection = activeFileController?.codeController.selection;
+
     _deleteFileControllers();
     _createFileControllers(example.files, example.viewOptions);
+
+    if (selection != null) {
+      activeFileController?.codeController.selection = selection;
+    }
 
     notifyListeners();
   }

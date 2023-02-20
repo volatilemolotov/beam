@@ -27,7 +27,7 @@ class ShareCodeUtils {
     required Uri src,
   }) {
     return '<iframe'
-        ' src="${Uri.encodeComponent(src.toString())}"'
+        ' src="${Uri.encodeFull(src.toString())}"'
         ' width="${_htmlEscape(_width)}"'
         ' height="${_htmlEscape(_height)}"'
         ' allow="clipboard-write" '
