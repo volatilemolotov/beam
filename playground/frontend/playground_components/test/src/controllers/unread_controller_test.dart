@@ -54,7 +54,7 @@ void main() {
       expect(controller.isUnread('b'), true);
       expect(notified, 3);
 
-      controller.clearKey('b');
+      controller.markRead('b');
       expect(controller.isUnread('a'), true);
       expect(controller.isUnread('b'), false);
       expect(notified, 4);
@@ -65,12 +65,12 @@ void main() {
       expect(notified, 4);
 
       controller.setValue('c', 1);
-      controller.clear();
+      controller.markAllRead();
       expect(controller.isUnread('a'), false);
       expect(controller.isUnread('c'), false);
       expect(notified, 6);
 
-      controller.clear();
+      controller.markAllRead();
       expect(notified, 6);
     });
   });

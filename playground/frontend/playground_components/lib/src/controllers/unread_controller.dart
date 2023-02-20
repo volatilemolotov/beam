@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
 
 /// Tracks the unread status of arbitrary data.
 class UnreadController<K> extends ChangeNotifier {
@@ -38,8 +38,7 @@ class UnreadController<K> extends ChangeNotifier {
     return _unreadKeys.contains(key);
   }
 
-  /// Marks [key] as read.
-  void clearKey(K key) {
+  void markRead(K key) {
     if (!_unreadKeys.contains(key)) {
       return;
     }
@@ -48,8 +47,7 @@ class UnreadController<K> extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Marks all keys as read.
-  void clear() {
+  void markAllRead() {
     if (_unreadKeys.isEmpty) {
       return;
     }

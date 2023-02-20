@@ -25,16 +25,16 @@ class BeamTabBar<K extends Object> extends StatelessWidget {
   const BeamTabBar({
     super.key,
     required this.tabs,
-    this.padding = false,
+    this.hasPadding = false,
   });
 
-  final bool padding;
+  final bool hasPadding;
   final Map<K, Widget> tabs;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding
+      padding: hasPadding
           ? const EdgeInsets.symmetric(horizontal: BeamSizes.size16)
           : EdgeInsets.zero,
       child: SizedBox(

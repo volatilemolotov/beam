@@ -41,14 +41,14 @@ class UnreadClearer<T> extends StatelessWidget {
       key: Key(unreadKey.toString()),
       onVisibilityChanged: (info) {
         if (info.visibleFraction > 0) {
-          controller.clearKey(unreadKey);
+          controller.markRead(unreadKey);
         }
       },
       child: AnimatedBuilder(
         animation: controller,
         builder: (context, _) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            controller.clearKey(unreadKey);
+            controller.markRead(unreadKey);
           });
           return child;
         },

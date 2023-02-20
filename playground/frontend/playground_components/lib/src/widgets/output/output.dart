@@ -59,7 +59,7 @@ class OutputWidget extends StatelessWidget {
                 children: [
                   Expanded(
                     child: BeamTabBar(
-                      padding: true,
+                      hasPadding: true,
                       tabs: UnmodifiableOutputTabEnumMap(
                         result: ResultTab(
                           playgroundController: playgroundController,

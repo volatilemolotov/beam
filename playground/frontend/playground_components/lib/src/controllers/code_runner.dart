@@ -200,7 +200,7 @@ class CodeRunner extends ChangeNotifier {
     _result = newValue;
 
     if (newValue == null) {
-      unreadController.clear();
+      unreadController.markAllRead();
     } else {
       unreadController.setValue(
         UnreadEntryEnum.result,
