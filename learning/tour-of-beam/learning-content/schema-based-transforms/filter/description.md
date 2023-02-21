@@ -53,16 +53,16 @@ class UserAccount {
 Let's say you'd like to process only users who's total spend is over $100. You could write:
 
 ```
-PCollection<UserAccount> users = readUsers();
-users.apply(Filter
+PCollection<UserAccount> input = readUsers();
+input.apply(Filter
     .whereFieldNames(Lists.newArrayList("spendOnBooks", "spendOnMovies"),
         row -> return row.getDouble("spendOnBooks") + row.getDouble("spendOnMovies") > 100.00));
 ```
 
 ### Playground exercise
 
-In the playground window you can find examples of using the `Filter` button. 
-By running this example, you will see user statistics in certain games. 
+In the playground window you can find examples of using the `Filter` button.
+By running this example, you will see user statistics in certain games.
 You can do by multiple fields:
 ```
 .apply(Filter.create().whereFieldNames(Arrays.asList("userId", "score"), new SerializableFunction<Row, Boolean>() {
