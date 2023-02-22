@@ -40,10 +40,10 @@ pages:
   tour:
     assignment: Assignment
     completeUnit: Complete Unit
-    hint: Hint
-    showSolution: Show the solution
+    example: Example
+    myCode: My code
+    saving: Saving...
     solution: Solution
-    solveYourself: Before revealing the solution, try solving the challenge on your own. Remember, the more you practice, the better you will become. Give it a shot and see how far you can get.
     summaryTitle: Table of Contents
 
 dialogs:
