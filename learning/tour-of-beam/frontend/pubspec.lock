@@ -40,7 +40,7 @@ packages:
       sha256: "8f363b17492dccf720cc70e896a367726171bee8dad047acd8f69f2cc2cf7e9c"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.3"
+    version: "0.9.2"
   archive:
     dependency: transitive
     description:
