@@ -34,6 +34,8 @@ abstract class TobClient {
 
   Future<void> postUnitComplete(String sdkId, String id);
 
+  Future<void> postDeleteUserProgress();
+  
   Future<void> postUserCode({
     required List<SnippetFile> snippetFiles,
     required String sdkId,
