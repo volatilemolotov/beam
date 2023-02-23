@@ -343,7 +343,6 @@ class TourNotifier extends ChangeNotifier with PageStateMixin<void> {
     _unitContentCache.removeListener(_onUnitChanged);
     contentTreeController.removeListener(_onUnitChanged);
     _appNotifier.removeListener(_onAppNotifierChanged);
-    _authNotifier.removeListener(_onUnitProgressChanged);
     _authNotifier.removeListener(_onAuthChanged);
     playgroundController.snippetEditingController
         ?.removeListener(_onActiveFileControllerChanged);
@@ -351,6 +350,6 @@ class TourNotifier extends ChangeNotifier with PageStateMixin<void> {
     playgroundController
         .snippetEditingController?.activeFileController?.codeController
         .removeListener(_onCodeChanged);
-    await await super.dispose();
+    await super.dispose();
   }
 }
