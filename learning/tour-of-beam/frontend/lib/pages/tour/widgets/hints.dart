@@ -70,7 +70,7 @@ class _Popup extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'ui.hint',
+                'pages.tour.hint',
                 style: Theme.of(context).textTheme.headlineLarge,
               ).tr(),
               const SizedBox(height: BeamSizes.size8),
