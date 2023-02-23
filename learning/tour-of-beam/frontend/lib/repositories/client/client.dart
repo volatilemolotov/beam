@@ -39,4 +39,6 @@ abstract class TobClient {
     required String sdkId,
     required String unitId,
   });
+
+  Future<void> postDeleteUserProgress();
 }
