@@ -29,11 +29,6 @@ services:
     expose:
       - 8081
 
-  mitmproxy:
-    image: apache/beam_playground-backend-mitmproxy
-    expose:
-      - 8080
-
   router:
     image: apache/beam_playground-backend-router
     environment:
@@ -56,13 +51,10 @@ services:
       CACHE_TYPE: remote
       CACHE_ADDRESS: redis:6379
       SERVER_PORT: 8084
-      PLAYGROUND_MITM_SERVICE_HOST: mitmproxy
-      PLAYGROUND_MITM_SERVICE_PORT: 8080
     ports:
       - "8084:8084"
     depends_on:
       - redis
-      - mitmproxy
 
   java_runner:
     image: apache/beam_playground-backend-java
@@ -71,13 +63,10 @@ services:
       CACHE_TYPE: remote
       CACHE_ADDRESS: redis:6379
       SERVER_PORT: 8086
-      PLAYGROUND_MITM_SERVICE_HOST: mitmproxy
-      PLAYGROUND_MITM_SERVICE_PORT: 8080
     ports:
       - "8086:8086"
     depends_on:
       - redis
-      - mitmproxy
 
   python_runner:
     image: apache/beam_playground-backend-python
@@ -86,13 +75,10 @@ services:
       CACHE_TYPE: remote
       CACHE_ADDRESS: redis:6379
       SERVER_PORT: 8088
-      PLAYGROUND_MITM_SERVICE_HOST: mitmproxy
-      PLAYGROUND_MITM_SERVICE_PORT: 8080
     ports:
       - "8088:8088"
     depends_on:
       - redis
-      - mitmproxy
 
   scio_runner:
     image: apache/beam_playground-backend-scio
@@ -101,13 +87,10 @@ services:
       CACHE_TYPE: remote
       CACHE_ADDRESS: redis:6379
       SERVER_PORT: 8090
-      PLAYGROUND_MITM_SERVICE_HOST: mitmproxy
-      PLAYGROUND_MITM_SERVICE_PORT: 8080
     ports:
       - "8090:8090"
     depends_on:
       - redis
-      - mitmproxy
 
   frontend:
     image: apache/beam_playground-frontend
