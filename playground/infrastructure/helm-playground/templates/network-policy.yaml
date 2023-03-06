@@ -29,8 +29,13 @@ spec:
           - backend-java
           - backend-python
           - backend-scio
+  podSelector: {}
   policyTypes:
     - Egress
+    - Ingress
+  ingress:
+  - from:
+    - podSelector: {}
   egress:
     - to:
         - namespaceSelector:
