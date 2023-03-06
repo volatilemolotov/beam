@@ -278,7 +278,6 @@ tasks.register("pushBack") {
     dependsOn(":playground:backend:containers:python:dockerTagsPush")
     dependsOn(":playground:backend:containers:scio:dockerTagsPush")
     dependsOn(":playground:backend:containers:router:dockerTagsPush")
-    dependsOn(":playground:backend:containers:mitmproxy:dockerTagsPush")
 }
 
 tasks.register("pushFront") {
