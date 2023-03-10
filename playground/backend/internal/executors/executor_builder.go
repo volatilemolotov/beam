@@ -15,10 +15,6 @@
 
 package executors
 
-import (
-	"beam.apache.org/playground/backend/internal/preparers"
-)
-
 type handler func(executor *Executor)
 
 // ExecutorBuilder struct
@@ -69,11 +65,6 @@ func (b *ExecutorBuilder) WithRunner() *RunBuilder {
 // WithValidator - Lives chains to type *ExecutorBuilder and returns a *CompileBuilder
 func (b *ExecutorBuilder) WithValidator() *ValidatorBuilder {
 	return &ValidatorBuilder{*b}
-}
-
-// WithPreparer - Lives chains to type *ExecutorBuilder and returns a *PreparerBuilder
-func (b *ExecutorBuilder) WithPreparer() *PreparerBuilder {
-	return &PreparerBuilder{*b}
 }
 
 // WithTestRunner - Lives chains to type *ExecutorBuilder and returns a *UnitTestExecutorBuilder
@@ -189,14 +180,6 @@ func (b *UnitTestExecutorBuilder) WithGraphOutput() *UnitTestExecutorBuilder {
 func (b *UnitTestExecutorBuilder) WithExecutableFileName(name string) *UnitTestExecutorBuilder {
 	b.actions = append(b.actions, func(e *Executor) {
 		e.testArgs.fileName = name
-	})
-	return b
-}
-
-// WithSdkPreparers sets preparers to executor
-func (b *PreparerBuilder) WithSdkPreparers(preparers *[]preparers.Preparer) *PreparerBuilder {
-	b.actions = append(b.actions, func(e *Executor) {
-		e.preparers = *preparers
 	})
 	return b
 }

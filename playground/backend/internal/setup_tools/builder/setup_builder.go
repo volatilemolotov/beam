@@ -20,9 +20,7 @@ import (
 	"beam.apache.org/playground/backend/internal/environment"
 	"beam.apache.org/playground/backend/internal/executors"
 	"beam.apache.org/playground/backend/internal/fs_tool"
-	"beam.apache.org/playground/backend/internal/preparers"
 	"beam.apache.org/playground/backend/internal/utils"
-	"beam.apache.org/playground/backend/internal/validators"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -32,20 +30,6 @@ const (
 	javaLogConfigFileName        = "logging.properties"
 	javaLogConfigFilePlaceholder = "{logConfigFile}"
 )
-
-// Preparer return executor with set args for preparer
-func Preparer(paths *fs_tool.LifeCyclePaths, sdkEnv *environment.BeamEnvs, valResults validators.ValidationResult, prepareParams map[string]string) (*executors.ExecutorBuilder, error) {
-	sdk := sdkEnv.ApacheBeamSdk
-	prep, err := preparers.GetPreparers(sdk, paths.AbsoluteSourceFilePath, valResults, prepareParams)
-	if err != nil {
-		return nil, err
-	}
-	builder := executors.NewExecutorBuilder().
-		WithPreparer().
-		WithSdkPreparers(prep).
-		ExecutorBuilder
-	return &builder, nil
-}
 
 // Compiler return executor with set args for compiler
 func Compiler(paths *fs_tool.LifeCyclePaths, sdkEnv *environment.BeamEnvs) *executors.ExecutorBuilder {

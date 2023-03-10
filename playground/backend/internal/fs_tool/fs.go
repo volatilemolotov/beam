@@ -145,9 +145,9 @@ func (lc *LifeCycle) CopyFile(fileName, sourceDir, destinationDir string) error 
 	return nil
 }
 
-func (lc *LifeCycle) GetPreparerParameters() map[string]string {
+func (lc *LifeCycle) GetEmulatorParameters() *emulators.EmulatorParameters {
 	if lc.emulatorMockCluster == nil {
-		return map[string]string{}
+		return nil
 	}
 	return lc.emulatorMockCluster.GetPreparerParameters()
 }
