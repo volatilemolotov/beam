@@ -30,6 +30,12 @@ class ExternalUrlNavigatedAnalyticsEvent extends AnalyticsEvent {
   final Uri url;
 
   @override
+  List<Object?> get props => [
+        ...super.props,
+        url,
+      ];
+
+  @override
   Map<String, dynamic> toJson() => {
         ...super.toJson(),
         EventParams.destinationUrl: url.toString(),

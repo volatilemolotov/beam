@@ -115,8 +115,7 @@ Future<void> _tapAndExpectNavigationEvent(
     await wt.pumpAndSettle();
   }
 
-  expect(
-    PlaygroundComponents.analyticsService.lastEvent,
+  expectLastAnalyticsEvent(
     ExternalUrlNavigatedAnalyticsEvent(url: Uri.parse(url)),
     reason: url,
   );

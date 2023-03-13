@@ -18,6 +18,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playground_components/playground_components.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
 import '../common/examples.dart';
 
@@ -25,8 +26,7 @@ Future<void> checkReportIssue(WidgetTester wt) async {
   await wt.tap(find.byType(ReportIssueButton));
   await wt.pumpAndSettle();
 
-  expect(
-    PlaygroundComponents.analyticsService.lastEvent,
+  expectLastAnalyticsEvent(
     ReportIssueClickedAnalyticsEvent(
       snippetContext: defaultEventSnippetContext,
     ),

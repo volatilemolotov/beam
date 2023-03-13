@@ -18,6 +18,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:playground/services/analytics/events/snippet_selected.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:playground_components_dev/playground_components_dev.dart';
 
@@ -42,6 +43,13 @@ void main() {
             await javaAggregationMax.getVisibleText(),
           ),
       true,
+    );
+
+    expectLastAnalyticsEvent(
+      SnippetSelectedAnalyticsEvent(
+        sdk: Sdk.java,
+        snippet: javaAggregationMax.path,
+      ),
     );
   }
 
@@ -73,6 +81,8 @@ public class MyClass {
           ),
       true,
     );
+
+    expectLastAnalyticsEvent(const SdkSelectedAnalyticsEvent(sdk: Sdk.python));
   }
 
   Future<void> changeToPythonAggregationMean(WidgetTester wt) async {

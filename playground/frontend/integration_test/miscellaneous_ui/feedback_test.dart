@@ -18,6 +18,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playground_components/playground_components.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
 import '../common/common_finders.dart';
 import '../common/examples.dart';
@@ -42,8 +43,7 @@ Future<void> _checkFeedback(
   await wt.tap(find.feedbackThumb(rating));
   await wt.pumpAndSettle();
 
-  expect(
-    PlaygroundComponents.analyticsService.lastEvent,
+  expectLastAnalyticsEvent(
     AppRatedAnalyticsEvent(
       rating: rating,
       snippetContext: defaultEventSnippetContext,
@@ -65,8 +65,7 @@ Future<void> _checkFeedback(
     await wt.tap(find.feedbackDropdownSendButton());
     await wt.pumpAndSettle();
 
-    expect(
-      PlaygroundComponents.analyticsService.lastEvent,
+    expectLastAnalyticsEvent(
       FeedbackFormSentAnalyticsEvent(
         rating: rating,
         text: text,

@@ -127,11 +127,15 @@ extension WidgetTesterExtension on WidgetTester {
       );
 
       // ignore: avoid_catching_errors
-    } on FlutterError catch (ex) {
+    } on FlutterError {
       // Expected timeout because for some reason UI updates way longer.
     }
 
     expect(codeRunner.isCodeRunning, false);
+    expect(
+      PlaygroundComponents.analyticsService.lastEvent,
+      isA<RunStartedAnalyticsEvent>(), // Cached finish does not fire events.
+    );
 
     await pumpAndSettle(); // Let the UI catch up.
 
@@ -141,6 +145,9 @@ extension WidgetTesterExtension on WidgetTester {
 
   /// Runs and expects that the execution is as fast as it should be for cache.
   Future<void> modifyRunExpectReal(ExampleDescriptor example) async {
+    final playgroundController = findPlaygroundController();
+    final eventSnippetContext = playgroundController.eventSnippetContext;
+
     _modifyCodeController();
     await tap(find.runOrCancelButton());
     await pumpAndSettle();
@@ -148,6 +155,12 @@ extension WidgetTesterExtension on WidgetTester {
     final actualText = findOutputText();
     expect(actualText, isNot(startsWith(kCachedResultsLog)));
     expectOutput(example, this);
+
+    final event = PlaygroundComponents.analyticsService.lastEvent;
+    expect(event, isA<RunFinishedAnalyticsEvent>());
+
+    final finishedEvent = event! as RunFinishedAnalyticsEvent;
+    expect(finishedEvent.snippetContext, eventSnippetContext);
   }
 
   void _modifyCodeController() {
