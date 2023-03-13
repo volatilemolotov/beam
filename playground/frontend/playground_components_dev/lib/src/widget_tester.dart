@@ -145,10 +145,12 @@ extension WidgetTesterExtension on WidgetTester {
 
   /// Runs and expects that the execution is as fast as it should be for cache.
   Future<void> modifyRunExpectReal(ExampleDescriptor example) async {
+    _modifyCodeController();
+
     final playgroundController = findPlaygroundController();
     final eventSnippetContext = playgroundController.eventSnippetContext;
+    expect(eventSnippetContext.snippet, null);
 
-    _modifyCodeController();
     await tap(find.runOrCancelButton());
     await pumpAndSettle();
 
