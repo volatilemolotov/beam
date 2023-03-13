@@ -87,8 +87,11 @@ export 'src/util/pipeline_options.dart';
 export 'src/util/string.dart';
 
 export 'src/widgets/bubble.dart';
+export 'src/widgets/buttons/privacy_policy.dart';
+export 'src/widgets/buttons/report_issue.dart';
 export 'src/widgets/clickable.dart';
 export 'src/widgets/complexity.dart';
+export 'src/widgets/copyright.dart';
 export 'src/widgets/divider.dart';
 export 'src/widgets/header_icon_button.dart';
 export 'src/widgets/loading_error.dart';

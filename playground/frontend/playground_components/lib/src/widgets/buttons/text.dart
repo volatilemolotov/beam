@@ -16,29 +16,25 @@
  * limitations under the License.
  */
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 
-import '../common/common_finders.dart';
+import '../../theme/theme.dart';
 
-Future<void> checkShortcutsModal(WidgetTester wt) async {
-  expect(find.shortcutsModal(), findsNothing);
+class BeamTextButton extends StatelessWidget {
+  const BeamTextButton({
+    required this.onPressed,
+    required this.title,
+  });
 
-  AppLocalizations appLocale =
-      AppLocalizations.of(wt.element(find.moreActions()))!;
+  final VoidCallback onPressed;
+  final String title;
 
-  await wt.tap(find.moreActions());
-  await wt.pumpAndSettle();
-
-  expect(find.text(appLocale.shortcuts), findsOneWidget);
-
-  await wt.tap(find.text(appLocale.shortcuts));
-  await wt.pumpAndSettle();
-
-  expect(find.shortcutsModal(), findsOneWidget);
-
-  await wt.tap(find.text(appLocale.close));
-  await wt.pumpAndSettle();
-
-  expect(find.shortcutsModal(), findsNothing);
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: Theme.of(context).extension<BeamThemeExtension>()!.textButtonStyle,
+      onPressed: onPressed,
+      child: Text(title),
+    );
+  }
 }

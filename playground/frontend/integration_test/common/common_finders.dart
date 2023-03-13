@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playground/modules/actions/components/reset_action.dart';
 import 'package:playground/modules/editor/components/pipeline_options_dropdown/pipeline_options_dropdown.dart';
@@ -29,7 +29,7 @@ import 'package:playground/modules/sdk/components/sdk_selector_row.dart';
 import 'package:playground/modules/shortcuts/components/shortcuts_modal.dart';
 import 'package:playground/pages/standalone_playground/widgets/editor_textarea_wrapper.dart';
 import 'package:playground/pages/standalone_playground/widgets/feedback/feedback_dropdown_content.dart';
-import 'package:playground/pages/standalone_playground/widgets/feedback/playground_feedback.dart';
+import 'package:playground/pages/standalone_playground/widgets/feedback/feedback_dropdown_icon_button.dart';
 import 'package:playground/pages/standalone_playground/widgets/more_actions.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:playground_components/src/widgets/drag_handle.dart';
@@ -76,22 +76,26 @@ extension CommonFindersExtension on CommonFinders {
     return find.byKey(FeedbackDropdownContent.textFieldKey);
   }
 
-  Finder feedbackThumbDown() {
-    return find.byKey(PlaygroundFeedback.thumbDownKey);
-  }
-
-  Finder feedbackThumbUp() {
-    return find.byKey(PlaygroundFeedback.thumbUpKey);
+  Finder feedbackThumb(FeedbackRating rating) {
+    return find.byType(FeedbackDropdownIconButton).and(
+          find.byKey(Key(rating.name)),
+        );
   }
 
   Finder moreActions() {
     return byType(MoreActions);
   }
 
+  Finder menuItem(HeaderAction value) {
+    return byWidgetPredicate(
+      (widget) => widget is PopupMenuItem && widget.value == value,
+    );
+  }
+
   Finder pipelineOptionsDropdown() {
     return find.byType(PipelineOptionsDropdown);
   }
-  
+
   Finder pipelineOptionsListTab() {
     return find.byKey(PipelineOptionsDropdownBody.optionsTabKey);
   }

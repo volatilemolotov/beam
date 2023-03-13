@@ -25,3 +25,9 @@ final defaultExamples = {
   Sdk.python: pythonWordCountWithMetrics,
   // Sdk.scio: scioMinimalWordCount,
 };
+
+final defaultEventSnippetContext = EventSnippetContext(
+  originalSnippet: javaMinimalWordCount.dbPath,
+  sdk: Sdk.java,
+  snippet: javaMinimalWordCount.dbPath,
+);
