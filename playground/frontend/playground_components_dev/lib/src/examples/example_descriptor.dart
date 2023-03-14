@@ -89,6 +89,9 @@ class ExampleDescriptor {
   /// Whether the example tab must be visible after running this example.
   bool get hasGraphTab => !_noGraphSdks.contains(sdk);
 
+  /// The name base name of the main file with extension.
+  String get mainFileName => '$name${sdk.fileExtension}';
+
   /// The URL to view the file with GitHub UI elements.
   ///
   /// Example:

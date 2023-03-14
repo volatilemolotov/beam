@@ -31,3 +31,9 @@ final defaultEventSnippetContext = EventSnippetContext(
   sdk: Sdk.java,
   snippet: javaMinimalWordCount.dbPath,
 );
+
+final modifiedDefaultEventSnippetContext = EventSnippetContext(
+  originalSnippet: javaMinimalWordCount.dbPath,
+  sdk: Sdk.java,
+  snippet: null,
+);

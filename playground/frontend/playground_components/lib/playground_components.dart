@@ -75,6 +75,7 @@ export 'src/services/analytics/events/run_cancelled.dart';
 export 'src/services/analytics/events/run_finished.dart';
 export 'src/services/analytics/events/run_started.dart';
 export 'src/services/analytics/events/sdk_selected.dart';
+export 'src/services/analytics/events/snippet_modified.dart';
 export 'src/services/analytics/events/snippet_reset.dart';
 export 'src/services/analytics/events/theme_set.dart';
 export 'src/services/analytics/google_analytics4_service/google_analytics4_service.dart';
