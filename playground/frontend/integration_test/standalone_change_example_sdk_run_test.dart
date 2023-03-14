@@ -48,7 +48,7 @@ void main() {
     expectLastAnalyticsEvent(
       SnippetSelectedAnalyticsEvent(
         sdk: Sdk.java,
-        snippet: javaAggregationMax.path,
+        snippet: javaAggregationMax.dbPath,
       ),
     );
   }
