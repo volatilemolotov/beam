@@ -30,20 +30,17 @@ Future<void> checkShortcutsModal(WidgetTester wt) async {
   AppLocalizations appLocale =
       AppLocalizations.of(wt.element(find.moreActions()))!;
 
-  await wt.tap(find.moreActions());
-  await wt.pumpAndSettle();
+  await wt.tapAndSettle(find.moreActions());
 
   final menuItem = find.menuItem(HeaderAction.shortcuts);
   expect(menuItem, findsOneWidget);
 
-  await wt.tap(menuItem);
-  await wt.pumpAndSettle();
+  await wt.tapAndSettle(menuItem);
 
   expect(find.shortcutsModal(), findsOneWidget);
   expectLastAnalyticsEvent(const ShortcutsClickedAnalyticsEvent());
 
-  await wt.tap(find.text(appLocale.close));
-  await wt.pumpAndSettle();
+  await wt.tapAndSettle(find.text(appLocale.close));
 
   expect(find.shortcutsModal(), findsNothing);
 }

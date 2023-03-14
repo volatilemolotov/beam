@@ -22,8 +22,7 @@ import 'package:playground/services/analytics/events/new_example.dart';
 import 'package:playground_components_dev/playground_components_dev.dart';
 
 Future<void> checkNewExample(WidgetTester wt) async {
-  await wt.tap(find.byType(NewExampleButton));
-  await wt.pumpAndSettle();
+  await wt.tapAndSettle(find.byType(NewExampleButton));
 
   expectLastAnalyticsEvent(const NewExampleAnalyticsEvent());
 }

@@ -131,6 +131,7 @@ extension CommonFindersExtension on CommonFinders {
   }
 
   Finder shareEmbedTabHeader() {
+    // TODO(alexeyinkin): Use keys when refactored the sharing tabs, https://github.com/apache/beam/issues/24637
     return descendant(
       of: byType(ShareTabsHeaders),
       matching: text('Embed'),

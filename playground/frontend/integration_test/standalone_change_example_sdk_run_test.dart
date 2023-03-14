@@ -32,11 +32,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   Future<void> changeToJavaAggregationMax(WidgetTester wt) async {
-    await wt.tap(find.exampleSelector());
-    await wt.pumpAndSettle();
-
-    await wt.tap(find.exampleItemInDropdown(javaAggregationMax.name));
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(find.exampleSelector());
+    await wt.tapAndSettle(find.exampleItemInDropdown(javaAggregationMax.name));
 
     expect(
       wt.findOneCodeController().lastTextSpan!.toPlainText().isAsIfCutFrom(
@@ -66,8 +63,7 @@ public class MyClass {
     await wt.enterText(find.codeField(), code);
     await wt.pumpAndSettle();
 
-    await wt.tap(find.runOrCancelButton());
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(find.runOrCancelButton());
 
     expectOutputEquals('$_outputPrefix$text', wt);
   }
@@ -86,11 +82,9 @@ public class MyClass {
   }
 
   Future<void> changeToPythonAggregationMean(WidgetTester wt) async {
-    await wt.tap(find.exampleSelector());
-    await wt.pumpAndSettle();
-
-    await wt.tap(find.exampleItemInDropdown(pythonAggregationMean.name));
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(find.exampleSelector());
+    await wt
+        .tapAndSettle(find.exampleItemInDropdown(pythonAggregationMean.name));
 
     // Cannot test this because the DB examples differ from GitHub now.
     // TODO(alexeyinkin): Uncomment when DB is up-to-date.
@@ -112,8 +106,7 @@ public class MyClass {
     await wt.enterText(find.codeField(), code);
     await wt.pumpAndSettle();
 
-    await wt.tap(find.runOrCancelButton());
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(find.runOrCancelButton());
 
     expectOutputEquals('$_outputPrefix$text', wt);
   }

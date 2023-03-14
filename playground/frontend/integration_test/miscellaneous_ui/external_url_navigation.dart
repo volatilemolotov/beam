@@ -56,7 +56,7 @@ Future<void> _checkMenuItems(WidgetTester wt) async {
     wt,
     [
       find.moreActions,
-          () => find.menuItem(HeaderAction.apacheBeamGithub),
+      () => find.menuItem(HeaderAction.apacheBeamGithub),
     ],
     BeamLinks.github,
   );
@@ -111,8 +111,7 @@ Future<void> _tapAndExpectNavigationEvent(
   String url,
 ) async {
   for (final tapGetter in tapGetters) {
-    await wt.tap(tapGetter());
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(tapGetter());
   }
 
   expectLastAnalyticsEvent(

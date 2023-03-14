@@ -40,8 +40,7 @@ Future<void> _checkFeedback(
   required FeedbackRating rating,
   required bool send,
 }) async {
-  await wt.tap(find.feedbackThumb(rating));
-  await wt.pumpAndSettle();
+  await wt.tapAndSettle(find.feedbackThumb(rating));
 
   expectLastAnalyticsEvent(
     AppRatedAnalyticsEvent(
@@ -53,8 +52,7 @@ Future<void> _checkFeedback(
   expect(find.feedbackDropdownContent(), findsOneWidget);
 
   if (!send) {
-    await wt.tap(find.feedbackDropdownCancelButton());
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(find.feedbackDropdownCancelButton());
   } else {
     final text = 'This is $rating text.';
     await wt.enterText(find.feedbackDropdownTextField(), text);
@@ -62,8 +60,7 @@ Future<void> _checkFeedback(
 
     expect(find.text(text), findsOneWidget);
 
-    await wt.tap(find.feedbackDropdownSendButton());
-    await wt.pumpAndSettle();
+    await wt.tapAndSettle(find.feedbackDropdownSendButton());
 
     expectLastAnalyticsEvent(
       FeedbackFormSentAnalyticsEvent(
