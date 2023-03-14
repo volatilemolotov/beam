@@ -25,6 +25,7 @@ resource "google_container_cluster" "playground-gke" {
   network                    = var.network
   subnetwork                 = var.subnetwork
   remove_default_node_pool = true
+  datapath_provider = "ENVOY_V2"
   network_policy {
       enabled  = true
       provider = "CALICO"
