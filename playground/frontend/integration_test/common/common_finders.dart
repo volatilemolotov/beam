@@ -18,7 +18,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:playground/modules/actions/components/reset_action.dart';
 import 'package:playground/modules/editor/components/pipeline_options_dropdown/pipeline_options_dropdown.dart';
 import 'package:playground/modules/editor/components/pipeline_options_dropdown/pipeline_options_dropdown_body.dart';
 import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
@@ -106,10 +105,6 @@ extension CommonFindersExtension on CommonFinders {
 
   Finder pipelineOptionsSaveAndCloseButton() {
     return find.byKey(PipelineOptionsDropdownBody.saveAndCloseButtonKey);
-  }
-
-  Finder resetButton() {
-    return find.byType(ResetAction);
   }
 
   Finder sdkItemInDropdown(Sdk sdk) {

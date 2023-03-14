@@ -76,6 +76,7 @@ export 'src/services/analytics/events/run_finished.dart';
 export 'src/services/analytics/events/run_started.dart';
 export 'src/services/analytics/events/sdk_selected.dart';
 export 'src/services/analytics/events/snippet_reset.dart';
+export 'src/services/analytics/events/theme_set.dart';
 export 'src/services/analytics/google_analytics4_service/google_analytics4_service.dart';
 export 'src/services/symbols/loaders/yaml.dart';
 
@@ -99,6 +100,7 @@ export 'src/widgets/loading_indicator.dart';
 export 'src/widgets/logo.dart';
 export 'src/widgets/output/output.dart';
 export 'src/widgets/output/output_tab.dart';
+export 'src/widgets/output/result_tab.dart';
 export 'src/widgets/overlay/body.dart';
 export 'src/widgets/overlay/dismissible.dart';
 export 'src/widgets/overlay/opener.dart';

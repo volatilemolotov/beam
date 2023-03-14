@@ -185,27 +185,27 @@ Future<void> _testEmptyExampleLoader(WidgetTester wt) async {
 Future<void> _testHttpExampleLoader(WidgetTester wt) async {
   for (final path in _paths) {
     await wt.navigateAndSettle(
-      '$path?sdk=go&url=${goExample.url}&$_fullViewOptions',
+      '$path?sdk=go&url=${goExample.rawUrl}&$_fullViewOptions',
     );
     expectSdk(Sdk.go, wt);
     expectVisibleText(goExample.foldedVisibleText, wt);
     expectLastAnalyticsEvent(
       LoadedAnalyticsEvent(
         sdk: Sdk.go,
-        snippet: goExample.url,
+        snippet: goExample.rawUrl,
       ),
     );
     await _expectEditableAndReadOnly(wt);
 
     await wt.navigateAndSettle(
-      '$path?sdk=go&url=${goExample.url}&$_croppedViewOptions',
+      '$path?sdk=go&url=${goExample.rawUrl}&$_croppedViewOptions',
     );
     expectSdk(Sdk.go, wt);
     expectVisibleText(goExample.croppedFoldedVisibleText, wt);
     expectLastAnalyticsEvent(
       LoadedAnalyticsEvent(
         sdk: Sdk.go,
-        snippet: goExample.url,
+        snippet: goExample.rawUrl,
       ),
     );
     _expectReadOnly(wt);
@@ -285,7 +285,7 @@ Future<void> _testMultipleExamples(WidgetTester wt) async {
     },
     {
       'sdk': Sdk.go.id,
-      'url': goExample.url,
+      'url': goExample.rawUrl,
       ..._fullViewOptionsMap,
     },
   ];
@@ -298,7 +298,7 @@ Future<void> _testMultipleExamples(WidgetTester wt) async {
     expectLastAnalyticsEvent(
       LoadedAnalyticsEvent(
         sdk: Sdk.go,
-        snippet: goExample.url,
+        snippet: goExample.rawUrl,
       ),
     );
     await _expectEditableAndReadOnly(wt);

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:playground/modules/shortcuts/constants/global_shortcuts.dart';
@@ -23,8 +25,8 @@ import 'package:playground/services/analytics/events/new_example.dart';
 import 'package:playground_components/playground_components.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NewExampleAction extends StatelessWidget {
-  const NewExampleAction({Key? key}) : super(key: key);
+class NewExampleButton extends StatelessWidget {
+  const NewExampleButton();
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +39,10 @@ class NewExampleAction extends StatelessWidget {
         ),
         label: 'intents.playground.newExample'.tr(),
         onPressed: () {
-          launchUrl(Uri.parse('/'));
           PlaygroundComponents.analyticsService.sendUnawaited(
             const NewExampleAnalyticsEvent(),
           );
+          unawaited(launchUrl(Uri.parse('/')));
         },
       ),
     );

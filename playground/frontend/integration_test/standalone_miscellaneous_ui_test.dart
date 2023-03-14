@@ -23,6 +23,7 @@ import 'common/common.dart';
 import 'miscellaneous_ui/description_test.dart';
 import 'miscellaneous_ui/external_url_navigation.dart';
 import 'miscellaneous_ui/feedback_test.dart';
+import 'miscellaneous_ui/new_example.dart';
 import 'miscellaneous_ui/output_placement_test.dart';
 import 'miscellaneous_ui/report_issue.dart';
 import 'miscellaneous_ui/resize_output_test.dart';
@@ -43,6 +44,7 @@ void main() {
       await checkShortcutsModal(wt);
       await checkToggleBrightnessMode(wt);
       await checkReportIssue(wt);
+      await checkNewExample(wt);
       await checkExternalUrlNavigation(wt);
     },
   );

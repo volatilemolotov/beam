@@ -18,6 +18,9 @@
 
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:playground/pages/standalone_playground/widgets/more_actions.dart';
+import 'package:playground/services/analytics/events/shortcuts_clicked.dart';
+import 'package:playground_components_dev/playground_components_dev.dart';
 
 import '../common/common_finders.dart';
 
@@ -30,12 +33,14 @@ Future<void> checkShortcutsModal(WidgetTester wt) async {
   await wt.tap(find.moreActions());
   await wt.pumpAndSettle();
 
-  expect(find.text(appLocale.shortcuts), findsOneWidget);
+  final menuItem = find.menuItem(HeaderAction.shortcuts);
+  expect(menuItem, findsOneWidget);
 
-  await wt.tap(find.text(appLocale.shortcuts));
+  await wt.tap(menuItem);
   await wt.pumpAndSettle();
 
   expect(find.shortcutsModal(), findsOneWidget);
+  expectLastAnalyticsEvent(const ShortcutsClickedAnalyticsEvent());
 
   await wt.tap(find.text(appLocale.close));
   await wt.pumpAndSettle();
