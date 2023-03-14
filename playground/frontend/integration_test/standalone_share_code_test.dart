@@ -39,16 +39,13 @@ const _sdk = Sdk.go;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets(
-    'Share code test',
-    (WidgetTester wt) async {
-      await init(wt);
+  testWidgets('Share code test', (WidgetTester wt) async {
+    await init(wt);
 
-      await wt.changeSdk(_sdk);
-      await _shareUnmodifiedCode(wt);
-      await _shareModifiedCode(wt);
-    },
-  );
+    await wt.changeSdk(_sdk);
+    await _shareUnmodifiedCode(wt);
+    await _shareModifiedCode(wt);
+  });
 }
 
 Future<void> _shareUnmodifiedCode(WidgetTester wt) async {

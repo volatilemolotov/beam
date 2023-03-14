@@ -91,8 +91,8 @@ class _LinkTextFieldState extends State<LinkTextField> {
   void _submitEvent() {
     PlaygroundComponents.analyticsService.sendUnawaited(
       ShareableCopiedAnalyticsEvent(
-        snippetContext: widget.eventSnippetContext,
         shareFormat: widget.shareFormat,
+        snippetContext: widget.eventSnippetContext,
       ),
     );
   }
