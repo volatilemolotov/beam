@@ -20,6 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:playground/modules/editor/components/pipeline_options_dropdown/pipeline_options_dropdown.dart';
 import 'package:playground/modules/editor/components/pipeline_options_dropdown/pipeline_options_dropdown_body.dart';
+import 'package:playground/modules/editor/components/share_dropdown/link_text_field.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_button.dart';
+import 'package:playground/modules/editor/components/share_dropdown/share_tabs_headers.dart';
 import 'package:playground/modules/examples/components/description_popover/description_popover.dart';
 import 'package:playground/modules/examples/components/description_popover/description_popover_button.dart';
 import 'package:playground/modules/examples/example_selector.dart';
@@ -37,6 +40,10 @@ import 'package:playground_components_dev/playground_components_dev.dart';
 extension CommonFindersExtension on CommonFinders {
   Finder codeTextAreaWrapper() {
     return byType(CodeTextAreaWrapper);
+  }
+
+  Finder copyButton() {
+    return byType(CopyButton);
   }
 
   Finder descriptionPopoverButton() {
@@ -113,6 +120,21 @@ extension CommonFindersExtension on CommonFinders {
 
   Finder sdkSelector() {
     return byType(SDKSelector);
+  }
+
+  Finder shareableTextField() {
+    return byType(LinkTextField);
+  }
+
+  Finder shareButton() {
+    return byType(ShareButton);
+  }
+
+  Finder shareEmbedTabHeader() {
+    return descendant(
+      of: byType(ShareTabsHeaders),
+      matching: text('Embed'),
+    );
   }
 
   Finder shortcutsModal() {

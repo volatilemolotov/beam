@@ -87,8 +87,14 @@ extension WidgetTesterExtension on WidgetTester {
     }
   }
 
-  Future<void> tapAndSettle(Finder finder) async {
-    await tap(finder);
+  Future<void> tapAndSettle(
+    Finder finder, {
+    bool warnIfMissed = true,
+  }) async {
+    await tap(
+      finder,
+      warnIfMissed: warnIfMissed,
+    );
     await pumpAndSettle();
   }
 
@@ -145,7 +151,7 @@ extension WidgetTesterExtension on WidgetTester {
 
   /// Runs and expects that the execution is as fast as it should be for cache.
   Future<void> modifyRunExpectReal(ExampleDescriptor example) async {
-    _modifyCodeController();
+    modifyCodeController();
 
     final playgroundController = findPlaygroundController();
     final eventSnippetContext = playgroundController.eventSnippetContext;
@@ -165,14 +171,18 @@ extension WidgetTesterExtension on WidgetTester {
     expect(finishedEvent.snippetContext, eventSnippetContext);
   }
 
-  void _modifyCodeController() {
+  /// Modifies the code controller in a unique way by inserting timestamp
+  /// in the comment.
+  void modifyCodeController() {
     // Add a character into the first comment.
     // This relies on that the position 10 is inside a license comment.
     final controller = findOneCodeController();
     final text = controller.fullText;
 
     // ignore: prefer_interpolation_to_compose_strings
-    controller.fullText = text.substring(0, 10) + '+' + text.substring(10);
+    controller.fullText = text.substring(0, 10) +
+        DateTime.now().millisecondsSinceEpoch.toString() +
+        text.substring(10);
   }
 
   Future<void> navigateAndSettle(String urlString) async {
