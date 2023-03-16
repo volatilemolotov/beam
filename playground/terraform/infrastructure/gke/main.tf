@@ -25,11 +25,6 @@ resource "google_container_cluster" "playground-gke" {
   network                    = var.network
   subnetwork                 = var.subnetwork
   remove_default_node_pool = true
-
-  dns_config {
-    cluster_dns              = "CLOUD_DNS"
-    cluster_dns_scope        = "CLUSTER_SCOPE"
-  }
 }
 
 resource "google_container_node_pool" "playground-node-pool" {
