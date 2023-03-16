@@ -34,7 +34,7 @@ resource "google_compute_subnetwork" "playground" {
 
 resource "google_compute_firewall" "playground-firewall-rule" {
   name    = "gke-node-ingress"
-  network = "projects/${var.project_id}/global/networks/${var.network_name}"
+  network = google_compute_network.playground.name
   direction     = "EGRESS"
   deny {
     protocol      = "all"
