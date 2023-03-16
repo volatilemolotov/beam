@@ -52,6 +52,6 @@ resource "google_compute_firewall" "playground-firewall-rule" {
   deny {
     protocol      = "all"
   }
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["0.0.0.0/0","169.254.169.254/32"]
   target_tags = ["beam-playground"]
 }
