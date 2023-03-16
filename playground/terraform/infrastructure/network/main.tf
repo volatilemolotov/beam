@@ -48,7 +48,7 @@ resource "google_compute_firewall" "playground-firewall-rule" {
   name    = "gke-node-ingress"
   network = google_compute_network.playground.name
   direction     = "EGRESS"
-  priority      = 1000
+  priority      = 1001
   deny {
     protocol      = "all"
   }
