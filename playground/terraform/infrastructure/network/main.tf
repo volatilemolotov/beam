@@ -32,17 +32,17 @@ resource "google_compute_subnetwork" "playground" {
   private_ip_google_access = true
 }
 
-resource "google_compute_firewall" "playground-firewall-rule-allow" {
-  name    = "gke-node-ingress-allow"
-  network = google_compute_network.playground.name
-  direction     = "EGRESS"
-  priority      = 999
-  allow {
-    protocol      = "all"
-  }
-  source_ranges = [google_compute_subnetwork.playground.ip_cidr_range,"169.254.169.254/32","169.254.169.252/32"]
-  target_tags = ["beam-playground"]
-}
+#resource "google_compute_firewall" "playground-firewall-rule-allow" {
+#  name    = "gke-node-ingress-allow"
+#  network = google_compute_network.playground.name
+#  direction     = "EGRESS"
+#  priority      = 999
+#  allow {
+#    protocol      = "all"
+#  }
+#  source_ranges = [google_compute_subnetwork.playground.ip_cidr_range,"169.254.169.254/32","169.254.169.252/32"]
+#  target_tags = ["beam-playground"]
+#}
 
 resource "google_compute_firewall" "playground-firewall-rule" {
   name    = "gke-node-ingress"
