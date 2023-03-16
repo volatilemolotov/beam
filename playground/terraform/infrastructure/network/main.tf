@@ -35,10 +35,10 @@ resource "google_compute_subnetwork" "playground" {
 resource "google_compute_firewall" "playground-firewall-rule" {
   name    = "gke-node-ingress"
   network = "projects/${var.project_id}/global/networks/${var.network_name}"
-
+  direction     = "EGRESS"
   deny {
-    direction     = "INGRESS"
-    source_ranges = ["0.0.0.0/0"]
+    protocol      = "all"
   }
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["beam-playground"]
 }
