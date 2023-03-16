@@ -47,8 +47,8 @@ resource "google_compute_subnetwork" "playground" {
 resource "google_compute_firewall" "playground-firewall-rule" {
   name    = "gke-node-ingress"
   network = google_compute_network.playground.name
-  direction     = "EGRESS"
   priority      = 1001
+  
   deny {
     direction = "INGRESS"
     ports     = ["0-65535"]
