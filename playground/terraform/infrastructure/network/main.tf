@@ -47,25 +47,11 @@ resource "google_compute_subnetwork" "playground" {
 resource "google_compute_firewall" "playground-firewall-rule" {
   name    = "gke-node-ingress"
   network = google_compute_network.playground.name
+  direction     = "INGRESS"
   priority      = 1001
-  
   deny {
-    direction = "INGRESS"
-    ports     = ["0-65535"]
-    protocol  = "all"
-    source_ranges = ["0.0.0.0/0"]
+    protocol      = "all"
   }
-
-  deny {
-    direction = "EGRESS"
-    ports     = ["0-65535"]
-    protocol  = "all"
-    destination_ranges = ["0.0.0.0/0"]
-  }
-
-  allow {
-    direction = "INGRESS"
-    protocol  = "icmp"
-  }
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["beam-playground"]
 }
