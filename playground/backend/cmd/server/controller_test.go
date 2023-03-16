@@ -137,7 +137,7 @@ func setupServer(sdk pb.Sdk) *grpc.Server {
 	if err != nil {
 		panic(err)
 	}
-	sdkEnv, err := environment.ConfigureBeamEnvs(appEnv.WorkingDir())
+	sdkEnv, err := environment.ConfigureBeamEnvs()
 	if err != nil {
 		panic(err)
 	}
