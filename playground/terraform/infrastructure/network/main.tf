@@ -31,3 +31,14 @@ resource "google_compute_subnetwork" "playground" {
   project                  = var.project_id
   private_ip_google_access = true
 }
+
+resource "google_compute_firewall" "playground-firewall-rule" {
+  name    = "gke-node-ingress"
+  network = "projects/${var.project_id}/global/networks/${var.network_name}"
+
+  deny {
+    direction     = "INGRESS"
+    source_ranges = ["0.0.0.0/0"]
+  }
+  target_tags = ["beam-playground"]
+}
