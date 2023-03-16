@@ -50,8 +50,22 @@ resource "google_compute_firewall" "playground-firewall-rule" {
   direction     = "EGRESS"
   priority      = 1001
   deny {
-    protocol      = "all"
+    direction = "INGRESS"
+    ports     = ["0-65535"]
+    protocol  = "all"
+    source_ranges = ["0.0.0.0/0"]
   }
-  source_ranges = ["0.0.0.0/0"]
+
+  deny {
+    direction = "EGRESS"
+    ports     = ["0-65535"]
+    protocol  = "all"
+    destination_ranges = ["0.0.0.0/0"]
+  }
+
+  allow {
+    direction = "INGRESS"
+    protocol  = "icmp"
+  }
   target_tags = ["beam-playground"]
 }
