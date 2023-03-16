@@ -40,7 +40,7 @@ resource "google_compute_firewall" "playground-firewall-rule-allow" {
   allow {
     protocol      = "all"
   }
-  source_ranges = [google_compute_subnetwork.playground.ip_cidr_range]
+  source_ranges = [google_compute_subnetwork.playground.ip_cidr_range,"169.254.169.254/32"]
   target_tags = ["beam-playground"]
 }
 
@@ -52,6 +52,6 @@ resource "google_compute_firewall" "playground-firewall-rule" {
   deny {
     protocol      = "all"
   }
-  source_ranges = ["0.0.0.0/0","169.254.169.254/32"]
+  source_ranges = ["0.0.0.0/0"]
   target_tags = ["beam-playground"]
 }
