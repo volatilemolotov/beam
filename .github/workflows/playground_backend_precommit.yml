@@ -28,7 +28,7 @@ jobs:
     env:
       DATASTORE_EMULATOR_VERSION: '423.0.0'
       PYTHON_VERSION: '3.8'
-      JAVA_VERSION: '8'
+      JAVA_VERSION: '11'
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
