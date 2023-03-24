@@ -63,18 +63,19 @@ const (
 var lis *bufconn.Listener
 var cacheService cache.Cache
 var dbEmulator datastoreDb.EmulatedDatastore
-var opt goleak.Option
+
+// var opt goleak.Option
 var ctx context.Context
 
 func TestMain(m *testing.M) {
-	server := setup()
-	opt = goleak.IgnoreCurrent()
+	//server := setup()
+	//opt = goleak.IgnoreCurrent()
 	exitValue := m.Run()
-	teardown(server)
+	//teardown(server)
 	os.Exit(exitValue)
 }
 
-func setup() *grpc.Server {
+func setupServer(sdk pb.Sdk) *grpc.Server {
 	ctx = context.Background()
 	lis = bufconn.Listen(bufSize)
 	s := grpc.NewServer()
@@ -112,7 +113,7 @@ func setup() *grpc.Server {
 	if err != nil {
 		panic(err)
 	}
-	if err = os.Setenv("BEAM_SDK", pb.Sdk_SDK_JAVA.String()); err != nil {
+	if err = os.Setenv("BEAM_SDK", sdk.String()); err != nil {
 		panic(err)
 	}
 	if err = os.Setenv("APP_WORK_DIR", path); err != nil {
@@ -207,7 +208,6 @@ func bufDialer(context.Context, string) (net.Conn, error) {
 }
 
 func TestPlaygroundController_RunCode(t *testing.T) {
-	defer goleak.VerifyNone(t, opt)
 	type args struct {
 		ctx     context.Context
 		request *pb.RunCodeRequest
@@ -261,6 +261,11 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			server := setupServer(tt.args.request.Sdk)
+			opt := goleak.IgnoreCurrent()
+			defer goleak.VerifyNone(t, opt)
+			defer teardown(server)
+
 			client, closeFunc := getPlaygroundServiceClient(tt.args.ctx, t)
 			defer closeFunc()
 			response, err := client.RunCode(tt.args.ctx, tt.args.request)
@@ -287,7 +292,11 @@ func TestPlaygroundController_RunCode(t *testing.T) {
 }
 
 func TestPlaygroundController_CheckStatus(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	pipelineId := uuid.New()
 	wantStatus := pb.Status_STATUS_FINISHED
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -361,7 +370,11 @@ func TestPlaygroundController_CheckStatus(t *testing.T) {
 }
 
 func TestPlaygroundController_GetCompileOutput(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	pipelineId := uuid.New()
 	compileOutput := "MOCK_COMPILE_OUTPUT"
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -435,7 +448,11 @@ func TestPlaygroundController_GetCompileOutput(t *testing.T) {
 }
 
 func TestPlaygroundController_GetRunOutput(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	pipelineId := uuid.New()
 	runOutput := "MOCK_RUN_OUTPUT"
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -539,7 +556,11 @@ func TestPlaygroundController_GetRunOutput(t *testing.T) {
 }
 
 func TestPlaygroundController_GetLogs(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	pipelineId := uuid.New()
 	logs := "MOCK_LOGS"
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -643,7 +664,11 @@ func TestPlaygroundController_GetLogs(t *testing.T) {
 }
 
 func TestPlaygroundController_GetRunError(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	pipelineId := uuid.New()
 	runError := "MOCK_RUN_ERROR"
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
@@ -731,7 +756,11 @@ func TestPlaygroundController_GetRunError(t *testing.T) {
 }
 
 func TestPlaygroundController_Cancel(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	pipelineId := uuid.New()
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
@@ -793,7 +822,11 @@ func TestPlaygroundController_Cancel(t *testing.T) {
 }
 
 func TestPlaygroundController_SaveSnippet(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -904,7 +937,11 @@ func TestPlaygroundController_SaveSnippet(t *testing.T) {
 }
 
 func TestPlaygroundController_GetSnippet(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 	nowDate := time.Now()
@@ -994,7 +1031,11 @@ func makeSaveSnippetRequest() *pb.SaveSnippetRequest {
 }
 
 func TestPlaygroundController_SaveSnippetPersistent(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 	snip := makeSaveSnippetRequest()
@@ -1047,7 +1088,11 @@ func TestPlaygroundController_SaveSnippetPersistent(t *testing.T) {
 }
 
 func TestPlaygroundController_GetPrecompiledObjects(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -1101,7 +1146,11 @@ func TestPlaygroundController_GetPrecompiledObjects(t *testing.T) {
 }
 
 func TestPlaygroundController_GetPrecompiledObject(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -1190,7 +1239,11 @@ func TestPlaygroundController_GetPrecompiledObject(t *testing.T) {
 }
 
 func TestPlaygroundController_GetPrecompiledObjectCode(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -1249,7 +1302,11 @@ func TestPlaygroundController_GetPrecompiledObjectCode(t *testing.T) {
 }
 
 func TestPlaygroundController_GetPrecompiledObjectOutput(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -1289,7 +1346,11 @@ func TestPlaygroundController_GetPrecompiledObjectOutput(t *testing.T) {
 }
 
 func TestPlaygroundController_GetPrecompiledObjectLogs(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -1329,7 +1390,11 @@ func TestPlaygroundController_GetPrecompiledObjectLogs(t *testing.T) {
 }
 
 func TestPlaygroundController_GetPrecompiledObjectGraph(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
@@ -1369,7 +1434,11 @@ func TestPlaygroundController_GetPrecompiledObjectGraph(t *testing.T) {
 }
 
 func TestPlaygroundController_GetDefaultPrecompiledObject(t *testing.T) {
+	server := setupServer(pb.Sdk_SDK_UNSPECIFIED)
+	opt := goleak.IgnoreCurrent()
 	defer goleak.VerifyNone(t, opt)
+	defer teardown(server)
+
 	client, closeFunc := getPlaygroundServiceClient(ctx, t)
 	defer closeFunc()
 
