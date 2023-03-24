@@ -103,9 +103,9 @@ func runStep(ctx context.Context, cacheService cache.Cache, paths *fs_tool.LifeC
 	var executorBuilder *executors.ExecutorBuilder
 	err := error(nil)
 	if isUnitTest {
-		executorBuilder, err = builder.TestRunner(paths, sdkEnv)
+		executorBuilder, err = builder.TestRunner(ctx, paths, sdkEnv)
 	} else {
-		executorBuilder, err = builder.Runner(paths, utils.ReduceWhiteSpacesToSinge(pipelineOptions), sdkEnv)
+		executorBuilder, err = builder.Runner(ctx, paths, utils.ReduceWhiteSpacesToSinge(pipelineOptions), sdkEnv)
 	}
 	if err != nil {
 		if processingErr := processSetupError(err, pipelineId, cacheService); processingErr != nil {
@@ -183,7 +183,11 @@ func compileStep(ctx context.Context, cacheService cache.Cache, paths *fs_tool.L
 			return err
 		}
 	} else { // in case of Java, Go (not unit test), Scala - need compile step
-		executorBuilder := builder.Compiler(paths, sdkEnv)
+		executorBuilder, err := builder.Compiler(paths, sdkEnv)
+		if err != nil {
+			logger.Errorf("compileStep(): failed creating ExecutorBuilder = %v", executorBuilder)
+			return nil
+		}
 		executor := executorBuilder.Build()
 		logger.Infof("%s: Compile() ...\n", pipelineId)
 		compileCmd := executor.Compile(ctx)
