@@ -76,17 +76,20 @@ RUN mkdir -p /opt/playground/backend/executable_files/
 # Chown all required files to the `appuser`.
 RUN chown -R appuser:appgroup /opt/playground/backend/executable_files/ && chmod +x /entrypoint.sh
 
+# Let sbt download files from Maven
+RUN mkdir -p /opt/sbt-template
+RUN chown -R appuser:appgroup /opt/sbt-template
+
 # Switch to appuser
 USER appuser
 
-# Let sbt download files from Maven
-RUN mkdir -p /tmp/sbt-initialize
-WORKDIR /tmp/sbt-initialize
-RUN /opt/playground/backend/new_scio_project.sh
-WORKDIR /tmp/sbt-initialize/scio
+WORKDIR /opt/sbt-template
+RUN { printf scio\\nscio\\n; yes; } | sbt new spotify/scio-template.g8
+RUN echo "Compile / run / fork := false" >> scio/build.sbt
+RUN echo "updateOptions := updateOptions.value.withCachedResolution(true)" >> scio/build.sbt
+WORKDIR /opt/sbt-template/scio
 RUN sbt "+compile"
 WORKDIR /
-RUN rm -r /tmp/sbt-initialize
 
 # Enable mitmproxy
 ENV HTTP_PROXY="http://127.0.0.1:8081"
