@@ -53,6 +53,7 @@ Ensure that the account has at least following privileges:
 * [Docker](https://docs.docker.com/engine/install/)
 * [Terraform](https://www.terraform.io/downloads)
 * [gcloud CLI](https://cloud.google.com/sdk/docs/install-sdk)
+* [Kubectl authentication](https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke)
 
 6. Apache Beam Git repository cloned locally
 
@@ -64,13 +65,22 @@ Playground uses `terraform.tfvars` located in `playground/terraform/environment/
 ```
 project_id           = "project_id"          #GCP Project ID
 network_name         = "network_name"        #GCP VPC Network Name for Playground deployment
+subnetwork_name      = "stg-playground-sub"  #GCP VPC Subnetwork Name for Playground deployment
 gke_name             = "playground-backend"  #Playground GKE Cluster name
 region               = "us-east1"            #Set the deployment region
 location             = "us-east1-b"          #Select the deployment location from available in the specified region
 state_bucket         = "bucket_name"         #GCS bucket name for Beam Playground temp files
 redis_name           = "playground_redis"    #Choose the name for redis instance
+redis_tier           = "BASIC"               #Redis tier type. Could be "Basic" or "Standard_HA". "BASIC" by default
 min_count            = 2                     #Min node count for GKE cluster
 max_count            = 6                     #Max node count for GKE cluster
+redis_tier           = "STANDARD_HA"         #Choose the "Basic" or "STANDARD_HA" tyre
+gke_machine_type     = "e2-standard-8"       #Instance type
+app_engine_flag      = true                  #AppEngine flag - defined if AppEngine and Datastore need to be installed. Should be "false" if AppEngine and Datastore were installed before
+ip-address-name      = "static-ip-stg"       #Static IP Address name
+repository_id        = "playground-stg"      #Artifact repository name for Playground images
+service_account_id   = "beam-playground-stg" #Service account name
+gke_machine_type     = "e2-standard-8"       #Machine type for GKE Nodes
 
 ```
 * `state.tfbackend` environment variables:
@@ -119,9 +129,9 @@ Start the following command from the top level repository folder ("beam") to dep
 ```
 ./gradlew playground:terraform:gkebackend -Pproject_environment="environment_name" -Pdocker-tag="tag" \
   -Pdns-name="playground.zone" -Psdk-tag=2.44.0 \
-   -Pdocker-repository-root="<chosen_region>-docker.pkg.dev/<project_id>/playground-repository"
+   -Pdocker-repository-root="<chosen_region>-docker.pkg.dev/<project_id>/playground-repository" -Pdatastore-namespace="dev"
 ```
-Where tag - image tag for backend, playground.zone - chosen DNS for Playground, Psdk-tag - current BEAM version
+Where tag - image tag for backend, playground.zone - chosen DNS for Playground, Psdk-tag - current BEAM version, Pdatastore-namespace - namespace for Datastore
 
 During script execution, a Google managed certificate will be created. [Provisioning might take up to 60 minutes](https://cloud.google.com/load-balancing/docs/ssl-certificates/google-managed-certs).
 

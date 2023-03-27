@@ -1,3 +1,4 @@
+
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.
@@ -13,19 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource "google_app_engine_application" "app_playground" {
-  count         = var.feature_flag ? 1 : 0
-  project     = var.project_id
-  location_id = var.region == "us-central1" ? var.location_id_us : var.region
-  database_type = "CLOUD_DATASTORE_COMPATIBILITY"
-}
-
-resource "google_project_service" "firestore" {
-  count      = var.feature_flag ? 1 : 0
-  project = var.project_id
-  service = "firestore.googleapis.com"
-  disable_dependent_services = true
-  depends_on = [
-    google_app_engine_application.app_playground
-    ]
-}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: backend-mitm
+    type: backend
+  name: playground-mitm
+  annotations:
+    cloud.google.com/backend-config: '{"default": "bkend-health"}'
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  ports:
+  - name: tcp
+    port: 8080
+    protocol: TCP
+    targetPort: {{ .Values.service.targetPort }}
+  selector:
+    app: backend-mitm
+  type: {{ .Values.service.type }}

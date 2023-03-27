@@ -37,7 +37,7 @@ variable "region" {
 
 variable "gke_machine_type" {
   description = "Node pool machine types"
-  default     = "e2-standard-4"
+  default     = "e2-standard-8"
 }
 
 variable "gke_name" {
@@ -66,6 +66,30 @@ variable "repository_id" {
   default     = "playground-repository"
 }
 
+#IAM
+variable "service_account_id" {
+  description = "Service account ID"
+  default     = "beam-playground"
+}
+
+#Network
+variable "ip-address-name" {
+  description = "Static IP address name"
+  default     = "pg-static-ip"
+}
+
+variable "subnetwork_name" {
+  description = "Name of VPC to be created"
+  default     = "playground-vpc-sub"
+}
+
+#AppEngine Flag
+variable "app_engine_flag" {
+  description = "AppEngine enabled"
+  type        = bool
+  default     = true
+}
+
 #Redis
 
 variable "redis_version" {
@@ -80,12 +104,12 @@ variable "redis_name" {
 
 variable "redis_tier" {
   description = "Tier of Redis"
-  default     = "STANDARD_HA"
+  default     = "BASIC"
 }
 
 variable "redis_replica_count" {
   description = "Redis's replica count"
-  default     = 1
+  default     = 0
 }
 
 variable "redis_memory_size_gb" {

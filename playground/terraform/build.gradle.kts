@@ -43,7 +43,7 @@ plugins {
 }
 
 terraformPlugin {
-    terraformVersion.set("1.0.9")
+    terraformVersion.set("1.4.2")
 }
 
 tasks {
@@ -261,6 +261,7 @@ tasks.register("pushBack") {
     dependsOn(":playground:backend:containers:python:dockerTagsPush")
     dependsOn(":playground:backend:containers:scio:dockerTagsPush")
     dependsOn(":playground:backend:containers:router:dockerTagsPush")
+    dependsOn(":playground:backend:containers:mitmproxy:dockerTagsPush")
 }
 
 tasks.register("pushFront") {
@@ -410,6 +411,8 @@ tasks.register("takeConfig") {
         val proj = project.rootProject.extra["playground_gke_project"]
         val registry = project.rootProject.extra["docker-repository-root"]
         val ipaddrname = project.rootProject.extra["playground_static_ip_address_name"]
+        /* Default value for Datastore namespace in a server side is set in datastore_constants.go */
+        val datastore_name = if (project.hasProperty("datastore_namespace")) (project.property("datastore_namespace") as String) else "Playground"
 
         file.appendText(
             """
@@ -419,6 +422,7 @@ project_id: ${proj}
 registry: ${registry}
 static_ip_name: ${ipaddrname}
 tag: $d_tag
+datastore_name: ${datastore_name}
 dns_name: ${dns_name}
     """
         )
@@ -428,12 +432,11 @@ dns_name: ${dns_name}
 tasks.register("helmRelease") {
     group = "deploy"
     val modulePath = project(":playground").projectDir.absolutePath
-    val hdir = File("$modulePath/infrastructure/helm-playground/")
-    doLast {
-        exec {
-            executable("helm")
-            args("install", "playground", "$hdir")
-        }
+    val helmdir = File("$modulePath/infrastructure/helm-playground/")
+    doLast{
+    exec {
+        executable("helm")
+    args("upgrade", "--install", "playground", "$helmdir")
     }
 }
 tasks.register("gkebackend") {
@@ -456,4 +459,3 @@ tasks.register("gkebackend") {
     indexcreateTask.mustRunAfter(pushFrontTask)
     helmTask.mustRunAfter(indexcreateTask)
 }
-
