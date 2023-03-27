@@ -58,7 +58,6 @@ echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.l
 curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add
 RUN apt-get update && apt-get install -y sbt
 
-
 ## Install mitmpoxy
 RUN mkdir /opt/mitmproxy &&\
     cd /opt/mitmproxy &&\
@@ -88,17 +87,20 @@ RUN chown -R appuser:appgroup /opt/playground/backend/executable_files/ \
   && chmod -R 777 /usr/local/share/ca-certificates/extra/ && chmod -R 777 /usr/local/openjdk-8/jre/lib/security/ \
   && chmod -R 777 /etc/ssl/certs && chmod +x /entrypoint.sh
 
+# Let sbt download files from Maven
+RUN mkdir -p /opt/sbt-template
+RUN chown -R appuser:appgroup /opt/sbt-template
+
 # Switch to appuser
 USER appuser
 
-# Let sbt download files from Maven
-RUN mkdir -p /tmp/sbt-initialize
-WORKDIR /tmp/sbt-initialize
-RUN /opt/playground/backend/new_scio_project.sh
-WORKDIR /tmp/sbt-initialize/scio
+WORKDIR /opt/sbt-template
+RUN { printf scio\\nscio\\n; yes; } | sbt new spotify/scio-template.g8
+RUN echo "Compile / run / fork := false" >> scio/build.sbt
+RUN echo "updateOptions := updateOptions.value.withCachedResolution(true)" >> scio/build.sbt
+WORKDIR /opt/sbt-template/scio
 RUN sbt "+compile"
 WORKDIR /
-RUN rm -r /tmp/sbt-initialize
 
 # Enable mitmproxy
 ENV HTTP_PROXY="http://127.0.0.1:8081"
