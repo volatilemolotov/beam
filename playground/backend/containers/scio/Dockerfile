@@ -88,17 +88,24 @@ RUN chown -R appuser:appgroup /opt/playground/backend/executable_files/ \
   && chmod -R 777 /usr/local/share/ca-certificates/extra/ && chmod -R 777 /usr/local/openjdk-8/jre/lib/security/ \
   && chmod -R 777 /etc/ssl/certs && chmod +x /entrypoint.sh
 
+# Let sbt download files from Maven
+RUN mkdir -p /opt/sbt-template
+RUN chown -R appuser:appgroup /opt/sbt-template
+
 # Switch to appuser
 USER appuser
 
-# Let sbt download files from Maven
-RUN mkdir -p /tmp/sbt-initialize
-WORKDIR /tmp/sbt-initialize
+# Cache sbt project template
+WORKDIR /opt/sbt-template
 RUN /opt/playground/backend/new_scio_project.sh
-WORKDIR /tmp/sbt-initialize/scio
+WORKDIR /opt/sbt-template/scio
 RUN sbt "+compile"
 WORKDIR /
-RUN rm -r /tmp/sbt-initialize
+
+USER root
+RUN chown -R root:root /opt/sbt-template
+
+USER appuser
 
 # Enable mitmproxy
 ENV HTTP_PROXY="http://127.0.0.1:8081"
