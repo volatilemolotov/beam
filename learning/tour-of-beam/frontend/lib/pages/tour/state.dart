@@ -105,6 +105,7 @@ class TourNotifier extends ChangeNotifier with PageStateMixin<void> {
     await _unitProgressCache.loadUnitProgress(currentSdk);
     // The local changes are preserved if the user signs in.
     if (_snippetType != SnippetType.saved || !isAuthenticated) {
+      _trySetSnippetType(SnippetType.saved);
       await _loadSnippetByType();
     }
     notifyListeners();
