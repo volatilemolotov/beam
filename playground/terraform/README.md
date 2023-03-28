@@ -63,29 +63,27 @@ Playground uses `terraform.tfvars` located in `playground/terraform/environment/
 
 * `terraform.tfvars` environment variables:
 ```
-project_id           = "project_id"          #GCP Project ID
-network_name         = "network_name"        #GCP VPC Network Name for Playground deployment
-subnetwork_name      = "stg-playground-sub"  #GCP VPC Subnetwork Name for Playground deployment
+project_id           = "projectID"          #GCP Project ID
+network_name         = "playground-network"        #GCP VPC Network Name for Playground deployment
+subnetwork_name      = "playground-subnetwork"  #GCP VPC Subnetwork Name for Playground deployment
 gke_name             = "playground-backend"  #Playground GKE Cluster name
 region               = "us-east1"            #Set the deployment region
-location             = "us-east1-b"          #Select the deployment location from available in the specified region
-state_bucket         = "bucket_name"         #GCS bucket name for Beam Playground temp files
-redis_name           = "playground_redis"    #Choose the name for redis instance
+zone                 = "us-east1-b"          #Select the deployment zone from available in the specified region
+state_bucket         = "playground-state-bucket"         #GCS bucket name for Beam Playground temp files
+redis_name           = "playground-redis"    #Choose the name for redis instance
 redis_tier           = "BASIC"               #Redis tier type. Could be "Basic" or "Standard_HA". "BASIC" by default
 min_count            = 2                     #Min node count for GKE cluster
 max_count            = 6                     #Max node count for GKE cluster
-redis_tier           = "STANDARD_HA"         #Choose the "Basic" or "STANDARD_HA" tyre
-gke_machine_type     = "e2-standard-8"       #Instance type
 app_engine_flag      = true                  #AppEngine flag - defined if AppEngine and Datastore need to be installed. Should be "false" if AppEngine and Datastore were installed before
-ip-address-name      = "static-ip-stg"       #Static IP Address name
-repository_id        = "playground-stg"      #Artifact repository name for Playground images
-service_account_id   = "beam-playground-stg" #Service account name
+ip-address-name      = "playground-static-ip"       #Static IP Address name
+repository_id        = "playground-artifacts"      #Artifact repository name for Playground images
+service_account_id   = "playground-gke-account" #Service account name
 gke_machine_type     = "e2-standard-8"       #Machine type for GKE Nodes
 
 ```
 * `state.tfbackend` environment variables:
 ```
-bucket               = "bucket_name"         #input bucket name - will be used for terraform tfstate file
+bucket               = "bucket-name"         #input bucket name - will be used for terraform tfstate file
 ```
 2. Configure authentication for the Google Cloud Platform
 ```
@@ -123,7 +121,7 @@ gcloud auth configure-docker <chosen_region>-docker.pkg.dev
 ```
 2. Run the following command to authenticate in GKE:
 ```
-gcloud container clusters get-credentials --region <chosen_location> <gke_name> --project <project_id>
+gcloud container clusters get-credentials --region <chosen_zone> <gke_name> --project <project_id>
 ```
 Start the following command from the top level repository folder ("beam") to deploy the Payground infrastructure:
 ```

@@ -37,6 +37,11 @@ variable "location_id_us" {
   default = "us-central"
 }
 
+variable "location_id_eu" {
+  description = "Location of App"
+  default = "europe-west"
+}
+
 variable "feature_flag" {
   type    = bool
   default = true
