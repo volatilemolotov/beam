@@ -17,6 +17,7 @@ package streaming
 
 import (
 	"beam.apache.org/playground/backend/internal/cache"
+	"beam.apache.org/playground/backend/internal/logger"
 	"context"
 	"fmt"
 	"github.com/google/uuid"
@@ -49,6 +50,8 @@ func (row *RunOutputWriter) Write(p []byte) (int, error) {
 		customErr := fmt.Errorf("error during saving output: %s", err)
 		return 0, customErr
 	}
+
+	logger.Infof("RunOutputWriter: Write(): %s", string(p))
 
 	// concat prevValue and new value
 	str := fmt.Sprintf("%s%s", prevOutput.(string), string(p))
