@@ -341,7 +341,9 @@ tasks.register("helmRelease") {
         executable("helm")
     args("upgrade", "--install", "playground", "$helmdir")
     }
+    }
 }
+
 tasks.register("gkebackend") {
     group = "deploy"
     val initTask = tasks.getByName("terraformInit")
