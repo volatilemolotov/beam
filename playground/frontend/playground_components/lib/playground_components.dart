@@ -69,6 +69,7 @@ export 'src/widgets/bubble.dart';
 export 'src/widgets/clickable.dart';
 export 'src/widgets/close_button.dart';
 export 'src/widgets/complexity.dart';
+export 'src/widgets/dialog.dart';
 export 'src/widgets/dialogs/confirm.dart';
 export 'src/widgets/dialogs/progress.dart';
 export 'src/widgets/divider.dart';

@@ -35,9 +35,28 @@ import 'state.dart';
 final _client = CloudFunctionsTobClient();
 
 Future<void> initializeServiceLocator() async {
+  await _initializeRepositories();
   _initializeAuth();
   _initializeState();
   _initializeCaches();
+}
+
+Future<void> _initializeRepositories() async {
+  final routerUrl = await getRouterUrl();
+  final runnerUrls = await waitMap({
+    for (final sdk in Sdk.known) sdk.id: getRunnerUrl(sdk),
+  });
+
+  final codeClient = GrpcCodeClient(
+    url: routerUrl,
+    runnerUrlsById: runnerUrls,
+  );
+  final exampleClient = GrpcExampleClient(url: routerUrl);
+
+  GetIt.instance.registerSingleton<CodeClient>(codeClient);
+  GetIt.instance.registerSingleton(CodeRepository(client: codeClient));
+  GetIt.instance.registerSingleton<ExampleClient>(exampleClient);
+  GetIt.instance.registerSingleton(ExampleRepository(client: exampleClient));
 }
 
 void _initializeAuth() {
