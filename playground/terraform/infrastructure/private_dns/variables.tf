@@ -17,11 +17,15 @@
 # under the License.
 #
 
-variable "project_id" {
- description = "project_id"
+variable "network_id" {
+  description = "Network ID to use private dns zone in"
 }
 
-variable "services" {
- description = "Enable necessary APIs in GCP"
- default = ["cloudresourcemanager.googleapis.com","iam.googleapis.com","compute.googleapis.com","appengine.googleapis.com","artifactregistry.googleapis.com","redis.googleapis.com","dns.googleapis.com"]
+variable "private_zones" {
+  description = "List of private zones to point to private.googleapis.com"
+  type = set(string)
+}
+
+variable "project_id" {
+  description = "Project ID to use private dns zone in"
 }

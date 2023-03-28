@@ -55,3 +55,8 @@ variable "max_count" {
   description = "Max cluster node count"
   default     = 6
 }
+variable "control_plane_cidr" {
+  description = "CIDR block for GKE controlplane"
+  default     = "10.129.0.0/28"
+}
+

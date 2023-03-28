@@ -16,12 +16,14 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-
-variable "project_id" {
- description = "project_id"
+variable "network_name" {
+  description = "Name of VPC to be created"
+  default     = "playground-network"
 }
 
-variable "services" {
- description = "Enable necessary APIs in GCP"
- default = ["cloudresourcemanager.googleapis.com","iam.googleapis.com","compute.googleapis.com","appengine.googleapis.com","artifactregistry.googleapis.com","redis.googleapis.com","dns.googleapis.com"]
+variable "gke_controlplane_cidr" {
+  description = "CIDR for gke controlplane rule"
+}
+variable "redis_ip" {
+  description = "IP address for Redis instance"
 }
