@@ -43,7 +43,7 @@ Ensure that the account has at least following privileges:
 
 3. [Google Cloud Storage bucket](https://cloud.google.com/storage/docs/creating-buckets) for saving deployment state
 
-4. DNS name for your Playground deployment instance
+4. DNS name for your Playground deployment instance (e.g. "play.beam.apache.org") further referred as <playground.zone>
 
 5. OS with installed software listed below:
 
@@ -58,12 +58,12 @@ Ensure that the account has at least following privileges:
 6. Apache Beam Git repository cloned locally
 
 # Prepare deployment configuration:
-Playground uses `terraform.tfvars` located in `playground/terraform/environment/environment_name` to define variables specific to an environment (e.g., prod, test, staging).<br>
-1. Create a folder (further referred as `environment_name`) to define a new environment and place configuration files into it:
+Playground uses `terraform.tfvars` located in `playground/terraform/environment/<environment_name>` to define variables specific to an environment (e.g., prod, test, staging).<br>
+1. Create a folder (further referred as <environment_name>) to define a new environment and place configuration files into it:
 
 * `terraform.tfvars` environment variables:
 ```
-project_id           = "projectID"          #GCP Project ID
+project_id           = "project_id"          #GCP Project ID
 network_name         = "playground-network"        #GCP VPC Network Name for Playground deployment
 subnetwork_name      = "playground-subnetwork"  #GCP VPC Subnetwork Name for Playground deployment
 gke_name             = "playground-backend"  #Playground GKE Cluster name
@@ -83,7 +83,7 @@ gke_machine_type     = "e2-standard-8"       #Machine type for GKE Nodes
 ```
 * `state.tfbackend` environment variables:
 ```
-bucket               = "bucket-name"         #input bucket name - will be used for terraform tfstate file
+bucket               = "playground-state-bucket"         #input bucket name - will be used for terraform tfstate file
 ```
 2. Configure authentication for the Google Cloud Platform
 ```
@@ -93,23 +93,23 @@ gcloud init
 gcloud auth application-default login
 ```
 # Deploy Playground infrastructure:
+If you intend to install more than one environment, you may need to manually remove 'playground/terraform/.terraform' folder before a new attempt
+
 1. Start the following command from the top level repository folder ("beam") to deploy the Payground infrastructure:
 ```
-./gradlew playground:terraform:InitInfrastructure -Pproject_environment="environment_name" -Pdns-name="playground.zone"
+./gradlew playground:terraform:InitInfrastructure -Pproject_environment="<environment_name>"
 ```
-Where playground.zone - chosen DNS for Playground
 
 2. Find a Static IP in your GCP project>VPC Network>IP Addresses>pg-static-ip
 <br>Add following DNS A records for the discovered static IP address:
 ```
-java.playground.zone
-python.playground.zone
-scio.playground.zone
-go.playground.zone
-router.playground.zone
-playground.zone
+java.<playground.zone>
+python.<playground.zone>
+scio.<playground.zone>
+go.<playground.zone>
+router.<playground.zone>
+<playground.zone>
 ```
-Where "playground.zone" is the registered DNS zone<br>
 [More about DNS zone registration](https://domains.google/get-started/domain-search/)<br>
 [More about A records in DNS](https://support.google.com/a/answer/2579934?hl=en)
 
@@ -117,19 +117,19 @@ Where "playground.zone" is the registered DNS zone<br>
 
 1. Run the following command to authenticate in the Docker registry:
 ```
-gcloud auth configure-docker <chosen_region>-docker.pkg.dev
+gcloud auth configure-docker <region>-docker.pkg.dev
 ```
 2. Run the following command to authenticate in GKE:
 ```
-gcloud container clusters get-credentials --region <chosen_zone> <gke_name> --project <project_id>
+gcloud container clusters get-credentials --region <zone> <gke_name> --project <project_id>
 ```
 Start the following command from the top level repository folder ("beam") to deploy the Payground infrastructure:
 ```
-./gradlew playground:terraform:gkebackend -Pproject_environment="environment_name" -Pdocker-tag="tag" \
-  -Pdns-name="playground.zone" -Psdk-tag=2.44.0 \
-   -Pdocker-repository-root="<chosen_region>-docker.pkg.dev/<project_id>/playground-repository" -Pdatastore-namespace="dev"
+./gradlew playground:terraform:gkebackend -Pproject_environment="<environment_name>" -Pdocker-tag="tag" \
+  -Pdns-name="<playground.zone>" -Psdk-tag=2.44.0 \
+   -Pdocker-repository-root="<region>-docker.pkg.dev/<project_id>/<repository_id>" -Pdatastore-namespace="Playground"
 ```
-Where tag - image tag for backend, playground.zone - chosen DNS for Playground, Psdk-tag - current BEAM version, Pdatastore-namespace - namespace for Datastore
+Where tag - image tag for docker images, Psdk-tag - current Apache Beam SDK version, Pdatastore-namespace - namespace for Datastore
 
 During script execution, a Google managed certificate will be created. [Provisioning might take up to 60 minutes](https://cloud.google.com/load-balancing/docs/ssl-certificates/google-managed-certs).
 
