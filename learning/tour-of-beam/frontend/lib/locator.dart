@@ -51,7 +51,6 @@ Future<void> _initializeRepositories() async {
       Sdk.java.id: await getRunnerUrl(Sdk.java),
       Sdk.go.id: await getRunnerUrl(Sdk.go),
       Sdk.python.id: await getRunnerUrl(Sdk.python),
-      Sdk.scio.id: await getRunnerUrl(Sdk.scio),
     },
   );
   final exampleClient = GrpcExampleClient(url: routerUrl);
