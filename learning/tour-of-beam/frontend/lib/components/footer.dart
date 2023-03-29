@@ -53,39 +53,6 @@ class Footer extends StatelessWidget {
   }
 }
 
-class _BeamVersion extends StatelessWidget {
-  const _BeamVersion();
-
-  Future<String?> _getSdkBeamVersion() async {
-    final sdk = GetIt.instance.get<AppNotifier>().sdk;
-    if (sdk == null) {
-      return null;
-    }
-    final metadata = await GetIt.instance.get<CodeClient>().getMetadata(sdk);
-    return metadata.beamSdkVersion;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: GetIt.instance.get<AppNotifier>(),
-      builder: (context, child) => FutureBuilder<String?>(
-        // TODO(nausharipov) review: is this ok? I didn't want to initialize a future in initState.
-        // ignore: discarded_futures
-        future: _getSdkBeamVersion(),
-        builder: (context, snapshot) => snapshot.hasData
-            ? Text(
-                '${'ui.builtWith'.tr()} v${snapshot.data}',
-                style: const TextStyle(
-                  color: BeamColors.grey3,
-                ),
-              )
-            : Container(),
-      ),
-    );
-  }
-}
-
 class _Body extends StatelessWidget {
   final Widget child;
   const _Body({required this.child});
@@ -139,6 +106,39 @@ class _PrivacyPolicyButton extends StatelessWidget {
         unawaited(launchUrl(Uri.parse(BeamLinks.privacyPolicy)));
       },
       child: const Text('ui.privacyPolicy').tr(),
+    );
+  }
+}
+
+class _BeamVersion extends StatelessWidget {
+  const _BeamVersion();
+
+  Future<String?> _getSdkBeamVersion() async {
+    final sdk = GetIt.instance.get<AppNotifier>().sdk;
+    if (sdk == null) {
+      return null;
+    }
+    final metadata = await GetIt.instance.get<CodeClient>().getMetadata(sdk);
+    return metadata.beamSdkVersion;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: GetIt.instance.get<AppNotifier>(),
+      builder: (context, child) => FutureBuilder<String?>(
+        // TODO(nausharipov) review: is this ok? I didn't want to initialize a future in initState.
+        // ignore: discarded_futures
+        future: _getSdkBeamVersion(),
+        builder: (context, snapshot) => snapshot.hasData
+            ? Text(
+                '${'ui.builtWith'.tr()} v${snapshot.data}',
+                style: const TextStyle(
+                  color: BeamColors.grey3,
+                ),
+              )
+            : Container(),
+      ),
     );
   }
 }
