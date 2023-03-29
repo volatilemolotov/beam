@@ -20,6 +20,7 @@ export 'src/cache/example_cache.dart';
 export 'src/constants/colors.dart';
 export 'src/constants/links.dart';
 export 'src/constants/sizes.dart';
+export 'src/controllers/build_metadata.dart';
 export 'src/controllers/example_loaders/examples_loader.dart';
 export 'src/controllers/playground_controller.dart';
 export 'src/controllers/public_notifier.dart';

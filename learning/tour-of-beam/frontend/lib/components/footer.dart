@@ -113,13 +113,15 @@ class _PrivacyPolicyButton extends StatelessWidget {
 class _BeamVersion extends StatelessWidget {
   const _BeamVersion();
 
-  Future<String?> _getSdkBeamVersion() async {
+  Future<String?> _getBeamSdkVersion() async {
     final sdk = GetIt.instance.get<AppNotifier>().sdk;
     if (sdk == null) {
       return null;
     }
-    final metadata = await GetIt.instance.get<CodeClient>().getMetadata(sdk);
-    return metadata.beamSdkVersion;
+    final runnerVersion = await GetIt.instance
+        .get<BuildMetadataController>()
+        .getRunnerVersion(sdk);
+    return runnerVersion.beamSdkVersion;
   }
 
   @override
@@ -127,12 +129,15 @@ class _BeamVersion extends StatelessWidget {
     return AnimatedBuilder(
       animation: GetIt.instance.get<AppNotifier>(),
       builder: (context, child) => FutureBuilder<String?>(
-        // TODO(nausharipov) review: is this ok? I didn't want to initialize a future in initState.
         // ignore: discarded_futures
-        future: _getSdkBeamVersion(),
+        future: _getBeamSdkVersion(),
         builder: (context, snapshot) => snapshot.hasData
             ? Text(
-                '${'ui.builtWith'.tr()} v${snapshot.data}',
+                'ui.builtWith'.tr(
+                  namedArgs: {
+                    'beamSdkVersion': snapshot.data!,
+                  },
+                ),
                 style: const TextStyle(
                   color: BeamColors.grey3,
                 ),
