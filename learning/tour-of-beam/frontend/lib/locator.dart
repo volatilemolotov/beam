@@ -43,13 +43,16 @@ Future<void> initializeServiceLocator() async {
 
 Future<void> _initializeRepositories() async {
   final routerUrl = await getRouterUrl();
-  final runnerUrls = await waitMap({
-    for (final sdk in Sdk.known) sdk.id: getRunnerUrl(sdk),
-  });
 
   final codeClient = GrpcCodeClient(
     url: routerUrl,
-    runnerUrlsById: runnerUrls,
+    // TODO(nausharipov): Remove the hardcoded SDKs when runners are hidden.
+    runnerUrlsById: {
+      Sdk.java.id: await getRunnerUrl(Sdk.java),
+      Sdk.go.id: await getRunnerUrl(Sdk.go),
+      Sdk.python.id: await getRunnerUrl(Sdk.python),
+      Sdk.scio.id: await getRunnerUrl(Sdk.scio),
+    },
   );
   final exampleClient = GrpcExampleClient(url: routerUrl);
 
