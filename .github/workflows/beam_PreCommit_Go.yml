@@ -41,11 +41,12 @@ jobs:
           - name: get the one latest&last sha # get the last commit sha in pull_Requst
             run: | 
               URL=${{ github.event.pull_request.url }}/commits
-              echo "PRSHA=$(curl  \
+              PRSHA=$(curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              -s $URL  | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}' )" >> "$GIHTUB_ENV"
+              -s $URL  | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}' )
+              echo $PRSHA 
           - name: echo PRSHA # check the lastest SHA
             run: |
               echo $PRSHA
