@@ -37,8 +37,14 @@ jobs:
           #   run: ./gradlew :goPreCommit
           - name: get the one latest&last sha # get the last commit sha in pull_Requst
             run: | 
-              URL=${{ github.event.issue.pull_request.url }}/commits
-              echo $(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
+              echo "secret: ${{ secrets.GITHUB_TOKEN }}"
           - name: echo PRSHA # check the lastest SHA
             run: |
               echo $PRSHA
+
+
+
+# - name: get the one latest&last sha # get the last commit sha in pull_Requst
+# run: | 
+#   URL=${{ github.event.issue.pull_request.url }}/commits
+#   echo $(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
