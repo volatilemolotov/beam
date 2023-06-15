@@ -20,18 +20,25 @@ jobs:
         steps:       
           - name: Git checkout
             uses: actions/checkout@v3
-          - name: Install Java
-            uses: actions/setup-java@v3.8.0
-            with:
-              distribution: 'zulu'
-              java-version: '8'
-          - name: Install Go
-            uses: actions/setup-go@v3
-            with:
-              go-version: '1.20'
-          - name: Setup Gradle
-            uses: gradle/gradle-build-action@v2
-            with:
-              cache-read-only: false
-          - name: run goPreCommit script
-            run: ./gradlew :goPreCommit
+          # - name: Install Java
+          #   uses: actions/setup-java@v3.8.0
+          #   with:
+          #     distribution: 'zulu'
+          #     java-version: '8'
+          # - name: Install Go
+          #   uses: actions/setup-go@v3
+          #   with:
+          #     go-version: '1.20'
+          # - name: Setup Gradle
+          #   uses: gradle/gradle-build-action@v2
+          #   with:
+          #     cache-read-only: false
+          # - name: run goPreCommit script
+          #   run: ./gradlew :goPreCommit
+          - name: get the one latest&last sha # get the last commit sha in pull_Requst
+            run: | 
+              URL=${{ github.event.issue.pull_request.url }}/commits
+              echo "::set-env name=PRSHA::$(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}')"
+          - name: echo PRSHA # check the lastest SHA
+            run: |
+              echo $PRSHA
