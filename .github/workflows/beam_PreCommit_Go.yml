@@ -37,7 +37,7 @@ jobs:
           #   run: ./gradlew :goPreCommit
           - name: get the one latest&last sha # get the last commit sha in pull_Requst
             run: | 
-              echo "The title of PR is: ${{ github.event.pull_request.title }}"
+              echo "The title of PR is: ${{ github.event.pull_request.url }}"
 
 
 
