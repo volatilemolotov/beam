@@ -51,6 +51,7 @@ jobs:
             run: |
               echo "${{ env.prsha }}" 
           - name: Get Checks for PR # get the last commit sha in pull_Requst
+            if: ${{github.event.comment.body == 'Run Go PreCommit'}}
             run: | 
               URL="${{github.api_url}}/repos/${{github.repository}}/commits/${{env.prsha}}/statuses"
               CHECKS=$(curl  \
