@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '* */6 * * *'
 
+permissions: read-all
+
+
 jobs:
   beam_PreCommit_Go:
         if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Go PreCommit'}} || ${{github.event.schedule}}
