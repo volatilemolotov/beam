@@ -46,8 +46,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -s $URL  | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}' ) 
-              echo $GITHUB_ENV
-              cat $GITHUB_ENV
+              echo $PRSHA >> $GITHUB_ENV
           - name: echo PRSHA # check the lastest SHA
             run: |
               echo "${{ env.prsha }}" 
