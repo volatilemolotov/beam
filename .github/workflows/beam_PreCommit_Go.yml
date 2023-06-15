@@ -53,11 +53,12 @@ jobs:
           - name: Get Checks for PR # get the last commit sha in pull_Requst
             run: | 
               URL=${{ github.event.pull_request.url }}/statuses
-              PRSHA=$(curl  \
+              CHECKS=$(curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -s $URL )
+              echo $CHECKS
 
 
 
