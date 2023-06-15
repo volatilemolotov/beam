@@ -18,8 +18,8 @@ jobs:
         runs-on: [self-hosted, ubuntu-20.04]
         name: beam_PreCommit_Go
         steps:       
-          # - name: Git checkout
-          #   uses: actions/checkout@v3
+          - name: Git checkout
+            uses: actions/checkout@v3
           # - name: Install Java
           #   uses: actions/setup-java@v3.8.0
           #   with:
@@ -37,8 +37,11 @@ jobs:
           #   run: ./gradlew :goPreCommit
           - name: get the one latest&last sha # get the last commit sha in pull_Requst
             run: | 
-              echo "The title of PR is: ${{ github.event.pull_request.url }}"
-
+              URL=${{ github.event.pull_request.url }}/commits
+              echo $(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
+          - name: echo PRSHA # check the lastest SHA
+            run: |
+              echo $PRSHA
 
 
 
