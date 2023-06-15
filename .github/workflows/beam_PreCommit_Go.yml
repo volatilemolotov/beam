@@ -40,20 +40,19 @@ jobs:
           #   run: ./gradlew :goPreCommit
           - name: get the one latest&last sha # get the last commit sha in pull_Requst
             run: | 
-              URL=${{ github.event.pull_request.url }}/commits
+              PRSHA=URL=${{ github.event.pull_request.url }}/commits
               echo $(curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              -s $URL  | jq -r '.[] | .commit.message' | xargs | awk -F " " '{print $NF}' )
-            #-s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
+              -s $URL  | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}' ) >> "$GIHTUB_ENV"
           - name: echo PRSHA # check the lastest SHA
             run: |
               echo $PRSHA
 
 
 
-# - name: get the one latest&last sha # get the last commit sha in pull_Requst
+# - name: get the one latest&last sha # get the last commit sha in pull_Requstsdasd
 # run: | 
 #   URL=${{ github.event.issue.pull_request.url }}/commits
 #   echo $(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
