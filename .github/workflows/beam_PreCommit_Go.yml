@@ -38,10 +38,10 @@ jobs:
           - name: get the one latest&last sha # get the last commit sha in pull_Requst
             run: | 
               URL=${{ github.event.pull_request.url }}/commits
-              echo $(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }} '\
+              echo $(curl --request POST \
+              -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
-              -H "X-GitHub-Api-Version: 2022-11-28" \
-              ${{ secrets.GITHUB_TOKEN }}' $URL)
+              $URL)
             #-s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
           - name: echo PRSHA # check the lastest SHA
             run: |
