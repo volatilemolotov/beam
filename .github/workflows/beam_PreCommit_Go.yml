@@ -38,7 +38,7 @@ jobs:
           #     cache-read-only: false
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
-          - name: get the one latest&last sha # get the last commit sha in pull_Requst
+          - name: Get the last commit for the PR
             run: | 
               URL=${{ github.event.pull_request.url }}/commits
               PRSHA=$(curl  \
@@ -50,6 +50,14 @@ jobs:
           - name: echo PRSHA # check the lastest SHA
             run: |
               echo "${{ env.prsha }}" 
+          - name: Get Checks for PR # get the last commit sha in pull_Requst
+            run: | 
+              URL=${{ github.event.pull_request.url }}/statuses
+              PRSHA=$(curl  \
+              -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -s $URL  | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}' )
 
 
 
