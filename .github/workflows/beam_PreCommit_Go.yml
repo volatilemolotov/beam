@@ -40,7 +40,7 @@ jobs:
           #   run: ./gradlew :goPreCommit
           - name: Get the last commit for the PR
             run: | 
-              URL=${{ github.event.pull_request.url }}/commits
+              URL=${{ github.event.issue.pull_request.url }}/commits
               PRSHA=$(curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
