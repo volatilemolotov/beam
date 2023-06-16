@@ -53,9 +53,9 @@ jobs:
           - name: Get Check Run for the SHA 
             run: | 
               JOB_ID = ${{github.job}}
-              JOB_NAME = ${{job.JOB_ID.name}}
+        
 
-              echo $JOB_NAME
+              echo $JOB_ID
   
 
 
