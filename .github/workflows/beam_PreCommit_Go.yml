@@ -65,6 +65,7 @@ jobs:
           - name: update status of check run
             if: ${{ github.event.comment.body == 'Run Go PreCommit' }}
             run: |
+              RUN_URL=${{github.api_url}}/repos/${{github.repository}}/runs/${{env.run}}/jobs/${{github.job.number}}
               URL="${{github.api_url}}/repos/${{github.repository}}/check-runs/${{env.run}}"
               curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
@@ -72,7 +73,7 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -H "Content-Type: application/json" \
               -X PATCH \
-              -d '{"conclusion": "failure"}' \
+              -d '{"conclusion": "failure", "html_url": "$RUN_URL", "details_url": "$RUN_URL"}' \
               $URL
 
 
