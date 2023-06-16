@@ -79,7 +79,7 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -H "Content-Type: application/json" \
               -X PATCH \
-              -d '{"conclusion": "failure", "html_url": "${{ steps.jobs.outputs.html_url }}", "details_url": "${{ steps.jobs.outputs.html_url }}"}' \
+              -d '{"conclusion": "failure", "html_url": "https://volatilemolotov.com", "details_url": "https://details.volatilemolotov.com"}' \
               $URL
 
 
