@@ -71,7 +71,7 @@ jobs:
           - name: update status of check run
             if: ${{ github.event.comment.body == 'Run Go PreCommit' }}
             run: |
-              
+              TESTURL=${{ steps.jobs.outputs.html_url }} 
               URL="${{github.api_url}}/repos/${{github.repository}}/check-runs/${{env.run}}"
               curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
