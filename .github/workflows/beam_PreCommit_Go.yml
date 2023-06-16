@@ -15,7 +15,8 @@ on:
 permissions:
   checks: write
   issues: write
-  pull-requests: write 
+  pull-requests: write
+  actions: write
 #test
 
 jobs:
