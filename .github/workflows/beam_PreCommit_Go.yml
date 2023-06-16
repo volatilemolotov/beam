@@ -73,7 +73,7 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -H "Content-Type: application/json" \
               -X PATCH \
-              -d '{"conclusion": "failure", "html_url": "$RUN_URL", "details_url": "$RUN_URL"}' \
+              -d "{\"conclusion\": \"failure\", \"html_url\": \"$RUN_URL\", \"details_url\": \"$RUN_URL\"}" \
               $URL
 
 
