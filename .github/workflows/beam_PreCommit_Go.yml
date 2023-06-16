@@ -66,7 +66,7 @@ jobs:
   # -H "Accept: application/vnd.github+json" \
   # -H "X-GitHub-Api-Version: 2022-11-28" \
   # -s $URL | jq '.check_runs | .[] | select(name=) ')
-    echo $JOB_ID
+  #  echo $JOB_ID
 
 # - name: get the one latest&last sha # get the last commit sha in pull_Requstsdasd
 # run: | 
