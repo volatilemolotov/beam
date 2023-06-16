@@ -12,7 +12,10 @@ on:
   schedule:
     - cron: '* */6 * * *'
 
-permissions: read-all
+permissions:
+  checks: write
+  issues: write
+  pull-requests: write 
 #test
 
 jobs:
