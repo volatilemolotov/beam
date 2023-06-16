@@ -57,7 +57,7 @@ jobs:
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
-              -s $URL | jq '.check_runs | .[] | select(name="${{github.job}}") ')
+              -s $URL | jq '.check_runs | .[] | select(name=="${{github.job}}")')
               echo $RUN
 
 
