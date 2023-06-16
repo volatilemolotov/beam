@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '* */6 * * *'
 
+permissions: read-all
+#test
+
 jobs:
   beam_PreCommit_Go:
         if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Go PreCommit'}} || ${{github.event.schedule}}
@@ -20,18 +23,58 @@ jobs:
         steps:       
           - name: Git checkout
             uses: actions/checkout@v3
-          - name: Install Java
-            uses: actions/setup-java@v3.8.0
-            with:
-              distribution: 'zulu'
-              java-version: '8'
-          - name: Install Go
-            uses: actions/setup-go@v3
-            with:
-              go-version: '1.20'
-          - name: Setup Gradle
-            uses: gradle/gradle-build-action@v2
-            with:
-              cache-read-only: false
-          - name: run goPreCommit script
-            run: ./gradlew :goPreCommit
+          # - name: Install Java
+          #   uses: actions/setup-java@v3.8.0
+          #   with:
+          #     distribution: 'zulu'
+          #     java-version: '8'
+          # - name: Install Go
+          #   uses: actions/setup-go@v3
+          #   with:
+          #     go-version: '1.20'
+          # - name: Setup Gradle
+          #   uses: gradle/gradle-build-action@v2
+          #   with:
+          #     cache-read-only: false
+          # - name: run goPreCommit script
+          #   run: ./gradlew :goPreCommit
+          - name: Get the last commit for the PR
+            run: | 
+              URL=${{ github.event.pull_request.url }}/commits
+              PRSHA=$(curl  \
+              -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -s $URL  | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}' ) 
+              echo prsha=$PRSHA >> $GITHUB_ENV
+          - name: echo PRSHA # check the lastest SHA
+            run: |
+              echo "${{ env.prsha }}" 
+          - name: Get Check Run for the SHA 
+            run: | 
+              URL="${{github.api_url}}/repos/${{github.repository}}/commits/${{env.prsha}}/check-runs"
+              RUN=$(curl  \
+              -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -s $URL | jq '.check_runs | .[] | select(.name=="${{github.job}}") | .id')
+              echo run=$RUN >> $GITHUB_ENV
+          - name: update status of check run
+            if: ${{ github.event.comment.body == 'Run Go PreCommit' }}
+            run: |
+              URL="${{github.api_url}}/repos/${{github.repository}}/check-runs/${{env.run}}"
+              curl  \
+              -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/json" \
+              -X PATCH \
+              -d '{"conclusion": "failed"}' \
+              $URL
+
+
+
+# - name: get the one latest&last sha # get the last commit sha in pull_Requstsdasd
+# run: | 
+#   URL=${{ github.event.issue.pull_request.url }}/commits
+#   echo $(curl --request POST -H 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -s $URL | jq -r '.[] | .sha' | xargs | awk -F " " '{print $NF}') >> "$GIHTUB_ENV"
