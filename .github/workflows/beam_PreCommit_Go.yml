@@ -62,10 +62,16 @@ jobs:
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -s $URL | jq '.check_runs | .[] | select(.name=="${{github.job}}") | .id')
               echo run=$RUN >> $GITHUB_ENV
+          - name: Get Current Job Log URL
+            uses: Tiryoh/gha-jobid-action@v0
+            id: jobs
+            with:
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              job_name: ${{ github.job }}
           - name: update status of check run
             if: ${{ github.event.comment.body == 'Run Go PreCommit' }}
             run: |
-              RUN_URL=${{github.api_url}}/repos/${{github.repository}}/runs/${{env.run}}/jobs/${{github.job.number}}
+              RUN_URL=${{github.api_url}}/repos/${{github.repository}}/runs/${{env.run}}/jobs/${{ steps.jobs.outputs.html_url }}
               URL="${{github.api_url}}/repos/${{github.repository}}/check-runs/${{env.run}}"
               curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
