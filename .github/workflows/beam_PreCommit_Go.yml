@@ -67,7 +67,7 @@ jobs:
           - name: Reurn the status check for commit
             if: ${{ github.event.comment.body == 'Run Go PreCommit' }}
             run: | 
-              URL="${{github.api_url}}/repos/${{github.repository}}/jobs/${{env.run}}/rerun"
+              URL="${{github.api_url}}/repos/${{github.repository}}/actions/jobs/${{env.run}}/rerun"
               curl  \
               -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
               -H "Accept: application/vnd.github+json" \
