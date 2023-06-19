@@ -43,6 +43,7 @@ jobs:
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
           - uses: ./.github/actions/rerun-job-action
+            if: ${{github.event.comment.body == 'Run Go PreCommit'}}
             with:
               github_job: ${{ github.job }}
               github_token: ${{ secrets.GITHUB_TOKEN }}
