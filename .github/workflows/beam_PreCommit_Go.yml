@@ -46,5 +46,5 @@ jobs:
             with:
               github_job: ${{ github.job }}
               github_token: ${{ secrets.GITHUB_TOKEN }}
-              pull_request: ${{ github.event.issue.pull_request }}
+              pull_request_url: ${{ github.event.issue.pull_request }}
               github_repository: ${{ github.repository }}
