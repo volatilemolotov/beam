@@ -42,7 +42,9 @@ jobs:
           #     cache-read-only: false
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
-  rerun_job:
-    if: ${{github.event.comment.body == 'Run Go PreCommit'}}
-    uses: volatilemolotov/beam/.github/workflows/rerun_job.yml@master        
-          
+          - uses: ./.github/actions/rerun-job-action
+            with:
+              github_job: ${{ github.job }}
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              pull_request: ${{ github.event.issue.pull_request }}
+              github_repository: ${{ github.repository }}
