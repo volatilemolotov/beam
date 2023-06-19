@@ -36,7 +36,7 @@ runs:
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
-      -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}") | .check_suite_id')
+      -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}") | .check_suite.id')
       echo check_suite_id=$CHECK_SUITE_ID >> $GITHUB_ENV
   - id: get_run_id
     shell: bash
