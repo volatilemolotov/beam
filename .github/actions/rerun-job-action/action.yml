@@ -1,7 +1,7 @@
 name: "Rerun Job"
 description: Reruns the job in the PR status check
 inputs:
-  pr_request_url:
+  pull_request_url:
     description: "The URL of the PR"
     required: true
   github_repository:
@@ -21,7 +21,7 @@ runs:
   - id: get_last_commit_sha
     shell: bash
     run: | 
-      URL=${{inputs.pr_request_url}}/commits
+      URL=${{inputs.pull_request_url}}/commits
       PRSHA=$(curl  \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
