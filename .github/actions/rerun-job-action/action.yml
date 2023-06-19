@@ -62,7 +62,7 @@ runs:
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/jobs/${{env.job_id}}/rerun"
-      JOB_ID=$(curl -X POST\
+      curl -X POST \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
