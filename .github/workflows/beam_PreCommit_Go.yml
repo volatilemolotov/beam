@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   beam_PreCommit_Go:
-        if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Go PreCommit'}} || ${{github.event.schedule}}
+        if: ${{github.event.issue.pull_request}} || ${{github.event.schedule}}
         runs-on: [self-hosted, ubuntu-20.04]
         name: beam_PreCommit_Go
         steps:       
@@ -42,7 +42,7 @@ jobs:
           #     cache-read-only: false
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
-          - name: rerun job
-            if: ${{github.event.comment.body == 'Run Go PreCommit'}}
-            uses: volatilemolotov/beam/.github/workflows/rerun_job.yml@master
+  rerun_job:
+    if: ${{github.event.comment.body == 'Run Go PreCommit'}}
+    uses: volatilemolotov/beam/.github/workflows/rerun_job.yml@master        
           
