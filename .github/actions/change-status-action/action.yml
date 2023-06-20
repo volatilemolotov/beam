@@ -44,7 +44,7 @@ runs:
   - id: get_run_id
     shell: bash
     run: | 
-      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/check-runs/${{env.check_run_id}}"
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs/${{env.check_run_id}}"
       curl -X PATCH \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
