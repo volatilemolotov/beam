@@ -1,0 +1,55 @@
+name: beam_PreCommit_Go_alt
+
+on:
+  push:
+    tags: ['v*']
+    branches: ['master', 'release-*']
+  pull_request:
+    branches: ['master']
+    paths: ['model/**', 'sdks/go.**', 'release/**']
+  issue_comment:
+    types: [created]
+  schedule:
+    - cron: '* */6 * * *'
+
+permissions:
+  checks: write
+  issues: write
+  pull-requests: write
+  actions: write
+#test
+
+jobs:
+  beam_PreCommit_Go_alt:
+        if: ${{github.event.issue.pull_request}} || ${{github.event.schedule}}
+        runs-on: [self-hosted, ubuntu-20.04]
+        name: beam_PreCommit_Go_alt
+        steps:       
+          - name: Git checkout
+            uses: actions/checkout@v3
+          # - name: Install Java
+          #   uses: actions/setup-java@v3.8.0
+          #   with:
+          #     distribution: 'zulu'
+          #     java-version: '8'
+          # - name: Install Go
+          #   uses: actions/setup-go@v3
+          #   with:
+          #     go-version: '1.20'
+          # - name: Setup Gradle
+          #   uses: gradle/gradle-build-action@v2
+          #   with:
+          #     cache-read-only: false
+          # - name: run goPreCommit script
+          #   run: ./gradlew :goPreCommit
+          - name: fail 
+            if: ${{github.event.comment.body == 'Run Go PreCommit_alt'}}
+            run: exit 1
+          - uses: ./.github/actions/change-status-action
+            if: ${{github.event.comment.body == 'Run Go PreCommit_alt'}} && ${{ success() }}
+            with:
+              github_job: ${{ github.job }}
+              github_token: ${{ secrets.GITHUB_TOKEN }}
+              pull_request_url: ${{ github.event.issue.pull_request.url }}
+              github_repository: ${{ github.repository }}
+              status: ''

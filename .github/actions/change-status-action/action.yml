@@ -1,0 +1,54 @@
+name: "Rerun Job"
+description: Reruns the job in the PR status check
+inputs:
+  pull_request_url:
+    description: "The URL of the PR"
+    required: true
+  github_repository:
+    description: "The GitHub repository"
+    required: true
+  github_token:
+    description: "The GitHub token"
+    required: true
+  github_job:
+    description: "The GitHub job"
+    required: true
+  status:
+    description: "Desired status"
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+  - id: get_last_commit_sha
+    shell: bash
+    run: | 
+      URL=${{inputs.pull_request_url}}/commits
+      PRSHA=$(curl  \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL  | jq -r '.[-1].sha' ) 
+      echo prsha=$PRSHA >> $GITHUB_ENV
+  - id: get_check_run_id
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/commits/${{env.prsha}}/check-runs"
+      CHECK_RUN_ID=$(curl  \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}") | .id')
+      echo check_run_id=$CHECK_RUN_ID >> $GITHUB_ENV
+  - id: get_run_id
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/check-runs/${{env.check_run_id}}"
+      RUN_ID=$(curl - X PATCH \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -d '{"conclusion": "${{inputs.status}}"}' \
+      -s $URL 
+      echo run_id=$RUN_ID >> $GITHUB_ENV
