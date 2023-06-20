@@ -42,9 +42,6 @@ jobs:
           #     cache-read-only: false
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
-          - name: fail 
-            if: ${{github.event.comment.body == 'Run Go PreCommit_alt'}}
-            run: exit 1
           - uses: ./.github/actions/change-status-action
             if: ${{ (github.event.comment.body == 'Run Go PreCommit_alt') && success() }}
             with:
