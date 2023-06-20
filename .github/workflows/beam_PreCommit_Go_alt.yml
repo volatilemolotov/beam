@@ -46,7 +46,7 @@ jobs:
             if: ${{github.event.comment.body == 'Run Go PreCommit_alt'}}
             run: exit 1
           - uses: ./.github/actions/change-status-action
-            if: ${{github.event.comment.body == 'Run Go PreCommit_alt'}}
+            if: ${{ (github.event.comment.body == 'Run Go PreCommit_alt') && success() }}
             with:
               github_job: ${{ github.job }}
               github_token: ${{ secrets.GITHUB_TOKEN }}
