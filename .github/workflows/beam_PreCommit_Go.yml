@@ -27,21 +27,6 @@ jobs:
         steps:       
           - name: Git checkout
             uses: actions/checkout@v3
-          # - name: Install Java
-          #   uses: actions/setup-java@v3.8.0
-          #   with:
-          #     distribution: 'zulu'
-          #     java-version: '8'
-          # - name: Install Go
-          #   uses: actions/setup-go@v3
-          #   with:
-          #     go-version: '1.20'
-          # - name: Setup Gradle
-          #   uses: gradle/gradle-build-action@v2
-          #   with:
-          #     cache-read-only: false
-          # - name: run goPreCommit script
-          #   run: ./gradlew :goPreCommit
           - uses: ./.github/actions/rerun-job-action
             if: ${{github.event.comment.body == 'Run Go PreCommit'}}
             with:
@@ -49,3 +34,18 @@ jobs:
               github_token: ${{ secrets.GITHUB_TOKEN }}
               pull_request_url: ${{ github.event.issue.pull_request.url }}
               github_repository: ${{ github.repository }}
+          - name: Install Java
+            uses: actions/setup-java@v3.8.0
+            with:
+              distribution: 'zulu'
+              java-version: '8'
+          - name: Install Go
+            uses: actions/setup-go@v3
+            with:
+              go-version: '1.20'
+          - name: Setup Gradle
+            uses: gradle/gradle-build-action@v2
+            with:
+              cache-read-only: false
+          # - name: run goPreCommit script
+          #   run: ./gradlew :goPreCommit
