@@ -42,6 +42,8 @@ jobs:
           #     cache-read-only: false
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
+          - name: fail
+            run: exit 1
           - uses: ./.github/actions/rerun-job-action
             if: ${{github.event.comment.body == 'Run Go PreCommit'}}
             with:
