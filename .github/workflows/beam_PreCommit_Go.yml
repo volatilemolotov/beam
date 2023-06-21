@@ -27,6 +27,7 @@ jobs:
         steps:       
           - name: Git checkout
             uses: actions/checkout@v3
+          - uses: numtide/action-cli@v0.7.0
           - uses: ./.github/actions/rerun-job-action
             if: ${{github.event.comment.body == 'Run Go PreCommit'}}
             with:
