@@ -27,11 +27,11 @@ jobs:
         steps:       
           - name: Git checkout
             uses: actions/checkout@v3
-          - uses: numtide/action-cli@v0.7.0
           - name: Install GH CLI
             uses: dev-hanz-ops/install-gh-cli-action
             with:
               gh-cli-version: 2.14.2 # optional, see action.yml for current default
+          - uses: ./.github/actions/rerun-job-action
             if: ${{github.event.comment.body == 'Run Go PreCommit'}}
             with:
               github_job: ${{ github.job }}
