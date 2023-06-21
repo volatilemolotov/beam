@@ -52,10 +52,12 @@ runs:
     if: ${{env.status}} == "completed" && (${{env.conclusion}} == "success" || ${{env.conclusion}} == "skipped")
     shell: bash
     run: echo success=true >> $GITHUB_ENV
+
   - id: get_check_suite_id
     if: ${{env.success}} != "true"
     shell: bash
     run: | 
+      test=${{env.success}}
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/commits/${{env.prsha}}/check-runs"
       CHECK_SUITE_ID=$(curl  \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
