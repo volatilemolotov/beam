@@ -52,7 +52,7 @@ runs:
       echo conclusion=$CONCLUSION >> $GITHUB_ENV
   
   - name: Enable Rerun
-    if: ${{env.status == 'completed'}} && ${{ (env.conclusion == 'success' || env.conclusion == 'skipped')}}
+    if: ${{env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')}}
     shell: bash
     run: echo rerun=false >> $GITHUB_ENV
 
