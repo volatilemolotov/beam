@@ -107,6 +107,6 @@ runs:
     shell: bash
     run: |
       gh run cancel ${{ inputs.github_current_run_id }}
-      gh run watch ${{ inputs.github_current_run_i }}
+      gh run watch ${{ inputs.github_current_run_id }}
     env:
       GITHUB_TOKEN: ${{ inputs.github_token }}
