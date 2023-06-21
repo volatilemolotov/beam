@@ -75,6 +75,7 @@ runs:
       -s $URL | jq -r '.workflow_runs | .[0] | .id')
       echo run_id=$RUN_ID >> $GITHUB_ENV
   - id: get_job_id
+    if: ${{env.success}} != "true"
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/runs/${{env.run_id}}/jobs"
