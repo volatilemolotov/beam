@@ -49,7 +49,7 @@ runs:
       -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}") | .conclusion')
       echo conclusion=$CONCLUSION >> $GITHUB_ENV
   - id: exit_on_success
-    if: ${{env.status}} == "completed" && (${{env.conclusion}} == "success" || env.conclusion == "skipped")
+    if: ${{env.status}} == "completed" && (${{env.conclusion}} == "success" || ${{env.conclusion}} == "skipped")
     shell: bash
     run: echo success=true >> $GITHUB_ENV
   - id: get_check_suite_id
