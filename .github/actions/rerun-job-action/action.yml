@@ -51,8 +51,9 @@ runs:
   - id: exit_on_success
     if: ${{env.status}} == "completed" && (${{env.conclusion}} == "success" || env.conclusion == "skipped")
     shell: bash
-    run: exit 0
+    run: echo success=true >> $GITHUB_ENV
   - id: get_check_suite_id
+    if: ${{env.success}} != "true"
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/commits/${{env.prsha}}/check-runs"
@@ -63,6 +64,7 @@ runs:
       -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}") | .check_suite.id')
       echo check_suite_id=$CHECK_SUITE_ID >> $GITHUB_ENV
   - id: get_run_id
+    if: ${{env.success}} != "true"
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/runs?check_suite_id=${{env.check_suite_id}}"
@@ -83,6 +85,7 @@ runs:
       -s $URL | jq -r '.jobs | .[] | select(.name=="${{inputs.github_job}}") | .id ')
       echo job_id=$JOB_ID >> $GITHUB_ENV
   - id: rerun_job
+    if: ${{env.success}} != "true"
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/jobs/${{env.job_id}}/rerun"
