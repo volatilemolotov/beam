@@ -34,6 +34,7 @@ jobs:
               github_token: ${{ secrets.GITHUB_TOKEN }}
               pull_request_url: ${{ github.event.issue.pull_request.url }}
               github_repository: ${{ github.repository }}
+              github_current_run_id: ${{ github.run_id }}
           - name: Install Java
             uses: actions/setup-java@v3.8.0
             with:

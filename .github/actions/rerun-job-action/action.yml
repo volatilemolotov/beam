@@ -13,6 +13,9 @@ inputs:
   github_job:
     description: "The GitHub job"
     required: true
+  github_current_run_id:
+    description: "The GitHub current run id. Not the same that is fetched in this action"
+    required: true
 
 
 runs:
@@ -99,3 +102,11 @@ runs:
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
       -s $URL 
+  - name: Exit rest of the run
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: |
+      gh run cancel ${{ inputs.github_current_run_id }}
+      gh run watch ${{ inputs.github_current_run_i }}
+    env:
+      GITHUB_TOKEN: ${{ inputs.github_token }}
