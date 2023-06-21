@@ -55,7 +55,7 @@ runs:
     run: echo test1=true >> $GITHUB_ENV
 
   - id: get_check_suite_id
-    if: ${{env.test1 != true }}
+    if: ${{env.test1 != 'true' }}
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/commits/${{env.prsha}}/check-runs"
