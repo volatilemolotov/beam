@@ -54,3 +54,5 @@ jobs:
               cache-read-only: false
           # - name: run goPreCommit script
           #   run: ./gradlew :goPreCommit
+          - name: fail
+            run: exit 1
