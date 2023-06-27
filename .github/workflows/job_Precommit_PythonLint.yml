@@ -16,7 +16,7 @@ name: beam_PreCommit_PythonLint
 on:
   pull_request_target:
     branches: [ "master", "release-*" ]
-    paths: [ "model/.*","sdks/python/.*","release/.*"]
+    paths: [ "model/**","sdks/python/**","release/**"]
   issue_comment:
     types: [created]
   push:
