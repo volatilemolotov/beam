@@ -20,7 +20,8 @@ on:
     paths: [ "model/**","sdks/python/**","release/**"]
   issue_comment:
     types: [created]
-
+  schedule:
+    - cron: '* */6 * * *'
 
 jobs:
   beam_PreCommit_Python_Runners:
