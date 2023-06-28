@@ -22,8 +22,8 @@ on:
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
-  schedule:
-    - cron: '* * * * *'
+ # schedule:
+ #   - cron: '* * * * *'
 jobs:
   test_if:
     runs-on: [self-hosted, ubuntu-20.04]
