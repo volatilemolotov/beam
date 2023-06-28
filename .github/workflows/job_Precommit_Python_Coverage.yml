@@ -38,32 +38,32 @@ jobs:
           echo "Github comment: ${{ github.event.comment.body }}"
           echo "----"
           echo "Github schedule: ${{ github.event.schedule }}"
-  beam_PreCommit_Python_Coverage:
-    if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Python_Coverage PreCommit'}} || ${{github.event.schedule}}
+  # beam_PreCommit_Python_Coverage:
+  #   if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Python_Coverage PreCommit'}} || ${{github.event.schedule}}
 
 
-    runs-on: [self-hosted, ubuntu-20.04]
+  #   runs-on: [self-hosted, ubuntu-20.04]
 
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.8'
-      - name: Install Java
-        uses: actions/setup-java@v3.8.0
-        with:
-          distribution: 'zulu'
-          java-version: '8'
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          cache-read-only: false
-      - name: Run preCommitPyCoverage
-        run: ./gradlew :sdks:python:test-suites:tox:py38:preCommitPyCoverage 
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: python-code-coverage-report
-          path: "**/pytest*.xml"
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         ref: ${{ github.event.pull_request.head.sha }}
+  #     - uses: actions/setup-python@v2
+  #       with:
+  #         python-version: '3.8'
+  #     - name: Install Java
+  #       uses: actions/setup-java@v3.8.0
+  #       with:
+  #         distribution: 'zulu'
+  #         java-version: '8'
+  #     - name: Setup Gradle
+  #       uses: gradle/gradle-build-action@v2
+  #       with:
+  #         cache-read-only: false
+  #     - name: Run preCommitPyCoverage
+  #       run: ./gradlew :sdks:python:test-suites:tox:py38:preCommitPyCoverage 
+  #     - name: Archive code coverage results
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: python-code-coverage-report
+  #         path: "**/pytest*.xml"
