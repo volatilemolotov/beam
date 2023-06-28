@@ -29,7 +29,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+        
       - name: output
+        if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Python_Coverage PreCommit'}} || ${{github.event.schedule}}
         run: |
           echo "Github event: ${{ github.event.issue.pull_request }}"
           echo "----"
