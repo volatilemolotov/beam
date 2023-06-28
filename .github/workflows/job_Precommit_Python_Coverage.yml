@@ -35,7 +35,7 @@ jobs:
         run: |
           echo "$GITHUB_CONTEXT"
       - name: test
-        if: github.event_name == 'push' || github.event.issue.pull_request || github.event.comment.body == 'Run Python_Coverage PreCommit' || github.event.schedule
+        if: github.event_name == 'push' || github.event_name == 'pull_request_target' || github.event.comment.body == 'Run Python_Coverage PreCommit' || github.event.schedule
         run: |
           echo "TEST"
   
