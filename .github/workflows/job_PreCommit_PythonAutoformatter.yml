@@ -24,8 +24,8 @@ on:
     branches: ['master', 'release-*']
 jobs:
   beam_PreCommit_PythonFormatter:
-    if: ${{github.event.issue.pull_request || github.event.comment.body == 'Run PythonFormatter PreCommit' || github.event.schedule}}
-    
+    if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run PythonFormatter PreCommit'}} || ${{github.event.schedule}}
+   
     runs-on: [self-hosted, ubuntu-20.04]
 
     steps:
