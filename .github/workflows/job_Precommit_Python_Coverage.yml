@@ -37,7 +37,7 @@ jobs:
         if: github.event.comment.body == 'Run Python_Coverage PreCommit'
         uses: ./.github/actions/rerun-job-action
         with:
-          pull_request_url: ${{ github.event.pull_request.url }}
+          pull_request_url: ${{ github.event.issue.pull_request.url }}
           github_repository: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_job: ${{ github.job }}
