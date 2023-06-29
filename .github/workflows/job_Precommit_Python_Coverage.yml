@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-        with:
+        #with:
           #ref: ${{ github.event.pull_request.head.sha }}
       - name: Rerun on comment
         if: github.event.comment.body == 'Run Python_Coverage PreCommit'
