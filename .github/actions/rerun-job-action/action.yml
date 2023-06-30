@@ -62,7 +62,7 @@ runs:
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
       -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}")')
-      if [ "$CHECK_RUN" == "{}" ]; then
+      if [ -z $CHECK_RUN ]; then
         echo "No check runs found for this job"
         echo skip=true >> $GITHUB_ENV
         exit 0
