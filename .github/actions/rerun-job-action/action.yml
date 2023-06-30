@@ -67,7 +67,7 @@ runs:
         echo skip=true >> $GITHUB_ENV
         exit 0
       fi
-      read -r STATUS CONCLUSION CHECK_SUITE_ID<<< $(jq -r '"\(.status) \(.conclusion) \(.check_suite.id)"')
+      read -r STATUS CONCLUSION CHECK_SUITE_ID<<< $(echo $CHECK_RUN | jq -r '"\(.status) \(.conclusion) \(.check_suite.id)"')
       echo status=$STATUS >> $GITHUB_ENV
       echo conclusion=$CONCLUSION >> $GITHUB_ENV
       echo check_suite_id=$CHECK_SUITE_ID >> $GITHUB_ENV
