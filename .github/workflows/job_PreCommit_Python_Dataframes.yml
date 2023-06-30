@@ -24,17 +24,14 @@ on:
     branches: ['master', 'release-*']
 permissions:
   actions: write
-
+  
 jobs:
   beam_PreCommit_Python_Dataframes:
     strategy:
       matrix:
         python_version: ['3.8','3.9','3.10']
-
-    if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run Python_Dataframes PreCommit'}} || ${{github.event.schedule}}
-
+    if: github.event_name == 'push' || github.event_name == 'pull_request_target' || github.event.comment.body == 'Run Python_Dataframes PreCommit' || github.event_name == 'schedule'
     runs-on: [self-hosted, ubuntu-20.04]
-    
     steps:
       - uses: actions/checkout@v3
         with:

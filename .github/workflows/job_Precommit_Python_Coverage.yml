@@ -23,9 +23,9 @@ on:
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
-
 permissions:
   actions: write
+
 jobs:
   beam_PreCommit_Python_Coverage:
     if: github.event_name == 'push' || github.event_name == 'pull_request_target' || github.event.comment.body == 'Run Python_Coverage PreCommit' || github.event_name == 'schedule'
