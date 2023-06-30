@@ -22,6 +22,9 @@ on:
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
+permissions:
+  actions: write
+
 jobs:
   beam_PreCommit_Python_Examples:
     strategy:

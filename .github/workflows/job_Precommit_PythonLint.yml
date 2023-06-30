@@ -22,6 +22,8 @@ on:
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
+permissions:
+  actions: write
 
 jobs:
   beam_PreCommit_PythonLint:

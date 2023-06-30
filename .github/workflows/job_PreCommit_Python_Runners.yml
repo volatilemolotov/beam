@@ -22,6 +22,8 @@ on:
     types: [created]
   schedule:
     - cron: '* */6 * * *'
+permissions:
+  actions: write
 
 jobs:
   beam_PreCommit_Python_Runners:

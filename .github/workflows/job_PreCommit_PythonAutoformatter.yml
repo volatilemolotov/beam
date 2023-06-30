@@ -22,6 +22,9 @@ on:
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
+permissions:
+  actions: write
+
 jobs:
   beam_PreCommit_PythonFormatter:
     if: ${{github.event.issue.pull_request}} || ${{github.event.comment.body == 'Run PythonFormatter PreCommit'}} || ${{github.event.schedule}}
