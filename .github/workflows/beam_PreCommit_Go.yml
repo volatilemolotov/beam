@@ -13,6 +13,8 @@ on:
     - cron: '* */6 * * *'
 permissions:
   actions: write
+  pull-requests: read
+
 
 jobs:
   beam_PreCommit_Go:
