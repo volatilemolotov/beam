@@ -60,4 +60,4 @@ jobs:
       - name: Run pythonPreCommit
         run: |
           PY_VER=${{ matrix.python_version }}
-          ./gradlew :sdks:python:test-suites:tox:py${PY_VER//.}:preCommitPy${PY_VER//.} -Pposargs=--ignore=apache_beam/dataframe/ --ignore=apache_beam/examples/ --ignore=apache_beam/runners/ --ignore=apache_beam/transforms/ -PpythonVersion=${PY_VER}
+          ./gradlew :sdks:python:test-suites:tox:py${PY_VER//.}:preCommitPy${PY_VER//.} -Pposargs="--ignore=apache_beam/dataframe/ --ignore=apache_beam/examples/ --ignore=apache_beam/runners/ --ignore=apache_beam/transforms/" -PpythonVersion=${PY_VER}
