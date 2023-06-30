@@ -4,13 +4,15 @@ on:
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
-  pull_request:
-    branches: ['master']
+  pull_request_target:
+    branches: ['master', 'release-*' ]
     paths: ['model/**', 'sdks/go.**', 'release/**']
   issue_comment:
     types: [created]
   schedule:
     - cron: '* */6 * * *'
+permissions:
+  actions: write
 
 jobs:
   beam_PreCommit_Go:
@@ -22,8 +24,9 @@ jobs:
     runs-on: [self-hosted, ubuntu-20.04]
     name: Go Precommit
     steps:       
-      - name: Git checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - name: Install GH CLI
         uses: dev-hanz-ops/install-gh-cli-action@v0.1.0
       - name: Rerun on comment
