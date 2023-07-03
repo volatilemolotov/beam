@@ -25,6 +25,8 @@ on:
   pull_request_target:
     branches: ['master']
     paths: ['.github/gh-actions-self-hosted-runners/arc/images/**']
+env:
+  docker_image: europe-west3-docker.pkg.dev/main-386117/temp/newrunner
 
 jobs:
   build-and-version-runner:
@@ -55,8 +57,8 @@ jobs:
         context: ${{ env.working-directory }}
         load: true
         tags: |
-          europe-west3-docker.pkg.dev/main-386117/temp/newrunner:dev1
-          europe-west3-docker.pkg.dev/main-386117/temp/newrunner:${{ github.sha }}
+          ${{env.docker_image}}:dev1
+          ${{env.docker_image}}:${{ github.sha }}
     - name: Push Docker image
       if: github.event_name == 'push'
       id: docker_build
@@ -65,5 +67,5 @@ jobs:
         context: ${{ env.working-directory }}
         push: true
         tags: |
-          europe-west3-docker.pkg.dev/main-386117/temp/newrunner:dev1
-          europe-west3-docker.pkg.dev/main-386117/temp/newrunner:${{ github.sha }}
+          ${{env.docker_image}}:dev1
+          ${{env.docker_image}}:${{ github.sha }}
