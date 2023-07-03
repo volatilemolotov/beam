@@ -29,11 +29,6 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Install GH Cli
-        run: |
-          wget https://github.com/cli/cli/releases/download/v2.31.0/gh_2.31.0_linux_amd64.tar.gz
-          tar -xvf gh_2.31.0_linux_amd64.tar.gz
-          sudo mv gh_2.31.0_linux_amd64/bin/gh /usr/local/bin
       - name: Rerun on comment
         if: github.event.comment.body == 'Run Go PreCommit'
         uses: ./.github/actions/rerun-job-action
