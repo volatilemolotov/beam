@@ -59,7 +59,7 @@ jobs:
         run: |
           echo "COMMENT_BODY=Run Python_Dataframes PreCommit (${{ matrix.python_version }})" >> $GITHUB_ENV
       - name: Rerun on comment
-        if: github.event.comment.body  == ${{ env.COMMENT_BODY }}
+        if: ${{ github.event.comment.body }}  == ${{ env.COMMENT_BODY }}
         uses: ./.github/actions/rerun-job-action
         with:
           pull_request_url: ${{ github.event.issue.pull_request.url }}
