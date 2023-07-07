@@ -41,6 +41,15 @@ permissions:
   security-events: read
   statuses: read
 jobs:
+  set_comment_body:
+    runs-on: ubuntu-20.04
+    if: startsWith(github.event.comment.body, 'Run Python_Dataframes PreCommit') 
+    outputs: 
+      comment_body: ${{ steps.set_comment_body.outputs.comment_body }}
+    steps:
+      - name: Set comment body
+        run: |
+          echo "comment_body=Run Python_Dataframes PreCommit" >> $GITHUB_ENV
   beam_PreCommit_Python_Dataframes:
     strategy:
       matrix:
@@ -55,11 +64,8 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
-      - name: Set comment body with matrix
-        run: |
-          echo "COMMENT_BODY=Run Python_Dataframes PreCommit (${{ matrix.python_version }})" >> $GITHUB_ENV
       - name: Rerun on comment
-        if: ${{ github.event.comment.body }}  == ${{ env.COMMENT_BODY }}
+        if: github.event.comment.body  == needs.set_comment_body.outputs.comment_body
         uses: ./.github/actions/rerun-job-action
         with:
           pull_request_url: ${{ github.event.issue.pull_request.url }}
