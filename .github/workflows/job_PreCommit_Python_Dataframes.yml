@@ -56,6 +56,7 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Set comment body with matrix
+        id: set_comment_body
         run: |
           echo "comment_body=Run Python_Dataframes PreCommit (${{ matrix.python_version }})" >> $GITHUB_ENV
       - name: Rerun on comment
