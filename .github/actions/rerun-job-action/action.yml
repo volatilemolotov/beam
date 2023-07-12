@@ -56,7 +56,7 @@ runs:
   - name: Get Status and Conclusion for PR Job
     shell: bash
     run: | 
-      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/commits/${{env.prsha}}/check-runs"
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/commits/${{env.prsha}}/check-runs?check_name=${{inputs.github_job}}"
       CHECK_RUN=$(curl  \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
