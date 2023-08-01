@@ -51,11 +51,13 @@ concurrency:
 
 jobs:
   beam_PreCommit_PythonDocker:
-    name: beam_PreCommit_PythonDocker (Run PythonDocker PreCommit 3.x)
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
+        job_name: ["beam_PreCommit_PythonDocker"]
+        job_phrase: ["Run PythonDocker PreCommit"]
         python_version: ['3.8','3.9','3.10','3.11']
     if: |
       github.event_name == 'push' || 
@@ -71,7 +73,7 @@ jobs:
       - name: Set comment body with matrix
         id: set_comment_body
         run: |
-          echo "comment_body=Run PythonDocker PreCommit (${{ matrix.python_version }})" >> $GITHUB_OUTPUT
+          echo "comment_body=${{ matrix.job_phrase }} (${{ matrix.python_version }})" >> $GITHUB_OUTPUT
       - name: Rerun on comment
         if: github.event.comment.body  == steps.set_comment_body.outputs.comment_body
         uses: ./.github/actions/rerun-job-action
@@ -79,7 +81,7 @@ jobs:
           pull_request_url: ${{ github.event.issue.pull_request.url }}
           github_repository: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          github_job: "${{ github.job }} (${{ matrix.python_version }})"
+          github_job: "${{ matrix.job_name }} (${{ matrix.job_phrase }})  (${{ matrix.python_version }})"
           github_current_run_id: ${{ github.run_id }}
       - name: Install Java
         uses: actions/setup-java@v3
