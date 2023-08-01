@@ -51,7 +51,7 @@ concurrency:
 
 jobs:
   beam_PreCommit_PythonDocker:
-    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }}) (${{ matrix.python_version }})
     timeout-minutes: 30
     strategy:
       fail-fast: false
