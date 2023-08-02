@@ -10,5 +10,5 @@ jobs:
     steps:
       - name: echo context
         run: |
-          JOB=${{ tojson(github.job) }}
+          JOB=${{ tojson(github) }}
           echo $JOB
