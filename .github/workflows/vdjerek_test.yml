@@ -17,6 +17,6 @@ jobs:
           sudo apt install yq -y
       - name: echo context
         run: |
-          filepath=$(${{tojson(github)}} | jq )
+          filepath=$(${{tojson(github.event.workflow)}} | jq )
           echo $filepath
           
