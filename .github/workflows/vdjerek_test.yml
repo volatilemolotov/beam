@@ -8,7 +8,13 @@ jobs:
     name: name of job
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: install yq
+        run: |
+          sudo apt-get update
+          sudo apt-get install yq -y
       - name: echo context
         run: |
-          JOB=${{ tojson(github) }}
-          echo $JOB
+          cat ${{github.workflow}} | yq '.jobs.${{github.job}}.name'
+          
