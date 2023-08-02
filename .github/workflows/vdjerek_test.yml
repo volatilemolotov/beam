@@ -1,0 +1,14 @@
+name: test some stuff
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  echo_context:
+    name: name of job
+    runs-on: ["ubuntu-latest","self-hosted"]
+    steps:
+      - name: echo context
+        run: |
+          JOB=${{ tojson(job) }}
+          echo $JOB
