@@ -6,7 +6,7 @@ on:
 jobs:
   echo_context:
     name: name of job
-    runs-on: ["ubuntu-latest","self-hosted"]
+    runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
       - name: echo context
         run: |
