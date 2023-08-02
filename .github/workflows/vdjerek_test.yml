@@ -19,4 +19,5 @@ jobs:
         run: |
           filepath=$(${{tojson(github.event.workflow)}} | jq )
           echo $filepath
+          sleep 3600
           
