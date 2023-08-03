@@ -17,7 +17,5 @@ jobs:
           sudo apt install yq -y
       - name: echo context
         run: |
-          filepath=$(${{tojson(github.event.workflow)}} | jq )
-          echo $filepath
-          sleep 3600
+          test=${{ tojson('this pretty little string') }}
           
