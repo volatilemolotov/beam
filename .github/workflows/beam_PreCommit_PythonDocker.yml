@@ -62,8 +62,11 @@ jobs:
     if: |
       github.event_name == 'push' || 
       github.event_name == 'pull_request_target' || 
-      startsWith(github.event.comment.body, 'Run PythonDocker PreCommit') ||
-      github.event_name == 'schedule'
+      github.event_name == 'schedule' ||
+      (github.event.comment.body == 'Run PythonDocker PreCommit 3.8' || 
+      github.event.comment.body == 'Run PythonDocker PreCommit 3.9' ||
+      github.event.comment.body == 'Run PythonDocker PreCommit 3.10' ||
+      github.event.comment.body == 'Run PythonDocker PreCommit 3.11')
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
       - name: Check out repository code
@@ -75,7 +78,7 @@ jobs:
         run: |
           echo "comment_body=${{ matrix.job_phrase }} ${{ matrix.python_version }}" >> $GITHUB_OUTPUT
       - name: Rerun on comment
-        if: github.event.comment.body  == steps.set_comment_body.outputs.comment_body
+        if: github.event.comment.body  == '(${{ matrix.job_phrase }} ${{ matrix.python_version }})'
         uses: ./.github/actions/rerun-job-action
         with:
           pull_request_url: ${{ github.event.issue.pull_request.url }}
