@@ -78,7 +78,7 @@ jobs:
         run: |
           echo "comment_body=${{ matrix.job_phrase }} ${{ matrix.python_version }}" >> $GITHUB_OUTPUT
       - name: Rerun on comment
-        if: github.event.comment.body  == '(${{ matrix.job_phrase }} ${{ matrix.python_version }})'
+        if: ${{ github.event.comment.body  == '(${{ matrix.job_phrase }} ${{ matrix.python_version }})'}}
         uses: ./.github/actions/rerun-job-action
         with:
           pull_request_url: ${{ github.event.issue.pull_request.url }}
