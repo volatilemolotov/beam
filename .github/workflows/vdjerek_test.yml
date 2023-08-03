@@ -17,5 +17,5 @@ jobs:
           sudo apt install yq -y
       - name: echo context
         run: |
-          test=${{ tojson('this pretty little string') }}
+          test=${{ toJSON(format('[0]','this pretty little string')) }}
           
