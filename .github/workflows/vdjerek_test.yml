@@ -17,5 +17,5 @@ jobs:
           sudo apt install yq -y
       - name: echo context
         run: |
-          test=${{ format('[{0}]', "['this','string']")}}
+          test=${{ fromJson(format('[{0}]', 'this, string, is, pretty')) }}
           
