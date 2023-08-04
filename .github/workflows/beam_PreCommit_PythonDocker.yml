@@ -70,10 +70,6 @@ jobs:
       github.event.comment.body == 'Run PythonDocker PreCommit 3.11')
     steps:
       - uses: actions/checkout@v3
-      - name: Set comment body with matrix
-        id: set_comment_body
-        run: |
-          echo "comment_body=Run Python PythonDocker (${{ matrix.python_version }})" >> $GITHUB_OUTPUT
       - name: Setup repository
         uses: ./.github/actions/setup-action
         with:
