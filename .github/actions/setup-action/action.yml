@@ -43,7 +43,7 @@ runs:
         ref: ${{ github.event.pull_request.head.sha }}
     - name: Check if the phrase is correct
       shell: bash
-      if: github.event_name == "issue_comment" && github.event.comment.body != inputs.comment_phrase
+      if: github.event_name == 'issue_comment' && github.event.comment.body != inputs.comment_phrase
       run: |
         echo "The phrase ${{ inputs.comment_phrase }} does not match the phrase for this instance:  ${{ inputs.comment_phrase }}. Exiting."
         exit 1
