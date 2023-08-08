@@ -32,6 +32,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Check if the phrase is correct
+      shell: bash
+      if: github.event_name == 'issue_comment' && github.event.comment.body != inputs.comment_phrase
+      run: |
+        echo "The phrase ${{ inputs.comment_phrase }} does not match the phrase for this instance:  ${{ inputs.comment_phrase }}. Exiting."
+        exit 1
     - name: Check out repository code
       uses: actions/checkout@v3
       if: |
@@ -41,12 +47,6 @@ runs:
         github.event_name == 'workflow_dispatch'
       with:
         ref: ${{ github.event.pull_request.head.sha }}
-    - name: Check if the phrase is correct
-      shell: bash
-      if: github.event_name == 'issue_comment' && github.event.comment.body != inputs.comment_phrase
-      run: |
-        echo "The phrase ${{ inputs.comment_phrase }} does not match the phrase for this instance:  ${{ inputs.comment_phrase }}. Exiting."
-        exit 1
     - name: Check out repository code if comment phrase
       uses: actions/checkout@v3
       if: ${{ github.event.comment.body == inputs.comment_phrase }}
