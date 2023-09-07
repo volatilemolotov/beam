@@ -73,17 +73,12 @@ jobs:
           comment_phrase: ${{ matrix.job_phrase }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
-      - name: test mvn
-        run: mvn --version
-      # - name: run PostCommit Java script
-      #   uses: ./.github/actions/gradle-command-self-hosted-action
-      #   with:
-      #       gradle-command: :javaPostCommit
-      #       arguments: -Pmaven_home=/home/jenkins/tools/maven/apache-maven-3.5.4
-      # - name: env
-      #   run: env
-      # - name: Upload test report
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: java-code-coverage-report
-      #     path: "**/build/test-results/**/*.xml"
+      - name: run PostCommit Java script
+        uses: ./.github/actions/gradle-command-self-hosted-action
+        with:
+            gradle-command: :javaPostCommit
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: java-code-coverage-report
+          path: "**/build/test-results/**/*.xml"
