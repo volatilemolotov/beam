@@ -16,22 +16,22 @@
 name: PreCommit SQL Java11
 
 on:
-  push:
-    tags: ['v*']
-    branches: ['master', 'release-*']
-    paths: ['sdks/java/extensions/sql/**','.github/workflows/beam_PreCommit_SQL_Java11.yml']
-  pull_request_target:
-    branches: ['master', 'release-*']
-    paths: [sdks/java/extensions/sql/**]
-  issue_comment:
-    types: [created]
-  schedule:
-    - cron: '0 */6 * * *'
+  # push:
+  #   tags: ['v*']
+  #   branches: ['master', 'release-*']
+  #   paths: ['sdks/java/extensions/sql/**','.github/workflows/beam_PreCommit_SQL_Java11.yml']
+  # pull_request_target:
+  #   branches: ['master', 'release-*']
+  #   paths: [sdks/java/extensions/sql/**]
+  # issue_comment:
+  #   types: [created]
+  # schedule:
+  #   - cron: '0 */6 * * *'
   workflow_dispatch:
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
-  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.sha || github.head_ref || github.ref }}-${{ github.event.sender.login }}-${{ github.event.schedule }}'
+  group: '${{ github.workflow }} @ ${{ github.event.issue.number || github.event.pull_request.head.label || github.sha || github.head_ref || github.ref }}-${{ github.event.schedule || github.event.comment.body || github.event.sender.login}}'
   cancel-in-progress: true
 
 env:
@@ -43,7 +43,7 @@ env:
 permissions:
     actions: write
     pull-requests: read
-    checks: read
+    checks: write
     contents: read
     deployments: read
     id-token: none
@@ -115,4 +115,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: SpotBugs Results
+          path: '**/build/reports/spotbugs/*.html'
+      - name: Publish SpotBugs Results
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        if: always()
+        with:
+          name: SpotBugs
           path: '**/build/reports/spotbugs/*.html'
