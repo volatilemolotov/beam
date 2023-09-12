@@ -40,7 +40,7 @@ for dataset in ${BQ_DATASETS[@]}; do
       LAST_MODIFIED_MS=${BASH_REMATCH[1]}
       LAST_MODIFIED=$(($LAST_MODIFIED_MS / 1000))
       if [[ $GRACE_PERIOD -gt $LAST_MODIFIED ]]; then
-        if bq --project_id=$PROJECT rm -r -f $dataset; then
+        if echo $dataset; then
           echo "Deleted $dataset (modified `date -d @$LAST_MODIFIED`)"
         else
           failed_calls+=1

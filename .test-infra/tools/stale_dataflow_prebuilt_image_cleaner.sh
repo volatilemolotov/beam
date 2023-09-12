@@ -71,7 +71,6 @@ for image_name in ${IMAGE_NAMES[@]}; do
       # this make sure we leave at least one container under each image name, either labelled "latest" or not
       if [ "$LATEST_IN_TIME" != "$current" ]; then
         echo "Deleting image. Command: gcloud container images delete ${image_name}@"${current}" --force-delete-tags -q"
-        gcloud container images delete ${image_name}@"${current}" --force-delete-tags -q || FAILED_TO_DELETE+="${current} "
       fi
     done
   fi
@@ -81,7 +80,7 @@ for image_name in ${IMAGE_NAMES[@]}; do
   echo "Failed to delete the following images: ${FAILED_TO_DELETE}. Retrying each of them."
   for current in $RETRY_DELETE; do
     echo "Trying again to delete image ${image_name}@"${current}". Command: gcloud container images delete ${image_name}@"${current}" --force-delete-tags -q"
-    gcloud container images delete ${image_name}@"${current}" --force-delete-tags -q
+    
   done
 done
 
