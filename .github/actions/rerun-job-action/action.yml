@@ -127,7 +127,7 @@ runs:
     env:
       GITHUB_TOKEN: ${{ inputs.github_token }}
   - name: submit new check
-    if: ${{env.no_check != 'true' }}
+    if: ${{env.no_check == 'true' }}
     shell: bash
     run: |
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs"
@@ -139,7 +139,7 @@ runs:
       "head_sha": "${{env.prsha}}", status: "queued"} 
       read -r CHECK_ID HTML_URL<<< $(echo $CHECK_DATA | jq -r '"\(.id) \(.html_url)"')
   - name: update check data
-    if: ${{env.no_check != 'true' }}
+    if: ${{env.no_check == 'true' }}
     shell: bash
     run: |
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs/${{env.CHECK_ID}}"
