@@ -66,7 +66,7 @@ runs:
       -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}")')
       if [ -z "$CHECK_RUN" ]; then
         echo "No check runs found for this job"
-        echo skip=true >> $GITHUB_ENV
+        echo no_check=true >> $GITHUB_ENV
         exit 0
       fi
       read -r STATUS CONCLUSION CHECK_SUITE_ID<<< $(echo $CHECK_RUN | jq -r '"\(.status) \(.conclusion) \(.check_suite.id)"')
@@ -76,7 +76,7 @@ runs:
  
 
   - name: Disable Rerun for Success or Skipped
-    if: ${{(env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')) || env.skip == 'true'}}
+    if: ${{(env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')) || env.no_check == 'true'}}
     shell: bash
     run: echo rerun=false >> $GITHUB_ENV
 
@@ -113,7 +113,6 @@ runs:
       -H "X-GitHub-Api-Version: 2022-11-28" \
       -s $URL 
   - name: Install GH Cli
-    if: ${{env.rerun != 'false' }}
     shell: bash
     run: |
       wget https://github.com/cli/cli/releases/download/v2.31.0/gh_2.31.0_linux_amd64.tar.gz
@@ -127,3 +126,26 @@ runs:
       gh run watch ${{ inputs.github_current_run_id }}
     env:
       GITHUB_TOKEN: ${{ inputs.github_token }}
+  - name: submit new check
+    if: ${{env.no_check != 'true' }}
+    shell: bash
+    run: |
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs"
+      CHECK_DATA=curl -X POST \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL -d {"name": "${{inputs.github_job}}", \
+      "head_sha": "${{env.prsha}}", status: "queued"} 
+      read -r CHECK_ID HTML_URL<<< $(echo $CHECK_DATA | jq -r '"\(.id) \(.html_url)"')
+  - name: update check data
+    if: ${{env.no_check != 'true' }}
+    shell: bash
+    run: |
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs/${{env.CHECK_ID}}"
+      CHECK_DATA=curl -X PATCH \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL -d {"details_url": "${{env.HTML_URL}}"}
+
