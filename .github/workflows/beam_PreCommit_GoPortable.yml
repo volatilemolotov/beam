@@ -16,13 +16,9 @@
 name: PreCommit GoPortable
 
 on:
-  push:
-    tags: ['v*']
-    branches: ['master', 'release-*']
-    paths: ['model/**', 'sdks/go.**', 'release/**','.github/workflows/beam_PreCommit_GoPortable.yml']
   pull_request_target:
     branches: ['master', 'release-*']
-    paths: ['model/**', 'sdks/go.**', 'release/**']
+    paths: ['.github/temp/test']
   issue_comment:
     types: [created]
   schedule:
