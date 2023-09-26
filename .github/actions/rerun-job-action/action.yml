@@ -79,6 +79,7 @@ runs:
     if: ${{(env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')) || env.no_check == 'true'}}
     shell: bash
     run: echo rerun=false >> $GITHUB_ENV
+    
   - name: Create a new check for PR
     if: ${{env.no_check == 'true' }}
     shell: bash
@@ -144,7 +145,7 @@ runs:
       main: echo "Will update status in post"
       post: |
         # get current run status
-        URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/runs/${{inputs.github_current_run_id}}"
+        URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs/${{inputs.github_current_run_id}}"
         STATUS=$(curl  \
         -H 'Authorization: Bearer ${{inputs.github_token}}' \
         -H "Accept: application/vnd.github+json" \
