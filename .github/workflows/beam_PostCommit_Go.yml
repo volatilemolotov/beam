@@ -81,12 +81,3 @@ jobs:
       - name: GCloud Docker credential helper
         run: |
           gcloud auth configure-docker us.gcr.io
-      - name: run Go PostCommit script
-        uses: ./.github/actions/gradle-command-self-hosted-action
-        env:
-          USER: github-actions
-        with:
-          gradle-command: :goPostCommit
-          arguments: |
-            --no-parallel \
-            -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions
