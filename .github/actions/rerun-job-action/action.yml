@@ -80,7 +80,7 @@ runs:
     shell: bash
     run: echo rerun=false >> $GITHUB_ENV
   - name: Create a new check for PR
-    if: ${{env.rerun != 'false' }}
+    if: ${{env.no_check != 'false' }}
     shell: bash
     run: | 
       URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs"
