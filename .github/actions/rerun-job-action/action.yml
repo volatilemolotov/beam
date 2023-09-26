@@ -158,4 +158,4 @@ runs:
         -H "Accept: application/vnd.github+json" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
         -s $URL \
-        -d '{"details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "completed", "conclusion": "$STATUS"}'
+        -d '{"details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "completed", "conclusion": "'$STATUS'"}'
