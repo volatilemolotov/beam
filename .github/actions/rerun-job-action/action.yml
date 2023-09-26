@@ -89,7 +89,7 @@ runs:
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
       -s $URL \
-      -d '{"name": "${{inputs.github_job}}", "head_sha": "${{env.prsha}}", "details_url": "${{github.server_url}}/actions/runs/${{ github.run_id}}" "status": "queued", "started_at": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'", "output": {"title": "${{ inputs.github_job }}"}}'
+      -d '{"name": "${{inputs.github_job}}", "head_sha": "${{env.prsha}}", "details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}" "status": "in_progress", "output": {"title": "${{ inputs.github_job }}"}}'
   - name: Get Run ID
     if: ${{env.rerun != 'false' }}
     shell: bash
