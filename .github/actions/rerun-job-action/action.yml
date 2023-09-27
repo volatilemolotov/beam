@@ -144,18 +144,24 @@ runs:
     with:
       main: echo "Will update status in post"
       post: |
-        # get current run status
-        URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        STATUS=$(curl  \
-        -H 'Authorization: Bearer ${{inputs.github_token}}' \
-        -H "Accept: application/vnd.github+json" \
-        -H "X-GitHub-Api-Version: 2022-11-28" \
-        -s $URL | jq)
-        echo $STATUS
-        URL="${{github.api_url}}/repos/${{ github.repository }}/check-runs/${{env.new_check_id}}"
-        curl -X PATCH \
-        -H 'Authorization: Bearer ${{inputs.github_token}}' \
-        -H "Accept: application/vnd.github+json" \
-        -H "X-GitHub-Api-Version: 2022-11-28" \
-        -s $URL \
-        -d '{"details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "completed", "conclusion": "'$STATUS'"}'
+        echo ${{ steps }}
+
+
+
+
+
+# # get current run status
+# URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+# STATUS=$(curl  \
+# -H 'Authorization: Bearer ${{inputs.github_token}}' \
+# -H "Accept: application/vnd.github+json" \
+# -H "X-GitHub-Api-Version: 2022-11-28" \
+# -s $URL | jq)
+# echo $STATUS
+# URL="${{github.api_url}}/repos/${{ github.repository }}/check-runs/${{env.new_check_id}}"
+# curl -X PATCH \
+# -H 'Authorization: Bearer ${{inputs.github_token}}' \
+# -H "Accept: application/vnd.github+json" \
+# -H "X-GitHub-Api-Version: 2022-11-28" \
+# -s $URL \
+# -d '{"details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "completed", "conclusion": "'$STATUS'"}'
