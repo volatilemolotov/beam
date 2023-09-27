@@ -57,7 +57,7 @@ runs:
     uses: pyTooling/Actions/with-post-step@v0.4.6
     with:
       main: |
-        echo ${{ toJSON(steps) }}
+        echo '${{ toJSON(steps) }}'
       post: |
         echo ${{ toJSON(steps) }}
 
