@@ -58,6 +58,7 @@ runs:
     with:
       main: |
         echo '${{ toJSON(steps) }}'
+        echo '${{ toJSON(github) }}'
       post: |
         echo ${{ toJSON(steps) }}
 
