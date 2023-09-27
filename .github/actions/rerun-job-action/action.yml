@@ -48,7 +48,7 @@ runs:
     with:
       main: echo "Will update status in post"
       post: |
-        echo ${{ steps }}
+        echo ${{ fromJSON(steps) }}
 
 
 
