@@ -48,12 +48,15 @@ runs:
     - name: Get all checks for SHA
       uses: actions/github-script@v6
       id: get-checks-for-sha
+      env:
+        SHA: ${{ steps.get-pr-sha.outputs.result }}
       with:
         script: |
+          const {SHA} = process.env;
           const { data: prChecks } = await github.rest.checks.listForRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: $ {{ steps.get-pr-sha.outputs.result }} 
+            ref: `${SHA}`
           });
           return prChecks;
     - name: debug
