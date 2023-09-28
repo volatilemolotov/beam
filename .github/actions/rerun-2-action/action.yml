@@ -29,15 +29,15 @@ runs:
     - name: View context attributes
       uses: actions/github-script@v6
       with:
-        script: console.log(context.repo.owner, context.repo.full_name, context.issue.number)
+        script: console.log(context.repo.owner, context.repo.repo, context.issue.number)
     - name: Get PR commit SHA
       uses: actions/github-script@v6
       id: get-pr-sha
       with:
         script: |
-          const {data: pullRequest } = await github.rest.pulls.get ({
+          const { data: pullRequest } = await github.rest.pulls.get ({
             owner: context.repo.owner,
-            repo: context.repo.full_name,
+            repo: context.repo.repo,
             pull_number: context.issue.number
           });
           return pullRequest;
