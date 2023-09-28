@@ -43,41 +43,121 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Get Last Commit SHA
+  - name: Get last commit SHA
+    id: get-sha
+    uses: actions/github-script@v6
+    with:
+      script: |
+        const { data: commits } = await github.pulls.listCommits({
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          pull_number: context.payload.pull_request.number,
+        });
+        console.log(commits[commits.length - 1].sha);
+        return commits[commits.length - 1].sha;
+  - name: Get Status and Conclusion for PR Job
     shell: bash
     run: | 
-      URL=${{inputs.pull_request_url}}/commits
-      PRSHA=$(curl  \
+      JOB="${{inputs.github_job}}"
+      QUERY_JOB=${JOB// /+}
+      URL="${{github.api_url}}/repos/${{ github.repository }}/commits/${{steps.get-sha.outputs.result}}/check-runs?check_name=$QUERY_JOB"
+      CHECK_RUN=$(curl  \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
-      -s $URL  | jq -r '.[-1].sha' ) 
-      echo prsha=$PRSHA >> $GITHUB_ENV
+      -s $URL | jq -r '.check_runs | .[] | select(.name=="${{inputs.github_job}}")')
+      if [ -z "$CHECK_RUN" ]; then
+        echo "No check runs found for this job"
+        echo no_check=true >> $GITHUB_ENV
+        exit 0
+      fi
+      read -r STATUS CONCLUSION CHECK_SUITE_ID<<< $(echo $CHECK_RUN | jq -r '"\(.status) \(.conclusion) \(.check_suite.id)"')
+      echo status=$STATUS >> $GITHUB_ENV
+      echo conclusion=$CONCLUSION >> $GITHUB_ENV
+      echo check_suite_id=$CHECK_SUITE_ID >> $GITHUB_ENV
+ 
+
+  - name: Disable Rerun for Success or Skipped
+    if: ${{(env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')) || env.no_check == 'true'}}
+    shell: bash
+    run: echo rerun=false >> $GITHUB_ENV
+    
+  - name: Create a new check for PR
+    if: ${{env.no_check == 'true' }}
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{ github.repository }}/check-runs"
+      new_check_id=$(curl -X POST \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL \
+      -d '{"name": "${{inputs.github_job}}", "head_sha": "${{steps.get-sha.outputs.result}}", "details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "in_progress", "output": {"title": "${{ inputs.github_job }}", "summary": "todo"}}' | jq -r '.id')
+      echo new_check_id=$new_check_id >> $GITHUB_ENV
+  - name: Get Run ID
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs?check_suite_id=${{env.check_suite_id}}"
+      RUN_ID=$(curl  \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL | jq -r '.workflow_runs | .[0] | .id')
+      echo run_id=$RUN_ID >> $GITHUB_ENV
+  - name: Get Job ID
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs/${{env.run_id}}/jobs"
+      JOB_ID=$(curl  \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL | jq -r '.jobs | .[] | select(.name=="${{inputs.github_job}}") | .id ')
+      echo job_id=$JOB_ID >> $GITHUB_ENV
+  - name: Trigger Re-run
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{ github.repository }}/actions/jobs/${{env.job_id}}/rerun"
+      curl -X POST \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL 
+  - name: Install GH Cli
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: |
+      wget https://github.com/cli/cli/releases/download/v2.31.0/gh_2.31.0_linux_amd64.tar.gz
+      tar -xvf gh_2.31.0_linux_amd64.tar.gz
+      sudo mv gh_2.31.0_linux_amd64/bin/gh /usr/local/bin
+  - name: Exit rest of the run
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: |
+      gh run cancel ${{ github.run_id }}
+      gh run watch ${{ github.run_id }}
+    env:
+      GITHUB_TOKEN: ${{ inputs.github_token }}
   - name: Update check status
     uses: pyTooling/Actions/with-post-step@v0.4.6
     with:
-      main: |
-        echo '${{ toJSON(steps) }}'
-        echo '${{ toJSON(github) }}'
+      main: echo "Will update status in post"
       post: |
-        echo ${{ toJSON(steps) }}
-
-
-
-
-
-# # get current run status
-# URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-# STATUS=$(curl  \
-# -H 'Authorization: Bearer ${{inputs.github_token}}' \
-# -H "Accept: application/vnd.github+json" \
-# -H "X-GitHub-Api-Version: 2022-11-28" \
-# -s $URL | jq)
-# echo $STATUS
-# URL="${{github.api_url}}/repos/${{ github.repository }}/check-runs/${{env.new_check_id}}"
-# curl -X PATCH \
-# -H 'Authorization: Bearer ${{inputs.github_token}}' \
-# -H "Accept: application/vnd.github+json" \
-# -H "X-GitHub-Api-Version: 2022-11-28" \
-# -s $URL \
-# -d '{"details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "completed", "conclusion": "'$STATUS'"}'
+        # get current run status
+        URL="${{github.api_url}}/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        STATUS=$(curl  \
+        -H 'Authorization: Bearer ${{inputs.github_token}}' \
+        -H "Accept: application/vnd.github+json" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        -s $URL | jq)
+        echo $STATUS
+        URL="${{github.api_url}}/repos/${{ github.repository }}/check-runs/${{env.new_check_id}}"
+        curl -X PATCH \
+        -H 'Authorization: Bearer ${{inputs.github_token}}' \
+        -H "Accept: application/vnd.github+json" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        -s $URL \
+        -d '{"details_url": "${{ github.server_url }}/actions/runs/${{ github.run_id }}","status": "completed", "conclusion": "'$STATUS'"}'
