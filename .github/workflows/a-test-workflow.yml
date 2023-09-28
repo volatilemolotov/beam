@@ -6,6 +6,8 @@ on:
   pull_request_target:
     paths:
       - 'test'
+  issue_comment:
+    types: [created]
 jobs:
   test_volatilemolotov:
     runs-on: [self-hosted, ubuntu-20.04, main]
