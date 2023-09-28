@@ -1,9 +1,11 @@
 
-name: Test Volatilemolotov
+name: A Test Volatilemolotov
 
 on:
   workflow_dispatch:
-
+  pull_request_target:
+    paths:
+      - 'test'
 jobs:
   test_volatilemolotov:
     runs-on: [self-hosted, ubuntu-20.04, main]

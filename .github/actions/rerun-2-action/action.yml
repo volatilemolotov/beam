@@ -36,8 +36,8 @@ runs:
       with:
         script: |
           const {data: pullRequest } = await github.rest.pulls.get ({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
+            owner: context.repository.owner,
+            repo: context.repository.full_name,
             pull_number: context.issue.number
           });
           return pullRequest;
