@@ -1,0 +1,11 @@
+
+name: Test Volatilemolotov
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test_volatilemolotov:
+    runs-on: [self-hosted, ubuntu-20.04, main]
+    steps:
+     - uses: ./.github/actions/rerun-2-action
