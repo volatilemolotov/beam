@@ -29,7 +29,7 @@ runs:
     - name: View context attributes
       uses: actions/github-script@v6
       with:
-        script: console.log(context)
+        script: console.log(context.repository.owner, context.repository.full_name, context.issue.number)
     - name: Get PR commit SHA
       uses: actions/github-script@v6
       id: get-pr-sha
