@@ -45,4 +45,4 @@ runs:
       id: debug
       shell: bash
       run: |
-        echo ${{ steps.get-pr-sha.outputs.result }}
+        echo ${{ steps.get-pr-sha.outputs.result.head.sha }}
