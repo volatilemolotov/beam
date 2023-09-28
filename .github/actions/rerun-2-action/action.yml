@@ -56,4 +56,4 @@ runs:
       id: debug
       shell: bash
       run: |
-        echo ${{ steps.get-pr-sha.outputs.result }}
+        echo ${{ steps.get-checks-for-sha.outputs.result }}
