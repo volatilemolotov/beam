@@ -42,7 +42,6 @@ runs:
           });
           return pullRequest.head.sha;
     - name: debug
-      id: debug
       shell: bash
       run: |
        echo ${{ steps.get-pr-sha.outputs.result }}
