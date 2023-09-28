@@ -40,9 +40,9 @@ runs:
             repo: context.repo.repo,
             pull_number: context.issue.number
           });
-          return pullRequest;
+          return pullRequest.head.sha;
     - name: debug
       id: debug
       shell: bash
       run: |
-        echo ${{ steps.get-pr-sha.outputs.result.head.sha }}
+        echo ${{ steps.get-pr-sha.outputs.result. }}
