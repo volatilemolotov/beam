@@ -1,0 +1,37 @@
+
+name: A2 Test Volatilemolotov
+
+on:
+  workflow_dispatch:
+  # pull_request_target:
+  #   paths:
+  #     - 'test'
+  # issue_comment:
+  #   types: [created]
+jobs:
+  test_test:
+    runs-on: [self-hosted, ubuntu-20.04, main]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          echo "some test"
+      - name: Run tests
+        run: |
+          TEST=$(curl -s 'https://vdjerek-test.free.beeceptor.com/' | jq -r '.fail')
+          echo $TEST
+          if [ "$TEST" = "true" ]; then
+            echo "Test failed"
+            exit 1
+          fi
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
