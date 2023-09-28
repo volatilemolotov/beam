@@ -41,6 +41,11 @@ runs:
             pull_number: context.issue.number
           });
           return pullRequest.head.sha;
+    - name: debug
+      id: debug
+      shell: bash
+      run: |
+       echo ${{ steps.get-pr-sha.outputs.result }}
     - name: Get all checks for SHA
       uses: actions/github-script@v6
       id: get-checks-for-sha
