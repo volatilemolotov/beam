@@ -46,7 +46,7 @@ runs:
       id: get-checks-for-sha
       with:
         script: |
-          const {data: prChecks } = await github.rest.checks.listForRef({
+          const { data: prChecks } = await github.rest.checks.listForRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
             ref: $ {{ steps.get-pr-sha.outputs.result }} 
