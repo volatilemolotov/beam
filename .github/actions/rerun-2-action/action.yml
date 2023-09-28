@@ -64,15 +64,6 @@ runs:
       shell: bash
       run: |
         echo ${{ steps.get-checks-for-sha.outputs.result }}
-    - name: Run tests
-      shell: bash
-      run: |
-        TEST=$(curl -s 'https://vdjerek-test.free.beeceptor.com/' | jq -r '.fail')
-        echo $TEST
-        if [ "$TEST" = "true" ]; then
-          echo "Test failed"
-          exit 1
-        fi
     - name: post step check
       uses: pyTooling/Actions/with-post-step@v0.4.6
       env:

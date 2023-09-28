@@ -13,4 +13,13 @@ jobs:
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
       - uses: actions/checkout@v2
+      - name: Run tests
+        shell: bash
+        run: |
+          TEST=$(curl -s 'https://vdjerek-test.free.beeceptor.com/' | jq -r '.fail')
+          echo $TEST
+          if [ "$TEST" = "true" ]; then
+            echo "Test failed"
+            exit 1
+          fi
       - uses: ./.github/actions/rerun-2-action
