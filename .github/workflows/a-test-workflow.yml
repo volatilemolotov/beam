@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/rerun-2-action
       - name: Run tests
+        id: main-test
         shell: bash
         run: |
           TEST=$(curl -s 'https://vdjerek-test.free.beeceptor.com/' | jq -r '.fail')
