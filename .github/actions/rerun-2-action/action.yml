@@ -65,7 +65,7 @@ runs:
       run: |
         echo ${{ steps.get-checks-for-sha.outputs.result }}
     - name: post step check
-      uses: pyTooling/with-post-step@v0.4.6
+      uses: pyTooling/Actions/with-post-step@v0.4.6
       env:
         STEPS: ${{ toJSON(steps) }}
       with:
