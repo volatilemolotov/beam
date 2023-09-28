@@ -56,7 +56,7 @@ runs:
           const { data: prChecks } = await github.rest.checks.listForRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: `${SHA}`
+            ref: `${SHA}`.replace(/"/g, '')
           });
           return prChecks;
     - name: debug
