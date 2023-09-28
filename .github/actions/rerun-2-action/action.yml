@@ -26,10 +26,10 @@ description: Re-runs a job that is attached to the PR as Check Run
 runs:
   using: composite
   steps:
-    - name: View context attributes
-      uses: actions/github-script@v6
-      with:
-        script: console.log(context.repo.owner, context.repo.repo, context.issue.number)
+    # - name: View context attributes
+    #   uses: actions/github-script@v6
+    #   with:
+    #     script: console.log(context.repo.owner, context.repo.repo, context.issue.number)
     - name: Get PR commit SHA
       uses: actions/github-script@v6
       id: get-pr-sha
@@ -41,6 +41,17 @@ runs:
             pull_number: context.issue.number
           });
           return pullRequest.head.sha;
+    - name: Get all checks for SHA
+      uses: actions/github-script@v6
+      id: get-checks-for-sha
+      with:
+        script: |
+          const {data: prChecks } = await github.rest.checks.listForRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: context.payload.pull_request.head.sha
+          });
+          return prChecks;
     - name: debug
       id: debug
       shell: bash
