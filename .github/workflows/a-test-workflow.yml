@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/rerun-2-action
+        with:
+          steps_context: ${{ steps }}
       - name: Run tests
         id: main-test
         shell: bash

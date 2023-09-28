@@ -23,6 +23,10 @@
 name: "Rerun Job Action 2"
 description: Re-runs a job that is attached to the PR as Check Run
 
+inputs:
+  steps_context:
+    description: 'The steps context'
+    required: true
 runs:
   using: composite
   steps:
@@ -67,7 +71,7 @@ runs:
     - name: post step check
       uses: pyTooling/Actions/with-post-step@v0.4.6
       env:
-        STEPS: ${{ toJSON(steps) }}
+        STEPS: ${{ toJSON(${{ inputs.steps_context }}) }}
       with:
         main: |
           echo main
