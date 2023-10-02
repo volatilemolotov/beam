@@ -100,4 +100,5 @@ jobs:
           gradle-command: :sdks:java:testing:tpcds:run 
           arguments: |
             --info -Ptpcds.runner=:runners:google-cloud-dataflow-java \
-            "-Ptpcds.args=${{env.tpcdsBigQueryArgs}} ${{env.tpcdsInfluxDBArgs}} ${{ env.GRADLE_COMMAND_ARGUMENTS }} --queries=${{env.tpcdsQueriesArg}}" \
+            "-Ptpcds.args=${{env.tpcdsBigQueryArgs}} ${{env.tpcdsInfluxDBArgs}} ${{ env.GRADLE_COMMAND_ARGUMENTS }} \
+             --queries=${{env.tpcdsQueriesArg}}" \
