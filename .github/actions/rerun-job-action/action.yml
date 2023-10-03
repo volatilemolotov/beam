@@ -152,6 +152,7 @@ runs:
       main: |
         echo Post update status
       post: |
+        echo $STEPS
         step_status="success"
         for status in $(echo $STEPS | tr -d '/n' | jq -r '.[] | .conclusion'); do
           if [ "$status" = "failure" ]; then
