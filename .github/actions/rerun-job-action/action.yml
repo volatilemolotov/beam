@@ -131,14 +131,13 @@ runs:
     if : ${{env.no_check == 'true'}}
     shell: bash
     run: |
-      # Use github api to create a check in PR
       new_check_id=$(URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs"
       curl -X POST \
       -H 'Authorization: Bearer ${{inputs.github_token}}' \
       -H "Accept: application/vnd.github+json" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
       -s $URL \
-      -d '{"name":"${{inputs.github_job}}","head_sha":"${{env.prsha}}","status":"queued","started_at":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"}')
+      -d '{"name":"${{inputs.github_job}}","head_sha":"${{env.prsha}}","status":"queued"')
       echo new_check_id=$new_check_id >> $GITHUB_ENV
   - name: Update check status 
     if: ${{env.no_check == 'true'}}
@@ -162,4 +161,4 @@ runs:
         -H "Accept: application/vnd.github+json" \
         -H "X-GitHub-Api-Version: 2022-11-28" \
         -s $URL \
-        -d '{"status":"completed","conclusion":"'"$step_status"'","completed_at":"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"}'
+        -d '{"status":"completed","conclusion":"'"$step_status"'"}'
