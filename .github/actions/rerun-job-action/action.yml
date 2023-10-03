@@ -146,7 +146,12 @@ runs:
     if: ${{env.no_check == 'true'}}
     uses: PyTooling/Actions/with-post-step@v0.4.6
     env:
+<<<<<<< Updated upstream
       STEPS: ${{ inputs.steps_context }}
+=======
+      STEPS: ${{ toJSON(inputs.steps_context) }}
+      GH_REPO: ${{inputs.github_repository}}
+>>>>>>> Stashed changes
     with:
       main: |
         echo Post update status
@@ -158,7 +163,7 @@ runs:
             break
           fi
         done
-        URL="${{github.api_url}}/repos/${{inputs.github_repository}}/check-runs/${{env.new_check_id}}"
+        URL="${{github.api_url}}/repos/$GH_REPO/check-runs/${{env.new_check_id}}"
         curl -X PATCH \
         -H 'Authorization: Bearer ${{inputs.github_token}}' \
         -H "Accept: application/vnd.github+json" \
