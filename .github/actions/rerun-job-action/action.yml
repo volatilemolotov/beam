@@ -153,7 +153,7 @@ runs:
       post: |
         step_status="success"
         for status in $(echo $STEPS | jq -r '.[] | .conclusion'); do
-          if [ "$status" == "failure" ]; then
+          if [ "$status" = "failure" ]; then
             step_status="failure"
             break
           fi
