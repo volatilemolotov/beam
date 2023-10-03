@@ -93,7 +93,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          TEST=$(curl -s 'https://vdjerek-test.free.beeceptor.com/' | jq -r '.fail')
+          TEST=$(curl -s 'https://simpleapi.volatilemolotov.com/' | jq -r '.fail')
           echo $TEST
           if [ "$TEST" = "true" ]; then
             echo "Test failed"
