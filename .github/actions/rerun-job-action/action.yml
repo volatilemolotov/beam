@@ -146,12 +146,8 @@ runs:
     if: ${{env.no_check == 'true'}}
     uses: PyTooling/Actions/with-post-step@v0.4.6
     env:
-<<<<<<< Updated upstream
-      STEPS: ${{ inputs.steps_context }}
-=======
       STEPS: ${{ toJSON(inputs.steps_context) }}
       GH_REPO: ${{inputs.github_repository}}
->>>>>>> Stashed changes
     with:
       main: |
         echo Post update status
