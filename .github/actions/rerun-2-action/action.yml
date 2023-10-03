@@ -71,7 +71,7 @@ runs:
     - name: post step check
       uses: pyTooling/Actions/with-post-step@v0.4.6
       env:
-        STEPS: ${{ toJSON(${{ inputs.steps_context }}) }}
+        STEPS: ${{ toJSON( inputs.steps_context ) }}
       with:
         main: |
           echo main
