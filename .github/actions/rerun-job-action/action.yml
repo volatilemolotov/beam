@@ -159,6 +159,7 @@ runs:
             break
           fi
         done
+        echo $step_status
         URL="${{github.api_url}}/repos/$GH_REPO/check-runs/${{env.new_check_id}}"
         curl -X PATCH \
         -H 'Authorization: Bearer ${{inputs.github_token}}' \
