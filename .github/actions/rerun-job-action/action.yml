@@ -162,6 +162,7 @@ runs:
         done
         echo $step_status
         URL="${{github.api_url}}/repos/$GH_REPO/check-runs/${{env.new_check_id}}"
+        echo $URL
         curl -X PATCH \
         -H 'Authorization: Bearer ${{inputs.github_token}}' \
         -H "Accept: application/vnd.github+json" \
