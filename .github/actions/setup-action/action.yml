@@ -28,6 +28,9 @@ inputs:
     description: "The GitHub job"
     required: false
     default: ''
+  steps_context:
+    description: 'The steps context'
+    required: true
 
 runs:
   using: composite
@@ -65,6 +68,7 @@ runs:
         github_repository: ${{ github.repository }}     
         github_current_run_id: ${{ github.run_id }}
         pull_request_url: ${{ github.event.issue.pull_request.url }}
+        steps_context: ${{ inputs.steps_context }}
     ## Used for jobs that spawn docker containers and need to mount gcloud config directory
     - name: expose gcloud path
       shell: bash
