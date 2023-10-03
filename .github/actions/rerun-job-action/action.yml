@@ -146,7 +146,7 @@ runs:
     if: ${{env.no_check == 'true'}}
     uses: PyTooling/Actions/with-post-step@v0.4.6
     env:
-      STEPS: ${{ toJSON(inputs.steps_context) }}
+      STEPS: ${{ inputs.steps_context }}
       GH_REPO: ${{inputs.github_repository}}
     with:
       main: |
@@ -154,7 +154,7 @@ runs:
       post: |
         echo $STEPS
         step_status="success"
-        for status in $(echo $STEPS | tr -d '/n' | jq -r '.[] | .conclusion'); do
+        for status in $(echo $STEPS | jq -r '.[] | .conclusion'); do
           if [ "$status" = "failure" ]; then
             step_status="failure"
             break
