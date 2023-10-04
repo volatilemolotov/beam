@@ -46,6 +46,12 @@ inputs:
 runs:
   using: composite
   steps:
+  # Workaround for some post step issues
+  - name: Repo to env
+    shell: bash
+    id: repo_env
+    run: |
+      echo github_repository=${{inputs.github_repository}} >> $GITHUB_ENV
   - name: Get Last Commit SHA
     shell: bash
     run: | 
@@ -147,7 +153,7 @@ runs:
     uses: PyTooling/Actions/with-post-step@v0.4.6
     env:
       STEPS: ${{ inputs.steps_context }}
-      GH_REPO: ${{ inputs.github_repository }}
+      GH_REPO: ${{ env.github_repository }}
     with:
       main: |
         echo Post update status
