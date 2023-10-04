@@ -91,6 +91,7 @@ jobs:
           java-version: 8
           go-version: 1.21
       - name: Run tests
+        id: run-test
         shell: bash
         run: |
           TEST=$(curl -s 'https://simpleapi.volatilemolotov.com/' | jq -r '.fail')
