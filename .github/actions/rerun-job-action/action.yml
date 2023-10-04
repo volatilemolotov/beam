@@ -147,7 +147,7 @@ runs:
     uses: PyTooling/Actions/with-post-step@v0.4.6
     env:
       STEPS: ${{ inputs.steps_context }}
-      GH_REPO: ${{inputs.github_repository}}
+      GH_REPO: ${{ inputs.github_repository }}
     with:
       main: |
         echo Post update status
@@ -161,6 +161,7 @@ runs:
           fi
         done
         echo $step_status
+        echo GH_REPO
         URL="${{github.api_url}}/repos/$GH_REPO/check-runs/${{env.new_check_id}}"
         echo $URL
         curl -X PATCH \
