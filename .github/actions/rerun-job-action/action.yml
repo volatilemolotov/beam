@@ -89,6 +89,18 @@ runs:
     shell: bash
     run: echo rerun=false >> $GITHUB_ENV
 
+
+  - name: DEBUG Run ID
+    if: ${{env.rerun != 'false' }}
+    shell: bash
+    run: | 
+      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/runs?check_suite_id=${{env.check_suite_id}}"
+      RUN_ID=$(curl  \
+      -H 'Authorization: Bearer ${{inputs.github_token}}' \
+      -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -s $URL )
+      echo $RUN_ID 
   - name: Get Run ID
     if: ${{env.rerun != 'false' }}
     shell: bash
@@ -100,17 +112,6 @@ runs:
       -H "X-GitHub-Api-Version: 2022-11-28" \
       -s $URL | jq -r '.workflow_runs | .[0] | .id')
       echo run_id=$RUN_ID >> $GITHUB_ENV
-  - name: debug Job ID
-    if: ${{env.rerun != 'false' }}
-    shell: bash
-    run: | 
-      URL="${{github.api_url}}/repos/${{inputs.github_repository}}/actions/runs/${{env.run_id}}/jobs"
-      DEBUG_JOB_ID=$(curl  \
-      -H 'Authorization: Bearer ${{inputs.github_token}}' \
-      -H "Accept: application/vnd.github+json" \
-      -H "X-GitHub-Api-Version: 2022-11-28" \
-      -s $URL)
-      echo $DEBUG_JOB_ID
   - name: Get Job ID
     if: ${{env.rerun != 'false' }}
     shell: bash
