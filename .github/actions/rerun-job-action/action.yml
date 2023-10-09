@@ -82,6 +82,8 @@ runs:
       if [ "$JOB_APP_NAME" != "GitHub Actions" ]; then
         echo "This job is not a GitHub Actions job"
         echo manual_check=true >> $GITHUB_ENV
+        new_check_id = $(echo $CHECK_RUN | jq -r '.id')
+        echo new_check_id=$new_check_id >> $GITHUB_ENV
         exit 0
       fi
       read -r STATUS CONCLUSION CHECK_SUITE_ID<<< $(echo $CHECK_RUN | jq -r '"\(.status) \(.conclusion) \(.check_suite.id)"')
