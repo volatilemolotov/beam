@@ -78,6 +78,12 @@ runs:
         echo no_check=true >> $GITHUB_ENV
         exit 0
       fi
+      JOB_APP_NAME=$(echo $CHECK_RUN | jq -r '.app.name')
+      if [ "$JOB_APP_NAME" != "GitHub Actions" ]; then
+        echo "This job is not a GitHub Actions job"
+        echo manual_check=true >> $GITHUB_ENV
+        exit 0
+      fi
       read -r STATUS CONCLUSION CHECK_SUITE_ID<<< $(echo $CHECK_RUN | jq -r '"\(.status) \(.conclusion) \(.check_suite.id)"')
       echo status=$STATUS >> $GITHUB_ENV
       echo conclusion=$CONCLUSION >> $GITHUB_ENV
@@ -85,7 +91,7 @@ runs:
  
 
   - name: Disable Rerun for Success or Skipped
-    if: ${{(env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')) || env.no_check == 'true'}}
+    if: ${{(env.status == 'completed' && (env.conclusion == 'success' || env.conclusion == 'skipped')) || env.no_check == 'true' || env.manual_check == 'true'}}
     shell: bash
     run: echo rerun=false >> $GITHUB_ENV
 
@@ -161,7 +167,7 @@ runs:
       -d '{"name":"${{inputs.github_job}}","head_sha":"${{env.prsha}}","status":"queued"' | jq -r '.id')
       echo new_check_id=$new_check_id >> $GITHUB_ENV
   - name: Update check status 
-    if: ${{env.no_check == 'true'}}
+    if: ${{env.no_check == 'true'}} || ${{env.manual_check == 'true'}}
     uses: PyTooling/Actions/with-post-step@v0.4.6
     env:
       STEPS: ${{ inputs.steps_context }}
