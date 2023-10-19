@@ -66,8 +66,8 @@ runs:
       id: generate_token
       uses: actions/create-github-app-token@v1
       with:
-        app_id: ${{ input.gh_app_id }}
-        private_key: ${{ input.gh_app_private_key }}
+        app_id: ${{ inputs.gh_app_id }}
+        private_key: ${{ inputs.gh_app_private_key }}
     - name: Rerun if comment phrase
       if: ${{ github.event.comment.body == inputs.comment_phrase }}
       uses: ./.github/actions/rerun-job-action
