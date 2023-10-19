@@ -22,6 +22,16 @@ on:
   #   - cron: '1 1 * * *'
   workflow_dispatch:
 
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.issue.number || github.sha || github.head_ref || github.ref }}-${{ github.event.schedule || github.event.comment.body || github.event.sender.login }}'
+  cancel-in-progress: true
+
+env:
+  GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GE_ACCESS_TOKEN }}
+  GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GE_CACHE_USERNAME }}
+  GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GE_CACHE_PASSWORD }}
+
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
 permissions:
   actions: write
@@ -67,8 +77,10 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+          steps_context: ${{ toJson(steps) }}
       - name: Prepare test arguments
         uses: ./.github/actions/test-arguments-action
         with:
@@ -80,6 +92,7 @@ jobs:
             ${{ github.workspace }}/.github/workflows/load-tests-job-configs/java_LoadTests_Combine_Smoke_CombineLoadTest_load_test_Dataflow-3.txt
         # The env variables are created and populated in the test-arguments-action as "<github.job>_test_arguments_<argument_file_paths_index>"
       - name: run CombineLoadTest load test Dataflow-1
+        id: run_CombineLoadTest_load_test_Dataflow-1
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:testing:load-tests:run
@@ -88,6 +101,7 @@ jobs:
             -Prunner=:runners:google-cloud-dataflow-java \
             '-PloadTest.args=${{ env.beam_Java_LoadTests_Combine_Smoke_test_arguments_1 }}' \
       - name: run CombineLoadTest load test Dataflow-2
+        id: run_CombineLoadTest_load_test_Dataflow-2
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:testing:load-tests:run
@@ -96,6 +110,7 @@ jobs:
             -Prunner=:runners:google-cloud-dataflow-java \
             '-PloadTest.args=${{ env.beam_Java_LoadTests_Combine_Smoke_test_arguments_2 }}' \
       - name: run CombineLoadTest load test Dataflow-3
+        id: run_CombineLoadTest_load_test_Dataflow-3
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:testing:load-tests:run

@@ -20,6 +20,13 @@ on:
     types: [created]
   workflow_dispatch:
 
+
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.issue.number || github.sha || github.head_ref || github.ref }}-${{ github.event.comment.body || github.event.sender.login }}'
+  cancel-in-progress: true
+
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
 permissions:
   actions: write
@@ -34,12 +41,6 @@ permissions:
   pages: read
   repository-projects: read
   security-events: read
-  statuses: read
-
-# This allows a subsequently queued workflow run to interrupt previous runs
-concurrency:
-  group: '${{ github.workflow }} @ ${{ github.event.issue.number || github.sha || github.head_ref || github.ref }}-${{ github.event.comment.body || github.event.sender.login }}'
-  cancel-in-progress: true
 
 env:
   GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GE_ACCESS_TOKEN }}
@@ -64,7 +65,8 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
       - name: Prepare test arguments
         uses: ./.github/actions/test-arguments-action

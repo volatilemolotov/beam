@@ -27,21 +27,7 @@ concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.issue.number || github.sha || github.head_ref || github.ref }}-${{ github.event.schedule || github.event.comment.id || github.event.sender.login }}'
   cancel-in-progress: true
 
-#Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
-permissions:
-  actions: write
-  pull-requests: read
-  checks: read
-  contents: read
-  deployments: read
-  id-token: none
-  issues: read
-  discussions: read
-  packages: read
-  pages: read
-  repository-projects: read
-  security-events: read
-  statuses: read
+
 
 env:
   GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GE_ACCESS_TOKEN }}
@@ -110,13 +96,16 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+          steps_context: ${{ toJson(steps) }}
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
       - name: run Java Testing Nexmark (query ${{ matrix.query }})
+        id: run-java-testing-nexmark-query
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:testing:nexmark:run
@@ -126,6 +115,7 @@ jobs:
             --query=${{ matrix.query }} \
             --generateEventFilePathPrefix=gs://temp-storage-for-perf-tests/nexmark/eventFiles/beam_PostCommit_Python_Nexmark_Direct/query${{ matrix.query }}-" \
       - name: run Python Testing Benchmarks Nexmark (query ${{ matrix.query }})
+        id: run-python-testing-benchmarks-nexmark-query
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:apache_beam:testing:benchmarks:nexmark:run

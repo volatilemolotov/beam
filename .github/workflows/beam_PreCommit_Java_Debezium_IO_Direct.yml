@@ -32,7 +32,6 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
-#Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
 permissions:
   actions: write
   pull-requests: write
@@ -79,9 +78,12 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+          steps_context: ${{ toJson(steps) }}
       - name: run Debezium IO build task
+        id: run-debezium-io-build-task
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:debezium:build
@@ -89,6 +91,7 @@ jobs:
             -PdisableSpotlessCheck=true \
             -PdisableCheckStyle=true \
       - name: run Debezium IO additional tasks
+        id: run-debezium-io-additional-tasks
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: |

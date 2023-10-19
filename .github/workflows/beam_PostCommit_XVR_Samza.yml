@@ -20,21 +20,7 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
-#Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
-permissions:
-  actions: write
-  pull-requests: read
-  checks: read
-  contents: read
-  deployments: read
-  id-token: none
-  issues: read
-  discussions: read
-  packages: read
-  pages: read
-  repository-projects: read
-  security-events: read
-  statuses: read
+
 
 # This allows a subsequently queued workflow run to interrupt previous runs
 concurrency:
@@ -66,7 +52,8 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }} ${{ matrix.python_version }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.python_version }})
       - name: Install Python
         uses: actions/setup-python@v4
@@ -78,6 +65,7 @@ jobs:
         env:
           CLOUDSDK_CONFIG: ${{ env.KUBELET_GCLOUD_CONFIG_PATH}}
         if: ${{ matrix.python_version != '3.8' }}
+        id: run-postcommit-xvr-samza
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :runners:samza:job-server:validatesCrossLanguageRunner
@@ -87,6 +75,7 @@ jobs:
       - name: run PostCommit XVR Samza script
         env:
           CLOUDSDK_CONFIG: ${{ env.KUBELET_GCLOUD_CONFIG_PATH}}
+        id: run-postcommit-xvr-samza-3-8
         if: ${{ matrix.python_version == '3.8' }}
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:

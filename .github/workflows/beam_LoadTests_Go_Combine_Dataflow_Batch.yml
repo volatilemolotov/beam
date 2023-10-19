@@ -65,8 +65,10 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+          steps_context: ${{ toJson(steps) }}
       - name: Prepare configs
         #Reads config files, excludes comments, appends current date to the job_name parameter
         id: set_configs
@@ -81,6 +83,7 @@ jobs:
             echo "prepared_config_$((INDEX + 1))=$CURCONFIG" >> $GITHUB_OUTPUT
           done
       - name: run Combine Dataflow Batch Go Load Test 1 (single key)
+        id: run_combine_dataflow_batch_go_load_test_1
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -89,6 +92,7 @@ jobs:
             -Prunner=DataflowRunner \
             '-PloadTest.args=${{ steps.set_configs.outputs.prepared_config_1 }}' \
       - name: run Combine Dataflow Batch Go Load Test 2 (multiple keys)
+        id: run_combine_dataflow_batch_go_load_test_2
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -97,6 +101,7 @@ jobs:
             -Prunner=DataflowRunner \
             '-PloadTest.args=${{ steps.set_configs.outputs.prepared_config_2 }}' \
       - name: run Combine Dataflow Batch Go Load Test 3 (reiterate 10KB)
+        id: run_combine_dataflow_batch_go_load_test_3
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run

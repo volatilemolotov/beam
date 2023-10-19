@@ -32,21 +32,7 @@ env:
   GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GE_CACHE_USERNAME }}
   GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GE_CACHE_PASSWORD }}
 
-#Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
-permissions:
-  actions: write
-  pull-requests: read
-  checks: read
-  contents: read
-  deployments: read
-  id-token: none
-  issues: read
-  discussions: read
-  packages: read
-  pages: read
-  repository-projects: read
-  security-events: read
-  statuses: read
+
 
 jobs:
   beam_PostCommit_Java_InfluxDbIO_IT:
@@ -67,8 +53,10 @@ jobs:
         uses: ./.github/actions/setup-action
         with:
           comment_phrase: ${{ matrix.job_phrase }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gh_app_id: ${{ secrets.GH_APP_ID }}
+          gh_app_private_key: ${{ secrets.GH_APP_PRIVATE_KEY }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+          steps_context: ${{ toJson(steps) }}
       - name: Authenticate on GCP
         id: auth
         uses: google-github-actions/auth@v1
@@ -88,6 +76,7 @@ jobs:
           loadbalancer_IP=$(kubectl get svc influxdb-load-balancer-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}') 
           echo influxdb_IP=$loadbalancer_IP >> $GITHUB_OUTPUT
       - name: Run Java InfluxDbIO_IT
+        id: run-java-influxdbio_it
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:influxdb:integrationTest --tests org.apache.beam.sdk.io.influxdb.InfluxDbIOIT
