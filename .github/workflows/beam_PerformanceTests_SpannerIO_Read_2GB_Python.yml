@@ -17,7 +17,7 @@ name: PerformanceTests SpannerIO Read 2GB Python
 
 on:
   schedule:
-    - cron: '30 4 * * *'
+    - cron: '30 10 * * *'
   workflow_dispatch:
 
 permissions:
@@ -83,6 +83,7 @@ jobs:
           arguments: |
             --job_name=performance-tests-spanner-read-python-2gb$(date '+%m%d%H%M%S' --utc)
       - name: run Performance SpannerIO Read 2GB Test Python
+        id: run_performance_spannerio_read_2gb_test_python
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:apache_beam:testing:load_tests:run

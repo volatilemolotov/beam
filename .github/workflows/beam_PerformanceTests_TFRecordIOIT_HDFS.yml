@@ -19,7 +19,7 @@ on:
   # TODO(https://github.com/apache/beam/issues/18796) TFRecord performance test is failing only when running on hdfs.
   # We need to fix this before enabling this job on jenkins.
   # schedule:
-  #   - cron: '17 8/20 * * *'
+  #   - cron: '50 11/12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -100,6 +100,7 @@ jobs:
             --filenamePrefix=hdfs://${{ steps.install_hadoop.outputs.hadoop_IP }}:9000/TEXTIO_IT_
             --hdfsConfiguration=[{\\\"fs.defaultFS\\\":\\\"hdfs:${{ steps.install_hadoop.outputs.hadoop_IP }}:9000\\\",\\\"dfs.replication\\\":1}]
       - name: run integrationTest
+        id: run_integrationtest
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:file-based-io-tests:integrationTest

@@ -24,7 +24,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 3/6 * * *'
   workflow_dispatch:
 
 
@@ -41,7 +41,7 @@ env:
 
 jobs:
   beam_PreCommit_RAT:
-    name: ${{matrix.job_name}} (${{ matrix.job_phrase }})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     strategy:
       matrix:
@@ -69,7 +69,7 @@ jobs:
         with:
           java-version: 8
       - name: run RAT script
-        id: run-rat-script
+        id: run_rat_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :rat

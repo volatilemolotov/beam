@@ -17,7 +17,7 @@ name: PostCommit PortableJar Flink
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 5/6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -73,6 +73,7 @@ jobs:
         with:
           python-version: 3.8
       - name: run testPipelineJarFlinkRunner script
+        id: run_testpipelinejarflinkrunner_script
         env:
           CLOUDSDK_CONFIG: ${{ env.KUBELET_GCLOUD_CONFIG_PATH}}
         uses: ./.github/actions/gradle-command-self-hosted-action
@@ -82,6 +83,7 @@ jobs:
             -PpythonVersion=3.8 \
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: python-code-coverage-report
           path: "**/pytest*.xml"

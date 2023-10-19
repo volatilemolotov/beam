@@ -17,7 +17,7 @@ name: PerformanceTests Cdap
 
 on:
   schedule:
-    - cron: '13 4/12 * * *'
+    - cron: '50 9/12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -97,6 +97,7 @@ jobs:
           arguments: |
             --postgresServerName=${{ steps.install_postgres.outputs.postgres_IP }}
       - name: run integrationTest
+        id: run_integrationtest
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:cdap:integrationTest

@@ -25,7 +25,7 @@ on:
     branches: ['master', 'release-*']
     paths: [ "model/**","sdks/python/**","release/**",".github/workflows/beam_PreCommit_PythonDocker.yml"]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 3/6 * * *'
   workflow_dispatch:
 
 
@@ -83,7 +83,7 @@ jobs:
           PY_VER_CLEAN=${PY_VER//.}
           echo "py_ver_clean=$PY_VER_CLEAN" >> $GITHUB_OUTPUT
       - name: Run pythonDockerBuildPreCommit
-        id: run-pythondockerbuildprecommit
+        id: run_pythondockerbuildprecommit
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:container:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:docker

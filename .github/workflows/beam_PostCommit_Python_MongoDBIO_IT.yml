@@ -17,7 +17,7 @@ name: PostCommit Python MongoDBIO IT
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '15 5/6 * * *'
   workflow_dispatch:
 
 
@@ -61,7 +61,7 @@ jobs:
           java-version: 8
           python-version: 3.11
       - name: Run mongodbioIT script
-        id: run-mongodbioit-script
+        id: run_mongodbioit_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:test-suites:direct:py311:mongodbioIT
@@ -69,6 +69,7 @@ jobs:
             -PpythonVersion=3.11 \
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: python-code-coverage-report
           path: "**/pytest*.xml"

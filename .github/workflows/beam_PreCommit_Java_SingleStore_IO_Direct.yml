@@ -31,7 +31,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '15 2/6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -85,7 +85,7 @@ jobs:
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
           steps_context: ${{ toJson(steps) }}
       - name: run SingleStore IO build script
-        id: run-singlestore-io-build-script
+        id: run_singlestore_io_build_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:singlestore:build
@@ -107,6 +107,13 @@ jobs:
           files: '**/build/test-results/**/*.xml'
       - name: Archive SpotBugs Results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: SpotBugs Results
-          path: "**/build/reports/spotbugs/*.html"
+          path: '**/build/reports/spotbugs/*.html'
+      - name: Publish SpotBugs Results
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        if: always()
+        with:
+          name: Publish SpotBugs
+          path: '**/build/reports/spotbugs/*.html'

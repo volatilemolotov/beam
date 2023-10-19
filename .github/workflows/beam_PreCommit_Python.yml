@@ -25,7 +25,7 @@ on:
     branches: ['master', 'release-*']
     paths: [ "model/**","sdks/python/**","release/**",".github/workflows/beam_PreCommit_Python.yml"]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 3/6 * * *'
   workflow_dispatch:
 
 
@@ -42,7 +42,7 @@ env:
 
 jobs:
   beam_PreCommit_Python:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}} ${{matrix.python_version}})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.python_version }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     timeout-minutes: 180
     strategy:
@@ -78,7 +78,7 @@ jobs:
           PY_VER_CLEAN=${PY_VER//.}
           echo "py_ver_clean=$PY_VER_CLEAN" >> $GITHUB_OUTPUT
       - name: Run pythonPreCommit
-        id: run-pythonprecommit
+        id: run_pythonprecommit
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:test-suites:tox:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:preCommitPy${{steps.set_py_ver_clean.outputs.py_ver_clean}}
@@ -88,6 +88,7 @@ jobs:
             -PuseWheelDistribution
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: python-code-coverage-report
           path: "**/pytest*.xml"

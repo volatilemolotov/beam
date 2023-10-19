@@ -25,7 +25,7 @@ on:
     branches: ['master', 'release-*']
     paths: ["sdks/python/**","release/**",".github/workflows/beam_PreCommit_PythonLint.yml"]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 3/6 * * *'
   workflow_dispatch:
 
 
@@ -42,7 +42,7 @@ env:
 
 jobs:
   beam_PreCommit_PythonLint:
-    name: ${{matrix.job_name}} (${{ matrix.job_phrase }})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     strategy:
       matrix:
@@ -72,7 +72,7 @@ jobs:
           python-version: 3.8
           go-version: 1.16
       - name: run pythonLintPreCommit script
-        id: run-pythonlintprecommit-script
+        id: run_pythonlintprecommit_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :pythonLintPreCommit

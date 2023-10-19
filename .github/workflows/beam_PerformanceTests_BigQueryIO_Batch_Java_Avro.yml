@@ -17,7 +17,7 @@ name: Performance Tests BigQueryIO Batch Java Avro
 
 on:
   schedule:
-    - cron: '10 1,13 * * *'
+    - cron: '10 9/12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -77,6 +77,7 @@ jobs:
           CONFIGWITHDATE=$(echo "${CURCONFIG/bqio_write_10GB_java_avro_/bqio_write_10GB_java_avro_$CURDATE}")
           echo "prepared_config=$CONFIGWITHDATE" >> $GITHUB_OUTPUT
       - name: run Java BigQueryIO Batch Avro Performance Test
+        id: run_java_bigqueryio_batch_avro_performance_test
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:bigquery-io-perf-tests:integrationTest

@@ -17,7 +17,7 @@ name: PerformanceTests ParquetIOIT
 
 on:
   schedule:
-    - cron: '10 3/12 * * *'
+    - cron: '50 10/12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -79,6 +79,7 @@ jobs:
           arguments: |
             --filenamePrefix=gs://temp-storage-for-perf-tests/${{ matrix.job_name }}/${{github.run_id}}/
       - name: run integrationTest
+        id: run_integrationtest
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:file-based-io-tests:integrationTest

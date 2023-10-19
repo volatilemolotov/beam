@@ -19,7 +19,7 @@ name: PostCommit Python Nexmark Direct
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '15 5/6 * * *'
   workflow_dispatch:
 
 # This allows a subsequently queued workflow run to interrupt previous runs
@@ -73,7 +73,7 @@ env:
 
 jobs:
   beam_PostCommit_Python_Nexmark_Direct:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     timeout-minutes: 240
     strategy:
@@ -105,7 +105,7 @@ jobs:
         with:
           python-version: 3.8
       - name: run Java Testing Nexmark (query ${{ matrix.query }})
-        id: run-java-testing-nexmark-query
+        id: run_java_testing_nexmark
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:testing:nexmark:run
@@ -115,7 +115,7 @@ jobs:
             --query=${{ matrix.query }} \
             --generateEventFilePathPrefix=gs://temp-storage-for-perf-tests/nexmark/eventFiles/beam_PostCommit_Python_Nexmark_Direct/query${{ matrix.query }}-" \
       - name: run Python Testing Benchmarks Nexmark (query ${{ matrix.query }})
-        id: run-python-testing-benchmarks-nexmark-query
+        id: run_python_testing_benchmarks_nexmark
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:apache_beam:testing:benchmarks:nexmark:run

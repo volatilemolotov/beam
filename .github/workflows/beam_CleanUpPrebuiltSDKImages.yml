@@ -50,7 +50,7 @@ permissions:
 
 jobs:
   beam_CleanUpPrebuiltSDKImages:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}}) 
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     timeout-minutes: 100
     strategy:
@@ -78,7 +78,7 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: run remove stale sdk container images
-        id: remove-stale-sdk-container-images
+        id: run_remove_stale_sdk_container_images
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :beam-test-tools:removeStaleSDKContainerImages

@@ -29,7 +29,7 @@ env:
 
 jobs:
   beam_Release_NightlySnapshot:
-    name: ${{matrix.job_name}}  (${{matrix.job_phrase}})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     strategy:
       matrix:
@@ -38,7 +38,6 @@ jobs:
     if: |
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'schedule'
-
     steps:
       - uses: actions/checkout@v4
       - name: Setup repository

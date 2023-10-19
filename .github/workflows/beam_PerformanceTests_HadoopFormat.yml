@@ -17,7 +17,7 @@ name: PerformanceTests HadoopFormat
 
 on:
   schedule:
-    - cron: '16 7/12 * * *'
+    - cron: '10 10/12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -97,6 +97,7 @@ jobs:
           arguments: |
             --postgresServerName=${{ steps.install_postgres.outputs.postgres_IP }}
       - name: run integrationTest
+        id: run_integrationtest
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:hadoop-format:integrationTest

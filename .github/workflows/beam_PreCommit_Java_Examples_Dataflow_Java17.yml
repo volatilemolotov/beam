@@ -39,7 +39,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '30 1/6 * * *'
   workflow_dispatch:
 
 # Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
@@ -112,7 +112,7 @@ jobs:
             -PdisableCheckStyle=true \
             -PskipCheckerFramework \
       - name: Build and Test
-        id: build-and-test
+        id: build_and_test
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :runners:google-cloud-dataflow-java:examples:preCommit

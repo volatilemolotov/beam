@@ -29,7 +29,7 @@ env:
 
 jobs:
   beam_Release_Python_NightlySnapshot:
-    name: ${{matrix.job_name}}  (${{matrix.job_phrase}})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     strategy:
       matrix:
@@ -60,10 +60,12 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
       - name: run Cleanup script
+        id: run_cleanup_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:clean
       - name: run Snapshot script
+        id: run_snapshot_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:buildSnapshot

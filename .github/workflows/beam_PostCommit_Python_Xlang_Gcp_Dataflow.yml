@@ -17,7 +17,7 @@ name: PostCommit Python Xlang Gcp Dataflow
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '15 5/6 * * *'
   workflow_dispatch:
 
 
@@ -62,7 +62,7 @@ jobs:
             3.8
             3.11
       - name: run PostCommit Python Xlang Gcp Dataflow script
-        id: run-postcommit-python-xlang-gcp-dataflow-script
+        id: run_postcommit_python_xlang_gcp_dataflow_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:test-suites:dataflow:gcpCrossLanguagePostCommit
@@ -71,5 +71,5 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: archiveJunit
+          name: python-code-coverage-report
           path: "**/pytest*.xml"

@@ -33,7 +33,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-  - cron: '20 */6 * * *'
+  - cron: '30 1/6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -86,7 +86,7 @@ jobs:
           java-version: 8
           python-version: 3.8
       - name: run Java Flink Versions PreCommit script
-        id: run-java-flink-versions-precommit-script
+        id: run_java_flink_versions_precommit_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :flinkPreCommit

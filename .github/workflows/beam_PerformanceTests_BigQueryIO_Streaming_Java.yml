@@ -17,7 +17,7 @@ name: Performance Tests BigQueryIO Streaming Java
 
 on:
   schedule:
-    - cron: '20 15,22 * * *'
+    - cron: '50 9/12 * * *'
   workflow_dispatch:
 
 permissions:
@@ -77,6 +77,7 @@ jobs:
           CONFIGWITHDATE=$(echo "${CURCONFIG/bqio_write_10GB_java_stream_/bqio_write_10GB_java_stream_$CURDATE}")
           echo "prepared_config=$CONFIGWITHDATE" >> $GITHUB_OUTPUT
       - name: run Java BigQueryIO Streaming Performance Test
+        id: run_java_bigqueryio_streaming_performance_test
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:bigquery-io-perf-tests:integrationTest

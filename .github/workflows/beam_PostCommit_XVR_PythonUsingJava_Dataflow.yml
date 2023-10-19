@@ -17,7 +17,7 @@ name: PostCommit XVR PythonUsingJava Dataflow
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '45 5/6 * * *'
   workflow_dispatch:
 
 
@@ -40,7 +40,7 @@ jobs:
       github.event.comment.body == 'Run XVR_PythonUsingJava_Dataflow PostCommit'
     runs-on: [self-hosted, ubuntu-20.04, main]
     timeout-minutes: 100
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}} ${{ matrix.python_version }})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.python_version }})
     strategy:
       matrix:
         job_name: ["beam_PostCommit_XVR_PythonUsingJava_Dataflow"]
@@ -62,6 +62,7 @@ jobs:
             3.8
             3.11
       - name: run PostCommit XVR PythonUsingJava Dataflow script
+        id: run_postcommit_xvr_pythonusingjava_dataflow_script
         env:
           CLOUDSDK_CONFIG: ${{ env.KUBELET_GCLOUD_CONFIG_PATH}}
         id: run-postcommit-xvr-pythonusingjava-dataflow
@@ -74,5 +75,5 @@ jobs:
         uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: archiveJunit
+          name: python-code-coverage-report
           path: "**/pytest*.xml"

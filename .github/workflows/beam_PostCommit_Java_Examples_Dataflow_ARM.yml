@@ -32,7 +32,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '45 3/6 * * *'
   workflow_dispatch:
 
 # This allows a subsequently queued workflow run to interrupt previous runs
@@ -62,7 +62,7 @@ permissions:
 
 jobs:
   beam_PostCommit_Java_Examples__Dataflow_ARM:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}} ${{matrix.java_version}}) 
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.java_version }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     timeout-minutes: 120
     strategy:
@@ -106,7 +106,7 @@ jobs:
         id: set_tag
         run: echo "TAG=$(date +'%Y%m%d-%H%M%S%N')" >> $GITHUB_OUTPUT
       - name: run javaExamplesDataflowARMPostCommit script for Java${{ matrix.java_version }}
-        id: run-javaexamplesdataflowarmpostcommit-script-for-java
+        id: run_javaexamplesdataflowarmpostcommit_script_for_java
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
             gradle-command: :runners:google-cloud-dataflow-java:arm:examplesJavaRunnerV2IntegrationTestARM

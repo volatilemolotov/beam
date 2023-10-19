@@ -47,7 +47,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 1/6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -101,7 +101,7 @@ jobs:
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
           steps_context: ${{ toJson(steps) }}
       - name: run Amazon-Web-Services2 IO build script
-        id: run-amazon-web-services2-io-build-script
+        id: run_amazon_web_services2_io_build_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:amazon-web-services2:build
@@ -109,7 +109,7 @@ jobs:
             -PdisableSpotlessCheck=true \
             -PdisableCheckStyle=true \
       - name: run Amazon-Web-Services2 IO IT script
-        id: run-amazon-web-services2-io-it-script
+        id: run_amazon_web_services2_io_it_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:amazon-web-services2:integrationTest
@@ -131,6 +131,13 @@ jobs:
           files: '**/build/test-results/**/*.xml'
       - name: Archive SpotBugs Results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: SpotBugs Results
-          path: "**/build/reports/spotbugs/*.html"
+          path: '**/build/reports/spotbugs/*.html'
+      - name: Publish SpotBugs Results
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        if: always()
+        with:
+          name: Publish SpotBugs
+          path: '**/build/reports/spotbugs/*.html'

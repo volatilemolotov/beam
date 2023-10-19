@@ -31,7 +31,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '30 1/6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -85,7 +85,7 @@ jobs:
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
           steps_context: ${{ toJson(steps) }}
       - name: run ElasticSearch IO build task
-        id: run-elasticsearch-io-build-task
+        id: run_elasticsearch_io_build_task
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:java:io:elasticsearch:build
@@ -93,7 +93,7 @@ jobs:
             -PdisableSpotlessCheck=true \
             -PdisableCheckStyle=true \
       - name: run ElasticSearch IO additional tasks
-        id: run-elasticsearch-io-additional-tasks
+        id: run_elasticsearch_io_additional_tasks
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: |
@@ -119,6 +119,13 @@ jobs:
           files: '**/build/test-results/**/*.xml'
       - name: Archive SpotBugs Results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: SpotBugs Results
-          path: "**/build/reports/spotbugs/*.html"
+          path: '**/build/reports/spotbugs/*.html'
+      - name: Publish SpotBugs Results
+        uses: jwgmeligmeyling/spotbugs-github-action@v1.2
+        if: always()
+        with:
+          name: Publish SpotBugs
+          path: '**/build/reports/spotbugs/*.html'

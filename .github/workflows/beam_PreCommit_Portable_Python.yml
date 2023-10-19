@@ -45,7 +45,7 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '30 2/6 * * *'
   workflow_dispatch:
 
 
@@ -62,7 +62,7 @@ env:
 
 jobs:
   beam_PreCommit_Portable_Python:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase}} ${{matrix.python_version}})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.python_version }})
     timeout-minutes: 120
     runs-on: ['self-hosted', ubuntu-20.04, main]
     strategy:
@@ -96,7 +96,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: |
-            ${{matrix.python_version}}
+            ${{ matrix.python_version }}
             3.8
       - name: Set PY_VER_CLEAN
         id: set_py_ver_clean
@@ -105,7 +105,7 @@ jobs:
           PY_VER_CLEAN=${PY_VER//.}
           echo "py_ver_clean=$PY_VER_CLEAN" >> $GITHUB_OUTPUT
       - name: run Portable Python script
-        id: run-portable-python-script
+        id: run_portable_python_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:test-suites:portable:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:preCommitPy${{steps.set_py_ver_clean.outputs.py_ver_clean}}

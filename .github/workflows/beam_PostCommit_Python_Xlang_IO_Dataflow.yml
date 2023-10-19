@@ -17,7 +17,7 @@ name: PostCommit Python Xlang IO Dataflow
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '30 5/6 * * *'
   workflow_dispatch:
 
 
@@ -62,7 +62,7 @@ jobs:
             3.8
             3.11
       - name: run PostCommit Python Xlang IO Dataflow script
-        id: run-postcommit-python-xlang-io-dataflow-script
+        id: run_postcommit_python_xlang_io_dataflow_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:test-suites:dataflow:ioCrossLanguagePostCommit

@@ -19,7 +19,7 @@ name: PostCommit Sickbay Python
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 # This allows a subsequently queued workflow run to interrupt previous runs
@@ -36,7 +36,7 @@ env:
 
 jobs:
   beam_PostCommit_Sickbay_Python:
-    name: ${{matrix.job_name}} (${{matrix.job_phrase_1}} ${{matrix.python_version}} ${{matrix.job_phrase_2}})
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase_1 }} ${{ matrix.python_version }} ${{ matrix.job_phrase_2 }})
     runs-on: [self-hosted, ubuntu-20.04, main]
     timeout-minutes: 180
     strategy:
@@ -63,7 +63,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: ${{matrix.python_version}}
+          python-version: ${{ matrix.python_version }}
       - name: Set PY_VER_CLEAN
         id: set_py_ver_clean
         run: |
@@ -71,7 +71,7 @@ jobs:
           PY_VER_CLEAN=${PY_VER//.}
           echo "py_ver_clean=$PY_VER_CLEAN" >> $GITHUB_OUTPUT
       - name: run PostCommit Python ${{ matrix.python_version }} script
-        id: run-postcommit-python-script
+        id: run_postcommit_python_script
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:test-suites:dataflow:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:postCommitSickbay
@@ -79,6 +79,7 @@ jobs:
             -PpythonVersion=${{ matrix.python_version }} \
       - name: Archive code coverage results
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: python-code-coverage-report
           path: "**/pytest*.xml"
