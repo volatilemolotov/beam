@@ -101,8 +101,8 @@ jobs:
           kubectl wait svc/svc-sdb-cluster-ddl --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' --timeout=120s
           loadbalancer_IP=$(kubectl get svc svc-sdb-cluster-ddl -o jsonpath='{.status.loadBalancer.ingress[0].ip}') 
           echo lb_ip=$loadbalancer_IP >> $GITHUB_OUTPUT
-      - name: Run Java SingleStore IO IT
+      - name: Run Java SingleStore IO IT 
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :sdks:java:io:singlestore:integrationTest --tests org.apache.beam.sdk.io.singlestore.SingleStoreIODefaultMapperIT --tests org.apache.beam.sdk.io.singlestore.SingleStoreIOSchemaTransformIT --tests org.apache.beam.sdk.io.singlestore.SingleStoreIOConnectionAttributesIT
+          gradle-command: :sdks:java:io:singlestore:integrationTest --tests org.apache.beam.sdk.io.singlestore.SingleStoreIODefaultMapperIT :sdks:java:io:singlestore:integrationTest --tests org.apache.beam.sdk.io.singlestore.SingleStoreIOSchemaTransformIT :sdks:java:io:singlestore:integrationTest --tests org.apache.beam.sdk.io.singlestore.SingleStoreIOConnectionAttributesIT
           arguments: --info -DintegrationTestRunner=dataflow -DintegrationTestPipelineOptions='["--tempRoot=gs://temp-storage-for-perf-tests","--project=apache-beam-testing","--runner=DataflowRunner","--singleStoreUsername=admin","--singleStorePassword=secretpass","--singleStorePort=3306","--numberOfRecords=1000", "--singleStoreServerName=${{ steps.install_singlestore.outputs.lb_ip }}"]'
