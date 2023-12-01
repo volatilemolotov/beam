@@ -34,26 +34,5 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run/}"
-          TOTAL_COUNT=$(gh api repos/${{ github.repository }}/actions/workflows | jq '.total_count')
-          PAGES=$(expr $TOTAL_COUNT / 100)
-          if [ $(expr $TOTAL_COUNT % 100) -ne 0 ]
-          then
-            PAGES=$(expr $PAGES + 1)
-          fi
-          for i in $(seq 1 $PAGES)
-          do
-           gh api repos/${{ github.repository }}/actions/workflows?per_page=100&page=$i | jq -e --arg REQUESTED_WORKFLOW_NAME "PreCommit Go" '.workflows[] | .id'
-            if [ $? -eq 0 ]
-            then
-              FOUND=true
-              break
-            fi
-          done
-          if [ "$FOUND" = true ]
-          then
-            #echo "Found workflow id: $WORKFLOW_ID"
-            echo "workflow_id=$WORKFLOW_ID" >> $GITHUB_ENV
-          else
-            echo "Workflow not found"
-            exit 1
-          fi
+          gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "PreCommit Go" '.workflows[] | .id'
+       
