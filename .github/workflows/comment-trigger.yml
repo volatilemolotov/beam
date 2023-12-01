@@ -42,7 +42,7 @@ jobs:
           fi
           for i in $(seq 1 $PAGES)
           do
-            WORKFLOW_ID=$(gh api repos/${{ github.repository }}/actions/workflows?per_page=100&page=$i | jq '.workflows[] | select(.name == "$REQUESTED_WORKFLOW_NAME") | .id')
+            WORKFLOW_ID=$(gh api repos/${{ github.repository }}/actions/workflows?per_page=100&page=$i | jq -e --arg REQUESTED_WORKFLOW_NAME "$REQUESTED_WORKFLOW_NAME" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id')
             if [ $? -eq 0 ]
             then
               FOUND=true
