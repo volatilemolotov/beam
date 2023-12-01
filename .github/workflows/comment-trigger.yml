@@ -34,7 +34,7 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run/}"
-          TOTAL_COUNT=$(gh api repos/apache/beam/actions/workflows | jq '.total_count')
+          TOTAL_COUNT=$(gh api repos/${{ github.repository }}/actions/workflows | jq '.total_count')
           PAGES=$(expr $TOTAL_COUNT / 100)
           if [ $(expr $TOTAL_COUNT % 100) -ne 0 ]
           then
@@ -42,7 +42,7 @@ jobs:
           fi
           for i in $(seq 1 $PAGES)
           do
-            gh api repos/apache/beam/actions/workflows?per_page=100&page=$i | jq '.workflows[] | select(.name == "$REQUESTED_WORKFLOW_NAME") | .id'
+            WORKFLOW_ID=gh api repos/apache/${{ github.repository }/workflows?per_page=100&page=$i | jq '.workflows[] | select(.name == "$REQUESTED_WORKFLOW_NAME") | .id'
             if [ $? -eq 0 ]
             then
               FOUND=true
