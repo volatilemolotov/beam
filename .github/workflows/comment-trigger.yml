@@ -39,5 +39,5 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run /}"
-          echo "Requested workflow name: $REQUESTED_WORKFLOW_NAME"
           WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "$REQUESTED_WORKFLOW_NAME" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id')
+          echo $WORKFLOW_ID
