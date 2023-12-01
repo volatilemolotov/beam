@@ -34,5 +34,5 @@ jobs:
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run/}"
-          gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "PreCommit Go" '.workflows[] | .id'
+          gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "PreCommit Go" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id'
        
