@@ -42,5 +42,18 @@ jobs:
           fi
           for i in $(seq 1 $PAGES)
           do
-            gh api repos/apache/beam/actions/workflows?page=$i | jq '.workflows[] | select(.name == "$REQUESTED_WORKFLOW_NAME") | .id'
+            gh api repos/apache/beam/actions/workflows?per_page=100&page=$i | jq '.workflows[] | select(.name == "$REQUESTED_WORKFLOW_NAME") | .id'
+            if [ $? -eq 0 ]
+            then
+              FOUND=true
+              break
+            fi
           done
+          if [ "$FOUND" = true ]
+          then
+            echo "Found workflow id: $WORKFLOW_ID"
+            echo "workflow_id=$WORKFLOW_ID" >> $GITHUB_ENV
+          else
+            echo "Workflow not found"
+            exit 1
+          fi
