@@ -30,9 +30,13 @@ jobs:
     runs-on: [self-hosted, ubuntu-20.04, main]
     if: (github.event.issue.pull_request && startswith(github.event.comment.body, 'Run'))
     steps:
+      - name: Update jq
+        run: |
+          curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
+          chmod +x jq-linux-amd64
+          sudo mv jq-linux-amd64 /usr/bin/jq
       - name: Get Workflow ID
         run: |
           COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run/}"
           gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "PreCommit Go" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id'
-       
