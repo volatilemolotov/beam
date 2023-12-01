@@ -29,7 +29,7 @@ jobs:
     steps:
       - name: Get Workflow ID
         run: |
-          REQUESTED_WORKFLOW_NAME=$(echo ${${{ github.event.comment.body }}//Run}
+          REQUESTED_WORKFLOW_NAME=$(echo ${${{ github.event.comment.body }}//Run})
           TOTAL_COUNT = $(gh api repos/apache/beam/actions/workflows | jq '.total_count')
           PAGES=$(expr $TOTAL_COUNT / 100)
           if [ $(expr $TOTAL_COUNT % 100) -ne 0 ]
