@@ -40,4 +40,9 @@ jobs:
           COMMENT_BODY="${{ github.event.comment.body }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run /}"
           WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "$REQUESTED_WORKFLOW_NAME" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id')
-          echo $WORKFLOW_ID
+          echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
+      - name: Get Last Commit SHA
+        run: |
+          PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -e '.[-1].sha')
+          echo pr_sha=$PR_SHA >> $GITHUB_ENV
+          
