@@ -109,6 +109,7 @@ jobs:
         if: env.dispatched == 'true'
         run: | 
           DATE_NOW=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc)
-          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..$DATE_NOW | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == $UUID) | .id')
+          echo date_now=$DATE_NOW >> $GITHUB_ENV
+          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }} | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == $UUID) | .id')
           echo $WORKFLOW_RUN_ID
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
