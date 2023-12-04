@@ -70,20 +70,26 @@ jobs:
           echo pr_sha=$PR_SHA >> $GITHUB_ENV
       - name: Get Workflow Run For PR
         run: | 
-          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -e --arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == ($WORKFLOW_ID | tonumber)) | .id')
+          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -e --arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == ($WORKFLOW_ID | tonumber)) | .id' || true)
+          if [ -z "$WORKFLOW_RUN_ID" ]; then
+            echo "No workflow run found for this PR"
+            echo no_triggered_run=true >> $GITHUB_ENV
+            exit 0
+          fi
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
       - name: Get Status and Conclusion for the WORKFLOW_RUN_ID
+        if: env.no_triggered_run != 'true'
         run: | 
           read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -r -e '"\(.status) \(.conclusion)"')
           echo status=$STATUS >> $GITHUB_ENV
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
       - name: Rerun Workflow
-        if: ( env.conclusion == 'failure' && env.force != 'true')
+        if: (( env.conclusion == 'failure' && env.force != 'true') && env.no_triggered_run != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun-failed-jobs -X POST
           echo "Rerun triggered"
       - name: Rerun Workflow -- Force
-        if:  env.force == 'true'
+        if:  (env.force == 'true' && env.no_triggered_run != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun -X POST
           echo "Rerun triggered"
