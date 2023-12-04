@@ -78,7 +78,7 @@ jobs:
           echo status=$STATUS >> $GITHUB_ENV
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
       - name: Rerun Workflow
-        if: ( env.conclusion == 'failed' && env.force != 'true')
+        if: ( env.conclusion == 'failure' && env.force != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun-failed-jobs -X POST
           echo "Rerun triggered"
