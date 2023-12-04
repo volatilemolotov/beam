@@ -40,7 +40,7 @@ jobs:
           sudo mv jq-linux-amd64 /usr/bin/jq
       - name: Parse options
         run: | 
-          OPTIONS=$(echo {{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])' || true )
+          OPTIONS=$(echo ${{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])' || true )
           echo $OPTIONS
           if [ -z "$OPTIONS" ]; then
             echo "No options found"
