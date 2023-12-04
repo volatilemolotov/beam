@@ -45,4 +45,7 @@ jobs:
         run: |
           PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -e '.[-1].sha')
           echo pr_sha=$PR_SHA >> $GITHUB_ENV
-          
+      - name: Get Workflow Run For PR
+        run: | 
+          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -e ---arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == $WORKFLOW_ID) | .id')
+          echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
