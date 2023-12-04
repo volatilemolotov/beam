@@ -40,12 +40,16 @@ jobs:
           sudo mv jq-linux-amd64 /usr/bin/jq
       - name: Parse options
         run: | 
-          OPTIONS=$(echo {{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])')
+          OPTIONS=$(echo {{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])' || true )
+          if [ -z "$OPTIONS" ]; then
+            echo "No options found"
+            exit 0
+          fi
           for option in $OPTIONS;
           do
-            KEY=$(echo $a | grep -oP '^(.*?)(?=\=)')
+            KEY=$(echo $option | grep -oP '^(.*?)(?=\=)')
             KEY_CLEAN=${KEY#--}
-            VALUE=$(echo $a | grep -oP '(?<=\=)(.*)')
+            VALUE=$(echo $option | grep -oP '(?<=\=)(.*)')
             echo $KEY_CLEAN=$VALUE >> $GITHUB_ENV
           done
       - name: Get Comment Body Without options
