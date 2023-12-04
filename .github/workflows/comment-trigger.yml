@@ -99,3 +99,11 @@ jobs:
           UUID=$(cat /proc/sys/kernel/random/uuid)
           gh api repos/${{ github.repository }}/actions/workflows/${{env.workflow_id}}/dispatches -d "{\"ref\":\"${{env.pr_sha }}\",\"inputs\":{\"UUID\":\"$UUID\"}"
           echo "Workflow dispatched"
+          echo uuid=$UUID >> $GITHUB_ENV
+          echo dispatched=true >> $GITHUB_ENV
+      - name: Get Run ID -- Dispatched
+        if: env.dispatched == 'true'
+        run: | 
+          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs| jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == "$WORKFLOW_ID") | .id')
+          echo $WORKFLOW_RUN_ID
+          echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
