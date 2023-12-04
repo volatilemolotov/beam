@@ -93,3 +93,9 @@ jobs:
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun -X POST
           echo "Rerun triggered"
+      - name: Dispatch a Workflow
+        if: (env.no_triggered_run == 'true')
+        run: |
+          UUID=$(uuidgen)
+          gh api repos/${{ github.repository }}/actions/workflows/${{env.workflow_id}}/dispatches -d "{\"ref\":\"${{env.pr_sha }}\",\"inputs\":{\"UUID\":\"$UUID\"}"
+          echo "Workflow dispatched"
