@@ -76,6 +76,7 @@ jobs:
       - name: Simple api
         run: |
           TEST=$(curl https://simpleapi.volatilemolotov.com/test2 | jq -r '.fail')
+          echo $TEST
           if [ "$TEST" == "true" ]; then
             echo "Simple api failed"
             exit 1
