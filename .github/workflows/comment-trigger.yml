@@ -40,7 +40,14 @@ jobs:
           sudo mv jq-linux-amd64 /usr/bin/jq
       - name: Parse options
         run: | 
-          echo {{ github.event.comment.body }} | grep -oP ''
+          OPTIONS=$(echo {{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])')
+          for option in $OPTIONS;
+          do
+            KEY=$(echo $a | grep -oP '^(.*?)(?=\=)')
+            KEY_CLEAN=${KEY#--}
+            VALUE=$(echo $a | grep -oP '(?<=\=)(.*)')
+            echo $KEY_CLEAN=$VALUE >> $GITHUB_ENV
+          done
       - name: Get Comment Body Without options
         run: |
           COMMENT_BODY_CLEAN="$(echo ${{ github.event.comment.body }} | grep -oP '^(.*?)(?= --|$)')"
@@ -52,7 +59,6 @@ jobs:
           WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "$REQUESTED_WORKFLOW_NAME" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id')
           echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
           echo $COMMENT_BODY
-          exit 0
       - name: Get Last Commit SHA
         run: |
           PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -e '.[-1].sha')
@@ -67,7 +73,7 @@ jobs:
           echo status=$STATUS >> $GITHUB_ENV
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
       - name: Rerun Workflow 
-        if: ${{ env.conclusion == 'failure' }}
+        if: ( env.conclusion == 'test' || env.force == 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun -X POST
           echo "Rerun triggered"
