@@ -17,6 +17,9 @@
 
 name: Comment Trigger
 
+permissions:
+  actions: write
+
 on:
   issue_comment:
     types: [created]
