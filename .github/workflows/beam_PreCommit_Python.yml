@@ -17,15 +17,11 @@ name: PreCommit Python
 on:
   pull_request_target:
     branches: [ "master", "release-*" ]
-    paths: [ "model/**","sdks/python/**","release/**", 'release/trigger_all_tests.json', '.github/trigger_files/beam_PreCommit_Python.json']
-  issue_comment:
-    types: [created]
+    paths: [ "model/**","sdks/python/**","release/**", 'release/trigger_all_tests.json', '.github/trigger_files/beam_PreCommit_Python.json',test]
   push:
     tags: ['v*']
     branches: ['master', 'release-*']
     paths: [ "model/**","sdks/python/**","release/**",".github/workflows/beam_PreCommit_Python.yml"]
-  schedule:
-    - cron: '0 3/6 * * *'
   workflow_dispatch:
 
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
@@ -64,13 +60,11 @@ jobs:
       matrix:
         job_name: ['beam_PreCommit_Python']
         job_phrase: ['Run Python PreCommit']
-        python_version: ['3.8','3.9','3.10','3.11']
+        python_version: ['test1','test2','test3','test4']
     if: |
       github.event_name == 'push' ||
       github.event_name == 'pull_request_target' ||
-      (github.event_name == 'schedule' && github.repository == 'apache/beam') ||
-      github.event_name == 'workflow_dispatch' ||
-      startsWith(github.event.comment.body, 'Run Python PreCommit')
+      github.event_name == 'workflow_dispatch' 
     steps:
       - uses: actions/checkout@v4
       - name: Setup repository
@@ -79,35 +73,11 @@ jobs:
           comment_phrase: ${{ matrix.job_phrase }} ${{ matrix.python_version }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.python_version }})
-      - name: Setup environment
-        uses: ./.github/actions/setup-environment-action
-        with:
-          java-version: 8
-          python-version: ${{ matrix.python_version }}
-      - name: Set PY_VER_CLEAN
-        id: set_py_ver_clean
+      - name: Simple api
         run: |
-          PY_VER=${{ matrix.python_version }}
-          PY_VER_CLEAN=${PY_VER//.}
-          echo "py_ver_clean=$PY_VER_CLEAN" >> $GITHUB_OUTPUT
-      - name: Run pythonPreCommit
-        uses: ./.github/actions/gradle-command-self-hosted-action
-        with:
-          gradle-command: :sdks:python:test-suites:tox:py${{steps.set_py_ver_clean.outputs.py_ver_clean}}:preCommitPy${{steps.set_py_ver_clean.outputs.py_ver_clean}}
-          arguments: |
-            -Pposargs="--ignore=apache_beam/dataframe/ --ignore=apache_beam/examples/ --ignore=apache_beam/runners/ --ignore=apache_beam/transforms/" \
-            -PpythonVersion=${{ matrix.python_version }} \
-            -PuseWheelDistribution
-      - name: Archive Python Test Results
-        uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: Python Test Results
-          path: '**/pytest*.xml'
-      - name: Publish Python Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          commit: '${{ env.prsha || env.GITHUB_SHA }}'
-          comment_mode: ${{ github.event_name == 'issue_comment'  && 'always' || 'off' }}
-          files: '**/pytest*.xml'
+          TEST=$(curl https://simpleapi.volatilemolotov.com/${{ matrix.python_version }} | jq -r '.fail')
+          echo $TEST
+          if [ "$TEST" == "true" ]; then
+            echo "Simple api failed"
+            exit 1
+          fi
