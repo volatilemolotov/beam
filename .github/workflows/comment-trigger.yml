@@ -38,12 +38,21 @@ jobs:
           curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
           chmod +x jq-linux-amd64
           sudo mv jq-linux-amd64 /usr/bin/jq
+      - name: Parse options
+        run: | 
+          echo {{ github.event.comment.body }} | grep -oP ''
+      - name: Get Comment Body Without options
+        run: |
+          COMMENT_BODY_CLEAN="$(echo ${{ github.event.comment.body }} | grep -oP '^(.*?)(?= --)')"
+          echo comment_body_clean=$COMMENT_BODY_CLEAN >> $GITHUB_ENV
       - name: Get Workflow ID
         run: |
-          COMMENT_BODY="${{ github.event.comment.body }}"
+          COMMENT_BODY="${{ env.comment_body_clean }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run /}"
           WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e --arg REQUESTED_WORKFLOW_NAME "$REQUESTED_WORKFLOW_NAME" '.workflows[] | select(.name == $REQUESTED_WORKFLOW_NAME) | .id')
           echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
+          echo $COMMENT_BODY
+          exit 0
       - name: Get Last Commit SHA
         run: |
           PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -e '.[-1].sha')
