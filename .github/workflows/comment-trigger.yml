@@ -99,13 +99,16 @@ jobs:
         if: (env.no_triggered_run == 'true')
         run: |
           UUID=$(cat /proc/sys/kernel/random/uuid)
+          DATE_RUN=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc)
           gh workflow run ${{ env.workflow_id }} -f uuid=$UUID
           echo "Workflow dispatched"
           echo uuid=$UUID >> $GITHUB_ENV
           echo dispatched=true >> $GITHUB_ENV
+          echo date_run=$DATE_RUN >> $GITHUB_ENV
       - name: Get Run ID -- Dispatched
         if: env.dispatched == 'true'
         run: | 
-          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs| jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == "$WORKFLOW_ID") | .id')
+          DATE_NOW=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc)
+          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..$DATE_NOW | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == "$WORKFLOW_ID") | .id')
           echo $WORKFLOW_RUN_ID
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
