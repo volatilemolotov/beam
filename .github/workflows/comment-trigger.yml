@@ -41,6 +41,7 @@ jobs:
       - name: Parse options
         run: | 
           OPTIONS=$(echo {{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])' || true )
+          echo $OPTIONS
           if [ -z "$OPTIONS" ]; then
             echo "No options found"
             exit 0
