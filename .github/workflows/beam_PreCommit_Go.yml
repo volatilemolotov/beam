@@ -14,7 +14,7 @@
 # limitations under the License.
 
 name: PreCommit Go
-
+run-name: ${{ inputs.uuid }}
 on:
   push:
     tags: ['v*']
@@ -28,6 +28,7 @@ on:
       uuid:
         description: 'UUID for the workflow run'
         required: false
+        default: 
 
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
 permissions:
