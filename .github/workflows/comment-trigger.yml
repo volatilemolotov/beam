@@ -51,7 +51,7 @@ jobs:
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
       - name: Get Status and Conclusion for the WORKFLOW_RUN_ID
         run: | 
-          read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -e '.status, .conclusion')
+          read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -e '"\(.status) \(.conclusion)"')
           echo status=$STATUS >> $GITHUB_ENV
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
           echo $STATUS
