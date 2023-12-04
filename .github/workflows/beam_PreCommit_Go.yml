@@ -23,8 +23,6 @@ on:
   pull_request_target:
     branches: ['master', 'release-*']
     paths: ['model/**', 'sdks/go.mod', 'sdks/go.sum', 'sdks/go/**', 'release/**', 'release/trigger_all_tests.json', '.github/trigger_files/beam_PreCommit_Go.json', 'test']
-  issue_comment:
-    types: [created]
   workflow_dispatch:
 
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
