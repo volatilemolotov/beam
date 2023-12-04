@@ -43,7 +43,7 @@ jobs:
           echo {{ github.event.comment.body }} | grep -oP ''
       - name: Get Comment Body Without options
         run: |
-          COMMENT_BODY_CLEAN="$(echo ${{ github.event.comment.body }} | grep -oP '^(.*?)(?= --)')"
+          COMMENT_BODY_CLEAN="$(echo ${{ github.event.comment.body }} | grep -oP '^(.*?)(?= --|$)')"
           echo comment_body_clean=$COMMENT_BODY_CLEAN >> $GITHUB_ENV
       - name: Get Workflow ID
         run: |
