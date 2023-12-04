@@ -49,3 +49,13 @@ jobs:
         run: | 
           WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -e --arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == ($WORKFLOW_ID | tonumber)) | .id')
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
+      - name: Get Status and Conclusion for the WORKFLOW_RUN_ID
+        run: | 
+          STATUS=$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -e '.status')
+          CONCLUSION=$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -e '.conclusion')
+          echo status=$STATUS >> $GITHUB_ENV
+          echo conclusion=$CONCLUSION >> $GITHUB_ENV
+          echo $STATUS
+          echo $CONCLUSION
+          
+          
