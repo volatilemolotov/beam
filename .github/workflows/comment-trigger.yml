@@ -97,7 +97,7 @@ jobs:
         if: (env.no_triggered_run == 'true')
         run: |
           UUID=$(cat /proc/sys/kernel/random/uuid)
-          gh api repos/${{ github.repository }}/actions/workflows/${{env.workflow_id}}/dispatches -d "{\"ref\":\"${{env.pr_sha }}\",\"inputs\":{\"UUID\":\"$UUID\"}"
+          gh workflow run ${{ env.workflow_id }} -f uuid=$UUID
           echo "Workflow dispatched"
           echo uuid=$UUID >> $GITHUB_ENV
           echo dispatched=true >> $GITHUB_ENV
