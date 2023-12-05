@@ -125,6 +125,7 @@ jobs:
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
           echo workflow_run_url=$WORKFLOW_RUN_URL >> $GITHUB_ENV
       - name: Create a check run
+        if: env.dispatched == 'true'
         run: |
           curl -X POST  -H "Accept: application/vnd.github+json" \
           -H "Accept: application/vnd.github+json" \
