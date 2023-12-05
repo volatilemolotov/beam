@@ -38,6 +38,7 @@ jobs:
           curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
           chmod +x jq-linux-amd64
           sudo mv jq-linux-amd64 /usr/bin/jq
+
       - name: Parse options
         run: | 
           OPTIONS=$(echo ${{ github.event.comment.body }} | grep -oP '(\-\-\w+)=(\w+|.*[^˘])' || true )
@@ -53,10 +54,12 @@ jobs:
             VALUE=$(echo $option | grep -oP '(?<=\=)(.*)')
             echo $KEY_CLEAN=$VALUE >> $GITHUB_ENV
           done
+
       - name: Get Comment Body Without options
         run: |
           COMMENT_BODY_CLEAN="$(echo ${{ github.event.comment.body }} | grep -oP '^(.*?)(?= --|$)')"
           echo comment_body_clean=$COMMENT_BODY_CLEAN >> $GITHUB_ENV
+
       - name: Get Workflow ID
         run: |
           COMMENT_BODY="${{ env.comment_body_clean }}"
@@ -65,35 +68,41 @@ jobs:
           echo requested_workflow_name=$REQUESTED_WORKFLOW_NAME >> $GITHUB_ENV
           echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
           echo $COMMENT_BODY
+
       - name: Get Last Commit SHA
         run: |
-          PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -e '.[-1].sha')
+          PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -r -e '.[-1].sha')
           echo pr_sha=$PR_SHA >> $GITHUB_ENV
+
       - name: Get Workflow Run For PR
         run: | 
-          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -e --arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == ($WORKFLOW_ID | tonumber)) | .id' || true)
+          WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -r -e --arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == ($WORKFLOW_ID | tonumber)) | .id' || true)
           if [ -z "$WORKFLOW_RUN_ID" ]; then
             echo "No workflow run found for this PR"
             echo no_triggered_run=true >> $GITHUB_ENV
             exit 0
           fi
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
+
       - name: Get Status and Conclusion for the WORKFLOW_RUN_ID
         if: env.no_triggered_run != 'true'
         run: | 
           read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -r -e '"\(.status) \(.conclusion)"')
           echo status=$STATUS >> $GITHUB_ENV
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
+
       - name: Rerun Workflow
         if: (( env.conclusion == 'failure' && env.force != 'true') && env.no_triggered_run != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun-failed-jobs -X POST
           echo "Rerun triggered"
+
       - name: Rerun Workflow -- Force
         if:  (env.force == 'true' && env.no_triggered_run != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun -X POST
           echo "Rerun triggered"
+
       - name: Dispatch a Workflow
         if: (env.no_triggered_run == 'true')
         run: |
@@ -115,6 +124,7 @@ jobs:
           echo date_run=$DATE_RUN >> $GITHUB_ENV
           DATE_NOW=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc --date "+10 seconds")
           echo date_now=$DATE_NOW >> $GITHUB_ENV
+
       - name: Get Run ID and URL -- Dispatched
         if: env.dispatched == 'true'
         run: |
@@ -124,6 +134,7 @@ jobs:
           echo $WORKFLOW_RUN_ID
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
           echo workflow_run_url=$WORKFLOW_RUN_URL >> $GITHUB_ENV
+          
       - name: Create a check run
         if: env.dispatched == 'true'
         run: |
