@@ -120,7 +120,7 @@ jobs:
         run: |
           #needed for API to reconcile
           sleep 5
-          read WORKFLOW_RUN_ID WORKFLOW_RUN_URL $(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}" | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == $UUID) | "\(.id) \(.html_url)"')
+          read -r WORKFLOW_RUN_ID WORKFLOW_RUN_URL <<<$(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}" | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == $UUID) | "\(.id) \(.html_url)"')
           echo $WORKFLOW_RUN_ID
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
           echo workflow_run_url=$WORKFLOW_RUN_URL >> $GITHUB_ENV
