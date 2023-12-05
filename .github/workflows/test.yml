@@ -1,0 +1,46 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Test
+
+permissions:
+  actions: write
+
+on:
+  issue_comment:
+    types: [created]
+
+env:
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  comment-trigger-job:
+    name: "Comment trigger"
+    runs-on: [self-hosted, ubuntu-20.04, main]
+    if: (github.event.issue.pull_request && startswith(github.event.comment.body, 'Run'))
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Update jq
+        run: |
+          curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
+          chmod +x jq-linux-amd64
+          sudo mv jq-linux-amd64 /usr/bin/jq
+
+      - name: Test
+        run: |
+          gh api --paginate repos/volatilemolotov/beam/actions/runs?event=workflow_dispatch&created=2023-12-04T22:57:59Z..2023-12-04T22:58:10Z | jq -e --arg UUID "e8493adc-6a8d-4066-8318-c51b99e4fb8e" '.workflow_runs[] | select(.display_title == $UUID )| .id'
