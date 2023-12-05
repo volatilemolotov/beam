@@ -31,7 +31,6 @@ jobs:
   comment-trigger-job:
     name: "Comment trigger"
     runs-on: [self-hosted, ubuntu-20.04, main]
-    if: (github.event.issue.pull_request && startswith(github.event.comment.body, 'Run'))
     steps:
       - name: Checkout
         uses: actions/checkout@v2
