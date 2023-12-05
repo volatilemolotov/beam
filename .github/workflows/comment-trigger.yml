@@ -111,7 +111,6 @@ jobs:
         if: env.dispatched == 'true'
         run: |
           sleep 5
-          #WORKFLOW_RUN_ID=$(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}" | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == $UUID) | .id')
-          WORKFLOW_RUN_ID=$(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}" )
+          WORKFLOW_RUN_ID=$(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}" | jq -e --arg UUID "${{ env.uuid }}" '.workflow_runs[] | select(.display_title == $UUID) | .id')
           echo $WORKFLOW_RUN_ID
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
