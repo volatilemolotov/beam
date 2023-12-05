@@ -32,8 +32,6 @@ jobs:
     name: "Comment trigger"
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
       - name: Update jq
         run: |
           curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
@@ -42,4 +40,4 @@ jobs:
 
       - name: Test
         run: |
-          gh api --paginate repos/volatilemolotov/beam/actions/runs?event=workflow_dispatch&created=2023-12-04T22:57:59Z..2023-12-04T22:58:10Z | jq -e --arg UUID "e8493adc-6a8d-4066-8318-c51b99e4fb8e" '.workflow_runs[] | select(.display_title == $UUID )| .id'
+          gh api --paginate repos/volatilemolotov/beam/actions/runs?event=workflow_dispatch&created=2023-12-04T22:57:59Z..2023-12-04T22:58:10Z
