@@ -21,8 +21,8 @@ permissions:
   actions: write
 
 on:
-  issue_comment:
-    types: [created]
+  workflow_dispatch:
+    
 
 env:
   GH_TOKEN: ${{ github.token }}
