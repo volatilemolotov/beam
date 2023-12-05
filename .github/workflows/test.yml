@@ -41,6 +41,6 @@ jobs:
           private_key: ${{ secrets.gh_app_private_key }}
       - name: Test
         run: |
-          gh api --paginate repos/volatilemolotov/beam/actions/runs?event=workflow_dispatch&created=2023-12-04T22:57:59Z..2023-12-04T22:58:10Z
+          gh api  repos/volatilemolotov/beam/actions/runs?event=workflow_dispatch
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
