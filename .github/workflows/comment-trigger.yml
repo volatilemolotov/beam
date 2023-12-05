@@ -110,6 +110,6 @@ jobs:
       - name: Get Run ID -- Dispatched
         if: env.dispatched == 'true'
         run: |
-          WORKFLOW_RUN_ID=$(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}" 
+          WORKFLOW_RUN_ID=$(gh api --paginate "repos/${{ github.repository }}/actions/runs?event=workflow_dispatch&created=${{ env.date_run }}..${{ env.date_now }}")
           echo $WORKFLOW_RUN_ID
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
