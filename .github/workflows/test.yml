@@ -23,10 +23,6 @@ permissions:
 on:
   workflow_dispatch:
     
-
-env:
-  GH_TOKEN: ${{ github.token }}
-
 jobs:
   comment-trigger-job:
     name: "Comment trigger"
@@ -37,7 +33,14 @@ jobs:
           curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
           chmod +x jq-linux-amd64
           sudo mv jq-linux-amd64 /usr/bin/jq
-
+      - name: Generate a token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app_id: ${{ secrets.gh_app_id }}
+          private_key: ${{ secrets.gh_app_private_key }}
       - name: Test
         run: |
           gh api --paginate repos/volatilemolotov/beam/actions/runs?event=workflow_dispatch&created=2023-12-04T22:57:59Z..2023-12-04T22:58:10Z
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
