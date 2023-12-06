@@ -188,7 +188,7 @@ jobs:
       - name: Update Check Run Link
         if: env.dispatched == 'true'
         run: |
-          CHECK_RUN_ID=$(echo "${{ env.check_run }}" | jq -r '.check_runs[0].id')
+          CHECK_RUN_ID=$(echo '${{ env.check_run }}' | jq -r '.check_runs[0].id')
           curl -X PATCH  -H "Accept: application/vnd.github+ json" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ github.token }}" \
@@ -202,12 +202,12 @@ jobs:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           WORKFLOW_RUN_ID=$(echo '${{ env.check_run }}' | jq -r '.check_runs[0].external_id')
-          gh api -X POST --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
+          gh api -X POST  repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
 
       - name: Restart Dispatched Run in Check -- Force
         if: (env.check_found == 'true' && env.force == 'true')
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          WORKFLOW_RUN_ID=$(echo "${{ env.check_run }}" | jq -r '.check_runs[0].external_id')
-          gh api -X POST --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
+          WORKFLOW_RUN_ID=$(echo '${{ env.check_run }}' | jq -r '.check_runs[0].external_id')
+          gh api -X POST  repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
