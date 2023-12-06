@@ -30,13 +30,12 @@ on:
         type: string
         description: 'Check run ID for the check'
         required: true
+    secrets:
       gh_app_id:
-        type: string
-        description: 'Github App ID'
+        description: 'GitHub App ID for the triggering check'
         required: true
       gh_app_private_key:
-        type: string
-        description: 'Github App Private Key'
+        description: 'GitHub App Private Key for the triggering check'
         required: true
 
 jobs:
@@ -178,7 +177,7 @@ jobs:
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
           ${{github.api_url}}/repos/${{ github.repository }}/actions/workflows/${{ env.workflow_id }}/dispatches \
-          -d "{\"ref\":\"master\",\"inputs\":{\"uuid\":\"$UUID\",\"check_run_id\":\"$CHECK_RUN_ID\",\"gh_app_id\":\"${{ secrets.gh_app_id }}\",\"gh_app_private_key\":\"${{ secrets.gh_app_private_key }}\"}"
+          -d "{\"ref\":\"master\",\"inputs\":{\"uuid\":\"$UUID\",\"check_run_id\":\"$CHECK_RUN_ID\"}"
 
 
           echo "Workflow dispatched"
