@@ -92,3 +92,5 @@ jobs:
     with:
       workflow_run_id: ${{ github.run_id }}
       check_run_id: ${{ github.event.inputs.check_run_id }}
+      gh_app_id: ${{ secrets.gh_app_id }}
+      gh_app_private_key: ${{ secrets.gh_app_private_key }}

@@ -30,6 +30,14 @@ on:
         type: string
         description: 'Check run ID for the check'
         required: true
+      gh_app_id:
+        type: string
+        description: 'Github App ID'
+        required: true
+      gh_app_private_key:
+        type: string
+        description: 'Github App Private Key'
+        required: true
 
 jobs:
   comment-trigger-job:
