@@ -146,7 +146,7 @@ jobs:
           -H "Authorization: Bearer ${{ github.token }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
-          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\",\"started_at\":\"${{ env.date_run }}\"}")
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\"}")
           echo check_run=$CHECK_RUN >> $GITHUB_ENV
 
       - name: Dispatch a Workflow
