@@ -128,8 +128,6 @@ jobs:
         run: |
           REQUESTED_FLOW_NAME="${{ env.requested_workflow_name }}"
           CHECK_RUN=$(gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${REQUESTED_FLOW_NAME// /+})
-          echo $CHECK_RUN
-          echo $(echo "$CHECK_RUN" | jq -r '.total_count')
           if [ $(echo "$CHECK_RUN" | jq -r '.total_count')  == 0  ]; then
             echo "No check run found for this PR"
             echo no_check_found=true >> $GITHUB_ENV
@@ -154,7 +152,7 @@ jobs:
       - name: Dispatch a Workflow
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
-        if: ( env.no_triggered_run == 'true' && env.no_check_found != 'true' )
+        if: ( env.no_triggered_run == 'true' && env.no_check_found == 'true' )
         run: |
           UUID=$(cat /proc/sys/kernel/random/uuid)
           DATE_RUN=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc)
