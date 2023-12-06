@@ -130,7 +130,7 @@ jobs:
             echo no_check_found=true >> $GITHUB_ENV
             exit 0
           fi
-          CHECK_RUN=$(echo $CHECK_RUNS | jq -r -e '.check_runs[])
+          CHECK_RUN=$(echo $CHECK_RUNS | jq -r -e '.check_runs[]')
           echo check_run=$CHECK_RUN >> $GITHUB_ENV
           echo check_found=true >> $GITHUB_ENV
 
