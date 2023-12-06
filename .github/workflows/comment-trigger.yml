@@ -127,20 +127,26 @@ jobs:
         if: env.no_triggered_run == 'true'
         run: |
           REQUESTED_FLOW_NAME="${{ env.requested_workflow_name }}"
-          gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${REQUESTED_FLOW_NAME// /+}
-          echo "Check run found"
-          exit 0
+          CHECK_RUN=$(gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${REQUESTED_FLOW_NAME// /+})
+          if [ $( echo $CHECK_RUN | jq -r '.total_count' == 0 ) ]; then
+            echo "No check run found for this PR"
+            echo no_check_found=true >> $GITHUB_ENV
+            exit 0
+          fi
+          echo check_run=$CHECK_RUN >> $GITHUB_ENV
+
       - name: Create a check run
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
-        if: env.no_triggered_run == 'true'
+        if: (env.no_triggered_run == 'true' && env.no_check_found == 'true')
         run: |
-          curl -X POST  -H "Accept: application/vnd.github+json" \
+          CHECK_RUN=$(curl -X POST  -H "Accept: application/vnd.github+json" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ github.token }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
-          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}"
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}")
+          echo check_run=$CHECK_RUN >> $GITHUB_ENV
 
       - name: Dispatch a Workflow
         env:
@@ -178,12 +184,13 @@ jobs:
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
           echo workflow_run_url=$WORKFLOW_RUN_URL >> $GITHUB_ENV
 
-      # - name: Update Check Run Link
-      #   if: env.dispatched == 'true'
-      #   run: |
-      #     curl -X PATCH  -H "Accept: application/vnd.github+json" \
-      #     -H "Accept: application/vnd.github+json" \
-      #     -H "Authorization: Bearer ${{ github.token }}" \
-      #     -H "X-GitHub-Api-Version: 2022-11-28" \
-      #     ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
-      #     -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}"
+      - name: Update Check Run Link
+        if: env.dispatched == 'true'
+        run: |
+          CHECK_RUN_URL=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].html_url')
+          curl -X PATCH  -H "Accept: application/vnd.github+json" \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ github.token }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"$CHECK_RUN_URL\"}"
