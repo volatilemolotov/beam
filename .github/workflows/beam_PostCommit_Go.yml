@@ -24,6 +24,9 @@ on:
       uuid:
         description: 'UUID for the workflow run'
         required: false 
+      check_run_id:
+        description: 'Check run ID for the check'
+        required: false
 
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
 permissions:
@@ -96,3 +99,9 @@ jobs:
           arguments: |
             --no-parallel \
             -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions
+  post_dispatch_update:
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/comment-trigger.yml@master
+    with:
+      workflow_run_id: ${{ github.run_id }}
+      check_run_id: ${{ github.event.inputs.check_run_id }}
