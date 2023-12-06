@@ -128,6 +128,7 @@ jobs:
         run: |
           REQUESTED_FLOW_NAME="${{ env.requested_workflow_name }}"
           CHECK_RUN=$(gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${REQUESTED_FLOW_NAME// /+})
+          echo $CHECK_RUN
           if [ $(echo $CHECK_RUN | jq -r '.total_count == 0' ) ]; then
             echo "No check run found for this PR"
             echo no_check_found=true >> $GITHUB_ENV
