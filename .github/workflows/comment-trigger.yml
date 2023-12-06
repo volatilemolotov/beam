@@ -24,8 +24,6 @@ on:
   issue_comment:
     types: [created]
 
-env:
-  GH_TOKEN: ${{ github.token }}
 
 jobs:
   comment-trigger-job:
@@ -38,6 +36,14 @@ jobs:
           curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
           chmod +x jq-linux-amd64
           sudo mv jq-linux-amd64 /usr/bin/jq
+
+      - name: Generate a token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app_id: ${{ inputs.gh_app_id }}
+          private_key: ${{ inputs.gh_app_private_key }}
+
 
       - name: Parse options
         run: | 
@@ -61,6 +67,8 @@ jobs:
           echo comment_body_clean=$COMMENT_BODY_CLEAN >> $GITHUB_ENV
 
       - name: Get Workflow ID
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           COMMENT_BODY="${{ env.comment_body_clean }}"
           REQUESTED_WORKFLOW_NAME="${COMMENT_BODY//Run /}"
@@ -70,11 +78,15 @@ jobs:
           echo $COMMENT_BODY
 
       - name: Get Last Commit SHA
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           PR_SHA=$(gh api --paginate repos/${{ github.repository }}/pulls/${{ github.event.issue.number }}/commits | jq -r -e '.[-1].sha')
           echo pr_sha=$PR_SHA >> $GITHUB_ENV
 
       - name: Get Workflow Run For PR
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: | 
           WORKFLOW_RUN_ID=$(gh api --paginate repos/${{ github.repository }}/actions/runs?head_sha=${{ env.pr_sha }} | jq -r -e --arg WORKFLOW_ID "${{ env.workflow_id }}" '.workflow_runs[] | select(.workflow_id == ($WORKFLOW_ID | tonumber)) | .id' || true)
           if [ -z "$WORKFLOW_RUN_ID" ]; then
@@ -85,6 +97,8 @@ jobs:
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
 
       - name: Get Status and Conclusion for the WORKFLOW_RUN_ID
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
         if: env.no_triggered_run != 'true'
         run: | 
           read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }} | jq -r -e '"\(.status) \(.conclusion)"')
@@ -92,18 +106,44 @@ jobs:
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
 
       - name: Rerun Workflow
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
         if: (( env.conclusion == 'failure' && env.force != 'true') && env.no_triggered_run != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun-failed-jobs -X POST
           echo "Rerun triggered"
 
       - name: Rerun Workflow -- Force
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
         if:  (env.force == 'true' && env.no_triggered_run != 'true')
         run: |
           gh api repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun -X POST
           echo "Rerun triggered"
 
+      - name: Get A Check Run
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
+        if: env.no_triggered_run != 'true'
+        run: |
+          gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${{ env.requested_workflow_name }}
+          echo "Check run found"
+          exit 0
+      - name: Create a check run
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
+        if: env.dispatched == 'true'
+        run: |
+          curl -X POST  -H "Accept: application/vnd.github+json" \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ github.token }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}"
+
       - name: Dispatch a Workflow
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
         if: (env.no_triggered_run == 'true')
         run: |
           UUID=$(cat /proc/sys/kernel/random/uuid)
@@ -126,6 +166,8 @@ jobs:
           echo date_now=$DATE_NOW >> $GITHUB_ENV
 
       - name: Get Run ID and URL -- Dispatched
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
         if: env.dispatched == 'true'
         run: |
           #needed for API to reconcile
@@ -135,12 +177,12 @@ jobs:
           echo workflow_run_id=$WORKFLOW_RUN_ID >> $GITHUB_ENV
           echo workflow_run_url=$WORKFLOW_RUN_URL >> $GITHUB_ENV
 
-      - name: Create a check run
-        if: env.dispatched == 'true'
-        run: |
-          curl -X POST  -H "Accept: application/vnd.github+json" \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ github.token }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
-          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}"
+      # - name: Update Check Run Link
+      #   if: env.dispatched == 'true'
+      #   run: |
+      #     curl -X PATCH  -H "Accept: application/vnd.github+json" \
+      #     -H "Accept: application/vnd.github+json" \
+      #     -H "Authorization: Bearer ${{ github.token }}" \
+      #     -H "X-GitHub-Api-Version: 2022-11-28" \
+      #     ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
+      #     -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}"
