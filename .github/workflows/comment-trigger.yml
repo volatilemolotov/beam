@@ -126,7 +126,7 @@ jobs:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
         if: env.no_triggered_run == 'true'
         run: |
-          REQUESTED_FLOW_NAME=${{ env.requested_workflow_name }}
+          REQUESTED_FLOW_NAME="${{ env.requested_workflow_name }}"
           gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${REQUESTED_FLOW_NAME// /+}
           echo "Check run found"
           exit 0
