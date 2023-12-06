@@ -203,7 +203,7 @@ jobs:
         if: env.check_found == 'true'
         run: |
           WORKFLOW_RUN_ID=$(echo '${{ env.check_run }}' | jq -r '.external_id')
-          gh api -X POST  repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
+          gh api -X POST  repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID/rerun 
 
       - name: Restart Dispatched Run in Check -- Force
         env:
@@ -211,4 +211,4 @@ jobs:
         if: (env.check_found == 'true' && env.force == 'true')
         run: |
           WORKFLOW_RUN_ID=$(echo '${{ env.check_run }}' | jq -r '.external_id')
-          gh api -X POST  repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
+          gh api -X POST  repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID/rerun 
