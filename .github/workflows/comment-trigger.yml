@@ -134,7 +134,7 @@ jobs:
             exit 0
           fi
           echo check_run=$CHECK_RUN >> $GITHUB_ENV
-
+          echo check_found=true >> $GITHUB_ENV
       - name: Create a check run
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
@@ -145,13 +145,13 @@ jobs:
           -H "Authorization: Bearer ${{ github.token }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
-          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\"}")
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"queued\",\"started_at\":\"${{ env.date_run }}\"}")
           echo check_run=$CHECK_RUN >> $GITHUB_ENV
 
       - name: Dispatch a Workflow
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
-        if: env.no_triggered_run == 'true'
+        if: ( env.no_triggered_run == 'true' && env.no_check_found != 'true' )
         run: |
           UUID=$(cat /proc/sys/kernel/random/uuid)
           DATE_RUN=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc)
@@ -187,10 +187,26 @@ jobs:
       - name: Update Check Run Link
         if: env.dispatched == 'true'
         run: |
-          CHECK_RUN_URL=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].html_url')
-          curl -X PATCH  -H "Accept: application/vnd.github+json" \
+          CHECK_RUN_ID=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].id')
+          curl -X PATCH  -H "Accept: application/vnd.github+ json" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ github.token }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
-          ${{github.api_url}}/repos/${{ github.repository }}/check-runs \
-          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"$CHECK_RUN_URL\"}"
+          ${{github.api_url}}/repos/${{ github.repository }}/check-runs?check_run_id=$CHECK_RUN_ID \
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\",\"external_id\":\"${{ env.workflow_run_id }}\"
+
+      - name: Restart Dispatched Run in Check
+        if: env.check_found == 'true'
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          WORKFLOW_RUN_ID=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].external_id')
+          gh api -X POST --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
+
+      - name: Restart Dispatched Run in Check -- Force
+        if: (env.check_found == 'true' && env.force == 'true')
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          WORKFLOW_RUN_ID=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].external_id')
+          gh api -X POST --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
