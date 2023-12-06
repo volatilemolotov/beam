@@ -201,7 +201,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          WORKFLOW_RUN_ID=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].external_id')
+          WORKFLOW_RUN_ID=$(echo "${{ env.check_run }}" | jq -r '.check_runs[0].external_id')
           gh api -X POST --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
 
       - name: Restart Dispatched Run in Check -- Force
@@ -209,5 +209,5 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          WORKFLOW_RUN_ID=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].external_id')
+          WORKFLOW_RUN_ID=$(echo "${{ env.check_run }}" | jq -r '.check_runs[0].external_id')
           gh api -X POST --paginate repos/${{ github.repository }}/actions/runs/${{ env.workflow_run_id }}/rerun 
