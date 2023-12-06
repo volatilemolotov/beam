@@ -178,7 +178,7 @@ jobs:
           -H "X-GitHub-Api-Version: 2022-11-28" \
           -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
           ${{github.api_url}}/repos/${{ github.repository }}/actions/workflows/${{ env.workflow_id }}/dispatches \
-          -d "{\"ref\":\"master\",\"inputs\":{\"uuid\":\"$UUID\",\"check_run_id\":\"$CHECK_RUN_ID\",\"gh_app_id\":\"${{ secrets.gh_app_id }}\",\"gh_app_private_key\":\"${{ secrets.gh_app_private_key }}\"}}"
+          -d "{\"ref\":\"master\",\"inputs\":{\"uuid\":\"$UUID\",\"check_run_id\":\"$CHECK_RUN_ID\",\"gh_app_id\":\"${{ secrets.gh_app_id }}\",\"gh_app_private_key\":\"${{ secrets.gh_app_private_key }}\"}"
 
 
           echo "Workflow dispatched"
