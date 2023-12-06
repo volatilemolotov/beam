@@ -17,9 +17,6 @@
 
 name: Comment Trigger
 
-permissions:
-  actions: write
-  checks: write
 on:
   issue_comment:
     types: [created]
