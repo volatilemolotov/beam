@@ -128,13 +128,14 @@ jobs:
         run: |
           REQUESTED_FLOW_NAME="${{ env.requested_workflow_name }}"
           CHECK_RUN=$(gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${REQUESTED_FLOW_NAME// /+})
-          if [ $( echo $CHECK_RUN | jq -r '.total_count' == 0 ) ]; then
+          if [ $(echo $CHECK_RUN | jq -r '.total_count == 0' ) ]; then
             echo "No check run found for this PR"
             echo no_check_found=true >> $GITHUB_ENV
             exit 0
           fi
           echo check_run=$CHECK_RUN >> $GITHUB_ENV
           echo check_found=true >> $GITHUB_ENV
+
       - name: Create a check run
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
@@ -187,7 +188,7 @@ jobs:
       - name: Update Check Run Link
         if: env.dispatched == 'true'
         run: |
-          CHECK_RUN_ID=$(echo ${{ env.check_run }} | jq -r '.check_runs[0].id')
+          CHECK_RUN_ID=$(echo "${{ env.check_run }}" | jq -r '.check_runs[0].id')
           curl -X PATCH  -H "Accept: application/vnd.github+ json" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ github.token }}" \
