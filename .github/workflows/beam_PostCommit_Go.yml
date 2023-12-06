@@ -99,18 +99,10 @@ jobs:
           arguments: |
             --no-parallel \
             -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions
-  # post_dispatch_update:
-  #   if: github.event_name == 'workflow_dispatch'
-  #   uses: ./.github/workflows/comment-trigger.yml@master
-  #   with:
-  #     workflow_run_id: ${{ github.run_id }}
-  #     check_run_id: ${{ github.event.inputs.check_run_id }}
   post_dispatch_update:
-    name: Update triggering check
-    runs-on: ubuntu-latest
-    steps:
-      - name: step1
-        run: |
-          echo "hello"
-          echo "world"
-          echo "!"
+    if: github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/comment-trigger.yml@master
+    name: Post Dispatch Update
+    with:
+      workflow_run_id: ${{ github.run_id }}
+      check_run_id: ${{ github.event.inputs.check_run_id }}
