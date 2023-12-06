@@ -230,8 +230,8 @@ jobs:
         id: generate_token
         uses: actions/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.gh_app_id }}
-          private_key: ${{ secrets.gh_app_private_key }}
+          app-id: ${{ secrets.gh_app_id }}
+          private-key: ${{ secrets.gh_app_private_key }}
       - name: Get Workflow Status
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
