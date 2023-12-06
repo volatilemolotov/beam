@@ -191,6 +191,7 @@ jobs:
         if: env.dispatched == 'true'
         run: |
           CHECK_RUN_ID=$(echo '${{ env.check_run }}' | jq -r '.check_runs[0].id')
+          echo $CHECK_RUN_ID
           curl -X PATCH  -H "Accept: application/vnd.github+ json" \
           -H "Accept: application/vnd.github+json" \
           -H "Authorization: Bearer ${{ github.token }}" \
