@@ -223,37 +223,34 @@ jobs:
           gh api -X POST  repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID/rerun 
   update_check_job:
     name: Update Check
-    #if: ${{ github.event_name == 'workflow_call' }}
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
-      - name: echo
+      - name: Generate a token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app_id: ${{ secrets.gh_app_id }}
+          private_key: ${{ secrets.gh_app_private_key }}
+      - name: Get Workflow Status
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          echo ${{ github.event_name }}
-      # - name: Generate a token
-      #   id: generate_token
-      #   uses: actions/create-github-app-token@v1
-      #   with:
-      #     app_id: ${{ secrets.gh_app_id }}
-      #     private_key: ${{ secrets.gh_app_private_key }}
-      # - name: Get Workflow Status
-      #   env:
-      #     GH_TOKEN: ${{ steps.generate_token.outputs.token }}
-      #   run: |
-      #     WORKFLOW_RUN_ID=${{ inputs.workflow_run_id }}
-      #     echo $WORKFLOW_RUN_ID
-      #     read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID | jq -r -e '"\(.status) \(.conclusion)"')
-      #     echo status=$STATUS >> $GITHUB_ENV
-      #     echo conclusion=$CONCLUSION >> $GITHUB_ENV
-      # - name: Update Check Run
-      #   env: 
-      #     GH_TOKEN: ${{ steps.generate_token.outputs.token }}
-      #   run: |
-      #     CHECK_RUN_ID=${{ inputs.check_run_id}}
-      #     echo $CHECK_RUN_ID
-      #     curl -X PATCH  -H "Accept: application/vnd.github+ json" \
-      #     -H "Accept: application/vnd.github+json" \
-      #     -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
-      #     -H "X-GitHub-Api-Version: 2022-11-28" \
-      #     ${{github.api_url}}/repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID \
-      #     -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\",\"external_id\":\"${{ env.workflow_run_id }}\"}"
+          WORKFLOW_RUN_ID=${{ inputs.workflow_run_id }}
+          echo $WORKFLOW_RUN_ID
+          read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID | jq -r -e '"\(.status) \(.conclusion)"')
+          echo status=$STATUS >> $GITHUB_ENV
+          echo conclusion=$CONCLUSION >> $GITHUB_ENV
+      - name: Update Check Run
+        env: 
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+        run: |
+          CHECK_RUN_ID=${{ inputs.check_run_id}}
+          echo $CHECK_RUN_ID
+          curl -X PATCH  -H "Accept: application/vnd.github+ json" \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          ${{github.api_url}}/repos/${{ github.repository }}/check-runs/$CHECK_RUN_ID \
+          -d "{\"name\":\"${{ env.requested_workflow_name }}\",\"head_sha\":\"${{ env.pr_sha }}\",\"status\":\"in_progress\",\"started_at\":\"${{ env.date_run }}\",\"details_url\":\"${{ env.workflow_run_url }}\",\"external_id\":\"${{ env.workflow_run_id }}\"}"
 
