@@ -223,7 +223,7 @@ jobs:
           gh api -X POST  repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID/rerun 
   update_check_job:
     name: Update Check
-    if: github.event_name == 'workflow_call'
+    if: ${{ github.event_name == 'workflow_call' }}
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
       - name: Generate a token
