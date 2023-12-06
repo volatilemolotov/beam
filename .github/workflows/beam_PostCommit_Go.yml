@@ -27,6 +27,12 @@ on:
       check_run_id:
         description: 'Check run ID for the triggering check'
         required: false
+      gh_app_id:
+        description: 'GitHub App ID for the triggering check'
+        required: false
+      gh_app_private_key:
+        description: 'GitHub App Private Key for the triggering check'
+        required: false
 
 #Setting explicit permissions for the action to avoid the default permissions which are `write-all` in case of pull_request_target event
 permissions:
@@ -93,5 +99,5 @@ jobs:
       workflow_run_id: ${{ github.run_id }}
       check_run_id: ${{ github.event.inputs.check_run_id }}
       #needed because the called workflow does not have access to secrets
-      gh_app_id: ${{ secrets.gh_app_id }}
-      gh_app_private_key: ${{ secrets.gh_app_private_key }}
+      gh_app_id: ${{ inputs.gh_app_id }}
+      gh_app_private_key: ${{ inputs.gh_app_private_key }}
