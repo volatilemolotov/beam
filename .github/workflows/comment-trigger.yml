@@ -124,7 +124,7 @@ jobs:
       - name: Get A Check Run
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
-        if: env.no_triggered_run != 'true'
+        if: env.no_triggered_run == 'true'
         run: |
           gh api --paginate repos/${{ github.repository }}/commits/${{ env.pr_sha }}/check-runs?check_name=${{ env.requested_workflow_name }}
           echo "Check run found"
@@ -132,7 +132,7 @@ jobs:
       - name: Create a check run
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
-        if: env.dispatched == 'true'
+        if: env.no_triggered_run == 'true'
         run: |
           curl -X POST  -H "Accept: application/vnd.github+json" \
           -H "Accept: application/vnd.github+json" \
@@ -144,7 +144,7 @@ jobs:
       - name: Dispatch a Workflow
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}      
-        if: (env.no_triggered_run == 'true')
+        if: env.no_triggered_run == 'true'
         run: |
           UUID=$(cat /proc/sys/kernel/random/uuid)
           DATE_RUN=$(date +"%Y-%m-%dT%H:%M:%SZ" --utc)
