@@ -23,7 +23,7 @@
 
 Continuous Integration is important component of making Apache Beam robust and stable.
 
-Our execution environment for CI is mainly the Jenkins which is available at
+**Deprecated** Our execution environment for CI is mainly the Jenkins which is available at
 [https://ci-beam.apache.org/](https://ci-beam.apache.org/). See
 [.test-infra/jenkins/README](.test-infra/jenkins/README.md)
 for trigger phrase, status and link of all Jenkins jobs. See Apache Beam Developer Guide for
