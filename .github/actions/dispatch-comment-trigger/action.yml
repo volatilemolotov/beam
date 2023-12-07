@@ -1,0 +1,57 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+
+#Action used to trigger a failed check re-run within a PR using a comment. Add this action to your workflow with an if condition 
+#to check if the comment is present 
+#If the check is failed this will trigger it again. If its not failed a new instance of workflow will run which will not show in the status box or checks tab in the PR and can be found in the actions tab https://github.com/apache/beam/actions
+
+name: "Dispatch Comment Trigger"
+description: Wrapper for dispatching the Comment Trigger workflow, used to update the check status in PR
+inputs:
+  github_token:
+    description: "The GitHub token"
+    required: true
+  workflow_run_id:
+    description: "The workflow run id"
+    required: true
+  check_run_id:
+    description: "The check run id"
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+  - name: Get Workflow ID
+    env: 
+      GH_TOKEN: ${{ inputs.github_token }}
+    shell: bash
+    run: | 
+      WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e '.workflows[] | select(.name == "Comment Trigger") | .id')
+      echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
+  - name: Get Last Commit SHA
+    env:
+      GH_TOKEN: ${{ inputs.github_token }}
+    shell: bash
+    run: | 
+      curl -X POST  -H "Accept: application/vnd.github+json" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      -H "Authorization: Bearer ${{ env.GH_TOKEN }}" \
+      ${{github.api_url}}/repos/${{ github.repository }}/actions/workflows/${{ env.workflow_id }}/dispatches \
+      -d "{\"ref\":\"master\",\"inputs\":{\"workflow_run_id\":\"${{ inputs.workflow_run_id }}\",\"check_run_id\":\"${{ inputs.check_run_id }}\"}"
+      echo "Workflow dispatched"
