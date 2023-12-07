@@ -239,8 +239,7 @@ jobs:
         run: |
           WORKFLOW_RUN_ID=${{ inputs.workflow_run_id }}
           echo $WORKFLOW_RUN_ID
-          #read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID | jq -r -e '"\(.status) \(.conclusion)"')
-          gh api --paginate repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID | jq -r -e '"\(.status) \(.conclusion)"'
+          read -r STATUS CONCLUSION <<<$(gh api --paginate repos/${{ github.repository }}/actions/runs/$WORKFLOW_RUN_ID | jq -r -e '"\(.status) \(.conclusion)"')
           echo status=$STATUS >> $GITHUB_ENV
           echo conclusion=$CONCLUSION >> $GITHUB_ENV
       - name: Update Check Run
