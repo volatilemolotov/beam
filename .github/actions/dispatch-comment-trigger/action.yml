@@ -42,7 +42,8 @@ runs:
       GH_TOKEN: ${{ inputs.github_token }}
     shell: bash
     run: | 
-      WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e '.workflows[] | select(.name == "Comment Trigger") | .id')
+      #WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e '.workflows[] | select(.name == "Comment Trigger") | .id')
+      gh api --paginate repos/${{ github.repository }}/actions/workflows
       echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
   - name: Get Last Commit SHA
     env:
