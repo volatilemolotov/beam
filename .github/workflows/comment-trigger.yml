@@ -20,7 +20,7 @@ name: Comment Trigger
 on:
   issue_comment:
     types: [created]
-  workflow_call:
+  workflow_dispatch:
     inputs:
       workflow_run_id:
         type: string
