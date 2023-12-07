@@ -37,13 +37,20 @@ inputs:
 runs:
   using: composite
   steps:
+    #REMOVE ONCE RUNNER IS UPDATED
+  - name: Update jq
+    shell: bash
+    run: |
+      curl -OL https://github.com/jqlang/jq/releases/download/jq-1.7/jq-linux-amd64
+      chmod +x jq-linux-amd64
+      sudo mv jq-linux-amd64 /usr/bin/jq
+
   - name: Get Workflow ID
     env: 
       GH_TOKEN: ${{ inputs.github_token }}
     shell: bash
     run: | 
-      #WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e '.workflows[] | select(.name == "Comment Trigger") | .id')
-      gh api --paginate repos/${{ github.repository }}/actions/workflows
+      WORKFLOW_ID=$(gh api --paginate repos/${{ github.repository }}/actions/workflows | jq -e '.workflows[] | select(.name == "Comment Trigger") | .id')
       echo workflow_id=$WORKFLOW_ID >> $GITHUB_ENV
   - name: Get Last Commit SHA
     env:
