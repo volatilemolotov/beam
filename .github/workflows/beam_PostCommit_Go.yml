@@ -90,6 +90,7 @@ jobs:
     needs: beam_PostCommit_Go
     name: Post Dispatch Update
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/dispatch-comment-trigger
         name: Dispatch Comment Trigger
         with:
