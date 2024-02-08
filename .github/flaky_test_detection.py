@@ -1,7 +1,5 @@
 import os
-import inspect
 import re
-import random
 from github import Github
 from github import Auth
 from grafana_client import GrafanaApi
@@ -9,30 +7,45 @@ from grafana_client import GrafanaApi
 
 GIT_ORG = "volatilemolotov"
 GIT_REPO = "beam"
-ALERT_NAME = "test2"
+ALERT_NAME = "flaky_test"
 READ_ONLY = os.environ.get("READ_ONLY", "false")
 GRAFANA_URL = "https://tempgrafana.volatilemolotov.com/"
 
 
 class Alert:
-    def __init__(self, workflow_id, workflow_url):
+    def __init__(self, workflow_id, workflow_url, workflow_name, workflow_file_name):
         self.workflow_id = workflow_id
         self.workflow_url = workflow_url
+        self.workflow_name = workflow_name
+        self.workflow_file_name = workflow_file_name
 
 
-def get_issues(r):
+def get_existing_issues(r):
     open_issues = r.get_issues(state="open", labels=["flaky_test"])
-    return open_issues
+    existing_label_ids = []
+    for issue in open_issues:
+        for label in issue.get_labels():
+            label_id = re.search(r"\d+", str(label.name))
+            if label_id is not None:
+                label_id = label_id.group()
+                existing_label_ids.append(label_id)
+
+    return existing_label_ids
 
 
 def create_issue(r, alert):
-
-    title_string = f"Flaky Test {alert.workflow_id}"
-    body_string = f"for more info see https://someurl/workflow/{alert.workflow_id}"
+    GIT_ORG = "apache"
+    failing_runs_url = f"https://github.com/{GIT_ORG}/{GIT_REPO}/actions/workflows/{alert.workflow_file_name}?query=is%3Afailure+branch%3Amaster"
+    title_string = f"{alert.workflow_name} is failing"
+    body_string = f"""It seems that the {alert.workflow_name }is failing
+    Please visit {failing_runs_url} to see the logs"""
     labels_list = ["flaky_test", f"workflow id: {alert.workflow_id}"]
+    print("-" * 10)
     print(f"Title: {title_string}")
     print(f"Body: {body_string}")
     print(f"Labels: {labels_list}")
+    print("-" * 10)
+
     if READ_ONLY == "true":
         print("READ_ONLY is true, not creating issue")
     else:
@@ -45,17 +58,23 @@ def get_grafana_alerts():
     )
     # Regex for key, value - Had to exclude comma (,) and bracket (})
     pattern = r"(\w+)=(\S[^,}]+)"
-    annotations = grafana.annotations.get_annotation(ann_type="alert")
+    annotations = grafana.annotations.get_annotation(ann_type="alert", limit=500)
     firing_alerts = []
     for annotation in annotations:
+        if annotation["newState"] != "Alerting":
+            continue
         kv_pairs = re.findall(pattern, annotation["text"])
         if kv_pairs:
             data = dict(kv_pairs)
             if data["alertname"] == ALERT_NAME:
-                alert = Alert(data["workflow_id"], data["workflow_url"])
+                alert = Alert(
+                    data["workflow_id"],
+                    data["workflow_url"],
+                    data["job_name"],
+                    data["job_yml_filename"],
+                )
                 firing_alerts.append(alert)
-    # return only a single record for testing
-    return firing_alerts[:1]
+    return firing_alerts
 
 
 def main():
@@ -68,18 +87,15 @@ def main():
     repo = g.get_repo(f"{GIT_ORG}/{GIT_REPO}")
 
     alerts = get_grafana_alerts()
-    issues = get_issues(repo)
+
+    existing_label_ids = get_existing_issues(repo)
     alert_ids = [alert.workflow_id for alert in alerts]
 
     for alert in alerts:
-        for issue in issues:
-            print(issue.title)
-            for label in issue.get_labels():
-                label_id = re.search(r"\d+", str(label.name))
-                if label_id is not None:
-                    label_id = label_id.group()
-                    if label_id in alert_ids:
-                        print("issue already exists, skipping")
+        if alert.workflow_id in existing_label_ids:
+            print("issue already exists, skipping")
+            continue
+        create_issue(repo, alert)
 
     exit()
     # if label_id is not NoneType:

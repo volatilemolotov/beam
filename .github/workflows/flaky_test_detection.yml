@@ -28,8 +28,8 @@ jobs:
     runs-on: [self-hosted, ubuntu-20.04, main]
     steps:
       - uses: actions/checkout@v4
-      - uses: action/setup-python@v5
+      - uses: actions/setup-python@v5
         with: 
           python-version: 3.11
       - run: pip install PyGithub grafana_client
-      - run: python flaky_test_detection.py
+      - run: python .github/flaky_test_detection.py
