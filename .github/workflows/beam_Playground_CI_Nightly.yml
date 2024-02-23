@@ -69,10 +69,10 @@ jobs:
       - name: Get Beam latest release
         run: |
           BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq '.tag_name')
-          echo "BEAM_VERSION=${BEAM_VERSION#v}" >> $GITHUB_ENV
+          echo "beam_version=${BEAM_VERSION#v}" >> $GITHUB_ENV
       - name: debug 
         run: |
-          echo ${{ env.BEAM_VERSION }}
+          echo ${{ env.beam_version }}
       - name: DOCKER DEBUG
         run: |
           docker image list
