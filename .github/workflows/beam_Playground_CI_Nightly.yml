@@ -68,22 +68,22 @@ jobs:
         run: |
           BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq -r '.tag_name')
           echo "BEAM_VERSION=${BEAM_VERSION#v}" >> $GITHUB_ENV
-      # - name: Build PYTHON base
-      #   uses: ./.github/actions/gradle-command-self-hosted-action
-      #   with:
-      #     gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=true
-      # - name: Build SDK container
-      #   uses: ./.github/actions/gradle-command-self-hosted-action
-      #   with:
-      #     gradle-command: :playground:backend:containers:python:docker -Pdocker-tag=nightly -Psdk-tag=$BEAM_VERSION -Pdocker-pull-licences=true
-      # - name: Run SDK container
-      #   run: |
-      #     CONTAINER_ID=$(docker run -d -e PROTOCOL_TYPE=TCP apache/beam_playground-backend-python:nightly)
-      #     echo "container_id=$CONTAINER_ID" >> $GITHUB_ENV
-      # - name: Get Container IP
-      #   run: | 
-      #     CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${{ env.container_id }})
-      #     echo "container_ip=$CONTAINER_IP" >> $GITHUB_ENV
+      - name: Build PYTHON base
+        uses: ./.github/actions/gradle-command-self-hosted-action
+        with:
+          gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=true
+      - name: Build SDK container
+        uses: ./.github/actions/gradle-command-self-hosted-action
+        with:
+          gradle-command: :playground:backend:containers:python:docker -Pdocker-tag=nightly -Psdk-tag=$BEAM_VERSION -Pdocker-pull-licences=true
+      - name: Run SDK container
+        run: |
+          CONTAINER_ID=$(docker run -d -e PROTOCOL_TYPE=TCP apache/beam_playground-backend-python:nightly)
+          echo "container_id=$CONTAINER_ID" >> $GITHUB_ENV
+      - name: Get Container IP
+        run: | 
+          CONTAINER_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${{ env.container_id }})
+          echo "container_ip=$CONTAINER_IP" >> $GITHUB_ENV
       - name: Install requirements
         run: |
           cd $BEAM_ROOT_DIR/playground/infrastructure
