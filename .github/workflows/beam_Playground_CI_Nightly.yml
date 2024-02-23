@@ -69,7 +69,8 @@ jobs:
       - name: Get Beam latest release
         run: |
           BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq '.tag_name')
-          echo "beam_version=${BEAM_VERSION#v}" >> $GITHUB_ENV
+          BEAM_VERSION_STRIPPED=${BEAM_VERSION#v}
+          echo "beam_version=$BEAM_VERSION_STRIPPED" >> $GITHUB_ENV
       - name: debug 
         run: |
           echo ${{ env.beam_version }}
