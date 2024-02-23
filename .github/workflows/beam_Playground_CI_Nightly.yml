@@ -91,7 +91,7 @@ jobs:
           SERVER_ADDRESS: ${{ env.container_ip }}:8080
         run: |
           cd playground/infrastructure
-          python ci_cd.py --STEP CI --SDK SDK_PYTHON --origin PG_EXAMPLES --subdirs ./learning/katas ./examples ./sdks
+          python ci_cd.py --step CI --sdk SDK_PYTHON --origin PG_EXAMPLES --subdirs ./learning/katas ./examples ./sdks
       - name: DOCKER DEBUG
         run: |
           echo ${{ env.container_ip }}
