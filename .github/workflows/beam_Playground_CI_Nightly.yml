@@ -45,7 +45,7 @@ env:
   GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GE_ACCESS_TOKEN }}
   GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GE_CACHE_USERNAME }}
   GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GE_CACHE_PASSWORD }}
-  BEAM_ROOT_ENV: /runner/_work/beam/beam
+  BEAM_ROOT_DIR: /runner/_work/beam/beam
 
 
 jobs:
@@ -86,14 +86,14 @@ jobs:
           echo "container_ip=$CONTAINER_IP" >> $GITHUB_ENV
       - name: Install requirements
         run: |
-          cd $BEAM_ROOT_ENV/playground/infrastructure
+          cd $BEAM_ROOT_DIR/playground/infrastructure
           pip install -r requirements.txt
       - name: Run CI
         env: 
           SERVER_ADDRESS: ${{ env.container_ip }}:8080
-          BEAM_EXAMPLE_CATEGORIES: $BEAM_ROOT_ENV/playground/categories.yaml
+          BEAM_EXAMPLE_CATEGORIES: $BEAM_ROOT_DIRplayground/categories.yaml
         run: |
-          cd $BEAM_ROOT_ENV/playground/infrastructure
+          cd $BEAM_ROOT_DIR/playground/infrastructure
           python ci_cd.py --step CI --sdk SDK_PYTHON --origin PG_EXAMPLES --subdirs ./learning/katas ./examples ./sdks
       - name: DOCKER DEBUG
         run: |
