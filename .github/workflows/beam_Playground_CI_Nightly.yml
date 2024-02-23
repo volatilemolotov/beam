@@ -91,7 +91,7 @@ jobs:
       - name: Run CI
         env: 
           SERVER_ADDRESS: ${{ env.container_ip }}:8080
-          BEAM_EXAMPLE_CATEGORIES: $BEAM_ROOT_DIRplayground/categories.yaml
+          BEAM_EXAMPLE_CATEGORIES: $BEAM_ROOT_DIR/playground/categories.yaml
         run: |
           cd $BEAM_ROOT_DIR/playground/infrastructure
           python ci_cd.py --step CI --sdk SDK_PYTHON --origin PG_EXAMPLES --subdirs ./learning/katas ./examples ./sdks
