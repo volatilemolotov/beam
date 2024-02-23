@@ -67,13 +67,12 @@ jobs:
       #   with:
       #     gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=true
       - name: Get Beam latest release
-        shell: bash
         run: |
-          BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq '.tag_name')
-          echo ${BEAM_VERSION#v}
+          BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq -r '.tag_name')
+          echo "BEAM_VERSION=${BEAM_VERSION#v}" >> $GITHUB_ENV
       - name: debug 
         run: |
-          echo ${{ env.beam_version }}
+          echo $BEAM_VERSION
       - name: DOCKER DEBUG
         run: |
           docker image list
