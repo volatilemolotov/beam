@@ -72,7 +72,7 @@ jobs:
           echo "BEAM_VERSION=${BEAM_VERSION#v}" >> $GITHUB_ENV
       - name: debug 
         run: |
-          echo $BEAM_VERSION
+          echo ${{ env.BEAM_VERSION }}
       - name: DOCKER DEBUG
         run: |
           docker image list
