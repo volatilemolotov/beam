@@ -50,7 +50,7 @@ jobs:
   beam_Playground_CI_Nightly:
     if: |
       github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'pull_request_target' || 
+      github.event_name == 'pull_request_target'  
 #      (github.event_name == 'schedule' && github.repository == 'apache/beam')
     runs-on: [self-hosted, ubuntu-20.04, main]
     name: "beam_Playground_CI_Nightly"
