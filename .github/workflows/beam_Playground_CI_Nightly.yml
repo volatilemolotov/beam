@@ -70,6 +70,7 @@ jobs:
         run: |
           BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq '.tag_name')
           BEAM_VERSION_STRIPPED=${BEAM_VERSION#v}
+          echo $BEAM_VERSION_STRIPPED
           echo "beam_version=$BEAM_VERSION_STRIPPED" >> $GITHUB_ENV
       - name: debug 
         run: |
