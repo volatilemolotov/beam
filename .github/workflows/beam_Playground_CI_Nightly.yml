@@ -45,6 +45,8 @@ env:
   GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GE_ACCESS_TOKEN }}
   GRADLE_ENTERPRISE_CACHE_USERNAME: ${{ secrets.GE_CACHE_USERNAME }}
   GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GE_CACHE_PASSWORD }}
+  BEAM_ROOT_ENV: /runner/_work/beam/beam
+
 
 jobs:
   beam_Playground_CI_Nightly:
@@ -89,7 +91,6 @@ jobs:
       - name: Run CI
         env: 
           SERVER_ADDRESS: ${{ env.container_ip }}:8080
-          BEAM_ROOT_ENV: /runner/_work/beam/beam
           BEAM_EXAMPLE_CATEGORIES: $BEAM_ROOT_ENV/playground/categories.yaml
         run: |
           cd $BEAM_ROOT_ENV/playground/infrastructure
