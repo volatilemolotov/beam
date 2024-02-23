@@ -56,23 +56,25 @@ jobs:
     name: "beam_Playground_CI_Nightly"
     steps:
       - uses: actions/checkout@v4
-      # - name: Setup environment
-      #   uses: ./.github/actions/setup-environment-action
-      # - name: Install Python 3.8
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.8'
-      # - name: Build PYTHON base
-      #   uses: ./.github/actions/gradle-command-self-hosted-action
-      #   with:
-      #     gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=true
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment-action
+      - name: Install Python 3.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
       - name: Get Beam latest release
         run: |
           BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq -r '.tag_name')
           echo "BEAM_VERSION=${BEAM_VERSION#v}" >> $GITHUB_ENV
-      - name: debug 
-        run: |
-          echo $BEAM_VERSION
+      - name: Build PYTHON base
+        uses: ./.github/actions/gradle-command-self-hosted-action
+        with:
+          gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=true
+      - name: Build SDK container
+        uses: ./.github/actions/gradle-command-self-hosted-action
+        with:
+          gradle-command: :playground:backend:containers:python:docker -Pdocker-tag=nightly -Psdk-tag=$BEAM_VERSION -Pdocker-pull-licences=true
+
       - name: DOCKER DEBUG
         run: |
           docker image list
