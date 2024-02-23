@@ -68,4 +68,4 @@ jobs:
           gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=tru
       - name: DOCKER DEBUG
         run: |
-          docker images list
+          docker image list
