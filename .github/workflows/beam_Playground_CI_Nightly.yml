@@ -66,6 +66,6 @@ jobs:
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:python:container:py310:docker -Pdocker-tag=nightly -Pdocker-pull-licences=tru
-      - name: DOCKER PS
+      - name: DOCKER DEBUG
         run: |
-          docker ps
+          docker images list
