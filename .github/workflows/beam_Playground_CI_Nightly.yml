@@ -76,7 +76,7 @@ jobs:
       #     gradle-command: :playground:backend:containers:python:docker -Pdocker-tag=nightly -Psdk-tag=$BEAM_VERSION -Pdocker-pull-licences=true
       - name: Run SDK container
         run: |
-          CONTAINER_ID=$(docker run -d -e PROTOCOL_TYPE=TCP ubuntu)
+          CONTAINER_ID=$(docker run -d -e PROTOCOL_TYPE=TCP ubuntu sleep infinity)
           echo "container_id=$CONTAINER_ID" >> $GITHUB_ENV
       - name: Get Container IP
         run: | 
