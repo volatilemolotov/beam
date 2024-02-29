@@ -211,8 +211,8 @@ task codeCoverageReport(type: JacocoReport, dependsOn: test) {
   sourceDirectories.setFrom(files(project.sourceSets.main.allSource.srcDirs))
   executionData.setFrom(file("${buildDir}/jacoco/test.exec"))
   reports {
-    xml.enabled true
-    html.enabled true
+    xml.enabled = true
+    html.enabled = true
   }
 }
 
