@@ -307,3 +307,6 @@ test {
   systemProperty "beam.sql.udf.test.jar_path", project(":sdks:java:extensions:sql:udf-test-provider").jarPath
   systemProperty "beam.sql.udf.test.empty_jar_path", emptyJar.archivePath
 }
+
+
+//TRIGGER
