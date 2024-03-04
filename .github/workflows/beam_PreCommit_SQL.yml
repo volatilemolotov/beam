@@ -115,7 +115,7 @@ jobs:
         with:
           name: Publish SpotBugs
           path: '**/build/reports/spotbugs/*.html'
-     - name: Set Jacoco report path
+      - name: Set Jacoco report path
         id: jacoco_report_path
         run: |
           echo "path=sdks/java/extensions/sql/build/reports/jacoco/codeCoverageReport" >> $GITHUB_OUTPUT
