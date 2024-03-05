@@ -537,7 +537,7 @@ public class BeamAnalyticFunctionsTest extends BeamSqlDslBase {
     pipeline.run();
   }
   @Test
-  public void testDenseRankFunction() throws Exception {
+  public void testDenseRankFunction2() throws Exception {
     pipeline.enableAbandonedNodeEnforcement(false);
     PCollection<Row> inputRows = inputData2();
     String sql = "SELECT x, DENSE_RANK() over (ORDER BY x ) as agg  FROM PCOLLECTION";
@@ -562,7 +562,7 @@ public class BeamAnalyticFunctionsTest extends BeamSqlDslBase {
     pipeline.run();
   }
   @Test
-  public void testRankFunction2() throws Exception {
+  public void testRankFunction() throws Exception {
     pipeline.enableAbandonedNodeEnforcement(false);
     PCollection<Row> inputRows = inputData2();
     String sql = "SELECT x, RANK() over (ORDER BY x ) as agg  FROM PCOLLECTION";
