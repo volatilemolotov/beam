@@ -115,3 +115,18 @@ jobs:
         with:
           name: Publish SpotBugs
           path: '**/build/reports/spotbugs/*.html'
+      - name: Set Jacoco report path
+        id: jacoco_report_path
+        run: |
+          echo "path=sdks/java/extensions/sql/build/reports/jacoco/codeCoverageReport" >> $GITHUB_OUTPUT
+      - name: Archive Jacoco Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: Jacoco Results
+          path: '**/${{ steps.jacoco_report_path.outputs.path }}/**'
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: volatilemolotov/beam
+          file: '${{ steps.jacoco_report_path.outputs.path }}/codeCoverageReport.xml'

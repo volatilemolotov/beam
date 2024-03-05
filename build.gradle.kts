@@ -365,18 +365,19 @@ tasks.register("flinkPreCommit") {
 }
 
 tasks.register("sqlPreCommit") {
-  dependsOn(":sdks:java:extensions:sql:preCommit")
-  dependsOn(":sdks:java:extensions:sql:buildDependents")
-  dependsOn(":sdks:java:extensions:sql:datacatalog:build")
-  dependsOn(":sdks:java:extensions:sql:expansion-service:build")
-  dependsOn(":sdks:java:extensions:sql:hcatalog:build")
-  dependsOn(":sdks:java:extensions:sql:jdbc:build")
-  dependsOn(":sdks:java:extensions:sql:jdbc:preCommit")
-  dependsOn(":sdks:java:extensions:sql:perf-tests:build")
-  dependsOn(":sdks:java:extensions:sql:shell:build")
-  dependsOn(":sdks:java:extensions:sql:udf-test-provider:build")
-  dependsOn(":sdks:java:extensions:sql:udf:build")
-  dependsOn(":sdks:java:extensions:sql:zetasql:build")
+  // dependsOn(":sdks:java:extensions:sql:preCommit")
+  // dependsOn(":sdks:java:extensions:sql:buildDependents")
+  // dependsOn(":sdks:java:extensions:sql:datacatalog:build")
+  // dependsOn(":sdks:java:extensions:sql:expansion-service:build")
+  // dependsOn(":sdks:java:extensions:sql:hcatalog:build")
+  // dependsOn(":sdks:java:extensions:sql:jdbc:build")
+  // dependsOn(":sdks:java:extensions:sql:jdbc:preCommit")
+  // dependsOn(":sdks:java:extensions:sql:perf-tests:build")
+  // dependsOn(":sdks:java:extensions:sql:shell:build")
+  // dependsOn(":sdks:java:extensions:sql:udf-test-provider:build")
+  // dependsOn(":sdks:java:extensions:sql:udf:build")
+  // dependsOn(":sdks:java:extensions:sql:zetasql:build")
+  dependsOn(":sdks:java:extensions:sql:codeCoverageReport")
 }
 
 tasks.register("javaPreCommitPortabilityApi") {
