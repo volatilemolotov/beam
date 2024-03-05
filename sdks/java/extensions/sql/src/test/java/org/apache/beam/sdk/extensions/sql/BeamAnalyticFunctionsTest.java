@@ -536,9 +536,33 @@ public class BeamAnalyticFunctionsTest extends BeamSqlDslBase {
 
     pipeline.run();
   }
-
   @Test
-  public void testRankFunction() throws Exception {
+  public void testDenseRankFunction() throws Exception {
+    pipeline.enableAbandonedNodeEnforcement(false);
+    PCollection<Row> inputRows = inputData2();
+    String sql = "SELECT x, DENSE_RANK() over (ORDER BY x ) as agg  FROM PCOLLECTION";
+    PCollection<Row> result = inputRows.apply("sql", SqlTransform.query(sql));
+
+    Schema overResultSchema = Schema.builder().addInt32Field("x").addInt64Field("agg").build();
+
+    List<Row> overResult =
+        TestUtils.RowsBuilder.of(overResultSchema)
+            .addRows(
+                1, 1L,
+                2, 2L,
+                2, 2L,
+                5, 3L,
+                8, 4L,
+                10, 5L,
+                10, 5L)
+            .getRows();
+
+    PAssert.that(result).containsInAnyOrder(overResult);
+
+    pipeline.run();
+  }
+  @Test
+  public void testRankFunction2() throws Exception {
     pipeline.enableAbandonedNodeEnforcement(false);
     PCollection<Row> inputRows = inputData2();
     String sql = "SELECT x, RANK() over (ORDER BY x ) as agg  FROM PCOLLECTION";
