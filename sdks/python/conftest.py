@@ -26,25 +26,30 @@ MAX_SUPPORTED_PYTHON_VERSION = (3, 8)
 
 
 def pytest_addoption(parser):
-  parser.addoption(
-      '--test-pipeline-options',
-      help='Options to use in test pipelines. NOTE: Tests may '
-      'ignore some or all of these options.')
+    parser.addoption(
+        "--test-pipeline-options",
+        help="Options to use in test pipelines. NOTE: Tests may "
+        "ignore some or all of these options.",
+    )
 
 
 # See pytest.ini for main collection rules.
 collect_ignore_glob = [
-    '*_py3%d.py' % minor for minor in range(
-        sys.version_info.minor + 1, MAX_SUPPORTED_PYTHON_VERSION[1] + 1)
+    "*_py3%d.py" % minor
+    for minor in range(sys.version_info.minor + 1, MAX_SUPPORTED_PYTHON_VERSION[1] + 1)
 ]
 
 
 def pytest_configure(config):
-  """Saves options added in pytest_addoption for later use.
-  This is necessary since pytest-xdist workers do not have the same sys.argv as
-  the main pytest invocation. xdist does seem to pickle TestPipeline
-  """
-  TestPipeline.pytest_test_pipeline_options = config.getoption(
-      'test_pipeline_options', default='')
-  # Enable optional type checks on all tests.
-  pipeline_options.enable_all_additional_type_checks()
+    """Saves options added in pytest_addoption for later use.
+    This is necessary since pytest-xdist workers do not have the same sys.argv as
+    the main pytest invocation. xdist does seem to pickle TestPipeline
+    """
+    TestPipeline.pytest_test_pipeline_options = config.getoption(
+        "test_pipeline_options", default=""
+    )
+    # Enable optional type checks on all tests.
+    pipeline_options.enable_all_additional_type_checks()
+
+
+# trigger 2
