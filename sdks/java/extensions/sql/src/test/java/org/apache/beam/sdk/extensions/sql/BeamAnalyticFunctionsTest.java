@@ -588,4 +588,29 @@ public class BeamAnalyticFunctionsTest extends BeamSqlDslBase {
 
     pipeline.run();
   }
+  @Test
+  public void testPercentRankFunction2() throws Exception {
+    pipeline.enableAbandonedNodeEnforcement(false);
+    PCollection<Row> inputRows = inputData2();
+    String sql = "SELECT x, PERCENT_RANK() over (ORDER BY x ) as agg  FROM PCOLLECTION";
+    PCollection<Row> result = inputRows.apply("sql", SqlTransform.query(sql));
+
+    Schema overResultSchema = Schema.builder().addInt32Field("x").addDoubleField("agg").build();
+
+    List<Row> overResult =
+        TestUtils.RowsBuilder.of(overResultSchema)
+            .addRows(
+                1, 0.0 / 6.0,
+                2, 1.0 / 6.0,
+                2, 1.0 / 6.0,
+                5, 3.0 / 6.0,
+                8, 4.0 / 6.0,
+                10, 5.0 / 6.0,
+                10, 5.0 / 6.0)
+            .getRows();
+
+    PAssert.that(result).containsInAnyOrder(overResult);
+
+    pipeline.run();
+  }
 }
