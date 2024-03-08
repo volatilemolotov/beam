@@ -40,3 +40,7 @@ requires = [
 
 # legacy installation is needed to generate `apache_beam.portability.api` package.
 build-backend = "setuptools.build_meta"
+
+
+[tool.coverage.run]
+source = ["sdks/python"]
