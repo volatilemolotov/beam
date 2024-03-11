@@ -17,3 +17,6 @@
 
 [run]
 omit = target/*
+
+[report]
+include_namespace_packages = true
