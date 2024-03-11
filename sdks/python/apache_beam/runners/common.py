@@ -316,6 +316,10 @@ class DoFnSignature(object):
     # type: () -> RestrictionProvider
     return self.process_method.restriction_provider
 
+  def get_restriction_provider2(self):
+    # type: () -> RestrictionProvider
+    return self.process_method.restriction_provider
+
   def get_watermark_estimator_provider(self):
     # type: () -> WatermarkEstimatorProvider
     return self.process_method.watermark_estimator_provider
