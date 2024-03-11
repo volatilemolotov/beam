@@ -2958,7 +2958,7 @@ class BeamModulePlugin implements Plugin<Project> {
             // until it is resolved on pip's side, don't use pip's cache.
             args '-c', ". ${project.ext.envdir}/bin/activate && " +
                 "pip install --pre --retries 10 --upgrade pip --no-cache-dir && " +
-                "pip install --pre --retries 10 --upgrade tox --no-cache-dir"
+                "pip install --pre --retries 10 --upgrade tox --no-cache-dir -r ${project.rootDir}/sdks/python/build-requirements.txt"
           }
         }
         // Gradle will delete outputs whenever it thinks they are stale. Putting a
