@@ -46,3 +46,6 @@ addopts = "-v --cov-report=xml --cov=. --cov-append"
 
 [tool.coverage.run]
 source = ["src"]
+
+[tool.coverage.report]
+include_namespace_packages = true
