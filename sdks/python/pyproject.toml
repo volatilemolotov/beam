@@ -41,6 +41,8 @@ requires = [
 # legacy installation is needed to generate `apache_beam.portability.api` package.
 build-backend = "setuptools.build_meta"
 
+[tool.pytest.ini_options]
+addopts = "-v --cov-report=xml --cov=. --cov-append"
 
 [tool.coverage.run]
 source = ["src"]
