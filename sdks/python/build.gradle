@@ -30,8 +30,8 @@ def buildPython = tasks.register("buildPython") {
     logger.info('Building Python Dependencies')
     exec {
       executable 'sh'
-      // args '-c', ". ${envdir}/bin/activate && python setup.py build --build-base ${buildDir}"
-      args '-c', ". ${envdir}/bin/activate && pip install -e ."
+       args '-c', ". ${envdir}/bin/activate && python setup.py build --build-base ${buildDir}"
+      //args '-c', ". ${envdir}/bin/activate && pip install -e ."
     }
   }
 }
