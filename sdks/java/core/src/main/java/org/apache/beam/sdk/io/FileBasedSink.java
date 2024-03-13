@@ -777,7 +777,7 @@ public abstract class FileBasedSink<UserT, DestinationT, OutputT>
       for (KV<FileResult<DestinationT>, ResourceId> entry : resultsToFinalFilenames) {
         srcFiles.add(entry.getKey().getTempFilename());
         dstFiles.add(entry.getValue());
-        LOG.info(
+        LOG.debug(
             "Will copy temporary file {} to final location {}", entry.getKey(), entry.getValue());
       }
       // During a failure case, files may have been deleted in an earlier step. Thus
