@@ -71,7 +71,7 @@ func convertSeverity(sev log.Severity) fnpb.LogEntry_Severity_Enum {
 	case log.SevFatal:
 		return fnpb.LogEntry_Severity_CRITICAL
 	default:
-		return fnpb.LogEntry_Severity_INFO
+		return fnpb.LogEntry_Severity_WARN
 	}
 }
 
