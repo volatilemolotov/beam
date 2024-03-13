@@ -120,7 +120,7 @@ func (f *filterFn) Setup() {
 func (f *filterFn) ProcessElement(ctx context.Context, word string, count int, emit func(string, int)) {
 	if f.re.MatchString(word) {
 		// Log at the "INFO" level each element that we match.
-		log.Infof(ctx, "Matched: %v", word)
+		//log.Infof(ctx, "Matched: %v", word)
 		emit(word, count)
 	} else {
 		// Log at the "DEBUG" level each element that is not matched.
