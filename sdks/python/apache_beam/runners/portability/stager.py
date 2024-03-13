@@ -870,7 +870,7 @@ class Stager(object):
                         os.path.dirname(setup_file),
                     ]
                     _LOGGER.info("Executing command: %s", build_setup_args)
-                    # processes.check_output(build_setup_args)
+                    processes.check_output(build_setup_args)
                 except RuntimeError:
                     build_setup_args = [
                         Stager._get_python_executable(),
