@@ -32,7 +32,7 @@ SDK_TAG_LOCAL=${SDK_TAG_LOCAL/%.dev/-dev}
 mkdir -p $PREPARED_MOD_DIR
 cd $PREPARED_MOD_DIR
 
-BEAM_PKG=github.com/apache/beam/sdks/v2
+BEAM_PKG=github.com/volatilemolotov/beam/sdks/v2
 
 go mod init $PIPELINES_MODULE
 go mod edit -require=$BEAM_PKG@v$SDK_TAG
