@@ -16,17 +16,18 @@
 package preparers
 
 import (
-	"beam.apache.org/playground/backend/internal/logger"
-	"beam.apache.org/playground/backend/internal/utils"
 	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"regexp"
+
+	"beam.apache.org/playground/backend/internal/logger"
+	"beam.apache.org/playground/backend/internal/utils"
 )
 
 const (
-	addLogHandlerCode       = "import logging\nlogging.basicConfig(\n    level=logging.INFO,\n    format=\"%(asctime)s [%(levelname)s] %(message)s\",\n    handlers=[\n        logging.FileHandler(\"logs.log\"),\n    ]\n)\n"
+	addLogHandlerCode       = "import logging\nlogging.basicConfig(\n    level=logging.WARNING,\n    format=\"%(asctime)s [%(levelname)s] %(message)s\",\n    handlers=[\n        logging.FileHandler(\"logs.log\"),\n    ]\n)\n"
 	oneIndentation          = "  "
 	findWithPipelinePattern = `(\s*)with.+Pipeline.+as (.+):`
 	indentationPattern      = `^(%s){0,1}\w+`
