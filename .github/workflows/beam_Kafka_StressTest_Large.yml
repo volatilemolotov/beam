@@ -96,9 +96,9 @@ jobs:
           done
       - name: debug kafka params
         run: |
-          echo "{{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_0 }}"
-          echo "{{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_1 }}"
-          echo "{{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_2 }}"
+          echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_0 }}"
+          echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_1 }}"
+          echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_2 }}"
       # - name: run BigQuery StressTest Large
       #   uses: ./.github/actions/gradle-command-self-hosted-action
       #   with:
