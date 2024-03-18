@@ -46,255 +46,273 @@ from apache_beam.metrics.metricbase import Gauge
 from apache_beam.metrics.metricbase import MetricName
 
 if TYPE_CHECKING:
-  from apache_beam.metrics.execution import MetricKey
-  from apache_beam.metrics.metricbase import Metric
+    from apache_beam.metrics.execution import MetricKey
+    from apache_beam.metrics.metricbase import Metric
 
-__all__ = ['Metrics', 'MetricsFilter']
+__all__ = ["Metrics", "MetricsFilter"]
 
 _LOGGER = logging.getLogger(__name__)
 
 
 class Metrics(object):
-  """Lets users create/access metric objects during pipeline execution."""
-  @staticmethod
-  def get_namespace(namespace):
-    # type: (Union[Type, str]) -> str
-    if isinstance(namespace, type):
-      return '{}.{}'.format(namespace.__module__, namespace.__name__)
-    elif isinstance(namespace, str):
-      return namespace
-    else:
-      raise ValueError('Unknown namespace type')
+    """Lets users create/access metric objects during pipeline execution."""
 
-  @staticmethod
-  def counter(namespace, name):
-    # type: (Union[Type, str], str) -> Metrics.DelegatingCounter
+    @staticmethod
+    def get_namespace(namespace):
+        # type: (Union[Type, str]) -> str
+        if isinstance(namespace, type):
+            return "{}.{}".format(namespace.__module__, namespace.__name__)
+        elif isinstance(namespace, str):
+            return namespace
+        else:
+            raise ValueError("Unknown namespace type")
 
-    """Obtains or creates a Counter metric.
+    @staticmethod
+    def counter(namespace, name):
+        # type: (Union[Type, str], str) -> Metrics.DelegatingCounter
 
-    Args:
-      namespace: A class or string that gives the namespace to a metric
-      name: A string that gives a unique name to a metric
+        """Obtains or creates a Counter metric.
 
-    Returns:
-      A Counter object.
-    """
-    namespace = Metrics.get_namespace(namespace)
-    return Metrics.DelegatingCounter(MetricName(namespace, name))
+        Args:
+          namespace: A class or string that gives the namespace to a metric
+          name: A string that gives a unique name to a metric
 
-  @staticmethod
-  def distribution(namespace, name):
-    # type: (Union[Type, str], str) -> Metrics.DelegatingDistribution
+        Returns:
+          A Counter object.
+        """
+        namespace = Metrics.get_namespace(namespace)
+        return Metrics.DelegatingCounter(MetricName(namespace, name))
 
-    """Obtains or creates a Distribution metric.
+    @staticmethod
+    def distribution(namespace, name):
+        # type: (Union[Type, str], str) -> Metrics.DelegatingDistribution
 
-    Distribution metrics are restricted to integer-only distributions.
+        """Obtains or creates a Distribution metric.
 
-    Args:
-      namespace: A class or string that gives the namespace to a metric
-      name: A string that gives a unique name to a metric
+        Distribution metrics are restricted to integer-only distributions.
 
-    Returns:
-      A Distribution object.
-    """
-    namespace = Metrics.get_namespace(namespace)
-    return Metrics.DelegatingDistribution(MetricName(namespace, name))
+        Args:
+          namespace: A class or string that gives the namespace to a metric
+          name: A string that gives a unique name to a metric
 
-  @staticmethod
-  def gauge(namespace, name):
-    # type: (Union[Type, str], str) -> Metrics.DelegatingGauge
+        Returns:
+          A Distribution object.
+        """
+        namespace = Metrics.get_namespace(namespace)
+        return Metrics.DelegatingDistribution(MetricName(namespace, name))
 
-    """Obtains or creates a Gauge metric.
+    @staticmethod
+    def gauge(namespace, name):
+        # type: (Union[Type, str], str) -> Metrics.DelegatingGauge
 
-    Gauge metrics are restricted to integer-only values.
+        """Obtains or creates a Gauge metric.
 
-    Args:
-      namespace: A class or string that gives the namespace to a metric
-      name: A string that gives a unique name to a metric
+        Gauge metrics are restricted to integer-only values.
 
-    Returns:
-      A Distribution object.
-    """
-    namespace = Metrics.get_namespace(namespace)
-    return Metrics.DelegatingGauge(MetricName(namespace, name))
+        Args:
+          namespace: A class or string that gives the namespace to a metric
+          name: A string that gives a unique name to a metric
 
-  class DelegatingCounter(Counter):
-    """Metrics Counter that Delegates functionality to MetricsEnvironment."""
-    def __init__(self, metric_name, process_wide=False):
-      # type: (MetricName, bool) -> None
-      super().__init__(metric_name)
-      self.inc = MetricUpdater(  # type: ignore[assignment]
-          cells.CounterCell,
-          metric_name,
-          default_value=1,
-          process_wide=process_wide)
+        Returns:
+          A Distribution object.
+        """
+        namespace = Metrics.get_namespace(namespace)
+        return Metrics.DelegatingGauge(MetricName(namespace, name))
 
-  class DelegatingDistribution(Distribution):
-    """Metrics Distribution Delegates functionality to MetricsEnvironment."""
-    def __init__(self, metric_name):
-      # type: (MetricName) -> None
-      super().__init__(metric_name)
-      self.update = MetricUpdater(cells.DistributionCell, metric_name)  # type: ignore[assignment]
+    class DelegatingCounter(Counter):
+        """Metrics Counter that Delegates functionality to MetricsEnvironment."""
 
-  class DelegatingGauge(Gauge):
-    """Metrics Gauge that Delegates functionality to MetricsEnvironment."""
-    def __init__(self, metric_name):
-      # type: (MetricName) -> None
-      super().__init__(metric_name)
-      self.set = MetricUpdater(cells.GaugeCell, metric_name)  # type: ignore[assignment]
+        def __init__(self, metric_name, process_wide=False):
+            # type: (MetricName, bool) -> None
+            super().__init__(metric_name)
+            self.inc = MetricUpdater(  # type: ignore[assignment]
+                cells.CounterCell,
+                metric_name,
+                default_value=1,
+                process_wide=process_wide,
+            )
+
+    class DelegatingDistribution(Distribution):
+        """Metrics Distribution Delegates functionality to MetricsEnvironment."""
+
+        def __init__(self, metric_name):
+            # type: (MetricName) -> None
+            super().__init__(metric_name)
+            self.update = MetricUpdater(cells.DistributionCell, metric_name)  # type: ignore[assignment]
+
+    class DelegatingGauge(Gauge):
+        """Metrics Gauge that Delegates functionality to MetricsEnvironment."""
+
+        def __init__(self, metric_name):
+            # type: (MetricName) -> None
+            super().__init__(metric_name)
+            self.set = MetricUpdater(cells.GaugeCell, metric_name)  # type: ignore[assignment]
 
 
 class MetricResults(object):
-  COUNTERS = "counters"
-  DISTRIBUTIONS = "distributions"
-  GAUGES = "gauges"
+    COUNTERS = "counters"
+    DISTRIBUTIONS = "distributions"
+    GAUGES = "gauges"
 
-  @staticmethod
-  def _matches_name(filter, metric_key):
-    # type: (MetricsFilter, MetricKey) -> bool
-    if ((filter.namespaces and
-         metric_key.metric.namespace not in filter.namespaces) or
-        (filter.names and metric_key.metric.name not in filter.names)):
-      return False
-    else:
-      return True
+    @staticmethod
+    def _matches_name(filter, metric_key):
+        # type: (MetricsFilter, MetricKey) -> bool
+        if (
+            filter.namespaces and metric_key.metric.namespace not in filter.namespaces
+        ) or (filter.names and metric_key.metric.name not in filter.names):
+            return False
+        else:
+            return True
 
-  @staticmethod
-  def _is_sub_list(needle, haystack):
-    # type: (List[str], List[str]) -> bool
+    @staticmethod
+    def _is_sub_list(needle, haystack):
+        # type: (List[str], List[str]) -> bool
 
-    """True iff `needle` is a sub-list of `haystack` (i.e. a contiguous slice
-    of `haystack` exactly matches `needle`"""
-    needle_len = len(needle)
-    haystack_len = len(haystack)
-    for i in range(0, haystack_len - needle_len + 1):
-      if haystack[i:i + needle_len] == needle:
-        return True
+        """True iff `needle` is a sub-list of `haystack` (i.e. a contiguous slice
+        of `haystack` exactly matches `needle`"""
+        needle_len = len(needle)
+        haystack_len = len(haystack)
+        for i in range(0, haystack_len - needle_len + 1):
+            if haystack[i : i + needle_len] == needle:
+                return True
 
-    return False
+        return False
 
-  @staticmethod
-  def _matches_sub_path(actual_scope, filter_scope):
-    # type: (str, str) -> bool
+    @staticmethod
+    def _matches_sub_path(actual_scope, filter_scope):
+        # type: (str, str) -> bool
 
-    """True iff the '/'-delimited pieces of filter_scope exist as a sub-list
-    of the '/'-delimited pieces of actual_scope"""
-    return bool(
-        actual_scope and MetricResults._is_sub_list(
-            filter_scope.split('/'), actual_scope.split('/')))
+        """True iff the '/'-delimited pieces of filter_scope exist as a sub-list
+        of the '/'-delimited pieces of actual_scope"""
+        return bool(
+            actual_scope
+            and MetricResults._is_sub_list(
+                filter_scope.split("/"), actual_scope.split("/")
+            )
+        )
 
-  @staticmethod
-  def _matches_scope(filter, metric_key):
-    # type: (MetricsFilter, MetricKey) -> bool
-    if not filter.steps:
-      return True
+    @staticmethod
+    def _matches_scope(filter, metric_key):
+        # type: (MetricsFilter, MetricKey) -> bool
+        if not filter.steps:
+            return True
 
-    for step in filter.steps:
-      if MetricResults._matches_sub_path(metric_key.step, step):
-        return True
+        for step in filter.steps:
+            if MetricResults._matches_sub_path(metric_key.step, step):
+                return True
 
-    return False
+        return False
 
-  @staticmethod
-  def matches(filter, metric_key):
-    # type: (Optional[MetricsFilter], MetricKey) -> bool
-    if filter is None:
-      return True
+    @staticmethod
+    def matches(filter, metric_key):
+        # type: (Optional[MetricsFilter], MetricKey) -> bool
+        if filter is None:
+            return True
 
-    if (MetricResults._matches_name(filter, metric_key) and
-        MetricResults._matches_scope(filter, metric_key)):
-      return True
-    return False
+        if MetricResults._matches_name(
+            filter, metric_key
+        ) and MetricResults._matches_scope(filter, metric_key):
+            return True
+        return False
 
-  def query(self, filter=None):
-    # type: (Optional[MetricsFilter]) -> Dict[str, List[MetricResults]]
+    def query(self, filter=None):
+        # type: (Optional[MetricsFilter]) -> Dict[str, List[MetricResults]]
 
-    """Queries the runner for existing user metrics that match the filter.
+        """Queries the runner for existing user metrics that match the filter.
 
-    It should return a dictionary, with lists of each kind of metric, and
-    each list contains the corresponding kind of MetricResult. Like so:
+        It should return a dictionary, with lists of each kind of metric, and
+        each list contains the corresponding kind of MetricResult. Like so:
 
-        {
-          "counters": [MetricResult(counter_key, committed, attempted), ...],
-          "distributions": [MetricResult(dist_key, committed, attempted), ...],
-          "gauges": []  // Empty list if nothing matched the filter.
-        }
+            {
+              "counters": [MetricResult(counter_key, committed, attempted), ...],
+              "distributions": [MetricResult(dist_key, committed, attempted), ...],
+              "gauges": []  // Empty list if nothing matched the filter.
+            }
 
-    The committed / attempted values are DistributionResult / GaugeResult / int
-    objects.
-    """
-    raise NotImplementedError
+        The committed / attempted values are DistributionResult / GaugeResult / int
+        objects.
+        """
+        raise NotImplementedError
 
 
 class MetricsFilter(object):
-  """Simple object to filter metrics results.
+    """Simple object to filter metrics results.
 
-  If filters by matching a result's step-namespace-name with three internal
-  sets. No execution/matching logic is added to this object, so that it may
-  be used to construct arguments as an RPC request. It is left for runners
-  to implement matching logic by themselves.
+    If filters by matching a result's step-namespace-name with three internal
+    sets. No execution/matching logic is added to this object, so that it may
+    be used to construct arguments as an RPC request. It is left for runners
+    to implement matching logic by themselves.
 
-  Note: This class only supports user defined metrics.
-  """
-  def __init__(self):
-    # type: () -> None
-    self._names = set()  # type: Set[str]
-    self._namespaces = set()  # type: Set[str]
-    self._steps = set()  # type: Set[str]
+    Note: This class only supports user defined metrics.
+    """
 
-  @property
-  def steps(self):
-    # type: () -> FrozenSet[str]
-    return frozenset(self._steps)
+    def __init__(self):
+        # type: () -> None
+        self._names = set()  # type: Set[str]
+        self._namespaces = set()  # type: Set[str]
+        self._steps = set()  # type: Set[str]
 
-  @property
-  def names(self):
-    # type: () -> FrozenSet[str]
-    return frozenset(self._names)
+    @property
+    def steps(self):
+        # type: () -> FrozenSet[str]
+        return frozenset(self._steps)
 
-  @property
-  def namespaces(self):
-    # type: () -> FrozenSet[str]
-    return frozenset(self._namespaces)
+    @property
+    def names(self):
+        # type: () -> FrozenSet[str]
+        return frozenset(self._names)
 
-  def with_metric(self, metric):
-    # type: (Metric) -> MetricsFilter
-    name = metric.metric_name.name or ''
-    namespace = metric.metric_name.namespace or ''
-    return self.with_name(name).with_namespace(namespace)
+    @property
+    def namespaces(self):
+        # type: () -> FrozenSet[str]
+        return frozenset(self._namespaces)
 
-  def with_name(self, name):
-    # type: (str) -> MetricsFilter
-    return self.with_names([name])
+    def with_metric(self, metric):
+        # type: (Metric) -> MetricsFilter
+        name = metric.metric_name.name or ""
+        namespace = metric.metric_name.namespace or ""
+        return self.with_name(name).with_namespace(namespace)
 
-  def with_names(self, names):
-    # type: (Iterable[str]) -> MetricsFilter
-    if isinstance(names, str):
-      raise ValueError('Names must be a collection, not a string')
+    def with_name(self, name):
+        # type: (str) -> MetricsFilter
+        return self.with_names([name])
 
-    self._names.update(names)
-    return self
+    def with_names(self, names):
+        # type: (Iterable[str]) -> MetricsFilter
+        if isinstance(names, str):
+            raise ValueError("Names must be a collection, not a string")
 
-  def with_namespace(self, namespace):
-    # type: (Union[Type, str]) -> MetricsFilter
-    return self.with_namespaces([namespace])
+        self._names.update(names)
+        return self
 
-  def with_namespaces(self, namespaces):
-    # type: (Iterable[Union[Type, str]]) -> MetricsFilter
-    if isinstance(namespaces, str):
-      raise ValueError('Namespaces must be an iterable, not a string')
+    def with_namespace(self, namespace):
+        # type: (Union[Type, str]) -> MetricsFilter
+        return self.with_namespaces([namespace])
 
-    self._namespaces.update([Metrics.get_namespace(ns) for ns in namespaces])
-    return self
+    def with_namespaces(self, namespaces):
+        # type: (Iterable[Union[Type, str]]) -> MetricsFilter
+        if isinstance(namespaces, str):
+            raise ValueError("Namespaces must be an iterable, not a string")
 
-  def with_step(self, step):
-    # type: (str) -> MetricsFilter
-    return self.with_steps([step])
+        self._namespaces.update([Metrics.get_namespace(ns) for ns in namespaces])
+        return self
 
-  def with_steps(self, steps):
-    # type: (Iterable[str]) -> MetricsFilter
-    if isinstance(steps, str):
-      raise ValueError('Steps must be an iterable, not a string')
+    def with_namespaces2(self, namespaces):
+        # type: (Iterable[Union[Type, str]]) -> MetricsFilter
+        if isinstance(namespaces, str):
+            raise ValueError("Namespaces must be an iterable, not a string")
 
-    self._steps.update(steps)
-    return self
+        self._namespaces.update([Metrics.get_namespace(ns) for ns in namespaces])
+        return self
+
+    def with_step(self, step):
+        # type: (str) -> MetricsFilter
+        return self.with_steps([step])
+
+    def with_steps(self, steps):
+        # type: (Iterable[str]) -> MetricsFilter
+        if isinstance(steps, str):
+            raise ValueError("Steps must be an iterable, not a string")
+
+        self._steps.update(steps)
+        return self
