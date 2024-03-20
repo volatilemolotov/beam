@@ -1278,6 +1278,13 @@ class BeamModulePlugin implements Plugin<Project> {
         '**/AutoValue_*'
       ]
 
+      def jacocoEnabled = project.hasProperty('enableJacocoReport') || project.gradle.taskGraph.allTasks.any { it.name.contains('javaPreCommit') }
+      if (jacocoEnabled) {
+        project.tasks.withType(Test) {
+          finalizedBy project.jacocoTestReport
+        }
+      }
+
       project.test {
         jacoco {
           excludes = jacocoExcludes
@@ -1285,14 +1292,24 @@ class BeamModulePlugin implements Plugin<Project> {
       }
 
       project.jacocoTestReport {
-        doFirst {
-          getClassDirectories().setFrom(project.files(
-              project.fileTree(
-              dir: "${project.rootDir}",
-              exclude: jacocoExcludes
-              )
-              )
-              )
+        getClassDirectories().setFrom(project.files(
+          project.fileTree(
+            dir: project.getLayout().getBuildDirectory().dir("classes/java/main"),
+            excludes: jacocoExcludes
+          )
+        ))
+        getSourceDirectories().setFrom(
+          project.files(project.sourceSets.main.allSource.srcDirs)
+        )
+        getExecutionData().setFrom(project.file(
+          project.getLayout().getBuildDirectory().file("jacoco/test.exec")
+        ))
+        reports {
+          html.required = true
+          xml.required = true
+          html.outputLocation = project.file(
+            project.getLayout().getBuildDirectory().dir("jacoco/report")
+          )
         }
       }
 
