@@ -128,5 +128,5 @@ jobs:
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          dir: '**/build/reports/jacoco/test'
+          directory: '**/build/reports/jacoco/test'
           flags: java
