@@ -36,6 +36,7 @@ import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.Partition;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.PCollectionList;
+import org.apache.beam.sdk.util.construction.renderer.PipelineDotRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
