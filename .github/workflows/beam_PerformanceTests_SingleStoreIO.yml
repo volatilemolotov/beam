@@ -83,6 +83,7 @@ jobs:
         with:
           cluster_name: io-datastores
           k8s_namespace: ${{ matrix.job_name }}-${{ github.run_id }}
+          remove_finalizer:  memsqlclusters.memsql.com/sdb-cluster
       - name: Install Singlestore operator
         run: | 
           kubectl apply -f ${{github.workspace}}/.test-infra/kubernetes/singlestore/sdb-rbac.yaml
@@ -94,8 +95,6 @@ jobs:
         run: |
           kubectl apply -f ${{github.workspace}}/.test-infra/kubernetes/singlestore/sdb-cluster.yaml
           kubectl wait --for=jsonpath='{.status.phase}'=Running memsqlclusters.memsql.com --all --timeout=300s
-          kubectl wait --for=jsonpath='{.metadata.finalizers}' memsqlclusters.memsql.com sdb-cluster --all --timeout=300s
-          kubectl patch memsqlclusters.memsql.com sdb-cluster -p '{"metadata":{"finalizers":null}}' --type=merge
           kubectl wait svc/svc-sdb-cluster-ddl --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' --timeout=300s
           loadbalancer_IP=$(kubectl get svc svc-sdb-cluster-ddl -o jsonpath='{.status.loadBalancer.ingress[0].ip}') 
           echo lb_ip=$loadbalancer_IP >> $GITHUB_OUTPUT
