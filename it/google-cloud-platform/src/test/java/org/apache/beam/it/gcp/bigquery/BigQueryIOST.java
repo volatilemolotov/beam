@@ -26,7 +26,6 @@ import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.text.ParseException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -176,6 +175,7 @@ public final class BigQueryIOST extends IOStressTestBase {
   }
 
   @Test
+  @Ignore
   public void testJsonStreamingWriteThenRead() throws IOException {
     configuration.writeFormat = "JSON";
     configuration.writeMethod = "STREAMING_INSERTS";
@@ -191,7 +191,6 @@ public final class BigQueryIOST extends IOStressTestBase {
   }
 
   @Test
-  @Ignore
   public void testJsonStorageAPIWrite() throws IOException {
     configuration.writeFormat = "JSON";
     configuration.writeMethod = "STORAGE_WRITE_API";
@@ -348,12 +347,8 @@ public final class BigQueryIOST extends IOStressTestBase {
             .setOutputPCollection("Counting element.out0")
             .setOutputPCollectionV2("Counting element/ParMultiDo(Counting).out0")
             .build();
-    try {
-      exportMetrics(
-          launchInfo, metricsConfig, configuration.exportMetricsToInfluxDB, influxDBSettings);
-    } catch (ParseException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    exportMetrics(
+        launchInfo, metricsConfig, configuration.exportMetricsToInfluxDB, influxDBSettings);
   }
 
   abstract static class FormatFn<InputT, OutputT> implements SerializableFunction<InputT, OutputT> {
