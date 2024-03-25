@@ -94,6 +94,9 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         export_default_credentials: true
+    - name: Get current gcloud user
+      run: | 
+        gcloud auth list
     - name: run scheduled javaPostcommitIOPerformanceTests script
       if: github.event_name == 'schedule' #This ensures only scheduled runs publish metrics publicly by changing which exportTable is configured
       uses: ./.github/actions/gradle-command-self-hosted-action
