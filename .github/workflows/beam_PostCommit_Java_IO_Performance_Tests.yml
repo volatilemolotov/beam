@@ -116,12 +116,6 @@ jobs:
       with:
         name: JUnit Test Results
         path: "**/build/reports/tests/"
-    - name: Debug log 
-      uses: actions/upload-artifact@v4
-      if: ${{ !success() }}
-      with:
-        name: JUnit Test Results
-        path: "/runner/_work/beam/beam/it/google-cloud-platform/build/reports/tests/"
     - name: Publish JUnit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
