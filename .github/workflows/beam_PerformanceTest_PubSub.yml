@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: AAA StressTest BigQuery Large
+name: AAA Performance Test PubSub 
 
 on:
   workflow_dispatch:
@@ -47,18 +47,18 @@ env:
   INFLUXDB_USER_PASSWORD: ${{ secrets.INFLUXDB_USER_PASSWORD }}
 
 jobs:
-  beam_LoadTests_Go_CoGBK_Dataflow_Batch:
+  beam_PerformanceTest_PubSub:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'schedule' && github.repository == 'apache/beam') ||
-      github.event.comment.body == 'Run BigQuery Stress Test Large'
+      github.event.comment.body == 'Run Performance Test PubSub'
     runs-on: [self-hosted, ubuntu-20.04, highmem]
     timeout-minutes: 720
     name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     strategy:
       matrix:
-        job_name: ["beam_BigQuery_StressTest_Large"]
-        job_phrase: ["Run BigQuery Stress Test Large"]
+        job_name: ["beam_PerformanceTest_PubSub"]
+        job_phrase: ["Run Performance Test PubSub"]
     steps:
       - uses: actions/checkout@v4
       - name: Setup repository
@@ -69,7 +69,7 @@ jobs:
           github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
       - name: Setup environment
         uses: ./.github/actions/setup-environment-action
-      - name: run BigQuery StressTest Large
+      - name: run PubSub Performance test
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :it:google-cloud-platform:BigQueryStressTestMedium --info
+          gradle-command: :it:google-cloud-platform:PubSubPerformanceTest --info
