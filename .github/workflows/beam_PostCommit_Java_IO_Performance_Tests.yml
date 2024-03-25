@@ -73,11 +73,15 @@ jobs:
         comment_phrase: ${{ matrix.job_phrase }} ${{ matrix.test_case }}
         github_token: ${{ secrets.GITHUB_TOKEN }}
         github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.test_case }})
+    - name: Get Beam latest release
+      run: |
+        BEAM_VERSION=$(curl -s https://api.github.com/repos/apache/beam/releases/latest | jq -r '.tag_name')
+        echo "BEAM_VERSION=${BEAM_VERSION}" >> $GITHUB_ENV
     - name: Checkout release branch
-      if: github.event_name == 'schedule' #This has scheduled runs run against the latest release
+      #if: github.event_name == 'schedule' #This has scheduled runs run against the latest release
       uses: actions/checkout@v4
       with:
-        ref: v2.50.0 #TODO(https://github.com/apache/beam/issues/28330) automate updating this
+        ref: ${{ env.BEAM_VERSION }}
         repository: apache/beam
     - name: Setup environment
       uses: ./.github/actions/setup-environment-action
