@@ -41,6 +41,7 @@ import org.apache.beam.it.common.utils.ResourceManagerUtils;
 import org.apache.beam.it.gcp.IOStressTestBase;
 import org.apache.beam.runners.dataflow.options.DataflowPipelineWorkerPoolOptions;
 import org.apache.beam.runners.dataflow.options.DataflowStreamingPipelineOptions;
+import org.apache.beam.sdk.extensions.gcp.options.GcpOptions;
 import org.apache.beam.sdk.io.Read;
 import org.apache.beam.sdk.io.gcp.spanner.SpannerIO;
 import org.apache.beam.sdk.io.synthetic.SyntheticSourceOptions;
@@ -50,6 +51,7 @@ import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.testing.TestPipelineOptions;
 import org.apache.beam.sdk.transforms.DoFn;
 import org.apache.beam.sdk.transforms.ParDo;
+import org.apache.beam.sdk.transforms.Reshuffle;
 import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
@@ -122,7 +124,6 @@ public final class SpannerIOST extends IOStressTestBase {
         }
         // Use streaming pipeline to write records
         writePipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
-        writePipeline.getOptions().as(DataflowStreamingPipelineOptions.class);
 
         // prepare schema
         String createTable =
@@ -145,11 +146,11 @@ public final class SpannerIOST extends IOStressTestBase {
                     ImmutableMap.of(
                             "medium",
                             Configuration.fromJsonString(
-                                    "{\"numRecords\":10000000,\"rowsPerSecond\":25000,\"minutes\":10,\"pipelineTimeout\":100,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
+                                    "{\"numRecords\":1000000,\"rowsPerSecond\":10000,\"minutes\":10,\"pipelineTimeout\":100,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
                                     Configuration.class),
                             "large",
                             Configuration.fromJsonString(
-                                    "{\"numRecords\":100000000,\"rowsPerSecond\":25000,\"minutes\":130,\"pipelineTimeout\":200,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
+                                    "{\"numRecords\":10000000,\"rowsPerSecond\":10000,\"minutes\":130,\"pipelineTimeout\":200,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
                                     Configuration.class));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -247,6 +248,7 @@ public final class SpannerIOST extends IOStressTestBase {
                             .apply(
                                     "One input to multiple outputs",
                                     ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
+                            .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
                             .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
         }
         source
@@ -258,8 +260,6 @@ public final class SpannerIOST extends IOStressTestBase {
                 .apply(
                         "Write to Spanner",
                         SpannerIO.write()
-                                .withHighPriority()
-                                .withCommitDeadline(org.joda.time.Duration.standardSeconds(3))
                                 .withProjectId(project)
                                 .withInstanceId(resourceManager.getInstanceId())
                                 .withDatabaseId(resourceManager.getDatabaseId()));
@@ -362,7 +362,7 @@ public final class SpannerIOST extends IOStressTestBase {
         @JsonProperty public String runner = "DirectRunner";
 
         /** Number of workers for the pipeline. */
-        @JsonProperty public int numWorkers = 50;
+        @JsonProperty public int numWorkers = 30;
 
         /** Maximum number of workers for the pipeline. */
         @JsonProperty public int maxNumWorkers = 100;
