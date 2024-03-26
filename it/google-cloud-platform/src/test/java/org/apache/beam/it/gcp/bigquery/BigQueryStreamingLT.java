@@ -281,6 +281,7 @@ public class BigQueryStreamingLT extends IOLoadTestBase {
                 .setSdk(PipelineLauncher.Sdk.JAVA)
                 .setPipeline(fileLoadsPipeline)
                 .addParameter("runner", config.getRunner())
+                .addParameter("maxNumWorkers", "100")
                 .build();
 
         // Don't use PipelineOperator because we don't want to wait on this batch job
@@ -360,6 +361,7 @@ public class BigQueryStreamingLT extends IOLoadTestBase {
               .addParameter("runner", config.getRunner())
               .addParameter("streaming", "true")
               .addParameter("experiments", GcpOptions.STREAMING_ENGINE_EXPERIMENT)
+              .addParameter("maxNumWorkers", "100")
               .build();
       // Launch job
       PipelineLauncher.LaunchInfo storageApiInfo =
