@@ -62,6 +62,9 @@ jobs:
     name: ${{ matrix.job_name }} (${{ matrix.job_phrase }} ${{ matrix.test_case }})
     strategy:
       matrix:
+        max-parallel: 1
+        fail-fast: false
+        job_phrase: ["Run Java PostCommit IO Performance Tests"]
         job_name: ["beam_PostCommit_Java_IO_Performance_Tests"]
         job_phrase: ["Run Java PostCommit IO Performance Tests"]
         test_case: ["GCSPerformanceTest", "BigTablePerformanceTest", "BigQueryStorageApiStreamingPerformanceTest"]
