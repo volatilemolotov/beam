@@ -318,7 +318,7 @@ public final class BigQueryIOST extends IOStressTestBase {
                     .toString())
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
-            .addParameter("streaming", "true")
+            .addParameter("experiments", "use_runner_v2")
             .build();
 
     PipelineLauncher.LaunchInfo launchInfo = pipelineLauncher.launch(project, region, options);
