@@ -95,35 +95,40 @@ jobs:
         credentials_json: ${{ secrets.GCP_SA_KEY }}
         project_id: ${{ secrets.GCP_PROJECT_ID }}
         token_format: 'access_token'
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        skip_install: true
     - name: Get current gcloud user
       run: | 
         gcloud auth list
-    # - name: run scheduled javaPostcommitIOPerformanceTests script
-    #   if: github.event_name == 'schedule' #This ensures only scheduled runs publish metrics publicly by changing which exportTable is configured
-    #   uses: ./.github/actions/gradle-command-self-hosted-action
-    #   with:
-    #     gradle-command: :it:${{ matrix.test_case }}
-    #   env:
-    #     exportDataset: performance_tests
-    #     exportTable: io_performance_metrics
-    # - name: run triggered javaPostcommitIOPerformanceTests script
-    #   if: github.event_name != 'schedule'
-    #   uses: ./.github/actions/gradle-command-self-hosted-action
-    #   with:
-    #     gradle-command: :it:${{ matrix.test_case }}
-    #   env:
-    #     exportDataset: performance_tests
-    #     exportTable: io_performance_metrics_test
-    # - name: Archive JUnit Test Results
-    #   uses: actions/upload-artifact@v4
-    #   if: ${{ !success() }}
-    #   with:
-    #     name: JUnit Test Results
-    #     path: "**/build/reports/tests/"
-    # - name: Publish JUnit Test Results
-    #   uses: EnricoMi/publish-unit-test-result-action@v2
-    #   if: always()
-    #   with:
-    #     commit: '${{ env.prsha || env.GITHUB_SHA }}'
-    #     comment_mode: ${{ github.event_name == 'issue_comment'  && 'always' || 'off' }}
-    #     files: '**/build/test-results/**/*.xml'
+    - name: run scheduled javaPostcommitIOPerformanceTests script
+      if: github.event_name == 'schedule' #This ensures only scheduled runs publish metrics publicly by changing which exportTable is configured
+      uses: ./.github/actions/gradle-command-self-hosted-action
+      with:
+        gradle-command: :it:${{ matrix.test_case }}
+      env:
+        exportDataset: performance_tests
+        exportTable: io_performance_metrics
+    - name: run triggered javaPostcommitIOPerformanceTests script
+      if: github.event_name != 'schedule'
+      uses: ./.github/actions/gradle-command-self-hosted-action
+      with:
+        gradle-command: :it:${{ matrix.test_case }}
+      env:
+        exportDataset: performance_tests
+        exportTable: io_performance_metrics_test
+    - name: Archive JUnit Test Results
+      uses: actions/upload-artifact@v4
+      if: ${{ !success() }}
+      with:
+        name: JUnit Test Results
+        path: "**/build/reports/tests/"
+    - name: Publish JUnit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        commit: '${{ env.prsha || env.GITHUB_SHA }}'
+        comment_mode: ${{ github.event_name == 'issue_comment'  && 'always' || 'off' }}
+        files: '**/build/test-results/**/*.xml'
