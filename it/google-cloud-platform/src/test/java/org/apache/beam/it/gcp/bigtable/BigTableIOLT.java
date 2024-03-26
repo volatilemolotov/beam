@@ -178,7 +178,7 @@ public class BigTableIOLT extends IOLoadTestBase {
             .setSdk(PipelineLauncher.Sdk.JAVA)
             .setPipeline(writePipeline)
             .addParameter("runner", configuration.getRunner())
-            .addParameter("maxNumWorkers","100")
+            .addParameter("maxWorkers","10")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
