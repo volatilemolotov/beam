@@ -26,6 +26,7 @@ import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -56,13 +57,11 @@ import org.apache.beam.sdk.testutils.publishing.InfluxDBSettings;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.PeriodicImpulse;
-import org.apache.beam.sdk.transforms.Reshuffle;
 import org.apache.beam.sdk.transforms.SerializableFunction;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.ImmutableMap;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.primitives.Longs;
 import org.junit.*;
 
 /**
@@ -280,32 +279,36 @@ public final class BigQueryIOST extends IOStressTestBase {
     List<LoadPeriod> loadPeriods =
         getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
-    PCollection<byte[]> source =
-        writePipeline
-            .apply(
-                PeriodicImpulse.create()
-                    .stopAfter(org.joda.time.Duration.millis(stopAfterMillis - 1))
-                    .withInterval(org.joda.time.Duration.millis(fireInterval)))
-            .apply(
-                "Extract row IDs",
-                MapElements.into(TypeDescriptor.of(byte[].class))
-                    .via(instant -> Longs.toByteArray(instant.getMillis() % totalRows)));
+    PCollection<org.joda.time.Instant> source =
+        writePipeline.apply(
+            PeriodicImpulse.create()
+                .stopAfter(org.joda.time.Duration.millis(stopAfterMillis - 1))
+                .withInterval(org.joda.time.Duration.millis(fireInterval)));
+    //            .apply(
+    //                "Extract row IDs",
+    //                MapElements.into(TypeDescriptor.of(byte[].class))
+    //                    .via(instant -> Longs.toByteArray(instant.getMillis() % totalRows)));
     if (startMultiplier > 1) {
       source =
           source
               .apply(
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
-              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
               .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
     }
-    source.apply(
-        "Write to BQ",
-        writeIO
-            .to(tableQualifier)
-            .withMethod(method)
-            .withSchema(schema)
-            .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
+    source
+        .apply(
+            "Map records to BigQuery format",
+            MapElements.into(TypeDescriptor.of(byte[].class))
+                .via(instant -> UUID.randomUUID().toString().getBytes(StandardCharsets.UTF_8)))
+        .apply(
+            "Write to BQ",
+            writeIO
+                .to(tableQualifier)
+                .withMethod(method)
+                .withSchema(schema)
+                .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
+
 
     PipelineLauncher.LaunchConfig options =
         PipelineLauncher.LaunchConfig.builder("write-bigquery")
