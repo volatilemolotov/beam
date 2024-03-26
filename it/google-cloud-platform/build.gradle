@@ -132,3 +132,13 @@ tasks.register(
         ['configuration':'large','project':'apache-beam-testing', 'artifactBucket':'io-performance-temp']
         + System.properties
 )
+tasks.register(
+        "SpannerStressTestMedium", IoPerformanceTestUtilities.IoPerformanceTest, project, 'google-cloud-platform', 'SpannerIOST',
+        ['configuration':'medium','project':'apache-beam-testing', 'artifactBucket':'io-performance-temp']
+        + System.properties
+)
+tasks.register(
+        "SpannerStressTestLarge", IoPerformanceTestUtilities.IoPerformanceTest, project, 'google-cloud-platform', 'SpannerIOST',
+        ['configuration':'large','project':'apache-beam-testing', 'artifactBucket':'io-performance-temp']
+        + System.properties
+)
