@@ -47,7 +47,7 @@ env:
   INFLUXDB_USER_PASSWORD: ${{ secrets.INFLUXDB_USER_PASSWORD }}
 
 jobs:
-  beam_LoadTests_Go_CoGBK_Dataflow_Batch:
+  beam_BigQuery_StressTest_Large:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'schedule' && github.repository == 'apache/beam') ||
