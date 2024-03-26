@@ -275,7 +275,7 @@ public final class BigQueryIOST extends IOStressTestBase {
         Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
     long stopAfterMillis =
         org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
-    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
+//    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
     List<LoadPeriod> loadPeriods =
         getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
