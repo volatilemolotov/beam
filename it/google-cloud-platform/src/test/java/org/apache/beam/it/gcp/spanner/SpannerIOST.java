@@ -146,7 +146,7 @@ public final class SpannerIOST extends IOStressTestBase {
                     ImmutableMap.of(
                             "medium",
                             Configuration.fromJsonString(
-                                    "{\"numRecords\":1000000,\"rowsPerSecond\":10000,\"minutes\":10,\"pipelineTimeout\":100,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
+                                    "{\"numRecords\":10000000,\"rowsPerSecond\":10000,\"minutes\":130,\"pipelineTimeout\":200,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
                                     Configuration.class),
                             "large",
                             Configuration.fromJsonString(
@@ -265,7 +265,7 @@ public final class SpannerIOST extends IOStressTestBase {
                                 .withDatabaseId(resourceManager.getDatabaseId()));
 
         PipelineLauncher.LaunchConfig options =
-                PipelineLauncher.LaunchConfig.builder("write-spanner")
+                PipelineLauncher.LaunchConfig.builder("mytestname-write-spanner")
                         .setSdk(PipelineLauncher.Sdk.JAVA)
                         .setPipeline(writePipeline)
                         .addParameter("runner", configuration.runner)
