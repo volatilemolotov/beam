@@ -166,7 +166,7 @@ public final class BigQueryIOST extends IOStressTestBase {
           ImmutableMap.of(
               "medium",
               Configuration.fromJsonString(
-                  "{\"numColumns\":10,\"rowsPerSecond\":25000,\"minutes\":30,\"numRecords\":90000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
+                  "{\"numColumns\":10,\"rowsPerSecond\":25000,\"minutes\":30,\"numRecords\":90000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":100,\"runner\":\"DataflowRunner\"}",
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
@@ -300,7 +300,7 @@ public final class BigQueryIOST extends IOStressTestBase {
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
               .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
-              .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
+              .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
     }
     source.apply(
         "Write to BQ",
