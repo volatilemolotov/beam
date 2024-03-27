@@ -296,6 +296,7 @@ public final class BigQueryIOST extends IOStressTestBase {
               .apply(
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
+              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
               .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
     }
     source.apply(

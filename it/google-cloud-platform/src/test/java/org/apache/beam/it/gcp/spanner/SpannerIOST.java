@@ -146,7 +146,7 @@ public final class SpannerIOST extends IOStressTestBase {
                     ImmutableMap.of(
                             "medium",
                             Configuration.fromJsonString(
-                                    "{\"numRecords\":10000000,\"rowsPerSecond\":10000,\"minutes\":130,\"pipelineTimeout\":200,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
+                                    "{\"numRecords\":10000000,\"rowsPerSecond\":10000,\"minutes\":60,\"pipelineTimeout\":200,\"valueSizeBytes\":1000,\"runner\":\"DataflowRunner\"}",
                                     Configuration.class),
                             "large",
                             Configuration.fromJsonString(
@@ -248,7 +248,6 @@ public final class SpannerIOST extends IOStressTestBase {
                             .apply(
                                     "One input to multiple outputs",
                                     ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
-                            .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
                             .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
         }
         source
@@ -262,10 +261,13 @@ public final class SpannerIOST extends IOStressTestBase {
                         SpannerIO.write()
                                 .withProjectId(project)
                                 .withInstanceId(resourceManager.getInstanceId())
-                                .withDatabaseId(resourceManager.getDatabaseId()));
+                                .withDatabaseId(resourceManager.getDatabaseId())
+                                .withCommitDeadline(org.joda.time.Duration.standardSeconds(100))
+                                .withMaxCumulativeBackoff(org.joda.time.Duration.standardMinutes(30))
+                                .withHighPriority());
 
         PipelineLauncher.LaunchConfig options =
-                PipelineLauncher.LaunchConfig.builder("mytestname-write-spanner")
+                PipelineLauncher.LaunchConfig.builder("test-write-spanner")
                         .setSdk(PipelineLauncher.Sdk.JAVA)
                         .setPipeline(writePipeline)
                         .addParameter("runner", configuration.runner)
