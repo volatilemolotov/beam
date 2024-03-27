@@ -85,7 +85,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/.test-infra/kubernetes/kafka-cluster/
           kubectl apply -R -f ${{ github.workspace }}/.test-infra/kubernetes/kafka-cluster/
-          kubectl wait pod -l 'app=kafka,!job-name' --for=condition=Ready
+          kubectl wait pod -l 'app=kafka,!job-name' --for=condition=Ready --timeout=120s
       - name: Set up Kafka brokers
         id: set_brokers
         run: |
