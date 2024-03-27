@@ -264,7 +264,7 @@ public final class BigTableIOST extends IOStressTestBase {
                 .withTableId(tableId));
 
     PipelineLauncher.LaunchConfig options =
-        PipelineLauncher.LaunchConfig.builder("vdjerek-write-bigtable")
+        PipelineLauncher.LaunchConfig.builder("write-bigtable")
             .setSdk(PipelineLauncher.Sdk.JAVA)
             .setPipeline(writePipeline)
             .addParameter("runner", configuration.runner)
@@ -294,7 +294,7 @@ public final class BigTableIOST extends IOStressTestBase {
         .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
 
     PipelineLauncher.LaunchConfig options =
-        PipelineLauncher.LaunchConfig.builder("vdjerek-read-bigtable")
+        PipelineLauncher.LaunchConfig.builder("read-bigtable")
             .setSdk(PipelineLauncher.Sdk.JAVA)
             .setPipeline(readPipeline)
             .addParameter("runner", configuration.runner)

@@ -66,8 +66,8 @@ jobs:
       matrix:
         job_phrase: ["Run Java PostCommit IO Performance Tests"]
         job_name: ["beam_PostCommit_Java_IO_Performance_Tests"]
-        #test_case: ["GCSPerformanceTest", "BigTablePerformanceTest", "BigQueryStorageApiStreamingPerformanceTest"]
-        test_case: ["BigTablePerformanceTest" ]
+        test_case: ["GCSPerformanceTest", "BigTablePerformanceTest", "BigQueryStorageApiStreamingPerformanceTest"]
+        #test_case: ["BigTablePerformanceTest" ]
     steps:
     - uses: actions/checkout@v4
     - name: Setup repository
