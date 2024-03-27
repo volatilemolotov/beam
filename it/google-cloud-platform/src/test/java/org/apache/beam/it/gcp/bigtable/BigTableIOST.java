@@ -120,7 +120,7 @@ public final class BigTableIOST extends IOStressTestBase {
     }
     // Use streaming pipeline to write records
     writePipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
-    
+
     if (configuration.exportMetricsToInfluxDB) {
       configuration.influxHost =
           TestProperties.getProperty("influxHost", "", TestProperties.Type.PROPERTY);
