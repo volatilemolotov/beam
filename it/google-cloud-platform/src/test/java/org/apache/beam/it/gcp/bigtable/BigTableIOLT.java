@@ -174,11 +174,11 @@ public class BigTableIOLT extends IOLoadTestBase {
         .apply("Write to BigTable", writeIO);
 
     PipelineLauncher.LaunchConfig options =
-        PipelineLauncher.LaunchConfig.builder("vdjerek-test")
+        PipelineLauncher.LaunchConfig.builder("write-bigtable")
             .setSdk(PipelineLauncher.Sdk.JAVA)
             .setPipeline(writePipeline)
             .addParameter("runner", configuration.getRunner())
-            .addParameter("maxNumWorkers","10")
+            .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
             .build();
 
     return pipelineLauncher.launch(project, region, options);
@@ -197,11 +197,11 @@ public class BigTableIOLT extends IOLoadTestBase {
         .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
 
     PipelineLauncher.LaunchConfig options =
-        PipelineLauncher.LaunchConfig.builder("vdjerek-test")
+        PipelineLauncher.LaunchConfig.builder("read-bigtable")
             .setSdk(PipelineLauncher.Sdk.JAVA)
             .setPipeline(readPipeline)
             .addParameter("runner", configuration.getRunner())
-            .addParameter("maxNumWorkers","10")
+            .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
             .build();
 
     return pipelineLauncher.launch(project, region, options);
