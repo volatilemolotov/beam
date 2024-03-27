@@ -86,7 +86,8 @@ jobs:
           cd ${{ github.workspace }}/.test-infra/kubernetes/kafka-cluster/
           kubectl apply -R -f ${{ github.workspace }}/.test-infra/kubernetes/kafka-cluster/
           kubectl wait statefulset kafka --for jsonpath='{.status.replicas}'=3
-          kubectl wait pod -l='kafka-broker-id' --for=condition=Ready
+          sleep 60
+          #kubectl wait pod -l='kafka-broker-id' --for=condition=Ready
       - name: Set up Kafka brokers
         id: set_brokers
         run: |
