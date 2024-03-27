@@ -267,12 +267,12 @@ public final class BigQueryIOST extends IOStressTestBase {
     writePipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
 
     // The PeriodicImpulse source will generate an element every this many millis:
-    int fireInterval = 1;
+//    int fireInterval = 1;
     // Each element from PeriodicImpulse will fan out to this many elements:
     int startMultiplier =
         Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
-    long stopAfterMillis =
-        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
+//    long stopAfterMillis =
+//        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
 //    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
     List<LoadPeriod> loadPeriods =
         getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
