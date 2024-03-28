@@ -103,4 +103,4 @@ jobs:
       - name: run Kafka StressTest Large
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :it:kafka:KafkaStressTestLarge --info -DbootstrapServers="34.66.35.87:9094"
+          gradle-command: :it:kafka:KafkaStressTestLarge --info -DbootstrapServers="35.223.179.5:9094,35.223.179.5:9094,35.192.126.141:9094"
