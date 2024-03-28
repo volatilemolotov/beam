@@ -160,7 +160,7 @@ public final class BigQueryIOST extends IOStressTestBase {
           ImmutableMap.of(
               "medium",
               Configuration.fromJsonString(
-                  "{\"numColumns\":10,\"rowsPerSecond\":25000,\"minutes\":30,\"numRecords\":900000,\"valueSizeBytes\":1000,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
+                  "{\"numColumns\":10,\"rowsPerSecond\":25000,\"minutes\":60,\"numRecords\":8000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
@@ -267,13 +267,13 @@ public final class BigQueryIOST extends IOStressTestBase {
     writePipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
 
     // The PeriodicImpulse source will generate an element every this many millis:
-//    int fireInterval = 1;
+    //    int fireInterval = 1;
     // Each element from PeriodicImpulse will fan out to this many elements:
     int startMultiplier =
         Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
-//    long stopAfterMillis =
-//        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
-//    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
+    //    long stopAfterMillis =
+    //        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
+    //    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
     List<LoadPeriod> loadPeriods =
         getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
