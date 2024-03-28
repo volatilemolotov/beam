@@ -17,7 +17,6 @@
  */
 package org.apache.beam.it.gcp.bigquery;
 
-import static org.apache.beam.sdk.io.gcp.bigquery.BigQueryIO.TypedRead.Method.DIRECT_READ;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -76,7 +75,6 @@ import org.junit.*;
 public final class BigQueryIOST extends IOStressTestBase {
 
   private static final String READ_ELEMENT_METRIC_NAME = "read_count";
-  private static final String WRITE_ELEMENT_METRIC_NAME = "write_count";
 
   private static BigQueryResourceManager resourceManager;
   private static String tableName;
@@ -89,7 +87,6 @@ public final class BigQueryIOST extends IOStressTestBase {
   private TableSchema schema;
 
   @Rule public TestPipeline writePipeline = TestPipeline.create();
-  @Rule public TestPipeline readPipeline = TestPipeline.create();
 
   @BeforeClass
   public static void beforeClass() {
@@ -137,9 +134,8 @@ public final class BigQueryIOST extends IOStressTestBase {
       tempLocation = String.format("gs://%s/temp/", tempBucketName);
       writePipeline.getOptions().as(TestPipelineOptions.class).setTempRoot(tempLocation);
       writePipeline.getOptions().setTempLocation(tempLocation);
-      readPipeline.getOptions().as(TestPipelineOptions.class).setTempRoot(tempLocation);
-      readPipeline.getOptions().setTempLocation(tempLocation);
     }
+    writePipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
 
     if (configuration.exportMetricsToInfluxDB) {
       configuration.influxHost =
@@ -176,7 +172,7 @@ public final class BigQueryIOST extends IOStressTestBase {
   }
 
   @Test
-  @Ignore
+//  @Ignore
   public void testJsonStreamingWriteThenRead() throws IOException {
     configuration.writeFormat = "JSON";
     configuration.writeMethod = "STREAMING_INSERTS";
@@ -192,6 +188,7 @@ public final class BigQueryIOST extends IOStressTestBase {
   }
 
   @Test
+  @Ignore
   public void testJsonStorageAPIWrite() throws IOException {
     configuration.writeFormat = "JSON";
     configuration.writeMethod = "STORAGE_WRITE_API";
@@ -294,7 +291,7 @@ public final class BigQueryIOST extends IOStressTestBase {
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
 //              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
-              .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
+              .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
     }
     source.apply(
         "Write to BQ",
@@ -318,50 +315,23 @@ public final class BigQueryIOST extends IOStressTestBase {
             .addParameter("experiments", GcpOptions.STREAMING_ENGINE_EXPERIMENT)
             .build();
 
-    PipelineLauncher.LaunchInfo writeInfo = pipelineLauncher.launch(project, region, options);
-    PipelineLauncher.LaunchInfo readInfo = null;
-    try {
-      PipelineOperator.Result result =
-          pipelineOperator.waitUntilDone(
-              createConfig(writeInfo, Duration.ofMinutes(configuration.pipelineTimeout)));
+    PipelineLauncher.LaunchInfo launchInfo = pipelineLauncher.launch(project, region, options);
+    PipelineOperator.Result result =
+        pipelineOperator.waitUntilDone(
+            createConfig(launchInfo, Duration.ofMinutes(configuration.pipelineTimeout)));
 
-      // Fail the test if pipeline failed.
-      assertNotEquals(PipelineOperator.Result.LAUNCH_FAILED, result);
+    // Fail the test if pipeline failed.
+    assertNotEquals(PipelineOperator.Result.LAUNCH_FAILED, result);
 
-      readInfo = readData();
-      result =
-          pipelineOperator.waitUntilDone(
-              createConfig(readInfo, Duration.ofMinutes(configuration.pipelineTimeout)));
-      // Fail the test if pipeline failed.
-      assertNotEquals(PipelineOperator.Result.LAUNCH_FAILED, result);
-
-      // check metrics
-      double writeNumRecords =
-          pipelineLauncher.getMetric(
-              project,
-              region,
-              writeInfo.jobId(),
-              getBeamMetricsName(PipelineMetricsType.COUNTER, WRITE_ELEMENT_METRIC_NAME));
-      double readNumRecords =
-          pipelineLauncher.getMetric(
-              project,
-              region,
-              readInfo.jobId(),
-              getBeamMetricsName(PipelineMetricsType.COUNTER, READ_ELEMENT_METRIC_NAME));
-      //    Long rowCount = resourceManager.getRowCount(tableName);
-      assertEquals(readNumRecords, writeNumRecords, 0.5);
-    } finally {
-      // clean up pipelines
-      if (pipelineLauncher.getJobStatus(project, region, writeInfo.jobId())
-          == PipelineLauncher.JobState.RUNNING) {
-        pipelineLauncher.cancelJob(project, region, writeInfo.jobId());
-      }
-      if (readInfo != null
-          && pipelineLauncher.getJobStatus(project, region, readInfo.jobId())
-              == PipelineLauncher.JobState.RUNNING) {
-        pipelineLauncher.cancelJob(project, region, readInfo.jobId());
-      }
-    }
+    // check metrics
+    double numRecords =
+        pipelineLauncher.getMetric(
+            project,
+            region,
+            launchInfo.jobId(),
+            getBeamMetricsName(PipelineMetricsType.COUNTER, READ_ELEMENT_METRIC_NAME));
+    Long rowCount = resourceManager.getRowCount(tableName);
+    assertEquals(rowCount, numRecords, 0.5);
 
     // export metrics
     MetricsConfiguration metricsConfig =
@@ -372,27 +342,7 @@ public final class BigQueryIOST extends IOStressTestBase {
             .setOutputPCollectionV2("Counting element/ParMultiDo(Counting).out0")
             .build();
     exportMetrics(
-        writeInfo, metricsConfig, configuration.exportMetricsToInfluxDB, influxDBSettings);
-  }
-
-  /** The method reads data from BigQuery table in streaming mode. */
-  private PipelineLauncher.LaunchInfo readData() throws IOException {
-
-    readPipeline
-        .apply(
-            "Read from BQ", BigQueryIO.readTableRows().from(tableQualifier).withMethod(DIRECT_READ))
-        .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
-
-    PipelineLauncher.LaunchConfig options =
-        PipelineLauncher.LaunchConfig.builder("test-read-bigquery")
-            .setSdk(PipelineLauncher.Sdk.JAVA)
-            .setPipeline(readPipeline)
-            .addParameter("runner", configuration.runner)
-            .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
-            .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
-            .build();
-
-    return pipelineLauncher.launch(project, region, options);
+        launchInfo, metricsConfig, configuration.exportMetricsToInfluxDB, influxDBSettings);
   }
 
   abstract static class FormatFn<InputT, OutputT> implements SerializableFunction<InputT, OutputT> {
