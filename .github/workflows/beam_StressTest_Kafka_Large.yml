@@ -80,6 +80,7 @@ jobs:
         with:
           cluster_name: vdjerek-test-kafka
           k8s_namespace: ${{ matrix.job_name }}-${{ github.run_id }}
+          cluster_zone: us-central1-c
       - name: Install Kafka
         id: install_kafka
         run: |
