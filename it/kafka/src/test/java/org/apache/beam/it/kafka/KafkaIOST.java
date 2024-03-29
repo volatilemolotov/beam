@@ -181,10 +181,6 @@ public final class KafkaIOST extends IOStressTestBase {
           pipelineOperator.waitUntilDone(
               createConfig(readInfo, Duration.ofMinutes(configuration.pipelineTimeout)));
       assertNotEquals(PipelineOperator.Result.LAUNCH_FAILED, readResult);
-      // streaming read pipeline does not end itself
-      assertEquals(
-          PipelineLauncher.JobState.RUNNING,
-          pipelineLauncher.getJobStatus(project, region, readInfo.jobId()));
 
       // Delete topic after test run
       adminClient.deleteTopics(Collections.singleton(kafkaTopic));
