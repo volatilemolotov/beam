@@ -76,7 +76,7 @@ import org.junit.*;
 public final class BigQueryIOST extends IOStressTestBase {
 
   private static final String READ_ELEMENT_METRIC_NAME = "read_count";
-  private static final int[] LOAD_INCREASE_ARRAY = {1, 1, 1, 1, 1, 1};
+//  private static final int[] LOAD_INCREASE_ARRAY = {1, 1, 1, 1, 1, 1};
 
   private static BigQueryResourceManager resourceManager;
   private static String tableName;
