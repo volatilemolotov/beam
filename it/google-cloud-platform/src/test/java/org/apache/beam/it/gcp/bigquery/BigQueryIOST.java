@@ -278,7 +278,7 @@ public final class BigQueryIOST extends IOStressTestBase {
     //        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
     //    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
     List<LoadPeriod> loadPeriods =
-        getLoadPeriods(configuration.minutes, LOAD_INCREASE_ARRAY);
+        getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
     PCollection<KV<byte[], byte[]>> source =
         writePipeline.apply(Read.from(new SyntheticUnboundedSource(configuration)));
