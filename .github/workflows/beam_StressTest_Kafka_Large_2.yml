@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: AAA Kafka StressTest Large 2
+name: AAA Kafka StressTest Large
 
 on:
   workflow_dispatch:
@@ -47,18 +47,18 @@ env:
   INFLUXDB_USER_PASSWORD: ${{ secrets.INFLUXDB_USER_PASSWORD }}
 
 jobs:
-  beam_Kafka_StressTest_Large_2:
+  beam_Kafka_StressTest_Large:
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'schedule' && github.repository == 'apache/beam') ||
-      github.event.comment.body == 'Run Kafka StressTest Large 2'
+      github.event.comment.body == 'Run Kafka StressTest Large'
     runs-on: [self-hosted, ubuntu-20.04, highmem]
     timeout-minutes: 720
     name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
     strategy:
       matrix:
-        job_name: ["beam_Kafka_StressTest_Large_2"]
-        job_phrase: ["Run Kafka StressTest Large 2"]
+        job_name: ["beam_Kafka_StressTest_Large"]
+        job_phrase: ["Run Kafka StressTest Large"]
     steps:
       - uses: actions/checkout@v4
       - name: Setup repository
@@ -75,32 +75,35 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-      # - name: Set k8s access
-      #   uses: ./.github/actions/setup-k8s-access
-      #   with:
-      #     cluster_name: io-datastores
-      #     k8s_namespace: ${{ matrix.job_name }}-${{ github.run_id }}
-      # - name: Install Kafka
-      #   id: install_kafka
-      #   run: |
-      #     cd ${{ github.workspace }}/.test-infra/kubernetes/kafka-cluster/
-      #     kubectl apply -R -f ${{ github.workspace }}/.test-infra/kubernetes/kafka-cluster/
-      #     kubectl wait pod -l 'app=kafka,!job-name' --for=condition=Ready --timeout=300s
-      # - name: Set up Kafka brokers
-      #   id: set_brokers
-      #   run: |
-      #     declare -a kafka_service_brokers
-      #     for INDEX in {0..2}; do
-      #       kubectl wait svc/outside-${INDEX} --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' --timeout=300s
-      #       kafka_service_brokers[$INDEX]=$(kubectl get svc outside-${INDEX} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-      #       echo "KAFKA_SERVICE_BROKER_${INDEX}=${kafka_service_brokers[$INDEX]}" >> $GITHUB_OUTPUT
-      #     done
-      # - name: debug kafka params
-      #   run: |
-      #     echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_0 }}"
-      #     echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_1 }}"
-      #     echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_2 }}"
+      - name: Set k8s access
+        uses: ./.github/actions/setup-k8s-access
+        with:
+          cluster_name: vdjerek-test-hr3bbh
+          k8s_namespace: ${{ matrix.job_name }}-${{ github.run_id }}
+          cluster_zone: us-central1
+      - name: Install Kafka
+        id: install_kafka
+        run: |
+          kubectl apply -k ${{ github.workspace }}/.test-infra/kafka/strimzi/02.kafka-persistent/base/v0.33.2
+          kubectl wait kafka beam-testing-cluster --for=condition=Ready --timeout=300s
+      - name: Set up Kafka brokers
+        id: set_brokers
+        run: |
+          declare -a kafka_service_brokers
+          declare -a kafka_service_brokers_ports
+          for INDEX in {0..2}; do
+            kubectl wait svc/beam-testing-cluster-${INDEX} --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' --timeout=300s
+            kafka_service_brokers[$INDEX]=$(kubectl get svc beam-testing-cluster-${INDEX} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+            kafka_service_brokers_ports[$INDEX]=$(kubectl get svc beam-testing-cluster-${INDEX} -o jsonpath='{.spec.ports[0].port}')
+            echo "KAFKA_SERVICE_BROKER_${INDEX}=${kafka_service_brokers[$INDEX]}" >> $GITHUB_OUTPUT
+            echo "KAFKA_SERVICE_BROKER_PORTS_${INDEX}=${kafka_service_brokers_ports[$INDEX]}" >> $GITHUB_OUTPUT
+          done
+      - name: debug kafka params
+        run: |
+          echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_0 }}:${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_PORTS_0 }}"
+          echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_1 }}:${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_PORTS_1 }}"
+          echo "${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_2 }}:${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_PORTS_2 }}"
       - name: run Kafka StressTest Large
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :it:kafka:KafkaStressTestLarge --info -DbootstrapServers="35.222.33.255:32400,34.136.238.205:32400,34.136.238.205:32400"
+          gradle-command: :it:kafka:KafkaStressTestLarge --info -DbootstrapServers="${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_0 }}:${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_PORTS_0 }},${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_1 }}:${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_PORTS_1 }},${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_2 }}:${{ steps.set_brokers.outputs.KAFKA_SERVICE_BROKER_PORTS_2 }}"
