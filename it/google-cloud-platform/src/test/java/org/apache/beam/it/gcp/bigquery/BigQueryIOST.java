@@ -161,7 +161,7 @@ public final class BigQueryIOST extends IOStressTestBase {
           ImmutableMap.of(
               "medium",
               Configuration.fromJsonString(
-                  "{\"numColumns\":10,\"rowsPerSecond\":1000,\"minutes\":40,\"numRecords\":8000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
+                  "{\"numColumns\":10,\"rowsPerSecond\":2000,\"minutes\":40,\"numRecords\":8000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
