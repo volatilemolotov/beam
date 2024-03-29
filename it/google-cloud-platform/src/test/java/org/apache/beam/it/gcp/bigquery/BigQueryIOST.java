@@ -76,6 +76,7 @@ import org.junit.*;
 public final class BigQueryIOST extends IOStressTestBase {
 
   private static final String READ_ELEMENT_METRIC_NAME = "read_count";
+  private static final int[] LOAD_INCREASE_ARRAY = {1, 1, 1, 1, 1, 1};
 
   private static BigQueryResourceManager resourceManager;
   private static String tableName;
@@ -277,7 +278,7 @@ public final class BigQueryIOST extends IOStressTestBase {
     //        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
     //    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
     List<LoadPeriod> loadPeriods =
-        getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
+        getLoadPeriods(configuration.minutes, LOAD_INCREASE_ARRAY);
 
     PCollection<KV<byte[], byte[]>> source =
         writePipeline.apply(Read.from(new SyntheticUnboundedSource(configuration)));
