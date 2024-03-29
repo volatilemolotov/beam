@@ -56,6 +56,7 @@ import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.testing.TestPipelineOptions;
 import org.apache.beam.sdk.testutils.publishing.InfluxDBSettings;
 import org.apache.beam.sdk.transforms.*;
+import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
@@ -160,7 +161,7 @@ public final class BigQueryIOST extends IOStressTestBase {
           ImmutableMap.of(
               "medium",
               Configuration.fromJsonString(
-                  "{\"numColumns\":10,\"rowsPerSecond\":25000,\"minutes\":30,\"numRecords\":8000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
+                  "{\"numColumns\":10,\"rowsPerSecond\":25000,\"minutes\":40,\"numRecords\":8000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
@@ -278,28 +279,28 @@ public final class BigQueryIOST extends IOStressTestBase {
     List<LoadPeriod> loadPeriods =
         getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
-    PCollection<byte[]> source =
-        writePipeline
-            .apply(Read.from(new SyntheticUnboundedSource(configuration)))
-            .apply(
-                "Extract row IDs",
-                MapElements.into(TypeDescriptor.of(byte[].class)).via(kv -> kv.getValue()));
+    PCollection<KV<byte[], byte[]>> source =
+        writePipeline.apply(Read.from(new SyntheticUnboundedSource(configuration)));
     if (startMultiplier > 1) {
       source =
           source
               .apply(
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
-//              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
-              .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)));
+              .apply("Reshuffle fanout", Reshuffle.of());
     }
-    source.apply(
-        "Write to BQ",
-        writeIO
-            .to(tableQualifier)
-            .withMethod(method)
-            .withSchema(schema)
-            .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
+    source
+        .apply(
+            "Extract row IDs",
+            MapElements.into(TypeDescriptor.of(byte[].class)).via(kv -> kv.getValue()))
+        .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)))
+        .apply(
+            "Write to BQ",
+            writeIO
+                .to(tableQualifier)
+                .withMethod(method)
+                .withSchema(schema)
+                .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
 
     PipelineLauncher.LaunchConfig options =
         PipelineLauncher.LaunchConfig.builder("write-bigquery")
