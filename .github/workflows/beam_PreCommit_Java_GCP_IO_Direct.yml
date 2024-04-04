@@ -109,7 +109,7 @@ jobs:
           gradle-command: |
             :sdks:java:io:google-cloud-platform:build \
             :sdks:java:io:google-cloud-platform:expansion-service:build \
-            :sdks:java:io:google-cloud-platform:postCommit \
+            :sdks:java:io:google-cloud-platform:postCommit --info\
           arguments: |
             -PdisableSpotlessCheck=true \
             -PdisableCheckStyle=true \
