@@ -143,7 +143,8 @@ docker {
     ])
     buildx project.useBuildx()
     platform(*project.containerPlatforms())
-    load project.useBuildx() && !pushContainers
+//    load project.useBuildx() && !pushContainers
+    load project.useBuildx()
     push pushContainers
 }
 
