@@ -87,7 +87,7 @@ jobs:
           USER: github-actions
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :runners:google-cloud-dataflow-java:validatesCrossLanguageRunnerGoUsingJava
+          gradle-command: :runners:google-cloud-dataflow-java:validatesCrossLanguageRunnerGoUsingJava --info
           arguments: |
             -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions \
             -Pdocker-tag=${{ steps.set_tag.outputs.TAG }} \
