@@ -334,7 +334,7 @@ def buildAndPushDockerPythonContainer = tasks.create("buildAndPushDockerPythonCo
       commandLine "docker", "tag", "${defaultDockerImageName}", "${dockerPythonImageName}"
     }
     exec {
-      commandLine "gcloud", "docker", "--", "push", "${dockerPythonImageName}"
+      commandLine "docker", "--", "push", "${dockerPythonImageName}"
     }
   }
 }
