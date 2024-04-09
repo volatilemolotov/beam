@@ -353,7 +353,7 @@ public final class KafkaIOST extends IOStressTestBase {
      * InfluxDB and displayed using Grafana. If set to false, metrics will be exported to BigQuery
      * and displayed with Looker Studio.
      */
-    @JsonProperty public boolean exportMetricsToInfluxDB = false;
+    @JsonProperty public boolean exportMetricsToInfluxDB = true;
 
     /** InfluxDB measurement to publish results to. * */
     @JsonProperty public String influxMeasurement = KafkaIOST.class.getName();
