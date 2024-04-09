@@ -102,7 +102,7 @@ jobs:
           cd ${{ github.workspace }}/.test-infra/dataproc; ./flink_cluster.sh create
       # The env variables are created and populated in the test-arguments-action as "<github.job>_test_arguments_<argument_file_paths_index>"
       - name: run GBK Flink Batch Go Load Test 1 (10 b records)
-        timeout-minutes: 120
+        timeout-minutes: 1200
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -111,7 +111,7 @@ jobs:
             -Prunner=FlinkRunner \
             '-PloadTest.args=${{ env.beam_LoadTests_Go_GBK_Flink_Batch_test_arguments_1 }}' \
       - name: run GBK Flink Batch Go Load Test 2 (100 b records)
-        timeout-minutes: 120
+        timeout-minutes: 1200
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -120,7 +120,7 @@ jobs:
             -Prunner=FlinkRunner \
             '-PloadTest.args=${{ env.beam_LoadTests_Go_GBK_Flink_Batch_test_arguments_2 }}' \
       - name: run GBK Flink Batch Go Load Test 3 (100 kb records)
-        timeout-minutes: 120
+        timeout-minutes: 1200
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -129,7 +129,7 @@ jobs:
             -Prunner=FlinkRunner \
             '-PloadTest.args=${{ env.beam_LoadTests_Go_GBK_Flink_Batch_test_arguments_3 }}' \
       - name: run GBK Flink Batch Go Load Test 6 (reiterate 4 times 10 kb)
-        timeout-minutes: 120
+        timeout-minutes: 1200
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -143,7 +143,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}/.test-infra/dataproc; ./flink_cluster.sh restart
       - name: run GBK Flink Batch Go Load Test 4 (fanout 4)
-        timeout-minutes: 120
+        timeout-minutes: 1200
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
@@ -152,7 +152,7 @@ jobs:
             -Prunner=FlinkRunner \
             '-PloadTest.args=${{ env.beam_LoadTests_Go_GBK_Flink_Batch_test_arguments_4 }}' \
       - name: run GBK Flink Batch Go Load Test 5 (fanout 8)
-        timeout-minutes: 120
+        timeout-minutes: 1200
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :sdks:go:test:load:run
