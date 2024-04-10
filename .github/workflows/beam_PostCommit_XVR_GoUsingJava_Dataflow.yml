@@ -82,15 +82,28 @@ jobs:
       - name: Generate TAG unique variable based on timestamp
         id: set_tag
         run: echo "TAG=$(date +'%Y%m%d-%H%M%S%N')" >> $GITHUB_OUTPUT
+      # - name: run XVR GoUsingJava Dataflow script
+      #   env:
+      #     USER: github-actions
+      #   uses: ./.github/actions/gradle-command-self-hosted-action
+      #   with:
+      #     gradle-command: :runners:google-cloud-dataflow-java:validatesCrossLanguageRunnerGoUsingJava --info
+      #     arguments: |
+      #       -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions \
+      #       -Pdocker-tag=2.56.0.dev \
+      #       -Pdocker_image_default_repo_root=us.gcr.io/apache-beam-testing/github-actions \
+      #       -Ppush-containers \
+      #       -Pcontainer-architecture-list=arm64,amd64 \
       - name: run XVR GoUsingJava Dataflow script
         env:
           USER: github-actions
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :runners:google-cloud-dataflow-java:validatesCrossLanguageRunnerGoUsingJava --info
+          gradle-command: :runners:google-cloud-dataflow-java:buildAndPushDockerPythonContainer --info
           arguments: |
             -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions \
             -Pdocker-tag=2.56.0.dev \
+            -Pdocker_image_default_repo_root=us.gcr.io/apache-beam-testing/github-actions \
             -Ppush-containers \
             -Pcontainer-architecture-list=arm64,amd64 \
       - name: Archive JUnit Test Results
