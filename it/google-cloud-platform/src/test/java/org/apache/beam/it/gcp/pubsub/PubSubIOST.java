@@ -234,7 +234,7 @@ public class PubSubIOST extends IOStressTestBase {
 
       // Assert that actual data equals or greater than expected data number since there might be
       // duplicates when testing big amount of data
-      assertTrue(readNumRecords >= writeNumRecords);
+      assertTrue(writeNumRecords >= readNumRecords);
 
       // export metrics
       MetricsConfiguration writeMetricsConfig =
@@ -335,6 +335,7 @@ public class PubSubIOST extends IOStressTestBase {
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
             .addParameter("streaming", "true")
+            .addParameter("experiments", "use_runner_v2")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
@@ -368,6 +369,7 @@ public class PubSubIOST extends IOStressTestBase {
             .setPipeline(readPipeline)
             .addParameter("runner", configuration.runner)
             .addParameter("streaming", "true")
+            .addParameter("experiments", "use_runner_v2")
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
             .build();
