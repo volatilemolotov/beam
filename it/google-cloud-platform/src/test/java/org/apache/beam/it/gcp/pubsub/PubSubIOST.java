@@ -368,7 +368,6 @@ public class PubSubIOST extends IOStressTestBase {
             .setPipeline(readPipeline)
             .addParameter("runner", configuration.runner)
             .addParameter("streaming", "true")
-            .addParameter("experiments", "use_runner_v2")
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
             .build();
