@@ -331,10 +331,10 @@ def buildAndPushDockerPythonContainer = tasks.create("buildAndPushDockerPythonCo
           tag: project.sdk_version)
   doLast {
     exec {
-      commandLine "docker", "tag", "${defaultDockerImageName}", "${dockerPythonImageName}"
+      commandLine "echo", "DOCKERTAG", "&&",  "docker", "tag", "${defaultDockerImageName}", "${dockerPythonImageName}"
     }
     exec {
-      commandLine "docker", "--", "push", "${dockerPythonImageName}"
+      commandLine "echo", "DOCKERPUSH", "&&", "docker", "--", "push", "${dockerPythonImageName}"
     }
   }
 }
