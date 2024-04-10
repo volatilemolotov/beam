@@ -90,7 +90,6 @@ jobs:
           gradle-command: :runners:google-cloud-dataflow-java:validatesCrossLanguageRunnerGoUsingJava --info
           arguments: |
             -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions \
-            -Pdocker-tag=vdjerek-test1 \
             -Ppush-containers \
             -Pcontainer-architecture-list=arm64,amd64 \
       - name: Archive JUnit Test Results
