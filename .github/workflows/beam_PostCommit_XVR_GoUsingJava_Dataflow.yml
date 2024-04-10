@@ -91,6 +91,7 @@ jobs:
           arguments: |
             -Pdocker-repository-root=us.gcr.io/apache-beam-testing/github-actions \
             -Pdocker-tag=2.56.0.dev \
+            -Pdocker_image_default_repo_root=us.gcr.io/apache-beam-testing/github-actions \
             -Ppush-containers \
             -Pcontainer-architecture-list=arm64,amd64 \
       - name: Archive JUnit Test Results
