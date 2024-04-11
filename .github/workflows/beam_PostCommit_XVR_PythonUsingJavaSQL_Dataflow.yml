@@ -74,9 +74,13 @@ jobs:
         uses: ./.github/actions/setup-environment-action
         with:
           python-version: 3.11
+      - name: Authenticate on GCP
+        id: auth
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: run PostCommit XVR PythonUsingJavaSQL Dataflow script
-#        env:
-#          CLOUDSDK_CONFIG: ${{ env.KUBELET_GCLOUD_CONFIG_PATH}}
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
           gradle-command: :runners:google-cloud-dataflow-java:validatesCrossLanguageRunnerPythonUsingSql
