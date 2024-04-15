@@ -26,17 +26,17 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 import org.apache.beam.it.common.PipelineLauncher;
 import org.apache.beam.it.common.PipelineOperator;
 import org.apache.beam.it.common.TestProperties;
 import org.apache.beam.it.gcp.IOStressTestBase;
 import org.apache.beam.runners.dataflow.options.DataflowPipelineWorkerPoolOptions;
+import org.apache.beam.sdk.io.Read;
 import org.apache.beam.sdk.io.kafka.KafkaIO;
 import org.apache.beam.sdk.io.synthetic.SyntheticSourceOptions;
+import org.apache.beam.sdk.io.synthetic.SyntheticUnboundedSource;
 import org.apache.beam.sdk.options.StreamingOptions;
 import org.apache.beam.sdk.testing.TestPipeline;
 import org.apache.beam.sdk.testing.TestPipelineOptions;
@@ -45,6 +45,7 @@ import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
 import org.apache.beam.sdk.transforms.PeriodicImpulse;
 import org.apache.beam.sdk.transforms.Reshuffle;
+import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
@@ -146,7 +147,7 @@ public final class KafkaIOST extends IOStressTestBase {
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"rowsPerSecond\":25000,\"minutes\":130,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
+                  "{\"numRecords\":20000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":25000,\"minutes\":60,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -232,27 +233,18 @@ public final class KafkaIOST extends IOStressTestBase {
    * dynamically over time, with options to use configurable parameters.
    */
   private PipelineLauncher.LaunchInfo generateDataAndWrite() throws IOException {
-    // The PeriodicImpulse source will generate an element every this many millis:
-    int fireInterval = 1;
-    // Each element from PeriodicImpulse will fan out to this many elements:
     int startMultiplier =
-        Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
-    long stopAfterMillis =
-        org.joda.time.Duration.standardMinutes(configuration.minutes).getMillis();
-    long totalRows = startMultiplier * stopAfterMillis / fireInterval;
+            Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
     List<LoadPeriod> loadPeriods =
-        getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
+            getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
     PCollection<byte[]> source =
-        writePipeline
-            .apply(
-                PeriodicImpulse.create()
-                    .stopAfter(org.joda.time.Duration.millis(stopAfterMillis - 1))
-                    .withInterval(org.joda.time.Duration.millis(fireInterval)))
-            .apply(
-                "Extract values",
-                MapElements.into(TypeDescriptor.of(byte[].class))
-                    .via(instant -> Longs.toByteArray(instant.getMillis() % totalRows)));
+            writePipeline.apply(
+                    "Read from source", Read.from(new SyntheticUnboundedSource(configuration)))
+                    .apply(
+                            "Extract values",
+                            MapElements.into(TypeDescriptor.of(byte[].class))
+                                    .via(instant -> Objects.requireNonNull(instant).getValue()));
     if (startMultiplier > 1) {
       source =
           source
@@ -267,7 +259,7 @@ public final class KafkaIOST extends IOStressTestBase {
         KafkaIO.<byte[], byte[]>write()
             .withBootstrapServers(configuration.bootstrapServers)
             .withTopic(kafkaTopic)
-            .withValueSerializer(ByteArraySerializer.class)
+                .withValueSerializer(ByteArraySerializer.class)
             .withProducerConfigUpdates(
                 ImmutableMap.of(
                     ProducerConfig.RETRIES_CONFIG, 10,
