@@ -264,7 +264,7 @@ public final class KafkaIOST extends IOStressTestBase {
                 ImmutableMap.of(
                     ProducerConfig.RETRIES_CONFIG, 10,
                     ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 600000,
-                    ProducerConfig.LINGER_MS_CONFIG, 10,
+                    ProducerConfig.BATCH_SIZE_CONFIG, 1024 * 2,
                     ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 5000))
             .values());
 
