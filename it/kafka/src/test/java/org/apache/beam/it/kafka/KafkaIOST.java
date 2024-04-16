@@ -251,7 +251,7 @@ public final class KafkaIOST extends IOStressTestBase {
               .apply(
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
-              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
+//              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
               .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
     }
     source.apply(
@@ -264,7 +264,7 @@ public final class KafkaIOST extends IOStressTestBase {
                 ImmutableMap.of(
                     ProducerConfig.RETRIES_CONFIG, 10,
                     ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 600000,
-                    ProducerConfig.BATCH_SIZE_CONFIG, 1024 * 2,
+                    ProducerConfig.BATCH_SIZE_CONFIG, 1024 * 64,
                     ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 5000))
             .values());
 
