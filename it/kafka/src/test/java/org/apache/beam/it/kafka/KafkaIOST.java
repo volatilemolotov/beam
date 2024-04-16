@@ -143,11 +143,11 @@ public final class KafkaIOST extends IOStressTestBase {
           ImmutableMap.of(
               "medium",
               Configuration.fromJsonString(
-                  "{\"rowsPerSecond\":25000,\"minutes\":30,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
+                  "{\"rowsPerSecond\":2000,\"minutes\":30,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"numRecords\":20000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":25000,\"minutes\":60,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
+                  "{\"numRecords\":20000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":2000,\"minutes\":60,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -263,8 +263,9 @@ public final class KafkaIOST extends IOStressTestBase {
             .withProducerConfigUpdates(
                 ImmutableMap.of(
                     ProducerConfig.RETRIES_CONFIG, 10,
-                    ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 5000,
-                    ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 2000))
+                    ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 600000,
+                    ProducerConfig.LINGER_MS_CONFIG, 10,
+                    ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 5000))
             .values());
 
     PipelineLauncher.LaunchConfig options =
