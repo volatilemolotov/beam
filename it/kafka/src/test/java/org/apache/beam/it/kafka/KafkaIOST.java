@@ -260,12 +260,6 @@ public final class KafkaIOST extends IOStressTestBase {
             .withBootstrapServers(configuration.bootstrapServers)
             .withTopic(kafkaTopic)
                 .withValueSerializer(ByteArraySerializer.class)
-            .withProducerConfigUpdates(
-                ImmutableMap.of(
-                    ProducerConfig.RETRIES_CONFIG, 10,
-                    ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 600000,
-                    ProducerConfig.BATCH_SIZE_CONFIG, 1024 * 2,
-                    ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 5000))
             .values());
 
     PipelineLauncher.LaunchConfig options =
@@ -279,7 +273,6 @@ public final class KafkaIOST extends IOStressTestBase {
                     .toString())
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
-            .addParameter("experiments", configuration.useDataflowRunnerV2 ? "use_runner_v2" : "")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
@@ -303,7 +296,6 @@ public final class KafkaIOST extends IOStressTestBase {
             .setPipeline(readPipeline)
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("runner", configuration.runner)
-            .addParameter("experiments", configuration.useDataflowRunnerV2 ? "use_runner_v2" : "")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
