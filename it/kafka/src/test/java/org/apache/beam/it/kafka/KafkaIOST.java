@@ -279,7 +279,6 @@ public final class KafkaIOST extends IOStressTestBase {
                     .toString())
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
-            .addParameter("experiments", configuration.useDataflowRunnerV2 ? "use_runner_v2" : "")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
@@ -303,7 +302,6 @@ public final class KafkaIOST extends IOStressTestBase {
             .setPipeline(readPipeline)
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("runner", configuration.runner)
-            .addParameter("experiments", configuration.useDataflowRunnerV2 ? "use_runner_v2" : "")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
