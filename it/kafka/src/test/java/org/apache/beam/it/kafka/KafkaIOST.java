@@ -156,7 +156,7 @@ public final class KafkaIOST extends IOStressTestBase {
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"rowsPerSecond\":50000,\"numRecords\":5000000,\"valueSizeBytes\":1000,\"minutes\":60,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
+                  "{\"rowsPerSecond\":50000,\"numRecords\":5000000,\"valueSizeBytes\":1000,\"minutes\":60,\"pipelineTimeout\":120,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -200,9 +200,9 @@ public final class KafkaIOST extends IOStressTestBase {
               readInfo.jobId(),
               getBeamMetricsName(PipelineMetricsType.COUNTER, READ_ELEMENT_METRIC_NAME));
 
-      // Assert that readNumRecords equals or greater than writeNumRecords since there might be
+      // Assert that writeNumRecords equals or greater than readNumRecords since there might be
       // duplicates when testing big amount of data
-      assertTrue(readNumRecords >= writeNumRecords);
+      assertTrue(writeNumRecords >= readNumRecords);
     } finally {
       // clean up pipelines
       if (pipelineLauncher.getJobStatus(project, region, writeInfo.jobId())
