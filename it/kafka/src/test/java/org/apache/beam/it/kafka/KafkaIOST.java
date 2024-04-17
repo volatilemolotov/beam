@@ -147,7 +147,7 @@ public final class KafkaIOST extends IOStressTestBase {
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"numRecords\":20000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":2000,\"minutes\":60,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
+                  "{\"numRecords\":40000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":2000,\"minutes\":60,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -264,7 +264,6 @@ public final class KafkaIOST extends IOStressTestBase {
                 ImmutableMap.of(
                     ProducerConfig.RETRIES_CONFIG, 10,
                     ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 600000,
-                    ProducerConfig.BATCH_SIZE_CONFIG, 1024 * 64,
                     ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 5000))
             .values());
 
