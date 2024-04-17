@@ -147,7 +147,7 @@ public final class KafkaIOST extends IOStressTestBase {
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"numRecords\":20000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":25000,\"minutes\":60,\"pipelineTimeout\":300,\"runner\":\"DataflowRunner\"}",
+                  "{\"numRecords\":5000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":25000,\"minutes\":40,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -251,7 +251,7 @@ public final class KafkaIOST extends IOStressTestBase {
               .apply(
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
-//              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
+              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
               .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
     }
     source.apply(
