@@ -26,8 +26,11 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import org.apache.beam.it.common.PipelineLauncher;
 import org.apache.beam.it.common.PipelineOperator;
 import org.apache.beam.it.common.TestProperties;
@@ -43,14 +46,11 @@ import org.apache.beam.sdk.testing.TestPipelineOptions;
 import org.apache.beam.sdk.testutils.publishing.InfluxDBSettings;
 import org.apache.beam.sdk.transforms.MapElements;
 import org.apache.beam.sdk.transforms.ParDo;
-import org.apache.beam.sdk.transforms.PeriodicImpulse;
 import org.apache.beam.sdk.transforms.Reshuffle;
-import org.apache.beam.sdk.values.KV;
 import org.apache.beam.sdk.values.PCollection;
 import org.apache.beam.sdk.values.TypeDescriptor;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.base.Strings;
 import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.collect.ImmutableMap;
-import org.apache.beam.vendor.guava.v32_1_2_jre.com.google.common.primitives.Longs;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -117,8 +117,8 @@ public final class KafkaIOST extends IOStressTestBase {
     kafkaTopic =
         "io-kafka-"
             + DateTimeFormatter.ofPattern("MMddHHmmssSSS")
-                .withZone(ZoneId.of("UTC"))
-                .format(java.time.Instant.now())
+            .withZone(ZoneId.of("UTC"))
+            .format(java.time.Instant.now())
             + UUID.randomUUID().toString().substring(0, 10);
     adminClient.createTopics(Collections.singletonList(new NewTopic(kafkaTopic, 1, (short) 3)));
 
@@ -133,6 +133,15 @@ public final class KafkaIOST extends IOStressTestBase {
     // Use streaming pipeline to write and read records
     writePipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
     readPipeline.getOptions().as(StreamingOptions.class).setStreaming(true);
+
+    if (configuration.exportMetricsToInfluxDB) {
+      configuration.influxHost =
+          TestProperties.getProperty("influxHost", "", TestProperties.Type.PROPERTY);
+      configuration.influxDatabase =
+          TestProperties.getProperty("influxDatabase", "", TestProperties.Type.PROPERTY);
+      configuration.influxMeasurement =
+          TestProperties.getProperty("influxMeasurement", "", TestProperties.Type.PROPERTY);
+    }
   }
 
   private static final Map<String, Configuration> TEST_CONFIGS_PRESET;
@@ -143,11 +152,11 @@ public final class KafkaIOST extends IOStressTestBase {
           ImmutableMap.of(
               "medium",
               Configuration.fromJsonString(
-                  "{\"rowsPerSecond\":25000,\"minutes\":30,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
+                  "{\"rowsPerSecond\":10000,\"numRecords\":1000000,\"valueSizeBytes\":1000,\"minutes\":20,\"pipelineTimeout\":60,\"runner\":\"DataflowRunner\"}",
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"numRecords\":5000000,\"valueSizeBytes\":1000,\"rowsPerSecond\":25000,\"minutes\":40,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
+                  "{\"rowsPerSecond\":50000,\"numRecords\":5000000,\"valueSizeBytes\":1000,\"minutes\":60,\"pipelineTimeout\":90,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -191,9 +200,9 @@ public final class KafkaIOST extends IOStressTestBase {
               readInfo.jobId(),
               getBeamMetricsName(PipelineMetricsType.COUNTER, READ_ELEMENT_METRIC_NAME));
 
-      // Assert that writeNumRecords equals or greater than readNumRecords since there might be
+      // Assert that readNumRecords equals or greater than writeNumRecords since there might be
       // duplicates when testing big amount of data
-      assertTrue(writeNumRecords >= readNumRecords);
+      assertTrue(readNumRecords >= writeNumRecords);
     } finally {
       // clean up pipelines
       if (pipelineLauncher.getJobStatus(project, region, writeInfo.jobId())
@@ -234,24 +243,24 @@ public final class KafkaIOST extends IOStressTestBase {
    */
   private PipelineLauncher.LaunchInfo generateDataAndWrite() throws IOException {
     int startMultiplier =
-            Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
+        Math.max(configuration.rowsPerSecond, DEFAULT_ROWS_PER_SECOND) / DEFAULT_ROWS_PER_SECOND;
     List<LoadPeriod> loadPeriods =
-            getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
+        getLoadPeriods(configuration.minutes, DEFAULT_LOAD_INCREASE_ARRAY);
 
     PCollection<byte[]> source =
-            writePipeline.apply(
-                    "Read from source", Read.from(new SyntheticUnboundedSource(configuration)))
-                    .apply(
-                            "Extract values",
-                            MapElements.into(TypeDescriptor.of(byte[].class))
-                                    .via(instant -> Objects.requireNonNull(instant).getValue()));
+        writePipeline
+            .apply(Read.from(new SyntheticUnboundedSource(configuration)))
+            .apply(
+                "Extract values",
+                MapElements.into(TypeDescriptor.of(byte[].class))
+                    .via(kv -> Objects.requireNonNull(kv).getValue()));
+
     if (startMultiplier > 1) {
       source =
           source
               .apply(
                   "One input to multiple outputs",
                   ParDo.of(new MultiplierDoFn<>(startMultiplier, loadPeriods)))
-//              .apply("Reshuffle fanout", Reshuffle.viaRandomKey())
               .apply("Counting element", ParDo.of(new CountingFn<>(WRITE_ELEMENT_METRIC_NAME)));
     }
     source.apply(
@@ -259,7 +268,7 @@ public final class KafkaIOST extends IOStressTestBase {
         KafkaIO.<byte[], byte[]>write()
             .withBootstrapServers(configuration.bootstrapServers)
             .withTopic(kafkaTopic)
-                .withValueSerializer(ByteArraySerializer.class)
+            .withValueSerializer(ByteArraySerializer.class)
             .withProducerConfigUpdates(
                 ImmutableMap.of(
                     ProducerConfig.RETRIES_CONFIG, 10,
@@ -278,6 +287,7 @@ public final class KafkaIOST extends IOStressTestBase {
                     .toString())
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
+            .addParameter("experiments", configuration.useDataflowRunnerV2 ? "use_runner_v2" : "")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
@@ -301,6 +311,7 @@ public final class KafkaIOST extends IOStressTestBase {
             .setPipeline(readPipeline)
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("runner", configuration.runner)
+            .addParameter("experiments", configuration.useDataflowRunnerV2 ? "use_runner_v2" : "")
             .build();
 
     return pipelineLauncher.launch(project, region, options);
@@ -318,7 +329,7 @@ public final class KafkaIOST extends IOStressTestBase {
      * Determines whether to use Dataflow runner v2. If set to true, it uses SDF mode for reading
      * from Kafka. Otherwise, Unbounded mode will be used.
      */
-    @JsonProperty public boolean useDataflowRunnerV2 = true;
+    @JsonProperty public boolean useDataflowRunnerV2 = false;
 
     /** Number of workers for the pipeline. */
     @JsonProperty public int numWorkers = 20;
