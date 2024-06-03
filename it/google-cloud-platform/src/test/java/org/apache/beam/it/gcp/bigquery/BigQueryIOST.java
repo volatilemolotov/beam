@@ -171,7 +171,7 @@ public final class BigQueryIOST extends IOStressTestBase {
                   Configuration.class),
               "large",
               Configuration.fromJsonString(
-                  "{\"numColumns\":10,\"rowsPerSecond\":50000,\"minutes\":60,\"numRecords\":5000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":120,\"runner\":\"DataflowRunner\"}",
+                  "{\"numColumns\":10,\"rowsPerSecond\":50000,\"minutes\":60,\"numRecords\":10000000,\"valueSizeBytes\":1000,\"pipelineTimeout\":120,\"runner\":\"DataflowRunner\"}",
                   Configuration.class));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -234,6 +234,9 @@ public final class BigQueryIOST extends IOStressTestBase {
         writeIO =
             BigQueryIO.<byte[]>write()
                 .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND)
+                .withoutValidation()
+                .optimizedWrites()
+                .withSuccessfulInsertsPropagation(false)
                 .withAvroFormatFunction(
                     new AvroFormatFn(
                         configuration.numColumns,
@@ -246,6 +249,8 @@ public final class BigQueryIOST extends IOStressTestBase {
             BigQueryIO.<byte[]>write()
                 .withWriteDisposition(BigQueryIO.Write.WriteDisposition.WRITE_APPEND)
                 .withSuccessfulInsertsPropagation(false)
+                .optimizedWrites()
+                .withoutValidation()
                 .withFormatFunction(new JsonFormatFn(configuration.numColumns));
         break;
     }
@@ -290,6 +295,8 @@ public final class BigQueryIOST extends IOStressTestBase {
                 .withSchema(schema)
                 .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
 
+    String experiments = method.equals(BigQueryIO.Write.Method.STORAGE_API_AT_LEAST_ONCE)
+        ? "streaming_mode_at_least_once" : GcpOptions.STREAMING_ENGINE_EXPERIMENT;
     PipelineLauncher.LaunchConfig options =
         PipelineLauncher.LaunchConfig.builder("write-bigquery")
             .setSdk(PipelineLauncher.Sdk.JAVA)
@@ -301,7 +308,7 @@ public final class BigQueryIOST extends IOStressTestBase {
                     .toString())
             .addParameter("numWorkers", String.valueOf(configuration.numWorkers))
             .addParameter("maxNumWorkers", String.valueOf(configuration.maxNumWorkers))
-            .addParameter("experiments", GcpOptions.STREAMING_ENGINE_EXPERIMENT)
+            .addParameter("experiments", experiments)
             .build();
 
     PipelineLauncher.LaunchInfo launchInfo = pipelineLauncher.launch(project, region, options);
