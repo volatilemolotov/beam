@@ -297,8 +297,8 @@ public final class BigQueryIOST extends IOStressTestBase {
                 .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
 
     String experiments = method.equals(BigQueryIO.Write.Method.STORAGE_API_AT_LEAST_ONCE)
-        ? GcpOptions.STREAMING_ENGINE_EXPERIMENT + ",streaming_mode_at_least_once"
-            : GcpOptions.STREAMING_ENGINE_EXPERIMENT;
+        ? GcpOptions.STREAMING_ENGINE_EXPERIMENT + ",streaming_mode_at_least_once,use_runner_v2"
+            : GcpOptions.STREAMING_ENGINE_EXPERIMENT + ",use_runner_v2";
     PipelineLauncher.LaunchConfig options =
         PipelineLauncher.LaunchConfig.builder("write-bigquery")
             .setSdk(PipelineLauncher.Sdk.JAVA)
