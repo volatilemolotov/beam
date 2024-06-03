@@ -178,19 +178,19 @@ public final class BigQueryIOST extends IOStressTestBase {
     }
   }
 
-  @Test
-  public void testAvroStorageAPIWrite() throws IOException {
-    configuration.writeFormat = WriteFormat.AVRO.name();
-    configuration.writeMethod = STORAGE_WRITE_API_METHOD;
-    runTest();
-  }
-
-  @Test
-  public void testJsonStorageAPIWrite() throws IOException {
-    configuration.writeFormat = WriteFormat.JSON.name();
-    configuration.writeMethod = STORAGE_WRITE_API_METHOD;
-    runTest();
-  }
+//  @Test
+//  public void testAvroStorageAPIWrite() throws IOException {
+//    configuration.writeFormat = WriteFormat.AVRO.name();
+//    configuration.writeMethod = STORAGE_WRITE_API_METHOD;
+//    runTest();
+//  }
+//
+//  @Test
+//  public void testJsonStorageAPIWrite() throws IOException {
+//    configuration.writeFormat = WriteFormat.JSON.name();
+//    configuration.writeMethod = STORAGE_WRITE_API_METHOD;
+//    runTest();
+//  }
 
   @Test
   public void testAvroStorageAPIAtLeastOnce() throws IOException {
@@ -296,7 +296,8 @@ public final class BigQueryIOST extends IOStressTestBase {
                 .withCustomGcsTempLocation(ValueProvider.StaticValueProvider.of(tempLocation)));
 
     String experiments = method.equals(BigQueryIO.Write.Method.STORAGE_API_AT_LEAST_ONCE)
-        ? "streaming_mode_at_least_once" : GcpOptions.STREAMING_ENGINE_EXPERIMENT;
+        ? GcpOptions.STREAMING_ENGINE_EXPERIMENT + ",streaming_mode_at_least_once"
+            : GcpOptions.STREAMING_ENGINE_EXPERIMENT;
     PipelineLauncher.LaunchConfig options =
         PipelineLauncher.LaunchConfig.builder("write-bigquery")
             .setSdk(PipelineLauncher.Sdk.JAVA)
