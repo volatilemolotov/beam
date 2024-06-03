@@ -61,6 +61,7 @@ jobs:
       - name: Install golangci-lint
         run: |
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.59.0
+          sudo cp ./bin/golanci-lint /usr/bin
       - name: Set up Cloud SDK and its components
         uses: google-github-actions/setup-gcloud@v0
         with:
