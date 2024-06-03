@@ -69,4 +69,4 @@ jobs:
       - name: Run PreCommit
         uses: ./.github/actions/gradle-command-self-hosted-action
         with:
-          gradle-command: :playground:backend:precommit --info
+          gradle-command: :playground:backend:precommit --debug
