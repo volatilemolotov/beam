@@ -81,6 +81,7 @@ import org.junit.Test;
  */
 public final class BigQueryIOST extends IOStressTestBase {
 
+  private static final String READ_ELEMENT_METRIC_NAME = "read_count";
   private static final String STORAGE_WRITE_API_METHOD = "STORAGE_WRITE_API";
   private static final String STORAGE_API_AT_LEAST_ONCE_METHOD = "STORAGE_API_AT_LEAST_ONCE";
 
@@ -286,6 +287,7 @@ public final class BigQueryIOST extends IOStressTestBase {
     }
     source
         .apply("Extract values", Values.create())
+        .apply("Counting element", ParDo.of(new CountingFn<>(READ_ELEMENT_METRIC_NAME)))
         .apply(
             "Write to BQ",
             writeIO
@@ -319,22 +321,24 @@ public final class BigQueryIOST extends IOStressTestBase {
     // Fail the test if pipeline failed.
     assertNotEquals(PipelineOperator.Result.LAUNCH_FAILED, result);
 
+    String metricsName = configuration.writeMethod.equals(STORAGE_API_AT_LEAST_ONCE_METHOD)
+            ? "recordsAppended" : READ_ELEMENT_METRIC_NAME;
     // check metrics
     double numRecords =
         pipelineLauncher.getMetric(
             project,
             region,
             launchInfo.jobId(),
-            getBeamMetricsName(PipelineMetricsType.COUNTER, "recordsAppended"));
+            getBeamMetricsName(PipelineMetricsType.COUNTER, metricsName));
     Long rowCount = resourceManager.getRowCount(tableName);
     System.err.println("ROW COUNT :" + rowCount);
 
     // Depending on writing method there might be duplicates on different sides (read or write).
-//    if (configuration.writeMethod.equals(STORAGE_API_AT_LEAST_ONCE_METHOD)) {
-    assertTrue(rowCount >= numRecords);
-//    } else {
-//      assertTrue(numRecords >= rowCount);
-//    }
+    if (configuration.writeMethod.equals(STORAGE_API_AT_LEAST_ONCE_METHOD)) {
+      assertTrue(rowCount >= numRecords);
+    } else {
+      assertTrue(numRecords >= rowCount);
+    }
 
     // export metrics
     MetricsConfiguration metricsConfig =
