@@ -81,7 +81,6 @@ import org.junit.Test;
  */
 public final class BigQueryIOST extends IOStressTestBase {
 
-  private static final String READ_ELEMENT_METRIC_NAME = "read_count";
   private static final String STORAGE_WRITE_API_METHOD = "STORAGE_WRITE_API";
   private static final String STORAGE_API_AT_LEAST_ONCE_METHOD = "STORAGE_API_AT_LEAST_ONCE";
 
