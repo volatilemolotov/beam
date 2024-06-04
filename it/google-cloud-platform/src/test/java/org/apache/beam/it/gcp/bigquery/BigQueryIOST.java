@@ -327,14 +327,14 @@ public final class BigQueryIOST extends IOStressTestBase {
             launchInfo.jobId(),
             getBeamMetricsName(PipelineMetricsType.COUNTER, "recordsAppended"));
     Long rowCount = resourceManager.getRowCount(tableName);
+    System.err.println("ROW COUNT :" + rowCount);
 
     // Depending on writing method there might be duplicates on different sides (read or write).
-    if (configuration.writeMethod.equals(STORAGE_API_AT_LEAST_ONCE_METHOD)) {
-      System.err.println("ROW COUNT :" + rowCount);
-      assertTrue(rowCount >= numRecords);
-    } else {
-      assertTrue(numRecords >= rowCount);
-    }
+//    if (configuration.writeMethod.equals(STORAGE_API_AT_LEAST_ONCE_METHOD)) {
+    assertTrue(rowCount >= numRecords);
+//    } else {
+//      assertTrue(numRecords >= rowCount);
+//    }
 
     // export metrics
     MetricsConfiguration metricsConfig =
