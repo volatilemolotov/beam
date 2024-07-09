@@ -40,6 +40,7 @@ RUN go mod download &&\
 
 FROM maven:3.8.6-openjdk-11 as dep
 ARG BEAM_VERSION
+ARG BASE_REPO=apache
 RUN mvn archetype:generate \
     -DinteractiveMode=false \
     -DarchetypeGroupId=org.apache.beam \
@@ -52,7 +53,7 @@ WORKDIR /pipeline-dependencies/
 RUN mvn dependency:resolve && mvn dependency:go-offline &&  mvn -o dependency:list
 RUN mvn dependency:copy-dependencies
 
-FROM apache/beam_java11_sdk:$BEAM_VERSION
+FROM $BASE_REPO/beam_java11_sdk:$BEAM_VERSION
 
 ARG BEAM_VERSION
 ARG SPRING_VERSION=5.3.27

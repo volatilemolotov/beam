@@ -25,6 +25,7 @@ applyDockerNature()
 
 def playgroundJobServerProject = "${project.path.replace('-container', '')}"
 def default_beam_version = "2.44.0"
+def default_base_repo = "apache"
 description = project(playgroundJobServerProject).description + " :: Container"
 
 configurations {
@@ -74,11 +75,14 @@ docker {
    files "./build/"
    tags containerImageTags()
    buildArgs(
-         ['BEAM_VERSION' : project.rootProject.hasProperty(["sdk-tag"]) ?
+         [ 'BASE_REPO'    : project.rootProject.hasProperty(["base-repo"]) ?
+               project.rootProject["base-repo"] :
+               default_base_repo,
+           'BEAM_VERSION' : project.rootProject.hasProperty(["sdk-tag"]) ?
                project.rootProject["sdk-tag"] :
                default_beam_version,
-          'GIT_COMMIT'   : getGitCommitHash(),
-          'GIT_TIMESTAMP': getGitCommitTimestamp()])
+          'GIT_COMMIT'    : getGitCommitHash(),
+          'GIT_TIMESTAMP' : getGitCommitTimestamp()])
 }
 
 // Ensure that we build the required resources and copy and file dependencies from related projects
