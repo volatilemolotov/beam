@@ -99,14 +99,17 @@ apt install -y apt-transport-https ca-certificates software-properties-common cu
 add-apt-repository -y ppa:deadsnakes/ppa > /dev/null 2>&1 && apt update > /dev/null 2>&1
 apt install -y python3.8 python3.8-distutils python3-pip > /dev/null 2>&1
 apt install -y --reinstall python3.8-distutils > /dev/null 2>&1
-pip install --upgrade google-api-python-client --break-system-packages
+apt install -y python3.8-venv 
+python3.8 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade google-api-python-client > /dev/null 2>&1
 python3.8 -m pip install pip --upgrade > /dev/null 2>&1
 ln -s /usr/bin/python3.8 /usr/bin/python > /dev/null 2>&1
 apt install -y python3.8-venv > /dev/null 2>&1
 
 LogOutput "Installing Python packages from beam/playground/infrastructure/requirements.txt"
 cd $BEAM_ROOT_DIR
-pip install -r playground/infrastructure/requirements.txt --break-system-packages
+pip install -r playground/infrastructure/requirements.txt
 
 LogOutput "Looking for files changed by the merge commit $MERGE_COMMIT"
 git fetch origin $MERGE_COMMIT
