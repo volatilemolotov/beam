@@ -37,6 +37,12 @@ export BEAM_CONCURRENCY=${BEAM_CONCURRENCY-2}
 export SDKS=${SDKS-"java python go"}
 export FORCE_CD=${FORCE_CD-'false'}
 
+
+python3.8 -m venv tmpvenv
+source tmpvenv/bin/activate
+
+exit 0
+
 # Playground FQDN
 if [[ -z "${DNS_NAME}" ]]; then
   echo "DNS_NAME is empty or not set. Exiting"
@@ -99,8 +105,7 @@ apt install -y apt-transport-https ca-certificates software-properties-common cu
 add-apt-repository -y ppa:deadsnakes/ppa > /dev/null 2>&1 && apt update > /dev/null 2>&1
 apt install -y python3.8 python3.8-distutils python3-pip > /dev/null 2>&1
 apt install -y --reinstall python3.8-distutils > /dev/null 2>&1
-python3.8 -m venv tmpvenv
-source tmpvenv/bin/activate
+
 pip install --upgrade google-api-python-client > /dev/null 2>&1
 python3.8 -m pip install pip --upgrade > /dev/null 2>&1
 ln -s /usr/bin/python3.8 /usr/bin/python > /dev/null 2>&1
