@@ -17,7 +17,7 @@ name: Playground PreCommit
 
 on:
   workflow_dispatch:
-  pull_request:
+  pull_request_target:
     paths:
       - .github/workflows/playground_backend_precommit.yml
       - playground/backend/**
@@ -28,9 +28,18 @@ env:
   GRADLE_ENTERPRISE_CACHE_PASSWORD: ${{ secrets.GE_CACHE_PASSWORD }}
 
 jobs:
-  precommit_check:
-    name: precommit-check
-    runs-on: ubuntu-latest
+  beam_Playground_PreCommit:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'pull_request_target' ||
+      github.event.comment.body == 'Run Playground PreCommit'
+    name: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
+    runs-on: [self-hosted, ubuntu-20.04, main]
+    strategy:
+      fail-fast: false
+      matrix:
+        job_name: [beam_Playground_PreCommit]
+        job_phrase: [Run Playground PreCommit]
     env:
       DATASTORE_EMULATOR_VERSION: '423.0.0'
       PYTHON_VERSION: '3.9'
