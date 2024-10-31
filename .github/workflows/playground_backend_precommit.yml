@@ -45,9 +45,13 @@ jobs:
       PYTHON_VERSION: '3.9'
       JAVA_VERSION: '11'
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-      
+      - uses: actions/checkout@v4
+      - name: Setup repository
+        uses: ./.github/actions/setup-action
+        with:
+          comment_phrase: ${{ matrix.job_phrase }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_job: ${{ matrix.job_name }} (${{ matrix.job_phrase }})
       - name: Setup environment
         uses: ./.github/actions/setup-environment-action
         with:
@@ -67,7 +71,7 @@ jobs:
           sudo chmod 644 /etc/apt/trusted.gpg.d/scalasbt-release.gpg
           sudo apt-get update --yes
           sudo apt-get install sbt --yes
-          sudo wget https://codeload.github.com/spotify/scio.g8/zip/7c1ba7c1651dfd70976028842e721da4107c0d6d -O scio.g8.zip && unzip scio.g8.zip && mv scio.g8-7c1ba7c1651dfd70976028842e721da4107c0d6d /opt/scio.g8
+          sudo wget https://codeload.github.com/spotify/scio.g8/zip/7c1ba7c1651dfd70976028842e721da4107c0d6d -O scio.g8.zip && unzip scio.g8.zip && sudo mv scio.g8-7c1ba7c1651dfd70976028842e721da4107c0d6d /opt/scio.g8
       - name: Set up Cloud SDK and its components
         uses: google-github-actions/setup-gcloud@v2
         with:
